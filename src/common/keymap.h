@@ -238,7 +238,7 @@ enum class Keyboard : unsigned
 };
 inline constexpr size_t keyboardKeyCount = static_cast<size_t>(Keyboard::K_COUNT);
 
-inline const char* keyboardNameMap[keyboardKeyCount]{
+inline const char* keyboardNameMap[]{
     "", // ERROR
 
     "ESC",
@@ -372,7 +372,13 @@ inline const char* keyboardNameMap[keyboardKeyCount]{
 
     // ISO
     "NONUS_BACKSLASH",
+
+    // scancodes with mask (e0)
+    "NUM_SLASH",
+    "NUM_STAR",
+    "NUM_ENTER"
 };
+static_assert(sizeof(keyboardNameMap) / sizeof(keyboardNameMap[0]) == keyboardKeyCount);
 
 enum class JoystickAxis
 {
