@@ -52,9 +52,7 @@ void SceneSelect::imguiInit()
     imguiRefreshProfileList();
     old_profile_index = imgui_profile_index;
 
-    std::string playerName = ConfigMgr::get('P', cfg::P_PLAYERNAME, "Unnamed");
-    strncpy(imgui_player_name_buf, playerName.c_str(),
-            std::max(sizeof(imgui_player_name_buf) - 1, playerName.length()));
+    lunaticvibes::assign(imgui_player_name_buf, ConfigMgr::get('P', cfg::P_PLAYERNAME, "Unnamed"));
 
     imguiRefreshLanguageList();
     old_language_index = imgui_language_index;
