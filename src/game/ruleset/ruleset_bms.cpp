@@ -462,8 +462,10 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 {
     // Older reference: https://github.com/aeventyr/LR2GAS_pub
     // Health gain later updated from LR2 disassembly.
-    // Note that regarding gauge lr2oraja is wrong.
     // HARD and GATTACK have additional multipliers applied elsewhere.
+    //
+    // ASSISTEASY and EXHARD match lr2oraja.
+    // https://github.com/wcko87/lr2oraja/blob/4e9df9a5394561a1c24fe48d52c1c6539de559f3/src/bms/player/beatoraja/play/GaugeProperty.java
 
     _gauge = get_gauge(gauge);
 
@@ -514,16 +516,15 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 
     case GaugeType::EXHARD:
         //_basic.health             = 1.0;
-        // TODO: match lr2oraja?
         _minHealth = 0;
         _clearHealth = 0;
         _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 1.0 / 1001.0;
-        _healthGain[JudgeType::GREAT] = 1.0 / 1001.0;
-        _healthGain[JudgeType::GOOD] = 1.0 / 1001.0 / 2;
+        _healthGain[JudgeType::PERFECT] = 0.001;
+        _healthGain[JudgeType::GREAT] = 0.001;
+        _healthGain[JudgeType::GOOD] = 0.001 / 2;
         _healthGain[JudgeType::BAD] = -0.12;
         _healthGain[JudgeType::MISS] = -0.2;
-        _healthGain[JudgeType::KPOOR] = -0.1;
+        _healthGain[JudgeType::KPOOR] = -0.02;
         break;
 
     case GaugeType::DEATH:
@@ -591,7 +592,6 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 
     case GaugeType::ASSIST:
         //_basic.health             = 0.2;
-        // TODO: match lr2oraja?
         _minHealth = 0.02;
         _clearHealth = 0.6;
         _healthGain[JudgeType::PERFECT] = 0.01 * total / noteCount * 1.2;
