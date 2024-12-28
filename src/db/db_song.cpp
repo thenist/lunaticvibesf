@@ -2,24 +2,20 @@
 
 #include <algorithm>
 #include <atomic>
-#include <functional>
 #include <thread>
 #include <vector>
 
-#include "common/chartformat/chartformat_types.h"
-#include "common/hash.h"
-#include "common/log.h"
-#include "common/sysutil.h"
-#include "common/u8.h"
-#include "common/utils.h"
-#include "game/chart/chart_types.h"
 #include <common/assert.h>
+#include <common/chartformat/chartformat_types.h>
+#include <common/hash.h>
+#include <common/log.h>
+#include <common/sysutil.h>
+#include <common/thread_pool.h>
+#include <common/u8.h>
+#include <common/utils.h>
+#include <game/chart/chart_types.h>
 
 #include <re2/re2.h>
-
-#define BOOST_ASIO_NO_EXCEPTIONS
-#include <boost/asio/post.hpp>
-#include <boost/asio/thread_pool.hpp>
 
 // TODO: NOT NULL everything.
 const char* CREATE_FOLDER_TABLE_STR = "CREATE TABLE IF NOT EXISTS folder( "
@@ -190,8 +186,6 @@ SongDB::SongDB(const char* path) : SQLite(path, "SONG")
     if (exec("PRAGMA cache_size = -512000") != SQLITE_OK)
         lunaticvibes::verify_failed(("[SongDB] Set cache_size: " + std::string{errmsg()}).c_str());
 
-    poolThreadCount = std::thread::hardware_concurrency() - 1;
-
     if (exec(CREATE_FOLDER_TABLE_STR) != SQLITE_OK)
         lunaticvibes::assert_failed(("[SongDB] Create table folder: " + std::string{errmsg()}).c_str());
     if (query("SELECT parent FROM folder WHERE pathmd5=?", {ROOT_FOLDER_HASH.hexdigest()}).empty())
@@ -214,17 +208,13 @@ SongDB::SongDB(const char* path) : SQLite(path, "SONG")
         lunaticvibes::assert_failed(("[SongDB] Create gamemode index for song: " + std::string{errmsg()}).c_str());
 }
 
-SongDB::~SongDB()
-{
-    if (threadPool)
-    {
-        delete (boost::asio::thread_pool*)threadPool;
-        threadPool = nullptr;
-    }
-}
+SongDB::~SongDB() = default;
 
-bool SongDB::addChart(const HashMD5& folder, const Path& path)
+bool SongDB::asyncAddChartTask(const HashMD5& folder, const Path& path)
 {
+    if (_asyncLoadStopRequested)
+        return false;
+
     auto closure = [&]() -> bool {
         decltype(path.filename().u8string()) filename;
         try
@@ -695,20 +685,10 @@ int SongDB::removeFolder(const HashMD5& hash, bool removeSong)
 
 void SongDB::waitLoadingFinish()
 {
-    if (threadPool)
-    {
-        LOG_DEBUG << "[SongDB] Waiting for all loading threads...";
-
-        // wait for all tasks
-        boost::asio::thread_pool& pool = *(boost::asio::thread_pool*)threadPool;
-        pool.join();
-
-        LOG_DEBUG << "[SongDB] All loading threads finished, continue";
-
-        // The old pool is not valid anymore, removing
-        delete (boost::asio::thread_pool*)threadPool;
-        threadPool = nullptr;
-    }
+    LOG_DEBUG << "[SongDB] Waiting for all loading threads...";
+    while (_asyncLoadJobs != _asyncLoadJobsDone)
+        std::this_thread::yield();
+    LOG_DEBUG << "[SongDB] All loading threads finished, continue";
 }
 
 int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& parentHash)
@@ -751,7 +731,7 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
     bool isSongFolder = false;
     for (const auto& f : fs::directory_iterator(path))
     {
-        if (stopRequested)
+        if (_asyncLoadStopRequested)
             break;
 
         if (analyzeChartType(f) != eChartFormat::UNKNOWN)
@@ -764,7 +744,7 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
     std::vector<Path> subFolderList;
     for (const auto& f : fs::directory_iterator(path))
     {
-        if (stopRequested)
+        if (_asyncLoadStopRequested)
             break;
 
         if (!isSongFolder && fs::is_directory(f))
@@ -774,20 +754,15 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
         else if (isSongFolder && analyzeChartType(f) != eChartFormat::UNKNOWN)
         {
             addChartTaskCount++;
-
-            if (!threadPool)
-            {
-                threadPool = (void*)new boost::asio::thread_pool(poolThreadCount);
-            }
-            boost::asio::thread_pool& pool = *(boost::asio::thread_pool*)threadPool;
-            boost::asio::post(pool, std::bind_front(&SongDB::addChart, this, hash, f));
+            _asyncLoadJobs++;
+            lunaticvibes::post_job(_asyncLoadJobsDone, std::bind_front(&SongDB::asyncAddChartTask, this, hash, f));
             ++count;
         }
     }
 
     for (const auto& sub : subFolderList)
     {
-        if (stopRequested)
+        if (_asyncLoadStopRequested)
             break;
 
         int addedCount = addSubFolder(sub, hash);
@@ -909,18 +884,11 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
                             std::back_inserter(newFiles));
         for (auto& p : newFiles)
         {
-            if (stopRequested)
-            {
+            if (_asyncLoadStopRequested)
                 break;
-            }
             addChartTaskCount++;
-
-            if (!threadPool)
-            {
-                threadPool = (void*)new boost::asio::thread_pool(poolThreadCount);
-            }
-            boost::asio::thread_pool& pool = *(boost::asio::thread_pool*)threadPool;
-            boost::asio::post(pool, std::bind_front(&SongDB::addChart, this, hash, p));
+            _asyncLoadJobs++;
+            lunaticvibes::post_job(_asyncLoadJobsDone, std::bind_front(&SongDB::asyncAddChartTask, this, hash, p));
             count++;
         }
 
@@ -983,10 +951,8 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
         std::vector<Path> subFolders;
         for (auto& f : fs::directory_iterator(path))
         {
-            if (stopRequested)
-            {
+            if (_asyncLoadStopRequested)
                 break;
-            }
             if (fs::is_directory(f))
             {
                 int addedCount = addSubFolder(f, hash);
@@ -1253,15 +1219,5 @@ void SongDB::resetAddSummary()
 
 void SongDB::stopLoading()
 {
-    if (threadPool)
-    {
-        // stop all tasks
-        boost::asio::thread_pool& pool = *(boost::asio::thread_pool*)threadPool;
-        pool.stop();
-
-        // The old pool is not valid anymore, removing
-        delete (boost::asio::thread_pool*)threadPool;
-        threadPool = nullptr;
-    }
-    stopRequested = true;
+    _asyncLoadStopRequested = true;
 }

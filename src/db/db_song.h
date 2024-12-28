@@ -35,7 +35,7 @@ public:
     SongDB& operator=(SongDB&) = delete;
 
 protected:
-    bool addChart(const HashMD5& folder, const Path& path);
+    bool asyncAddChartTask(const HashMD5& folder, const Path& path);
     bool removeChart(const Path& path, const HashMD5& parent);
     bool removeChart(const HashMD5& md5, const HashMD5& parent);
 
@@ -82,9 +82,9 @@ public:
     std::shared_ptr<EntryFolderSong> browseSong(const HashMD5& root);
     std::shared_ptr<EntryFolderRegular> search(const HashMD5& root, const std::string& key);
 
-private:
-    void* threadPool = nullptr;
-    int poolThreadCount = 4;
+    std::atomic<bool> _asyncLoadStopRequested = false;
+    std::atomic<size_t> _asyncLoadJobs = 0;
+    std::atomic<size_t> _asyncLoadJobsDone = 0;
 
 public:
     std::atomic<int> addChartTaskCount = 0;
@@ -97,6 +97,5 @@ public:
     std::string addCurrentPath;
     void resetAddSummary();
 
-    bool stopRequested = false;
     void stopLoading();
 };

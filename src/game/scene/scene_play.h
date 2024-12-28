@@ -7,23 +7,24 @@
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_mgr.h>
 
+#include <atomic>
 #include <future>
 #include <memory>
-
-enum class ePlayState
-{
-    PREPARE,
-    LOADING,
-    LOAD_END,
-    PLAYING,
-    FAILED,
-    FADEOUT,
-    WAIT_ARENA,
-};
 
 class ScenePlay : public SceneBase
 {
 public:
+    enum class ePlayState
+    {
+        PREPARE,
+        LOADING,
+        LOAD_END,
+        PLAYING,
+        FAILED,
+        FADEOUT,
+        WAIT_ARENA,
+    };
+
     explicit ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr);
     ~ScenePlay() override;
 

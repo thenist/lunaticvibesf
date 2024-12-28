@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -15,6 +16,7 @@
 #include <common/entry/entry_song.h>
 #include <common/entry/entry_types.h>
 #include <common/str_utils.h>
+#include <common/thread_pool.h>
 #include <common/utils.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
@@ -3320,14 +3322,15 @@ void SceneSelect::updatePreview()
                         return false;
                     };
 
-                    boost::asio::thread_pool pool(std::max(1u, std::thread::hardware_concurrency() - 2));
+                    std::atomic<size_t> jobs;
+                    std::atomic<size_t> jobs_done;
                     for (size_t i = 0; i < bms->wavFiles.size(); ++i)
                     {
                         const auto& wav = bms->wavFiles[i];
                         if (wav.empty())
                             continue;
-
-                        boost::asio::post(pool, [&, i]() {
+                        jobs++;
+                        lunaticvibes::post_job(jobs_done, [&, i]() {
                             if (shouldDiscard(*this, bms))
                                 return;
                             Path pWav = PathFromUTF8(wav);
@@ -3343,7 +3346,9 @@ void SceneSelect::updatePreview()
                             SoundMgr::loadNoteSample(p, i);
                         });
                     }
-                    pool.wait();
+                    LOG_VERBOSE << "[Select] Waiting on " << jobs << " load jobs";
+                    while (jobs != jobs_done)
+                        std::this_thread::yield();
 
                     if (shouldDiscard(*this, bms))
                     {

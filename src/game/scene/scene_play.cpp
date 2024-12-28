@@ -1,5 +1,7 @@
 #include "scene_play.h"
+#include "common/thread_pool.h"
 
+#include <algorithm>
 #include <array>
 #include <functional>
 #include <future>
@@ -1141,8 +1143,8 @@ void ScenePlay::loadChart()
                 return;
             }
 
-            const auto thread_count = std::thread::hardware_concurrency();
-            boost::asio::thread_pool pool(thread_count > 2 ? thread_count : 1);
+            std::atomic<size_t> _asyncJobs;
+            std::atomic<size_t> _asyncJobsDone;
             for (size_t i = 0; i < _pChart->wavFiles.size(); ++i)
             {
                 if (shouldDiscard(*this))
@@ -1152,7 +1154,8 @@ void ScenePlay::loadChart()
                 if (wav.empty())
                     continue;
 
-                boost::asio::post(pool, [&, i]() {
+                _asyncJobs++;
+                lunaticvibes::post_job(_asyncJobsDone, [&, i]() {
                     if (shouldDiscard(*this))
                         return;
                     Path pWav = PathFromUTF8(wav);
@@ -1171,7 +1174,8 @@ void ScenePlay::loadChart()
                     ++gPlayContext.wavLoaded;
                 });
             }
-            pool.wait();
+            while (_asyncJobsDone != _asyncJobs)
+                std::this_thread::yield();
 
             if (shouldDiscard(*this))
             {

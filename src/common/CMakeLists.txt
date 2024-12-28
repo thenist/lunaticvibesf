@@ -13,6 +13,7 @@ add_library(
     hash.cpp
     log.cpp
     str_utils.cpp
+    thread_pool.cpp
     types.cpp
     utils.cpp
     keymap.cpp
