@@ -26,6 +26,7 @@ TEST(RulesetBmsReplay, SkipToEndWorks)
     EXPECT_EQ(rr.getJudgeCount(RulesetBMS::JudgeType::MISS), 0);
     EXPECT_EQ(rr.getJudgeCountEx(RulesetBMS::JUDGE_EARLY), 7);
     EXPECT_EQ(rr.getJudgeCountEx(RulesetBMS::JUDGE_LATE), 7);
+    EXPECT_EQ(rr.getGaugeType(), lunaticvibes::BmsGaugeType::EASY);
     const RulesetBase::BasicData data = rr.getData();
     EXPECT_EQ(data.play_time, (lunaticvibes::Time{4789, false})); // Scuffed number, it differs in each replay.
     EXPECT_DOUBLE_EQ(data.health, 1.0);
