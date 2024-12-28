@@ -25,7 +25,7 @@ ScenePreSelect::ScenePreSelect() : SceneBase(nullptr, SkinType::PRE_SELECT, 240)
 {
     _type = SceneType::PRE_SELECT;
 
-    _updateCallback = std::bind_front(&ScenePreSelect::updateLoadSongs, this);
+    _state = SceneState::LoadSongs;
 
     rootFolderProp = SongListProperties{{}, ROOT_FOLDER_HASH, "", {}, {}, 0};
 
@@ -88,7 +88,14 @@ void ScenePreSelect::_updateAsync()
         return;
     }
 
-    _updateCallback();
+    switch (_state)
+    {
+    case SceneState::LoadSongs: updateLoadSongs(); break;
+    case SceneState::LoadTables: updateLoadTables(); break;
+    case SceneState::LoadCourses: updateLoadCourses(); break;
+    case SceneState::UpdateScoreCache: updateUpdateScoreCache(); break;
+    case SceneState::Finish: loadFinished(); break;
+    }
 }
 
 void ScenePreSelect::updateLoadSongs()
@@ -98,17 +105,11 @@ void ScenePreSelect::updateLoadSongs()
         startedLoadSong = true;
         LOG_INFO << "[List] Start loading songs...";
 
-        // wait for Initializing... text to draw
-        pushAndWaitMainThreadTask<void>([] {});
-
-        // wait for another frame
-        pushAndWaitMainThreadTask<void>([] {});
+        // TODO: wait for Initializing... text to draw
 
         // load files
         loadSongEnd = std::async(std::launch::async, [this]() {
             textHint = i18n::s(i18nText::CHECKING_FOLDERS);
-
-            loadSongTimer = std::chrono::system_clock::now();
 
             // get folders from config
             const std::vector<Path> pathList = ConfigMgr::General()->getFoldersPath();
@@ -219,8 +220,7 @@ void ScenePreSelect::updateLoadSongs()
         loadSongEnd.get();
         LOG_INFO << "[List] Loading songs complete.";
         LOG_INFO << "[List] ------------------------------------------------------------";
-
-        _updateCallback = std::bind_front(&ScenePreSelect::updateLoadTables, this);
+        _state = SceneState::LoadTables;
     }
 }
 
@@ -332,8 +332,7 @@ void ScenePreSelect::updateLoadTables()
         loadTableEnd.get();
         LOG_INFO << "[List] Loading tables complete.";
         LOG_INFO << "[List] ------------------------------------------------------------";
-
-        _updateCallback = std::bind_front(&ScenePreSelect::updateLoadCourses, this);
+        _state = SceneState::LoadCourses;
     }
 }
 
@@ -412,8 +411,7 @@ void ScenePreSelect::updateLoadCourses()
         loadCourseEnd.get();
         LOG_INFO << "[List] Loading courses complete.";
         LOG_INFO << "[List] ------------------------------------------------------------";
-
-        _updateCallback = std::bind_front(&ScenePreSelect::updateUpdateScoreCache, this);
+        _state = SceneState::UpdateScoreCache;
     }
 }
 
@@ -438,15 +436,21 @@ void ScenePreSelect::updateUpdateScoreCache()
         updateScoreCacheEnd.get();
         LOG_INFO << "[List] Finished updating score cache";
         LOG_INFO << "[List] ------------------------------------------------------------";
-
-        _updateCallback = std::bind_front(&ScenePreSelect::loadFinished, this);
+        _state = SceneState::Finish;
     }
 }
 
 void ScenePreSelect::loadFinished()
 {
-    if (!loadingFinished)
+    // Allow a single frame with hint to get rendered as we may get stuck with this frame for a view seconds while the
+    // skin is loading.
+    bool ready = true;
+
+    if (!_preparedForFinish)
     {
+        _preparedForFinish = true;
+        ready = false;
+
         gSelectContext.backtrace.clear();
         gSelectContext.backtrace.push_front(rootFolderProp);
 
@@ -467,20 +471,17 @@ void ScenePreSelect::loadFinished()
                            .str();
             textHint2 = i18n::s(i18nText::PLEASE_WAIT);
         }
+    }
 
-        // wait for updated text to draw
-        pushAndWaitMainThreadTask<void>([] {});
-
-        // wait for another frame
-        pushAndWaitMainThreadTask<void>([] {});
-
+    if (ready && !_switchedScene)
+    {
         int maxFPS = ConfigMgr::get('V', cfg::V_MAXFPS, 480);
         if (maxFPS < 30 && maxFPS != 0)
             maxFPS = 30;
         graphics_set_maxfps(maxFPS);
 
         gNextScene = SceneType::SELECT;
-        loadingFinished = true;
+        _switchedScene = true;
     }
 }
 
@@ -512,5 +513,5 @@ void ScenePreSelect::updateImgui()
 
 bool ScenePreSelect::isLoadingFinished() const
 {
-    return loadingFinished;
+    return _switchedScene;
 }

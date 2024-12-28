@@ -10,9 +10,17 @@ public:
 
 protected:
     // Looper callbacks
+    enum class SceneState
+    {
+        LoadSongs,
+        LoadTables,
+        LoadCourses,
+        UpdateScoreCache,
+        Finish,
+    };
+    SceneState _state;
     bool readyToStopAsync() const override;
     void _updateAsync() override;
-    std::function<void()> _updateCallback;
 
     void updateLoadSongs();
     void updateLoadTables();
@@ -29,7 +37,6 @@ protected:
     bool startedLoadTable = false;
     bool startedLoadCourse = false;
     bool startedUpdateScoreCache = false;
-    std::chrono::system_clock::time_point loadSongTimer;
     std::future<void> loadSongEnd;
     std::future<void> loadTableEnd;
     std::future<void> loadCourseEnd;
@@ -37,7 +44,9 @@ protected:
     int prevChartLoaded = 0;
     std::string textHint;
     std::string textHint2;
-    bool loadingFinished = false;
+
+    bool _preparedForFinish = false;
+    bool _switchedScene = false;
 
 public:
     bool isLoadingFinished() const;
