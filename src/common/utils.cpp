@@ -33,12 +33,6 @@
 #include <common/types.h>
 #include <common/u8.h>
 
-static const std::pair<RE2, re2::StringPiece> path_replace_pattern[]{
-    {R"(\\)", R"(\\\\)"}, {R"(\.)", R"(\\.)"}, {R"(\^)", R"(\\^)"}, {R"(\$)", R"(\\$)"},     {R"(\|)", R"(\\|)"},
-    {R"(\()", R"(\\()"},  {R"(\))", R"(\\))"}, {R"(\{)", R"(\\{)"}, {R"(\{)", R"(\\{)"},     {R"(\[)", R"(\\[)"},
-    {R"(\])", R"(\\])"},  {R"(\+)", R"(\\+)"}, {R"(\/)", R"(\\/)"}, {R"(\?)", R"([^\\\\])"}, {R"(\*)", R"([^\\\\]*)"},
-};
-
 std::vector<Path> findFiles(Path p, bool recursive)
 {
     LOG_VERBOSE << "[Utils] findFiles: '" << p << "' (" << (recursive ? "" : "non-") << "recursive)";
@@ -58,6 +52,13 @@ std::vector<Path> findFiles(Path p, bool recursive)
     {
         pstr =
             pstr.substr(pstr[folder.length() - 1] == Path::preferred_separator ? folder.length() : folder.length() + 1);
+
+        static const std::pair<RE2, re2::StringPiece> path_replace_pattern[]{
+            {R"(\\)", R"(\\\\)"}, {R"(\.)", R"(\\.)"},     {R"(\^)", R"(\\^)"},      {R"(\$)", R"(\\$)"},
+            {R"(\|)", R"(\\|)"},  {R"(\()", R"(\\()"},     {R"(\))", R"(\\))"},      {R"(\{)", R"(\\{)"},
+            {R"(\{)", R"(\\{)"},  {R"(\[)", R"(\\[)"},     {R"(\])", R"(\\])"},      {R"(\+)", R"(\\+)"},
+            {R"(\/)", R"(\\/)"},  {R"(\?)", R"([^\\\\])"}, {R"(\*)", R"([^\\\\]*)"},
+        };
 
         std::string str = lunaticvibes::u8str(pstr);
         for (const auto& [in, out] : path_replace_pattern)
