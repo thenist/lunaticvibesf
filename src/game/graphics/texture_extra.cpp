@@ -425,9 +425,8 @@ void TextureBmsBga::reset()
     }
 
     auto resetSub = [this](decltype(baseSlot)& slot) {
-        for (auto it = slot.begin(); it != slot.end(); ++it) // search from beginning
+        for (auto [time, idx] : slot) // search from beginning
         {
-            auto [time, idx] = *it;
             if (objs[idx].type == obj::Ty::VIDEO)
             {
                 auto pt = std::reinterpret_pointer_cast<TextureVideo>(objs[idx].pt);
@@ -464,9 +463,8 @@ void TextureBmsBga::setLoaded()
 void TextureBmsBga::stopUpdate()
 {
     auto resetSub = [this](decltype(baseSlot)& slot) {
-        for (auto it = slot.begin(); it != slot.end(); ++it) // search from beginning
+        for (auto [time, idx] : slot) // search from beginning
         {
-            auto [time, idx] = *it;
             if (objs[idx].type == obj::Ty::VIDEO)
             {
                 auto pt = std::reinterpret_pointer_cast<TextureVideo>(objs[idx].pt);
@@ -484,9 +482,8 @@ void TextureBmsBga::stopUpdate()
 void TextureBmsBga::setVideoSpeed()
 {
     auto setSpeed = [this](decltype(baseSlot)& slot) {
-        for (auto it = slot.begin(); it != slot.end(); ++it) // search from beginning
+        for (auto [time, idx] : slot) // search from beginning
         {
-            auto [time, idx] = *it;
             if (objs[idx].type == obj::Ty::VIDEO)
             {
                 auto pt = std::reinterpret_pointer_cast<TextureVideo>(objs[idx].pt);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <filesystem>
 #include <functional>
 #include <span>
 #include <stdexcept>
@@ -55,9 +56,9 @@ public:
 
     static constexpr size_t length() { return Len; }
     // TODO: remove this and use std::optional<Hash> where needed.
-    constexpr bool empty() const { return !set; }
-    std::string hexdigest() const { return lunaticvibes::bin2hex({data, Len}); }
-    constexpr const unsigned char* hex() const { return data; }
+    [[nodiscard]] constexpr bool empty() const { return !set; }
+    [[nodiscard]] std::string hexdigest() const { return lunaticvibes::bin2hex({data, Len}); }
+    [[nodiscard]] constexpr const unsigned char* hex() const { return data; }
     void reset()
     {
         set = false;

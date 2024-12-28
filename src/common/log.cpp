@@ -30,7 +30,7 @@ namespace plog
 class TxtFormatterFileLine
 {
 public:
-    static util::nstring header() { return util::nstring(); }
+    static util::nstring header() { return {}; }
 
     static util::nstring format(const Record& record)
     {

@@ -142,7 +142,7 @@ void panel_switch(int idx, int plus)
 {
     if (idx < 1 || idx > 9)
         return;
-    IndexSwitch panel = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + idx);
+    auto panel = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + idx);
     lunaticvibes::Time t{};
 
     // close other panels
@@ -150,7 +150,7 @@ void panel_switch(int idx, int plus)
     {
         if (i == idx)
             continue;
-        IndexSwitch p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
+        auto p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
         if (State::get(p))
         {
             State::set(p, false);
@@ -372,8 +372,8 @@ void fx_type(int idx, int plus)
 
     if (State::get(sw))
     {
-        float p1 = float(State::get(sli_p1));
-        float p2 = float(State::get(sli_p2));
+        auto p1 = float(State::get(sli_p1));
+        auto p2 = float(State::get(sli_p2));
         update_fx(val, idx, ch, p1, p2);
     }
     else
@@ -399,8 +399,8 @@ void fx_switch(int idx, int plus)
     {
         // button clicked, open fx
         State::set(sw, true);
-        float p1 = float(State::get(sli_p1));
-        float p2 = float(State::get(sli_p2));
+        auto p1 = float(State::get(sli_p1));
+        auto p2 = float(State::get(sli_p2));
         update_fx(State::get(op), idx, ch, p1, p2);
     }
 }
@@ -427,8 +427,8 @@ void fx_target(int idx, int plus)
         default: break;
         }
 
-        float p1 = float(State::get(sli_p1));
-        float p2 = float(State::get(sli_p2));
+        auto p1 = float(State::get(sli_p1));
+        auto p2 = float(State::get(sli_p2));
         State::set(num_p1, static_cast<int>(p1 * 100));
         State::set(num_p2, static_cast<int>(p2 * 100));
         update_fx(State::get(op), idx, ch, p1, p2);

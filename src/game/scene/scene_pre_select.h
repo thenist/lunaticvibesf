@@ -28,7 +28,7 @@ protected:
     void updateUpdateScoreCache();
     void loadFinished();
 
-    bool shouldShowImgui() const override;
+    [[nodiscard]] bool shouldShowImgui() const override;
     void updateImgui() override;
 
 protected:
@@ -49,5 +49,5 @@ protected:
     bool _switchedScene = false;
 
 public:
-    bool isLoadingFinished() const;
+    [[nodiscard]] bool isLoadingFinished() const;
 };

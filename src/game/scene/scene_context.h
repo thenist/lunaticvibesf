@@ -167,8 +167,8 @@ double getBgaLoadProgress();
 
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef std::pair<std::shared_ptr<EntryBase>, std::shared_ptr<ScoreBase>> Entry;
-typedef std::vector<Entry> EntryList;
+using Entry = std::pair<std::shared_ptr<EntryBase>, std::shared_ptr<ScoreBase>>;
+using EntryList = std::vector<Entry>;
 
 struct SongListProperties
 {
@@ -207,9 +207,9 @@ struct SelectContextParams
     std::shared_mutex _mutex;
     std::list<SongListProperties> backtrace;
     EntryList entries;
-    size_t selectedEntryIndex = 0; // current selected entry index
-    size_t highlightBarIndex = 0;  // highlighted bar index
-    bool draggingListSlider = 0;   // is dragging slider
+    size_t selectedEntryIndex = 0;   // current selected entry index
+    size_t highlightBarIndex = 0;    // highlighted bar index
+    bool draggingListSlider = false; // is dragging slider
 
     size_t cursorClick = 0;    // click bar
     int cursorClickScroll = 0; // -1: scroll up / 1: scroll down / 2: decide

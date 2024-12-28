@@ -91,10 +91,10 @@ class SkinLR2;
 //      BODY -> [sprite] -> TITLE/LEVEL/LAMP/RANK/etc.
 class SpriteBarEntry : public SpriteBase, public iSpriteMouse
 {
-    typedef std::shared_ptr<SpriteAnimated> psAnimated;
-    typedef std::shared_ptr<SpriteNumber> psNumber;
-    typedef std::shared_ptr<SpriteOption> psOption;
-    typedef std::shared_ptr<SpriteText> psText;
+    using psAnimated = std::shared_ptr<SpriteAnimated>;
+    using psNumber = std::shared_ptr<SpriteNumber>;
+    using psOption = std::shared_ptr<SpriteOption>;
+    using psText = std::shared_ptr<SpriteText>;
 
     friend class SkinLR2;
 

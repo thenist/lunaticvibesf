@@ -846,8 +846,8 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             ? _barTimestamp[lastBarIdx + 1]
             : basetime +
                   lunaticvibes::Time(
-                      std::min(2000'000'000ll,
-                               std::max(500'000'000ll, static_cast<long long>(
+                      std::min(2000'000'000LL,
+                               std::max(500'000'000LL, static_cast<long long>(
                                                            lunaticvibes::Time::singleBeatLengthFromBPM(bpm).hres()) *
                                                            4)),
                       true); // last measure + 1
@@ -928,7 +928,7 @@ std::vector<Input::Pad> ChartObjectBMS::getInputFromLane(size_t channel)
 void ChartObjectBMS::preUpdate(const lunaticvibes::Time& vt)
 {
     // check stop
-    size_t idx = (size_t)eNoteExt::STOP;
+    auto idx = (size_t)eNoteExt::STOP;
     _inStopNote = false;
     while (!isLastNoteSpecial(idx, _currentStopNote))
     {

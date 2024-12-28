@@ -14,9 +14,8 @@
 
 static bool is_ascii(const std::string_view str)
 {
-    for (auto it = str.begin(); it != str.end(); ++it)
+    for (unsigned char c : str)
     {
-        uint8_t c = *it;
         if (c > 0x7f)
             return false;
     }
@@ -333,7 +332,7 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
     auto icd = icd_it->second.get();
 
     // PERF: this buffer is MASSIVE. Don't initialize it or memset will dominate runtime.
-    char out_buf[1024l * 32l];
+    char out_buf[1024L * 32L];
 
     // BRUH-cast.
     char* buf_ptr = const_cast<char*>(input.data());

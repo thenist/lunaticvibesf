@@ -641,7 +641,7 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
 
         HashMD5 folderMD5{ANY_STR(q[0][0])};
         // std::string folderPath = ANY_STR(q[0][1]);
-        FolderType folderType = (FolderType)ANY_INT(q[0][2]);
+        auto folderType = (FolderType)ANY_INT(q[0][2]);
         long long folderModifyTimeDB = ANY_INT(q[0][3]);
 
         if (folderType == FolderType::SONG_BMS)

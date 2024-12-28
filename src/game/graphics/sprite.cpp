@@ -558,7 +558,7 @@ void SpriteNumber::updateNumber(int n)
 
     bool positive = n >= 0;
     int zeroIdx = -1;
-    unsigned digits = static_cast<unsigned>(digitNumber.size());
+    auto digits = static_cast<unsigned>(digitNumber.size());
     switch (numberType)
     {
     case NUM_TYPE_NORMAL: zeroIdx = -1; break;
@@ -1188,7 +1188,7 @@ void SpriteGaugeGrid::draw() const
     if (_draw && pTexture != nullptr && pTexture->isLoaded())
     {
         RectF r = _current.rect;
-        unsigned grid_val = unsigned(failGrids - 1);
+        auto grid_val = unsigned(failGrids - 1);
         const Rect clear_tex_flashing = textureRects[lightClearRectIdxOffset + animationFrameIndex];
         const Rect clear_tex = textureRects[darkClearRectIdxOffset + animationFrameIndex];
         const Rect fail_tex_flashing = textureRects[lightFailRectIdxOffset + animationFrameIndex];

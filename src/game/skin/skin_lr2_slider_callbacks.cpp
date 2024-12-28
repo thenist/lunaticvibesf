@@ -16,7 +16,7 @@ void select_pos(double p)
     if (gSelectContext.entries.empty())
         return;
     // TODO: allow smooth dragging. It currently snaps to closest possible value.
-    size_t idx_new = (size_t)std::floor(p * gSelectContext.entries.size());
+    auto idx_new = (size_t)std::floor(p * gSelectContext.entries.size());
     if (idx_new != gSelectContext.selectedEntryIndex)
     {
         State::set(IndexSlider::SELECT_LIST, (double)idx_new / gSelectContext.entries.size());

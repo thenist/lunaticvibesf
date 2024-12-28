@@ -11,7 +11,7 @@ ConfigInput::ConfigInput(const std::string& profile, GameModeKeys k)
 {
 }
 
-ConfigInput::~ConfigInput() {}
+ConfigInput::~ConfigInput() = default;
 
 const char* getBindingKey(Input::Pad ingame)
 {
@@ -197,7 +197,6 @@ void ConfigInput::bind(Input::Pad ingame, const KeyMap& km)
 KeyMap ConfigInput::getBindings(Input::Pad ingame)
 {
     if (ingame >= Input::Pad::ESC)
-        return KeyMap("INVALID");
-    else
-        return buffer[ingame];
+        return {"INVALID"};
+    return buffer[ingame];
 }

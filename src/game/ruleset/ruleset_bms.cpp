@@ -3,15 +3,14 @@
 #include <iterator>
 #include <utility>
 
-#include "game/arena/arena_data.h"
-#include "game/chart/chart_bms.h"
-#include "game/runtime/state.h"
-#include "game/scene/scene_context.h"
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
 #include <common/assert.h>
 #include <common/sysutil.h>
 #include <config/config_mgr.h>
+#include <game/chart/chart_bms.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
 
 using namespace chart;
 
@@ -1911,7 +1910,7 @@ void RulesetBMS::updateGlobals()
             case GaugeType::GROOVE: lamp = Option::LAMP_NORMAL; break;
             case GaugeType::EASY: lamp = Option::LAMP_EASY; break;
             case GaugeType::ASSIST: lamp = Option::LAMP_ASSIST; break;
-            case GaugeType::GRADE: lamp = Option::LAMP_NOPLAY; break;
+            case GaugeType::GRADE:
             case GaugeType::EXGRADE: lamp = Option::LAMP_NOPLAY; break;
             default: break;
             }
@@ -2036,7 +2035,7 @@ void RulesetBMS::updateGlobals()
             case GaugeType::GROOVE: lamp = Option::LAMP_NORMAL; break;
             case GaugeType::EASY: lamp = Option::LAMP_EASY; break;
             case GaugeType::ASSIST: lamp = Option::LAMP_ASSIST; break;
-            case GaugeType::GRADE: lamp = Option::LAMP_NOPLAY; break;
+            case GaugeType::GRADE:
             case GaugeType::EXGRADE: lamp = Option::LAMP_NOPLAY; break;
             default: break;
             }

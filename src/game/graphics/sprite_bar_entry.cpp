@@ -160,15 +160,15 @@ static BarType entry_bar_type(eEntryType e)
     case eEntryType::NEW_SONG_FOLDER: return BarType::NEW_SONG_FOLDER;
     case eEntryType::CUSTOM_FOLDER: return BarType::CUSTOM_FOLDER;
     case eEntryType::COURSE_FOLDER: return BarType::COURSE_FOLDER;
-    case eEntryType::SONG: return BarType::SONG;
+    case eEntryType::SONG:
     case eEntryType::CHART: return BarType::SONG;
     case eEntryType::RIVAL: return BarType::RIVAL;
-    case eEntryType::RIVAL_SONG: return BarType::SONG_RIVAL;
+    case eEntryType::RIVAL_SONG:
     case eEntryType::RIVAL_CHART: return BarType::SONG_RIVAL;
     case eEntryType::NEW_COURSE: return BarType::NEW_COURSE;
     case eEntryType::COURSE: return BarType::COURSE;
     case eEntryType::RANDOM_COURSE: return BarType::RANDOM_COURSE;
-    case eEntryType::ARENA_FOLDER: return BarType::RIVAL;
+    case eEntryType::ARENA_FOLDER:
     case eEntryType::ARENA_COMMAND: return BarType::RIVAL;
     case eEntryType::ARENA_LOBBY: return BarType::SONG;
     case eEntryType::RANDOM_CHART: return BarType::CUSTOM_FOLDER;

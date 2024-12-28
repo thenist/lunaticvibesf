@@ -320,7 +320,7 @@ void SceneKeyConfig::inputGamePressJoystick(JoystickMask& mask, size_t device, c
         // Buttons
         for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_BUTTON_COUNT; ++index)
         {
-            size_t bit = static_cast<size_t>(base + index);
+            auto bit = static_cast<size_t>(base + index);
             if (mask[bit] && !joystickPrev[device][bit])
             {
                 KeyMap j(device, Input::Joystick::Type::BUTTON, index);
@@ -344,9 +344,8 @@ void SceneKeyConfig::inputGamePressJoystick(JoystickMask& mask, size_t device, c
                 {static_cast<size_t>(base + index * 4 + 2), (1ul << 29)}, // UP
                 {static_cast<size_t>(base + index * 4 + 3), (1ul << 28)}, // RIGHT
             };
-            for (size_t i = 0; i < 4; ++i)
+            for (auto [bit, indexMask] : bitmask)
             {
-                const auto& [bit, indexMask] = bitmask[i];
                 if (mask[bit] && !joystickPrev[device][bit])
                 {
                     KeyMap j(device, Input::Joystick::Type::POV, index | indexMask);
@@ -372,7 +371,7 @@ void SceneKeyConfig::inputGamePressJoystick(JoystickMask& mask, size_t device, c
             // Relative Axis +
             for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_AXIS_COUNT; ++index)
             {
-                size_t bit = static_cast<size_t>(base + index);
+                auto bit = static_cast<size_t>(base + index);
                 if (mask[bit] && !joystickPrev[device][bit])
                 {
                     auto b = ConfigMgr::Input(keys)->getBindings(pad);
@@ -395,7 +394,7 @@ void SceneKeyConfig::inputGamePressJoystick(JoystickMask& mask, size_t device, c
             // Relative Axis -
             for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_AXIS_COUNT; ++index)
             {
-                size_t bit = static_cast<size_t>(base + index);
+                auto bit = static_cast<size_t>(base + index);
                 if (mask[bit] && !joystickPrev[device][bit])
                 {
                     auto b = ConfigMgr::Input(keys)->getBindings(pad);

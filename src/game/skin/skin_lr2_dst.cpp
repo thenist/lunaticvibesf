@@ -697,7 +697,7 @@ static bool getDstOptAbs(unsigned d)
 
 bool getDstOpt(int d)
 {
-    dst_option op = (dst_option)std::abs(d);
+    auto op = (dst_option)std::abs(d);
 
     if (std::shared_lock l{_mutex}; d < static_cast<int>(_opIsCached.size()) && _opIsCached[op])
     {

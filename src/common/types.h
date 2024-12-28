@@ -108,7 +108,7 @@ enum class ePlayMode
     GHOST_BATTLE,  //
 };
 
-typedef unsigned GameModeKeys; // 5 7 9 10 14
+using GameModeKeys = unsigned int; // 5 7 9 10 14
 
 enum class PlayModifierRandomType : uint8_t
 {
@@ -225,7 +225,7 @@ public:
 public:
     ScoreBase() = default;
     virtual ~ScoreBase() = default;
-    virtual Type getType() const { return Type::UNKNOWN; }
+    [[nodiscard]] virtual Type getType() const { return Type::UNKNOWN; }
 };
 
 class ScoreBMS : public ScoreBase
@@ -266,7 +266,7 @@ public:
     double rival_rate = 0;
     Lamp rival_lamp = Lamp::NOPLAY;
 
-    Type getType() const override { return Type::BMS; }
+    [[nodiscard]] Type getType() const override { return Type::BMS; }
 };
 
 class AxisDir

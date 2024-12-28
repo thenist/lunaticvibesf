@@ -47,7 +47,7 @@ std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge)
     if (State::get(IndexOption::PLAY_HSFIX_TYPE) == Option::e_speed_type::SPEED_FIX_CONSTANT)
         return {false, Option::LAMP_NOPLAY};
 
-    Option::e_random_type randomType = (Option::e_random_type)State::get(IndexOption::PLAY_RANDOM_TYPE_1P);
+    auto randomType = (Option::e_random_type)State::get(IndexOption::PLAY_RANDOM_TYPE_1P);
 
     bool isPlaymodeDP = (State::get(IndexOption::PLAY_MODE) == Option::PLAY_MODE_DOUBLE ||
                          State::get(IndexOption::PLAY_MODE) == Option::PLAY_MODE_DP_GHOST_BATTLE);
@@ -59,7 +59,7 @@ std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge)
 
     if (isPlaymodeDP)
     {
-        Option::e_random_type randomType2P = (Option::e_random_type)State::get(IndexOption::PLAY_RANDOM_TYPE_2P);
+        auto randomType2P = (Option::e_random_type)State::get(IndexOption::PLAY_RANDOM_TYPE_2P);
         if (randomType2P == Option::e_random_type::RAN_HRAN)
             return {false, Option::LAMP_ASSIST};
         else if (randomType2P == Option::e_random_type::RAN_ALLSCR)
@@ -85,7 +85,7 @@ std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge)
         case Option::GAUGE_HARD: lampType = Option::e_lamp_type::LAMP_HARD; break;
         case Option::GAUGE_DEATH: lampType = Option::e_lamp_type::LAMP_FULLCOMBO; break;
         case Option::GAUGE_EASY: lampType = Option::e_lamp_type::LAMP_EASY; break;
-        case Option::GAUGE_PATTACK: lampType = Option::e_lamp_type::LAMP_HARD; break; // TODO: pattack support
+        case Option::GAUGE_PATTACK:                                                   // TODO: pattack support
         case Option::GAUGE_GATTACK: lampType = Option::e_lamp_type::LAMP_HARD; break; // TODO gattack support
         case Option::GAUGE_ASSISTEASY: lampType = Option::e_lamp_type::LAMP_ASSIST; break;
         case Option::GAUGE_EXHARD: lampType = Option::e_lamp_type::LAMP_EXHARD; break;
@@ -1316,18 +1316,18 @@ void setPlayModeInfo()
         case Option::BATTLE_LOCAL: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_BATTLE); break;
         case Option::BATTLE_DB: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DOUBLE_BATTLE); break;
         case Option::BATTLE_GHOST: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_SP_GHOST_BATTLE); break;
-        default: LVF_DEBUG_ASSERT(false); break;
+        default: lunaticvibes::verify_failed("PLAY_BATTLE_TYPE"); break;
         }
     }
     else
     {
         switch (State::get(IndexOption::PLAY_BATTLE_TYPE))
         {
-        case Option::BATTLE_OFF: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DOUBLE); break;
+        case Option::BATTLE_OFF:
         case Option::BATTLE_LOCAL: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DOUBLE); break;
         case Option::BATTLE_DB: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DOUBLE_BATTLE); break;
         case Option::BATTLE_GHOST: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DP_GHOST_BATTLE); break;
-        default: LVF_DEBUG_ASSERT(false); break;
+        default: lunaticvibes::verify_failed("PLAY_BATTLE_TYPE"); break;
         }
     }
 }

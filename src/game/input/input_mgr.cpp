@@ -1,9 +1,9 @@
 #include "input_mgr.h"
-#include "common/log.h"
-#include "common/sysutil.h"
-#include "common/types.h"
-#include "config/config_mgr.h"
-#include "game/graphics/graphics.h"
+
+#include <common/log.h>
+#include <common/types.h>
+#include <config/config_mgr.h>
+#include <game/graphics/graphics.h>
 
 #ifdef RENDER_SDL2
 #include <game/graphics/SDL2/input.h>

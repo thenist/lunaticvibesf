@@ -10,12 +10,12 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <future>
-typedef HANDLE LooperHandler;
+using LooperHandler = HANDLE;
 
 #else
 
 #include <thread>
-typedef std::thread LooperHandler;
+using LooperHandler = std::thread;
 
 #endif // _WIN32
 
@@ -50,8 +50,8 @@ public:
     void setRate(unsigned rate_per_sec);
     void loopStart();
     void loopEnd();
-    bool isRunning() const { return _running; }
-    unsigned getRate() const { return _rate; };
+    [[nodiscard]] bool isRunning() const { return _running; }
+    [[nodiscard]] unsigned getRate() const { return _rate; };
 
 private:
     std::function<void()> _loopFunc;

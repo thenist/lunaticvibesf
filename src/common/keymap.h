@@ -424,7 +424,7 @@ public:
         MOUSE, // ???
     };
 
-    typedef int DeviceID;
+    using DeviceID = int;
 
 protected:
     DeviceType type = DeviceType::UNDEF;
@@ -435,17 +435,17 @@ protected:
 
 public:
     void reset() { type = DeviceType::UNDEF; }
-    DeviceType getType() const { return type; }
-    std::string toString() const;
+    [[nodiscard]] DeviceType getType() const { return type; }
+    [[nodiscard]] std::string toString() const;
 
-    Input::Keyboard getKeyboard() const
+    [[nodiscard]] Input::Keyboard getKeyboard() const
     {
         LVF_DEBUG_ASSERT(type == DeviceType::KEYBOARD);
         return keyboard;
     }
     void setKeyboard(Input::Keyboard kb);
 
-    Input::Joystick getJoystick() const
+    [[nodiscard]] Input::Joystick getJoystick() const
     {
         LVF_DEBUG_ASSERT(type == DeviceType::JOYSTICK);
         return joystick;
@@ -457,7 +457,7 @@ private:
     void loadFromStringK(std::string_view name);
     void loadFromStringJ(std::string_view name);
     void loadFromStringM(std::string_view name);
-    std::string toStringK() const;
-    std::string toStringJ() const;
-    std::string toStringM() const;
+    [[nodiscard]] std::string toStringK() const;
+    [[nodiscard]] std::string toStringJ() const;
+    [[nodiscard]] std::string toStringM() const;
 };

@@ -23,7 +23,7 @@ void RulesetBMSAuto::setTargetRate(double rate)
 {
     targetRate = rate;
     unsigned count = getNoteCount();
-    unsigned score = (unsigned)std::round(2 * count * rate);
+    auto score = (unsigned)std::round(2 * count * rate);
     if (!_judgeScratch)
     {
         auto pChart = std::dynamic_pointer_cast<ChartObjectBMS>(_chart);

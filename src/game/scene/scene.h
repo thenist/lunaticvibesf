@@ -108,20 +108,20 @@ public:
     void MouseRelease(InputMask& m, const lunaticvibes::Time& t);
     virtual void draw() const;
 
-    SkinBase::skinInfo getSkinInfo() const { return pSkin ? pSkin->info : SkinBase::skinInfo(); }
+    [[nodiscard]] SkinBase::skinInfo getSkinInfo() const { return pSkin ? pSkin->info : SkinBase::skinInfo(); }
 
 protected:
     virtual void _updateAsync() = 0;
     void _updateAsync1();
     // For any additional state when transitioning from Stopping to Stopped.
-    virtual bool readyToStopAsync() const { return true; };
+    [[nodiscard]] virtual bool readyToStopAsync() const { return true; };
 
-    virtual bool shouldShowImgui() const;
+    [[nodiscard]] virtual bool shouldShowImgui() const;
     virtual void updateImgui();
     void DebugToggle(InputMask& m, const lunaticvibes::Time& t);
 
-    bool isInTextEdit() const;
-    IndexText textEditType() const;
+    [[nodiscard]] bool isInTextEdit() const;
+    [[nodiscard]] IndexText textEditType() const;
     virtual bool checkAndStartTextEdit() { return false; }
     virtual void startTextEdit(bool clear);
     virtual void stopTextEdit(bool modify);

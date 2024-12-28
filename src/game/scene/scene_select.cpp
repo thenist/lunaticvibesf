@@ -774,7 +774,7 @@ void SceneSelect::_updateAsync()
     {
         gSelectContext.draggingListSlider = false;
 
-        size_t idx_new = (size_t)std::floor(State::get(IndexSlider::SELECT_LIST) * gSelectContext.entries.size());
+        auto idx_new = (size_t)std::floor(State::get(IndexSlider::SELECT_LIST) * gSelectContext.entries.size());
         if (idx_new == gSelectContext.entries.size())
             idx_new = 0;
 
@@ -989,10 +989,10 @@ void SceneSelect::updatePrepare()
         // restore panel stat
         for (int i = 1; i <= 9; ++i)
         {
-            IndexSwitch p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
+            auto p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
             if (State::get(p))
             {
-                IndexTimer tm = static_cast<IndexTimer>(int(IndexTimer::PANEL1_START) - 1 + i);
+                auto tm = static_cast<IndexTimer>(int(IndexTimer::PANEL1_START) - 1 + i);
                 State::set(tm, t.norm());
                 SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_OPEN);
             }
@@ -2255,9 +2255,10 @@ void SceneSelect::decide()
             case 2: return PlayModifierGaugeType::DEATH;
             case 3:
                 return PlayModifierGaugeType::EASY;
+                // TODO
                 // case 4: return PlayModifierGaugeType::PATTACK;
                 // case 5: return PlayModifierGaugeType::GATTACK;
-            case 4: return PlayModifierGaugeType::HARD;
+            case 4:
             case 5: return PlayModifierGaugeType::HARD;
             case 6: return PlayModifierGaugeType::EXHARD;
             case 7: return PlayModifierGaugeType::ASSISTEASY;
@@ -2874,7 +2875,7 @@ bool SceneSelect::closeAllPanels(const lunaticvibes::Time& t)
     bool hasPanelOpened = false;
     for (int i = 1; i <= 9; ++i)
     {
-        IndexSwitch p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
+        auto p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
         if (State::get(p))
         {
             hasPanelOpened = true;

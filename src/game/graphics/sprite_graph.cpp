@@ -65,7 +65,7 @@ void SpriteLine::updateRects()
                             const std::function<bool(int val1, int val2)>& cond) {
         std::vector<std::pair<Point, Point>> tmp;
         const auto& r = _current.rect;
-        size_t region = static_cast<size_t>(std::floor(size * _progress));
+        auto region = static_cast<size_t>(std::floor(size * _progress));
         if (region == 0)
             return;
         region--;
@@ -112,7 +112,7 @@ void SpriteLine::updateRects()
         auto cond = [](int, int) { return true; };
         std::vector<std::pair<Point, Point>> tmp;
         const auto& r = _current.rect;
-        size_t region = static_cast<size_t>(std::floor(size * _progress));
+        auto region = static_cast<size_t>(std::floor(size * _progress));
         if (region == 0)
             return;
         region--;

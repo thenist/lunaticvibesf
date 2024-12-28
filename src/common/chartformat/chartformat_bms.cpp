@@ -245,14 +245,9 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                         ifValue = std::stack<int>();
                     }
                 }
-                else if (ifValue.empty())
+                else if (ifValue.empty() || ifValue.top() != randomValue.top())
                 {
-                    // skip orphan blocks
-                    continue;
-                }
-                else if (ifValue.top() != randomValue.top())
-                {
-                    // skip mismatch IF value blocks
+                    // skip orphan blocks and mismatch IF value blocks
                     continue;
                 }
             }
@@ -895,11 +890,12 @@ int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned fla
         }
     }
 
-    const unsigned resolution = static_cast<unsigned>(length / 2);
+    const auto resolution = static_cast<unsigned>(length / 2);
     const unsigned scale = ch.relax(resolution) / resolution;
     for (unsigned i = 0; i < resolution; i++)
     {
         const unsigned segment = i * scale;
+        // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result) TODO
         const unsigned value = base36(str[i * 2], str[i * 2 + 1]);
         if (value == 0)
             continue;
@@ -927,11 +923,12 @@ int ChartFormatBMS::seqToLane16(channel& ch, StringContentView str)
         }
     }
 
-    const unsigned resolution = static_cast<unsigned>(length / 2);
+    const auto resolution = static_cast<unsigned>(length / 2);
     const unsigned scale = ch.relax(resolution) / resolution;
     for (unsigned i = 0; i < resolution; i++)
     {
         const unsigned segment = i * scale;
+        // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result) TODO
         const unsigned value = base16(str[i * 2], str[i * 2 + 1]);
         if (value == 0)
             continue;

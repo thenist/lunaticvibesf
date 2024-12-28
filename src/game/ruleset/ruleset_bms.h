@@ -140,7 +140,7 @@ public:
 
     /// /////////////////////////////////////////////////////////////////////
 
-    typedef std::map<chart::NoteLaneIndex, IndexTimer> NoteLaneTimerMap;
+    using NoteLaneTimerMap = std::map<chart::NoteLaneIndex, IndexTimer>;
 
     enum class PlaySide
     {
@@ -213,7 +213,7 @@ public:
     void initGaugeParams(PlayModifierGaugeType gauge);
 
 private:
-    JudgeRes _calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const;
+    [[nodiscard]] JudgeRes _calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const;
 
     void updateAutoadjust(const JudgeRes& j, const lunaticvibes::Time& rt);
 
@@ -245,25 +245,28 @@ public:
     void updateJudge(const lunaticvibes::Time& t, chart::NoteLaneIndex ch, JudgeArea judge, int slot);
 
 public:
-    GaugeType getGaugeType() const { return _gauge; }
+    [[nodiscard]] GaugeType getGaugeType() const { return _gauge; }
 
-    double getScore() const;
-    double getMaxMoneyScore() const;
-    unsigned getExScore() const;
-    unsigned getJudgeCount(JudgeType idx) const;
-    unsigned getJudgeCountEx(JudgeIndex idx) const;
-    std::string getModifierText() const;
-    std::string getModifierTextShort() const;
+    [[nodiscard]] double getScore() const;
+    [[nodiscard]] double getMaxMoneyScore() const;
+    [[nodiscard]] unsigned getExScore() const;
+    [[nodiscard]] unsigned getJudgeCount(JudgeType idx) const;
+    [[nodiscard]] unsigned getJudgeCountEx(JudgeIndex idx) const;
+    [[nodiscard]] std::string getModifierText() const;
+    [[nodiscard]] std::string getModifierTextShort() const;
 
-    bool isNoScore() const override { return moneyScore == 0.0; }
-    bool isCleared() const override { return !isFailed() && isFinished() && _basic.health >= getClearHealth(); }
-    bool isFailed() const override { return _isFailed; }
+    [[nodiscard]] bool isNoScore() const override { return moneyScore == 0.0; }
+    [[nodiscard]] bool isCleared() const override
+    {
+        return !isFailed() && isFinished() && _basic.health >= getClearHealth();
+    }
+    [[nodiscard]] bool isFailed() const override { return _isFailed; }
 
-    unsigned getCurrentMaxScore() const override { return notesReached * 2; }
-    unsigned getMaxScore() const override { return getNoteCount() * 2; }
+    [[nodiscard]] unsigned getCurrentMaxScore() const override { return notesReached * 2; }
+    [[nodiscard]] unsigned getMaxScore() const override { return getNoteCount() * 2; }
 
-    unsigned getNoteCount() const override;
-    unsigned getMaxCombo() const override;
+    [[nodiscard]] unsigned getNoteCount() const override;
+    [[nodiscard]] unsigned getMaxCombo() const override;
 
     void fail() override;
 

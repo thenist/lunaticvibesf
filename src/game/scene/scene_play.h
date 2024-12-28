@@ -37,15 +37,15 @@ private:
     std::vector<size_t> keySampleIndex;
 
 protected:
-    bool isPlaymodeDP() const;
+    [[nodiscard]] bool isPlaymodeDP() const;
 
 private:
     bool playInterrupted = false;
     bool playFinished = false;
     bool holdingStart[2]{false, false};
     bool holdingSelect[2]{false, false};
-    bool isHoldingStart(int player) const;
-    bool isHoldingSelect(int player) const;
+    [[nodiscard]] bool isHoldingStart(int player) const;
+    [[nodiscard]] bool isHoldingSelect(int player) const;
 
     struct PlayerState
     {
@@ -181,7 +181,7 @@ protected:
     bool imguiAdjustIsDP = false;
     bool imguiAdjustHas2P = false;
 
-    bool shouldShowImgui() const override;
+    [[nodiscard]] bool shouldShowImgui() const override;
     void updateImgui() override;
     void imguiInit();
     void imguiAdjustMenu();

@@ -112,7 +112,7 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
             case GaugeType::GROOVE: lamp = Option::LAMP_NORMAL; break;
             case GaugeType::EASY: lamp = Option::LAMP_EASY; break;
             case GaugeType::ASSIST: lamp = Option::LAMP_ASSIST; break;
-            case GaugeType::GRADE: lamp = Option::LAMP_NOPLAY; break;
+            case GaugeType::GRADE:
             case GaugeType::EXGRADE: lamp = Option::LAMP_NOPLAY; break;
             default: break;
             }

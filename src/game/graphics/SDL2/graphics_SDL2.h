@@ -6,7 +6,6 @@
 #include <SDL_ttf.h>
 #include <SDL_video.h>
 
-#include <array>
 #include <filesystem>
 #include <limits>
 #include <memory>
@@ -25,7 +24,7 @@ class Color : public SDL_Color
 public:
     Color(uint32_t rgba = 0xffffffff);
     Color(int r, int g, int b, int a);
-    uint32_t hex() const;
+    [[nodiscard]] uint32_t hex() const;
     Color operator+(const Color& rhs) const;
     Color operator*(const double& rhs) const;
     Color operator*(const Color& rhs) const;
@@ -79,9 +78,9 @@ public:
 public:
     constexpr Point(int zero = 0) {}
     constexpr Point(double x, double y) : x(x), y(y) {}
-    constexpr Point operator+(const Point& rhs) const { return Point(x + rhs.x, y + rhs.y); }
-    constexpr Point operator-(const Point& rhs) const { return Point(x - rhs.x, y - rhs.y); }
-    constexpr Point operator*(const double& rhs) const { return Point(x * rhs, y * rhs); }
+    constexpr Point operator+(const Point& rhs) const { return {x + rhs.x, y + rhs.y}; }
+    constexpr Point operator-(const Point& rhs) const { return {x - rhs.x, y - rhs.y}; }
+    constexpr Point operator*(const double& rhs) const { return {x * rhs, y * rhs}; }
     constexpr bool operator==(const Point& rhs) const { return x == rhs.x && y == rhs.y; }
 };
 
@@ -147,10 +146,10 @@ public:
     Image(const char* filePath);
     Image(const char* format, void* bmp, size_t size);
     void setTransparentColorRGB(Color c);
-    bool hasAlphaLayer() const { return _haveAlphaLayer; }
+    [[nodiscard]] bool hasAlphaLayer() const { return _haveAlphaLayer; }
 
 public:
-    Rect getRect() const;
+    [[nodiscard]] Rect getRect() const;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,8 +210,8 @@ public:
 
 public:
     void* raw();
-    Rect getRect() const { return textureRect; }
-    bool isLoaded() const { return loaded; }
+    [[nodiscard]] Rect getRect() const { return textureRect; }
+    [[nodiscard]] bool isLoaded() const { return loaded; }
     int updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* V, int Vpitch);
 };
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
@@ -154,10 +153,10 @@ protected:
     std::shared_mutex _mutex;
 
 public:
-    std::shared_ptr<ConfigGeneral> _General() { return G; }
-    std::shared_ptr<ConfigProfile> _Profile() { return P; }
-    std::shared_ptr<ConfigSkin> _Skin() { return S; };
-    std::shared_ptr<ConfigInput> _Input(GameModeKeys mode)
+    std::shared_ptr<ConfigGeneral> General1() { return G; }
+    std::shared_ptr<ConfigProfile> Profile1() { return P; }
+    std::shared_ptr<ConfigSkin> Skin1() { return S; };
+    std::shared_ptr<ConfigInput> Input1(GameModeKeys mode)
     {
         switch (mode)
         {
@@ -178,10 +177,10 @@ public:
         return getInst()._createProfile(newProfile, oldProfile);
     }
     static void setGlobals() { getInst()._setGlobals(); }
-    static std::shared_ptr<ConfigGeneral> General() { return getInst()._General(); }
-    static std::shared_ptr<ConfigProfile> Profile() { return getInst()._Profile(); }
-    static std::shared_ptr<ConfigInput> Input(GameModeKeys mode) { return getInst()._Input(mode); }
-    static std::shared_ptr<ConfigSkin> Skin() { return getInst()._Skin(); }
+    static std::shared_ptr<ConfigGeneral> General() { return getInst().General1(); }
+    static std::shared_ptr<ConfigProfile> Profile() { return getInst().Profile1(); }
+    static std::shared_ptr<ConfigInput> Input(GameModeKeys mode) { return getInst().Input1(mode); }
+    static std::shared_ptr<ConfigSkin> Skin() { return getInst().Skin1(); }
 
     template <class Ty_v> static Ty_v get(char type, const std::string& key, const Ty_v& fallback)
     {

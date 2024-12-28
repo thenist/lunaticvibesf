@@ -1,14 +1,19 @@
 #include "dxa.h"
 
 #include <cstddef>
+#include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <ios>
+#include <memory>
 #include <vector>
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/types.h>
 #include <common/u8.h>
 
 // Codes are from DXArchive (DX Library -> Tool -> DXArchive -> Source) , with some modification
@@ -37,7 +42,7 @@ const u32 DXA_KEYSTR_LENGTH_VER5 = (12);     // 鍵文字列の長さ
 #pragma pack(1)
 
 // アーカイブデータの最初のヘッダ
-typedef struct tagDARC_HEAD_VER5
+using DARC_HEAD_VER5 = struct tagDARC_HEAD_VER5
 {
     u16 Head;             // ヘッダ
     u16 Version;          // バージョン
@@ -50,10 +55,10 @@ typedef struct tagDARC_HEAD_VER5
                                     // のアドレスを０とする) アドレス０から配置されている DARC_DIRECTORY_VER5
                                     // 構造体がルートディレクトリ
     u32 CodePage; // ファイル名に使用しているコードページ番号
-} DARC_HEAD_VER5;
+};
 
 // アーカイブデータの最初のヘッダ(Ver 0x0003まで)
-typedef struct tagDARC_HEAD_VER3
+using DARC_HEAD_VER3 = struct tagDARC_HEAD_VER3
 {
     u16 Head;             // ヘッダ
     u16 Version;          // バージョン
@@ -65,18 +70,18 @@ typedef struct tagDARC_HEAD_VER3
     u32 DirectoryTableStartAddress; // ディレクトリテーブルの先頭アドレス(メンバ変数 FileNameTableStartAddress
                                     // のアドレスを０とする) アドレス０から配置されている DARC_DIRECTORY_VER5
                                     // 構造体がルートディレクトリ
-} DARC_HEAD_VER3;
+};
 
 // ファイルの時間情報
-typedef struct tagDARC_FILETIME_VER5
+using DARC_FILETIME_VER5 = struct tagDARC_FILETIME_VER5
 {
     u64 Create;     // 作成時間
     u64 LastAccess; // 最終アクセス時間
     u64 LastWrite;  // 最終更新時間
-} DARC_FILETIME_VER5;
+};
 
 // ファイル格納情報(Ver 0x0001)
-typedef struct tagDARC_FILEHEAD_VER1
+using DARC_FILEHEAD_VER1 = struct tagDARC_FILEHEAD_VER1
 {
     u32 NameAddress; // ファイル名が格納されているアドレス( ARCHIVE_HEAD構造体 のメンバ変数 FileNameTableStartAddress
                      // のアドレスをアドレス０とする)
@@ -88,10 +93,10 @@ typedef struct tagDARC_FILEHEAD_VER1
     // が示すアドレスをアドレス０とする 			ディレクトリの場合：DARC_HEAD_VER5構造体 のメンバ変数
     // DirectoryTableStartAddress のが示すアドレスをアドレス０とする
     u32 DataSize; // ファイルのデータサイズ
-} DARC_FILEHEAD_VER1;
+};
 
 // ファイル格納情報
-typedef struct tagDARC_FILEHEAD_VER5
+using DARC_FILEHEAD_VER5 = struct tagDARC_FILEHEAD_VER5
 {
     u32 NameAddress; // ファイル名が格納されているアドレス( ARCHIVE_HEAD構造体 のメンバ変数 FileNameTableStartAddress
                      // のアドレスをアドレス０とする)
@@ -104,10 +109,10 @@ typedef struct tagDARC_FILEHEAD_VER5
     // DirectoryTableStartAddress のが示すアドレスをアドレス０とする
     u32 DataSize; // ファイルのデータサイズ
     u32 CompressedDataSize; // 圧縮後のデータのサイズ( 0xffffffff:圧縮されていない ) ( Ver0x0002 で追加された )
-} DARC_FILEHEAD_VER5;
+};
 
 // ディレクトリ格納情報
-typedef struct tagDARC_DIRECTORY_VER5
+using DARC_DIRECTORY_VER5 = struct tagDARC_DIRECTORY_VER5
 {
     u32 DirectoryAddress; // 自分の DARC_FILEHEAD_VER5 が格納されているアドレス( DARC_HEAD_VER5 構造体 のメンバ変数
                           // FileTableStartAddress が示すアドレスをアドレス０とする)
@@ -116,7 +121,7 @@ typedef struct tagDARC_DIRECTORY_VER5
     u32 FileHeadNum; // ディレクトリ内のファイルの数
     u32 FileHeadAddress; // ディレクトリ内のファイルのヘッダ列が格納されているアドレス( DARC_HEAD_VER5構造体
                          // のメンバ変数 FileTableStartAddress が示すアドレスをアドレス０とする)
-} DARC_DIRECTORY_VER5;
+};
 
 #pragma pack(pop)
 
@@ -492,7 +497,7 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
             else
             {
                 // Do not override existing files
-                Path filePath((DirPath / GetOriginalFileName(NameP + File->NameAddress)));
+                const Path filePath((DirPath / GetOriginalFileName(NameP + File->NameAddress)));
                 if (std::filesystem::exists(filePath) && std::filesystem::is_regular_file(filePath))
                     continue;
 
@@ -651,7 +656,7 @@ static int DecodeArchive(const Path& path, DXArchive* output = nullptr)
 
 DXArchive extractDxaToMem(const StringPath& path)
 {
-    Path p(path);
+    const Path p(path);
     if (!std::filesystem::is_regular_file(p))
         return {};
 
@@ -663,11 +668,11 @@ DXArchive extractDxaToMem(const StringPath& path)
 
 int extractDxaToFile(const StringPath& path)
 {
-    Path p(path);
+    const Path p(path);
     if (!std::filesystem::is_regular_file(p))
         return {};
 
-    DXArchive a;
+    const DXArchive a;
     dxa::DecodeArchive(p);
 
     return 0;

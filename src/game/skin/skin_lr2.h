@@ -156,7 +156,7 @@ protected:
     Rect judgeLineRect2P;
 
 protected:
-    typedef std::shared_ptr<SpriteLine> psLine;
+    using psLine = std::shared_ptr<SpriteLine>;
 
 private:
     unsigned csvLineNumber = 0; // line parsing index
@@ -376,7 +376,7 @@ public:
     [[nodiscard]] StringContent getMaker() const override;
     [[nodiscard]] StringPath getFilePath() const override;
 
-    const std::vector<std::string>& getHelpFiles() const;
+    [[nodiscard]] const std::vector<std::string>& getHelpFiles() const;
 
 private:
     std::vector<std::string> _helpFiles;

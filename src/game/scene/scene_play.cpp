@@ -1433,7 +1433,7 @@ void ScenePlay::updateAsyncLanecover(const lunaticvibes::Time& t)
     int hsThreshold = getRate() / 25 * _input.getRate() / 1000;  // hispeed, +25 per second
 
     auto handleSide = [&](int slot) {
-        Option::e_lane_effect_type lanecoverType = (Option::e_lane_effect_type)State::get(
+        auto lanecoverType = (Option::e_lane_effect_type)State::get(
             slot == PLAYER_SLOT_PLAYER ? IndexOption::PLAY_LANE_EFFECT_TYPE_1P : IndexOption::PLAY_LANE_EFFECT_TYPE_2P);
 
         int lc = 0;
@@ -2971,7 +2971,7 @@ void ScenePlay::toggleLanecover(int slot, bool state)
 
     State::set(indLanecoverEnabled, state);
 
-    Option::e_lane_effect_type lcType = (Option::e_lane_effect_type)State::get(indLanecoverType);
+    auto lcType = (Option::e_lane_effect_type)State::get(indLanecoverType);
     switch (lcType)
     {
     case Option::LANE_OFF:

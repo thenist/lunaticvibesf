@@ -17,20 +17,20 @@
 #include <boost/algorithm/string/split.hpp>
 #include <re2/re2.h>
 
-#include "common/log.h"
-#include "common/u8.h"
-#include "common/utils.h"
-#include "config/config_mgr.h"
-#include "game/graphics/dxa.h"
-#include "game/graphics/video.h"
-#include "game/runtime/i18n.h"
-#include "game/runtime/state.h"
-#include "game/scene/scene_context.h"
-#include "game/scene/scene_customize.h"
-#include "skin_lr2_button_callbacks.h"
-#include "skin_lr2_converters.h"
-#include "skin_lr2_slider_callbacks.h"
 #include <common/assert.h>
+#include <common/log.h>
+#include <common/u8.h>
+#include <common/utils.h>
+#include <config/config_mgr.h>
+#include <game/graphics/dxa.h>
+#include <game/graphics/video.h>
+#include <game/runtime/i18n.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
+#include <game/scene/scene_customize.h>
+#include <game/skin/skin_lr2_button_callbacks.h>
+#include <game/skin/skin_lr2_converters.h>
+#include <game/skin/skin_lr2_slider_callbacks.h>
 
 using uint8_t = std::uint8_t;
 
@@ -184,17 +184,13 @@ struct s_number : s_basic
                 num += 20;
             else if (302 <= num && num <= 306)
                 num += 40;
-            else if (320 <= num && num <= 329)
-                num += 10;
-            else if (360 <= num && num <= 369)
+            else if ((320 <= num && num <= 329) || (360 <= num && num <= 369))
                 num += 10;
             else if (120 <= num && num <= 139)
                 num -= 20;
             else if (342 <= num && num <= 346)
                 num -= 40;
-            else if (330 <= num && num <= 339)
-                num -= 10;
-            else if (370 <= num && num <= 379)
+            else if ((330 <= num && num <= 339) || (370 <= num && num <= 379))
                 num -= 10;
             else
             {
@@ -615,8 +611,8 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
 
 [[nodiscard]] Point getCenterPoint(const int& wi, const int& hi, int numpadCenter)
 {
-    double w = (double)wi;
-    double h = (double)hi;
+    auto w = (double)wi;
+    auto h = (double)hi;
     switch (numpadCenter)
     {
     case 1: return {0, h};
@@ -666,7 +662,7 @@ Path SkinLR2::getCustomizePath(StringContentView input)
         // Or, randomly choose a file
         auto ls = findFiles(path);
         if (ls.empty())
-            return Path();
+            return {};
         static std::random_device rd;
         return ls[rd() % ls.size()];
     }
@@ -2227,7 +2223,7 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     if (pSpriteNote)
     {
         pSpriteNote->appendMotionKeyFrame(
-            {0, {Rect(), RenderParams::accelType::CONSTANT, Color(0xffffffff), BlendMode::ALPHA, 0, 0.0}});
+            {0, {Rect(), RenderParams::accelType::CONSTANT, Color(0xffffffff), BlendMode::ALPHA, false, 0.0}});
         pSpriteNote->setMotionLoopTo(0);
     }
 
@@ -2321,7 +2317,7 @@ ParseRet SkinLR2::SRC_BAR_LEVEL()
 {
     lr2skin::s_number d(parseParamBuf, csvLineNumber);
 
-    BarLevelType type = BarLevelType(d._null & 0xFFFFFFFF);
+    auto type = BarLevelType(d._null & 0xFFFFFFFF);
 
     // get NumType from div_x, div_y
     unsigned f = d.div_y * d.div_x;
@@ -2358,7 +2354,7 @@ ParseRet SkinLR2::SRC_BAR_LAMP()
 {
     lr2skin::s_basic d(parseParamBuf, csvLineNumber);
 
-    BarLampType type = BarLampType(d._null & 0xFFFFFFFF);
+    auto type = BarLampType(d._null & 0xFFFFFFFF);
 
     SpriteAnimated::SpriteAnimatedBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -2381,7 +2377,7 @@ ParseRet SkinLR2::SRC_BAR_LAMP()
 ParseRet SkinLR2::SRC_BAR_TITLE()
 {
     lr2skin::s_text d(parseParamBuf);
-    BarTitleType type = BarTitleType(d._null & 0xFFFFFFFF);
+    auto type = BarTitleType(d._null & 0xFFFFFFFF);
 
     SpriteImageText::SpriteImageTextBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -2415,7 +2411,7 @@ ParseRet SkinLR2::SRC_BAR_RANK()
 {
     lr2skin::s_basic d(parseParamBuf, csvLineNumber);
 
-    BarRankType type = BarRankType(d._null & 0xFFFFFFFF);
+    auto type = BarRankType(d._null & 0xFFFFFFFF);
 
     for (auto& bar : barSprites)
     {
@@ -2439,7 +2435,7 @@ ParseRet SkinLR2::SRC_BAR_RIVAL()
 {
     lr2skin::s_basic d(parseParamBuf, csvLineNumber);
 
-    BarRivalType type = BarRivalType(d._null & 0xFFFFFFFF);
+    auto type = BarRivalType(d._null & 0xFFFFFFFF);
 
     for (auto& bar : barSprites)
     {
@@ -2463,7 +2459,7 @@ ParseRet SkinLR2::SRC_BAR_RIVAL_MYLAMP()
 {
     lr2skin::s_basic d(parseParamBuf, csvLineNumber);
 
-    BarLampType type = BarLampType(d._null & 0xFFFFFFFF);
+    auto type = BarLampType(d._null & 0xFFFFFFFF);
 
     for (auto& bar : barSprites)
     {
@@ -2487,7 +2483,7 @@ ParseRet SkinLR2::SRC_BAR_RIVAL_RIVALLAMP()
 {
     lr2skin::s_basic d(parseParamBuf, csvLineNumber);
 
-    BarLampType type = BarLampType(d._null & 0xFFFFFFFF);
+    auto type = BarLampType(d._null & 0xFFFFFFFF);
 
     for (auto& bar : barSprites)
     {
@@ -2910,7 +2906,7 @@ ParseRet SkinLR2::DST_BAR_BODY()
     // timers are ignored for bars
     d.timer = 0;
 
-    unsigned idx = unsigned(d._null);
+    auto idx = unsigned(d._null);
 
     for (uint8_t i = 0; i != static_cast<uint8_t>(BarType::TYPE_COUNT); ++i)
     {
@@ -2998,7 +2994,7 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
     // timers are ignored for bars
     d.timer = 0;
 
-    BarLevelType type = BarLevelType(d._null);
+    auto type = BarLevelType(d._null);
     if (d._null >= (int)BarLevelType::LEVEL_TYPE_COUNT)
     {
         LOG_DEBUG << "[SkinLR2] BarEntry level type (" << int(type) << ") Invalid!"

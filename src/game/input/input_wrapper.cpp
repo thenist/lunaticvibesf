@@ -174,9 +174,8 @@ void InputWrapper::loopAsync()
                 _joycurr[device] = mask;
 
                 JoystickMask p;
-                for (size_t k = 0; k < MAX_JOYSTICK_MASK_BIT_COUNT; ++k)
+                for (size_t ki = 0; ki < MAX_JOYSTICK_MASK_BIT_COUNT; ++ki)
                 {
-                    size_t ki = static_cast<size_t>(k);
                     if (_joycurr[device][ki] && !_joyprev[device][ki])
                         p.set(ki);
                 }

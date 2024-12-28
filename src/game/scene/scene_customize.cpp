@@ -94,7 +94,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     _type = SceneType::CUSTOMIZE;
 
     gCustomizeContext.skinDir = 0;
-    gCustomizeContext.optionUpdate = 0;
+    gCustomizeContext.optionUpdate = false;
 
     if (gInCustomize)
     {
@@ -695,8 +695,8 @@ void SceneCustomize::updateTexts() const
 {
     for (size_t i = 0; i < 10; ++i)
     {
-        IndexText optionNameId = IndexText(size_t(IndexText::スキンカスタマイズカテゴリ名1個目) + i);
-        IndexText entryNameId = IndexText(size_t(IndexText::スキンカスタマイズ項目名1個目) + i);
+        auto optionNameId = IndexText(size_t(IndexText::スキンカスタマイズカテゴリ名1個目) + i);
+        auto entryNameId = IndexText(size_t(IndexText::スキンカスタマイズ項目名1個目) + i);
         size_t idx = topOptionIndex + i;
         if (idx < optionsKeyList.size())
         {

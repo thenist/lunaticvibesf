@@ -5,7 +5,6 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -15,8 +14,7 @@ enum class SkinVersion
     LR2beta3,
 };
 
-// typedef StringContent Token;
-typedef std::vector<StringContent> Tokens;
+using Tokens = std::vector<StringContent>;
 
 class SkinBase
 {
@@ -29,7 +27,7 @@ protected:
 
 public:
     virtual ~SkinBase();
-    SkinVersion version() const { return _version; }
+    [[nodiscard]] SkinVersion version() const { return _version; }
 
 protected:
     bool loaded = false;
@@ -77,8 +75,8 @@ public:
     void startSpriteVideoPlayback();
     void stopSpriteVideoPlayback();
 
-    bool textEditSpriteClicked() const;
-    IndexText textEditType() const;
+    [[nodiscard]] bool textEditSpriteClicked() const;
+    [[nodiscard]] IndexText textEditType() const;
     void startTextEdit(bool clear);
     void stopTextEdit(bool modify);
 
@@ -136,12 +134,12 @@ public:
         std::vector<StringContent> entries;
         size_t defaultEntry;
     };
-    virtual size_t getCustomizeOptionCount() const = 0;
-    virtual CustomizeOption getCustomizeOptionInfo(size_t idx) const = 0;
+    [[nodiscard]] virtual size_t getCustomizeOptionCount() const = 0;
+    [[nodiscard]] virtual CustomizeOption getCustomizeOptionInfo(size_t idx) const = 0;
 
-    virtual StringContent getName() const = 0;
-    virtual StringContent getMaker() const = 0;
-    virtual StringPath getFilePath() const = 0;
+    [[nodiscard]] virtual StringContent getName() const = 0;
+    [[nodiscard]] virtual StringContent getMaker() const = 0;
+    [[nodiscard]] virtual StringPath getFilePath() const = 0;
 
     // For customize scene itself.
     void setThumbnailTextureSize(int w, int h);

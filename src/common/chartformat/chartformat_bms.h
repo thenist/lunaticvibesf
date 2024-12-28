@@ -150,7 +150,7 @@ public:
         void imbue(channel& c);
         void sortNotes();
     };
-    typedef std::map<unsigned, channel> LaneMap; // bar -> channel
+    using LaneMap = std::map<unsigned int, channel>; // bar -> channel
 
 protected:
     // Lanes.

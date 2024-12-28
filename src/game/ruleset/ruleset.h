@@ -68,23 +68,23 @@ public:
     virtual void update(const lunaticvibes::Time& t) = 0;
 
 public:
-    BasicData getData() const { return _basic; }
-    double getClearHealth() const { return _clearHealth; }
-    bool failWhenNoHealth() const { return _failWhenNoHealth; }
+    [[nodiscard]] BasicData getData() const { return _basic; }
+    [[nodiscard]] double getClearHealth() const { return _clearHealth; }
+    [[nodiscard]] bool failWhenNoHealth() const { return _failWhenNoHealth; }
 
-    virtual bool isNoScore() const { return false; } // for quick esc
-    virtual bool isFinished() const { return notesExpired >= getMaxCombo(); }
-    virtual bool isCleared() const { return _isCleared; }
-    virtual bool isFailed() const { return _isFailed; }
+    [[nodiscard]] virtual bool isNoScore() const { return false; } // for quick esc
+    [[nodiscard]] virtual bool isFinished() const { return notesExpired >= getMaxCombo(); }
+    [[nodiscard]] virtual bool isCleared() const { return _isCleared; }
+    [[nodiscard]] virtual bool isFailed() const { return _isFailed; }
 
-    virtual unsigned getCurrentMaxScore() const = 0;
-    virtual unsigned getMaxScore() const = 0;
+    [[nodiscard]] virtual unsigned getCurrentMaxScore() const = 0;
+    [[nodiscard]] virtual unsigned getMaxScore() const = 0;
 
     // Some games count one LN as two notes. Leave it virtual
-    virtual unsigned getNoteCount() const = 0;
+    [[nodiscard]] virtual unsigned getNoteCount() const = 0;
 
     // A LN may have more than one combo (head+tail=2 / rolling LN). Leave it virtual
-    virtual unsigned getMaxCombo() const = 0;
+    [[nodiscard]] virtual unsigned getMaxCombo() const = 0;
 
     virtual void fail() { _isFailed = true; }
 

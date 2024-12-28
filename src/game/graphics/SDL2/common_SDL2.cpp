@@ -56,7 +56,7 @@ Color Color::operator+(const Color& rhs) const
 Color Color::operator*(const double& rhs) const
 {
     if (rhs < 0)
-        return Color(0);
+        return {0};
     Color c;
     c.r = (r * rhs <= 255) ? (Uint8)(r * rhs) : 255;
     c.g = (g * rhs <= 255) ? (Uint8)(g * rhs) : 255;
@@ -480,7 +480,7 @@ TextureFull::TextureFull(const SDL_Surface* pSurface) : Texture(pSurface) {}
 
 TextureFull::TextureFull(SDL_Texture* pTexture, int w, int h) : Texture(pTexture, w, h) {}
 
-TextureFull::~TextureFull() {}
+TextureFull::~TextureFull() = default;
 
 void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const BlendMode b, const bool filter,
                        const double angle) const

@@ -2,14 +2,15 @@
 
 #include <algorithm>
 #include <memory>
+#include <ranges>
 #include <string>
 #include <vector>
 
-#include "game/arena/arena_client.h"
-#include "game/arena/arena_host.h"
-#include "game/ruleset/ruleset.h"
-#include "game/ruleset/ruleset_bms_network.h"
-#include "game/scene/scene_context.h"
+#include <game/arena/arena_client.h>
+#include <game/arena/arena_host.h>
+#include <game/ruleset/ruleset.h>
+#include <game/ruleset/ruleset_bms_network.h>
+#include <game/scene/scene_context.h>
 
 ArenaData gArenaData;
 
@@ -144,9 +145,8 @@ void ArenaData::updateGlobals()
     int rank = 1;
     int step = 0;
     unsigned exscorePrev = 0;
-    for (auto it = ranking.rbegin(); it != ranking.rend(); ++it)
+    for (auto [exscore, op] : std::ranges::reverse_view(ranking))
     {
-        auto& [exscore, op] = *it;
         if (exscore == exscorePrev)
         {
             step++;

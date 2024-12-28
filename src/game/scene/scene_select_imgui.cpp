@@ -1387,12 +1387,12 @@ void SceneSelect::imguiRefreshVideoDisplayResolutionList()
         addResolution(3840, 2160);
     }
 
-    for (size_t i = 0; i < imgui_video_display_resolution_size.size(); ++i)
+    for (auto& i : imgui_video_display_resolution_size)
     {
         std::stringstream ss;
-        ss << imgui_video_display_resolution_size[i].first;
+        ss << i.first;
         ss << "x";
-        ss << imgui_video_display_resolution_size[i].second;
+        ss << i.second;
         imgui_video_display_resolution.push_back(ss.str());
     }
 

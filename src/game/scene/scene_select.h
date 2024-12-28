@@ -112,7 +112,7 @@ protected:
     void updateFadeout();
 
     void update() override;
-    bool shouldShowImgui() const override;
+    [[nodiscard]] bool shouldShowImgui() const override;
     void updateImgui() override;
 
 protected:

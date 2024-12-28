@@ -325,7 +325,7 @@ Metre ChartObjectBase::getBarMetrePosition(size_t bar)
 {
     if (bar >= _barMetrePos.size())
     {
-        return Metre(LLONG_MAX, 1);
+        return {LLONG_MAX, 1};
     }
 
     return _barMetrePos[bar];
@@ -383,7 +383,7 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
     // Skip expired barline
     {
         NoteLaneCategory cat = NoteLaneCategory::EXTRA;
-        NoteLaneIndex idx = (NoteLaneIndex)EXTRA_BARLINE_1P;
+        auto idx = (NoteLaneIndex)EXTRA_BARLINE_1P;
         auto it = incomingNote(cat, idx);
         while (!isLastNote(cat, idx, it) && vt >= it->time)
         {

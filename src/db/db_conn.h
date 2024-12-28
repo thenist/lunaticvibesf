@@ -16,11 +16,11 @@ struct sqlite3;
 typedef __int64 sqlite_int64;
 typedef unsigned __int64 sqlite_uint64;
 #else
-typedef long long int sqlite_int64;
-typedef unsigned long long int sqlite_uint64;
+using sqlite_int64 = long long;
+using sqlite_uint64 = unsigned long long;
 #endif
-typedef sqlite_int64 sqlite3_int64;
-typedef sqlite_uint64 sqlite3_uint64;
+using sqlite3_int64 = sqlite_int64;
+using sqlite3_uint64 = sqlite_uint64;
 
 inline long long ANY_INT(const std::any& a)
 {
