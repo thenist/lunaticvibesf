@@ -1600,9 +1600,9 @@ ParseRet SkinLR2::SRC_README()
     SpriteImageText::SpriteImageTextBuilder builder;
     builder.srcLine = csvLineNumber;
     builder.textInd = IndexText::LVF_INTERNAL_README;
-    builder.lvfLineIdx = IndexNumber::LVF_INTERNAL_README_LINE;
     builder.align = TextAlign::TEXT_ALIGN_LEFT;
     builder.editable = false;
+    builder.lvf_use_readme_line = true;
 
     std::string font = std::to_string(d.font);
     if (auto it = LR2FontNameMap.find(font); it != LR2FontNameMap.end() && it->second != nullptr)

@@ -12,7 +12,6 @@
 
 #include <array>
 #include <atomic>
-#include <map>
 #include <memory>
 #include <shared_mutex>
 #include <string>
@@ -231,6 +230,7 @@ struct SelectContextParams
     int lastLaneEffectType1P = 0;
 
     ReadmeOpenRequest readmeOpenRequest;
+    unsigned readme_line = 0;
 
     double bargraph_level_bar_another;
     double bargraph_level_bar_beginner;

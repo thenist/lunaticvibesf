@@ -378,7 +378,6 @@ enum class IndexNumber : unsigned
     SCENE_UPDATE_FPS = 1000,
     INPUT_DETECT_FPS,
     NEW_ENTRY_SECONDS,
-    LVF_INTERNAL_README_LINE,
 
     NUMBER_COUNT = 1199
 };

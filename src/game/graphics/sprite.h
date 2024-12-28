@@ -336,10 +336,9 @@ private:
 
 protected:
     IndexText textInd;
-    // Which line to start drawing from.
-    IndexNumber _lvfLineIdx;
     TextAlign align;
     bool editable = false;
+    bool _lvf_use_readme_line = false;
 
 protected:
     std::string _text;
@@ -357,11 +356,11 @@ public:
     {
         std::shared_ptr<TTFFont> font = nullptr;
         IndexText textInd = IndexText::INVALID;
-        IndexNumber lvfLineIdx = IndexNumber::ZERO;
         TextAlign align = TEXT_ALIGN_LEFT;
         unsigned ptsize = 72;
         Color color = 0xffffffff;
         bool editable = false;
+        bool lvf_use_readme_line = false;
 
         std::shared_ptr<SpriteText> build() const { return std::make_shared<SpriteText>(*this); }
     };

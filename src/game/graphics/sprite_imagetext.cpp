@@ -1,10 +1,11 @@
 #include "sprite_imagetext.h"
 
-#include <string>
-
-#include "common/beat.h"
-#include "common/encoding.h"
 #include <common/assert.h>
+#include <common/beat.h>
+#include <common/encoding.h>
+#include <game/scene/scene_context.h>
+
+#include <string>
 
 SpriteImageText::SpriteImageText(const SpriteImageTextBuilder& builder)
     : SpriteText(builder), _textures(builder.charTextures), _chrList(builder.charMappingList),
@@ -150,7 +151,10 @@ bool SpriteImageText::update(const lunaticvibes::Time& t)
     _draw = updateMotion(t);
     if (_draw)
     {
-        updateTextTexture(State::get(textInd), State::get(_lvfLineIdx));
+        unsigned first_line = 0;
+        if (_lvf_use_readme_line)
+            first_line = gSelectContext.readme_line;
+        updateTextTexture(State::get(textInd), first_line);
         updateTextRect();
     }
     return _draw;

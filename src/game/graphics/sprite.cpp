@@ -381,11 +381,11 @@ SpriteText::SpriteText(const SpriteTextBuilder& builder) : SpriteBase(builder)
     _type = SpriteTypes::TEXT;
     pFont = builder.font;
     textInd = builder.textInd;
-    _lvfLineIdx = builder.lvfLineIdx;
     align = builder.align;
     textHeight = builder.ptsize * 3 / 2;
     textColor = builder.color;
     editable = builder.editable;
+    _lvf_use_readme_line = builder.lvf_use_readme_line;
 }
 
 bool SpriteText::update(const lunaticvibes::Time& t)
