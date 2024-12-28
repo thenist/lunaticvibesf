@@ -1,15 +1,16 @@
 ---
 Checks: |
-    -*,
-    bugprone-*,
-    concurrency-*,
-    modernize-avoid-bind,
-    modernize-raw-string-literal,
-    modernize-use-emplace,
-    modernize-use-override,
-    # modernize-use-using, # TODO
-    performance-*,
-    -bugprone-easily-swappable-parameters, # ?
-    -bugprone-narrowing-conversions, # FIXME
-    -bugprone-switch-missing-default-case, # FIXME
+  -*,
+  bugprone-*,
+  concurrency-*,
+  modernize-avoid-bind,
+  modernize-raw-string-literal,
+  modernize-use-emplace,
+  modernize-use-override,
+  # modernize-use-using, # TODO
+  performance-*,
+  -bugprone-easily-swappable-parameters, # ?
+  -bugprone-narrowing-conversions, # FIXME
+  -bugprone-switch-missing-default-case, # FIXME
 ---
+
