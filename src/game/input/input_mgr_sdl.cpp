@@ -14,17 +14,17 @@
 
 struct SdlJoystickDeleter
 {
-    void operator()(SDL_Joystick* joystick)
+    void operator()(SDL_GameController* joystick)
     {
         if (joystick != nullptr)
-            SDL_JoystickClose(joystick);
+            SDL_GameControllerClose(joystick);
     }
 };
-using SdlJoystickPtr = std::unique_ptr<SDL_Joystick, SdlJoystickDeleter>;
+using SdlJoystickPtr = std::unique_ptr<SDL_GameController, SdlJoystickDeleter>;
 
 struct SdlInputHolder
 {
-    std::array<SDL_Joystick*, InputMgr::MAX_JOYSTICK_COUNT> joysticks;
+    std::array<SDL_GameController*, InputMgr::MAX_JOYSTICK_COUNT> controllers;
     SdlInputHolder();
     SdlInputHolder(const SdlInputHolder&) = delete;
     SdlInputHolder(SdlInputHolder&&) = delete;
@@ -35,15 +35,15 @@ struct SdlInputHolder
 
 SdlInputHolder::SdlInputHolder()
 {
-    LOG_INFO << "[SDL2] Initializing Joystick";
-    SDL_Init(SDL_INIT_JOYSTICK);
+    LOG_INFO << "[SDL2] Initializing SDL_INIT_GAMECONTROLLER";
+    SDL_Init(SDL_INIT_GAMECONTROLLER);
 }
 
 SdlInputHolder::~SdlInputHolder()
 {
-    joysticks.fill(nullptr);
-    LOG_INFO << "[SDL2] De-initializing Joystick";
-    SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    controllers.fill(nullptr);
+    LOG_INFO << "[SDL2] De-initializing SDL_INIT_GAMECONTROLLER";
+    SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
 }
 
 [[nodiscard]] static SdlInputHolder& getInputState()
@@ -58,7 +58,7 @@ void initInput()
     (void)getInputState();
 }
 
-inline SDL_Joystick* g_game_controller;
+inline SDL_GameController* g_game_controller;
 
 void refreshInputDevices()
 {
@@ -71,59 +71,32 @@ void refreshInputDevices()
     }
     if (ret < 1)
     {
-        LOG_INFO << "[SDL2] No joystick connected";
+        LOG_INFO << "[SDL2] No game controller connected";
         return;
     }
     const int joystick_count = ret;
     LOG_INFO << "[SDL2] Found " << joystick_count << " joysticks";
-    for (int i = 0; i < std::min(joystick_count, static_cast<int>(sdl::state::g_joysticks.size())); ++i)
+    for (int i = 0; i < std::min(joystick_count, static_cast<int>(sdl::state::g_con_buttons.size())); ++i)
     {
-        LOG_DEBUG << "[SDL2] Opening joystick " << i;
-        auto j = SDL_JoystickOpen(i);
+        LOG_DEBUG << "[SDL2] Opening game controller " << i;
+        auto j = SDL_GameControllerOpen(i);
         if (j == nullptr)
         {
-            LOG_ERROR << "[SDL2] Failed to open joystick: " << SDL_GetError();
+            LOG_ERROR << "[SDL2] Failed to open game controller: " << SDL_GetError();
             continue;
         }
 
-        ret = SDL_JoystickNumButtons(j);
-        if (ret < 0)
-        {
-            LOG_ERROR << "[SDL2] SDL_JoystickNumButtons failed: " << SDL_GetError();
-            continue;
-        }
-        const auto buttons = static_cast<unsigned int>(ret);
-
-        ret = SDL_JoystickNumAxes(j);
-        if (ret < 0)
-        {
-            LOG_ERROR << "[SDL2] SDL_JoystickNumAxes failed: " << SDL_GetError();
-            continue;
-        }
-        const auto axes = static_cast<unsigned int>(ret);
-
-        ret = SDL_JoystickNumHats(j);
-        if (ret < 0)
-        {
-            LOG_ERROR << "[SDL2] SDL_JoystickNumHats failed: " << SDL_GetError();
-            continue;
-        }
-        const auto hats = static_cast<unsigned int>(ret);
-
-        const char* name = SDL_JoystickName(j);
+        const char* name = SDL_GameControllerName(j);
         if (name == nullptr)
             name = "(unnamed)";
 
         std::array<char, 64> guid{0};
-        SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(j), guid.data(), guid.size());
+        SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(SDL_GameControllerGetJoystick(j)), guid.data(), guid.size());
 
-        state.joysticks[i] = j;
+        state.controllers[i] = j;
 
-        LOG_INFO << "[SDL2] Initialized joystick: " << name;
+        LOG_INFO << "[SDL2] Initialized game controller: " << name;
         LOG_DEBUG << "[SDL2] GUID: " << guid.data();
-        LOG_DEBUG << "[SDL2] Using up to " << sdl::state::g_joysticks[i].size() << "/" << buttons << " buttons";
-        LOG_DEBUG << "[SDL2] Using up to " << sdl::state::g_joystick_axes[i].size() << "/" << axes << " axes";
-        LOG_DEBUG << "[SDL2] Using up to " << 0 << "/" << hats << " hats";
     }
 }
 
@@ -144,8 +117,8 @@ bool isButtonPressed(Input::Joystick c, double deadzone)
     switch (c.type)
     {
     case Input::Joystick::Type::BUTTON: {
-        LVF_DEBUG_ASSERT(c.device < sdl::state::g_joysticks.size());
-        const auto& buttons = sdl::state::g_joysticks[c.device];
+        LVF_DEBUG_ASSERT(c.device < sdl::state::g_con_buttons.size());
+        const auto& buttons = sdl::state::g_con_buttons[c.device];
         if (buttons.size() < c.index)
             return false;
         return buttons[c.index];
@@ -162,23 +135,22 @@ bool isButtonPressed(Input::Joystick c, double deadzone)
 
 double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index)
 {
-    // 1. Axis conversions are broken.
-    // 2. Gamepad triggers also send button events in addition to axis events. Wtf?
+    //  Axis conversions are broken.
     /*
-    LVF_DEBUG_ASSERT(device < sdl::state::g_joystick_axes.size());
-    const auto& axes = sdl::state::g_joystick_axes[device];
+    LVF_DEBUG_ASSERT(device < sdl::state::g_con_axes.size());
+    const auto& axes = sdl::state::g_con_axes[device];
     if (axes.size() < index)
         return -1.;
-    const auto axis = static_cast<uint16_t>(axes[index]);
-    if (axis == 0)
+    const auto axis = static_cast<int16_t>(axes[index]);
+    if (axis == 0 || axis == std::numeric_limits<decltype(axis)>::min())
         return -1.;
     switch (type)
     {
     case Input::Joystick::Type::UNDEF:
     case Input::Joystick::Type::BUTTON:
     case Input::Joystick::Type::POV: break;
-    case Input::Joystick::Type::AXIS_RELATIVE_POSITIVE: return (axis - 32767) / -32767.0;
-    case Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE: return (axis - 32767) / 32767.0;
+    case Input::Joystick::Type::AXIS_RELATIVE_POSITIVE: return axis / -32767.0;
+    case Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE: return axis / 32767.0;
     case Input::Joystick::Type::AXIS_ABSOLUTE: return axis / 65535.;
     }
     lunaticvibes::verify_failed("getJoystickAxis");

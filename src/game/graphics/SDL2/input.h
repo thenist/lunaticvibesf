@@ -21,10 +21,9 @@ inline int g_mouse_x = 0;
 inline int g_mouse_y = 0;
 // Reset this to `0` after use.
 inline short g_mouse_wheel_delta = 0;
-inline std::array<std::array<int16_t, InputMgr::MAX_JOYSTICK_AXIS_COUNT>, InputMgr::MAX_JOYSTICK_COUNT>
-    g_joystick_axes{};
+inline std::array<std::array<int16_t, InputMgr::MAX_JOYSTICK_AXIS_COUNT>, InputMgr::MAX_JOYSTICK_COUNT> g_con_axes{};
 // `true` for buttons currently being pressed down.
-inline std::array<std::array<bool, InputMgr::MAX_JOYSTICK_BUTTON_COUNT>, InputMgr::MAX_JOYSTICK_COUNT> g_joysticks{};
+inline std::array<std::array<bool, InputMgr::MAX_JOYSTICK_BUTTON_COUNT>, InputMgr::MAX_JOYSTICK_COUNT> g_con_buttons{};
 
 } // namespace sdl::state
 
