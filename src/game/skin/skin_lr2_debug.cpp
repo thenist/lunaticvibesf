@@ -67,7 +67,6 @@ void imguiMonitorNumber()
         {
             IndexNumber etcNumbers[] = {
                 IndexNumber::RANDOM,
-                IndexNumber::SCENE_UPDATE_FPS,
                 IndexNumber::INPUT_DETECT_FPS,
                 IndexNumber::NEW_ENTRY_SECONDS,
             };

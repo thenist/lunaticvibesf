@@ -1,26 +1,27 @@
 #pragma once
-#include "game/ruleset/ruleset.h"
-#include "game/skin/skin_mgr.h"
+
 #include "scene.h"
+
+#include <game/skin/skin_mgr.h>
+
 #include <memory>
-#include <mutex>
 
 class ScoreBase;
-enum class eCourseResultState
-{
-    DRAW,
-    STOP,
-    RECORD,
-    FADEOUT,
-};
 
-class SceneCourseResult : public SceneBase
+class SceneCourseResult final : public SceneBase
 {
 public:
     explicit SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneCourseResult() override;
 
 private:
+    enum class eCourseResultState
+    {
+        DRAW,
+        STOP,
+        RECORD,
+        FADEOUT,
+    };
     eCourseResultState state;
     InputMask _inputAvailable;
 
@@ -52,12 +53,11 @@ protected:
     double acc = 0.;
 
 protected:
-    // Looper callbacks
-    void _updateAsync() override;
-    void updateDraw();
-    void updateStop();
-    void updateRecord();
-    void updateFadeout();
+    void update_fixed(const lunaticvibes::Time& t) override;
+    void updateDraw(const lunaticvibes::Time& t);
+    void updateStop(const lunaticvibes::Time& t);
+    void updateRecord(const lunaticvibes::Time& t);
+    void updateFadeout(const lunaticvibes::Time& t);
 
 protected:
     // Register to InputWrapper: judge / keysound

@@ -6,9 +6,7 @@
 #include <game/skin/skin_mgr.h>
 
 #include <array>
-#include <atomic>
 #include <memory>
-#include <string>
 
 enum class SceneType : uint8_t
 {
@@ -57,12 +55,14 @@ namespace lunaticvibes
 
 // Parent class of scenes, defines how an object being stored and drawn.
 // Every classes of scenes should inherit this class.
-class SceneBase : public AsyncLooper
+class SceneBase
 {
 protected:
     SceneType _type;
     std::shared_ptr<SkinBase> pSkin;
     InputWrapper _input;
+    bool inTextEdit = false;
+    unsigned _rate;
 
     std::shared_ptr<TTFFont> _fNotifications;
     std::shared_ptr<Texture> _texNotificationsBG;
@@ -72,11 +72,6 @@ protected:
     std::array<std::shared_ptr<SpriteStatic>,
                size_t(IndexText::_OVERLAY_NOTIFICATION_MAX) - size_t(IndexText::_OVERLAY_NOTIFICATION_0) + 1>
         _sNotificationsBG;
-
-public:
-    bool sceneEnding = false;
-    bool inTextEdit = false;
-    std::string textBeforeEdit;
 
 protected:
     static bool queuedScreenshot;
@@ -88,21 +83,15 @@ public:
     SceneBase() = delete;
     SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType, unsigned rate = 240,
               bool backgroundInput = false);
-    ~SceneBase() override;
-    enum class AsyncStopState
-    {
-        Running,
-        Stopping,
-        Stopped,
-    };
-    AsyncStopState postAsyncStop();
-    void postAsyncStart();
+    virtual ~SceneBase();
     void inputLoopStart() { _input.loopStart(); }
     void inputLoopEnd() { _input.loopEnd(); }
     void disableMouseInput() { pSkin->setHandleMouseEvents(false); }
+    [[nodiscard]] unsigned getRate() const { return _rate; };
 
 public:
-    virtual void update(); // skin update
+    virtual void update();                                     // Called once before rendering, includes skin updating.
+    virtual void update_fixed(const lunaticvibes::Time& t) {}; // Called 'rate' amount of times.
     void MouseClick(InputMask& m, const lunaticvibes::Time& t);
     void MouseDrag(InputMask& m, const lunaticvibes::Time& t);
     void MouseRelease(InputMask& m, const lunaticvibes::Time& t);
@@ -111,11 +100,6 @@ public:
     [[nodiscard]] SkinBase::skinInfo getSkinInfo() const { return pSkin ? pSkin->info : SkinBase::skinInfo(); }
 
 protected:
-    virtual void _updateAsync() = 0;
-    void _updateAsync1();
-    // For any additional state when transitioning from Stopping to Stopped.
-    [[nodiscard]] virtual bool readyToStopAsync() const { return true; };
-
     [[nodiscard]] virtual bool shouldShowImgui() const;
     virtual void updateImgui();
     void DebugToggle(InputMask& m, const lunaticvibes::Time& t);
@@ -127,9 +111,6 @@ protected:
     virtual void stopTextEdit(bool modify);
 
     void GlobalFuncKeys(InputMask& m, const lunaticvibes::Time& t);
-
-private:
-    std::atomic<AsyncStopState> _asyncStopState{AsyncStopState::Running};
 };
 
 ////////////////////////////////////////////////////////////////////////////////

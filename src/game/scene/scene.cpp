@@ -24,8 +24,8 @@
 
 // prototype
 SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType, unsigned rate, bool backgroundInput)
-    : AsyncLooper("UpdateLoop", std::bind_front(&SceneBase::_updateAsync1, this), rate), _type(SceneType::NOT_INIT),
-      _input(ConfigMgr::get('P', cfg::P_INPUT_POLLING_RATE, 1000), backgroundInput)
+    : _type(SceneType::NOT_INIT), _input(ConfigMgr::get('P', cfg::P_INPUT_POLLING_RATE, 1000), backgroundInput),
+      _rate(rate)
 {
     // Disable skin caching for now. dst options are changing all the time
     const bool simple_skin = gInCustomize && skinType != SkinType::THEME_SELECT;
@@ -116,25 +116,11 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
 SceneBase::~SceneBase()
 {
     LVF_ASSERT(!_input.isRunning());
-    LVF_ASSERT(!isRunning());
     _input.unregister_r("SKIN_MOUSE_RELEASE");
     _input.unregister_h("SKIN_MOUSE_DRAG");
     _input.unregister_p("SKIN_MOUSE_CLICK");
     _input.unregister_p("GLOBALFUNC");
     _input.unregister_p("DEBUG_TOGGLE");
-    sceneEnding = true;
-}
-
-void SceneBase::postAsyncStart()
-{
-    _asyncStopState = AsyncStopState::Running;
-}
-
-SceneBase::AsyncStopState SceneBase::postAsyncStop()
-{
-    if (_asyncStopState == AsyncStopState::Running)
-        _asyncStopState = AsyncStopState::Stopping;
-    return _asyncStopState;
 }
 
 void SceneBase::update()
@@ -288,23 +274,6 @@ void SceneBase::draw() const
     }
 }
 
-void SceneBase::_updateAsync1()
-{
-    switch (_asyncStopState)
-    {
-    case AsyncStopState::Running: _updateAsync(); break;
-    case AsyncStopState::Stopping:
-        _updateAsync();
-        if (readyToStopAsync())
-            _asyncStopState = AsyncStopState::Stopped;
-        break;
-    case AsyncStopState::Stopped: break;
-    }
-
-    if ((!gInCustomize && _type != SceneType::CUSTOMIZE) || (gInCustomize && _type == SceneType::CUSTOMIZE))
-        gFrameCount[FRAMECOUNT_IDX_SCENE]++;
-}
-
 static bool should_show_text_overlay()
 {
     for (size_t i = 0; i < 4; ++i)
@@ -335,8 +304,8 @@ void SceneBase::updateImgui()
             if (showFPS)
             {
                 ImGui::PushID("##fps");
-                ImGui::Text("FPS: Render %d | Input %d | Update %d", State::get(IndexNumber::FPS),
-                            State::get(IndexNumber::INPUT_DETECT_FPS), State::get(IndexNumber::SCENE_UPDATE_FPS));
+                ImGui::Text("FPS: Render %d | Input %d", State::get(IndexNumber::FPS),
+                            State::get(IndexNumber::INPUT_DETECT_FPS));
                 ImGui::PopID();
             }
 

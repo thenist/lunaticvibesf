@@ -533,7 +533,6 @@ SceneSelect::~SceneSelect()
 
     if (_virtualSceneCustomize != nullptr)
     {
-        _virtualSceneCustomize->loopEnd();
         _virtualSceneCustomize.reset();
     }
 
@@ -559,7 +558,6 @@ SceneSelect::~SceneSelect()
     ConfigMgr::save();
 
     _input.loopEnd();
-    loopEnd();
 }
 
 void SceneSelect::closeReadme(const lunaticvibes::Time& closing_time)
@@ -677,17 +675,23 @@ void SceneSelect::enterEntry(const eEntryType type, const lunaticvibes::Time t)
     }
 }
 
-bool SceneSelect::readyToStopAsync() const
+void SceneSelect::update()
 {
-    return _virtualSceneCustomize == nullptr || _virtualSceneCustomize->postAsyncStop() == AsyncStopState::Stopped;
+    SceneBase::update();
+    if (_virtualSceneCustomize)
+        _virtualSceneCustomize->update();
+    if (_virtualSceneLoadSongs)
+        _virtualSceneLoadSongs->update();
 }
 
-void SceneSelect::_updateAsync()
+void SceneSelect::update_fixed(const lunaticvibes::Time& t)
 {
+    if (_virtualSceneCustomize)
+        _virtualSceneCustomize->update_fixed(t);
+    if (_virtualSceneLoadSongs)
+        _virtualSceneLoadSongs->update_fixed(t);
     if (gNextScene != SceneType::SELECT)
         return;
-
-    lunaticvibes::Time t;
 
     if (gAppIsExiting)
     {
@@ -696,10 +700,10 @@ void SceneSelect::_updateAsync()
 
     switch (state)
     {
-    case eSelectState::PREPARE: updatePrepare(); break;
-    case eSelectState::SELECT: updateSelect(); break;
+    case eSelectState::PREPARE: updatePrepare(t); break;
+    case eSelectState::SELECT: updateSelect(t); break;
     case eSelectState::WATCHING_README: break;
-    case eSelectState::FADEOUT: updateFadeout(); break;
+    case eSelectState::FADEOUT: updateFadeout(t); break;
     }
 
     auto visit_readme_open_request = overloaded{
@@ -955,7 +959,6 @@ void SceneSelect::_updateAsync()
             pSkin->setHandleMouseEvents(false);
             _virtualSceneCustomize = std::make_shared<SceneCustomize>(_skinMgr);
             _virtualSceneCustomize->setIsVirtual(true);
-            _virtualSceneCustomize->loopStart();
             pSkin->setHandleMouseEvents(true);
 
             createNotification("Load finished.");
@@ -969,9 +972,8 @@ void SceneSelect::_updateAsync()
     }
 }
 
-void SceneSelect::updatePrepare()
+void SceneSelect::updatePrepare(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
     lunaticvibes::Time rt = t - State::get(IndexTimer::SCENE_START);
 
     if (rt.norm() >= pSkin->info.timeIntro)
@@ -1002,10 +1004,8 @@ void SceneSelect::updatePrepare()
     }
 }
 
-void SceneSelect::updateSelect()
+void SceneSelect::updateSelect(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
-
     if (!refreshingSongList)
     {
         int line = (int)IndexText::_OVERLAY_TOPLEFT;
@@ -1215,9 +1215,8 @@ void SceneSelect::updateSelect()
     }
 }
 
-void SceneSelect::updateFadeout()
+void SceneSelect::updateFadeout(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
     lunaticvibes::Time ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (ft >= pSkin->info.timeOutro)
@@ -1244,15 +1243,6 @@ void SceneSelect::updateFadeout()
             gNextScene = SceneType::EXIT_TRANS;
         }
     }
-}
-
-void SceneSelect::update()
-{
-    SceneBase::update();
-    if (_virtualSceneCustomize)
-        _virtualSceneCustomize->update();
-    if (_virtualSceneLoadSongs)
-        _virtualSceneLoadSongs->update();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1559,13 +1549,11 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
             if (_virtualSceneLoadSongs == nullptr)
             {
                 _virtualSceneLoadSongs = std::make_shared<ScenePreSelect>();
-                _virtualSceneLoadSongs->loopStart();
                 while (!_virtualSceneLoadSongs->isLoadingFinished())
                 {
                     using namespace std::chrono_literals;
                     std::this_thread::sleep_for(33ms);
                 }
-                _virtualSceneLoadSongs->loopEnd();
                 _virtualSceneLoadSongs.reset();
             }
 

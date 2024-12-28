@@ -114,10 +114,9 @@ SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr)
 SceneKeyConfig::~SceneKeyConfig()
 {
     _input.loopEnd();
-    loopEnd();
 }
 
-void SceneKeyConfig::_updateAsync()
+void SceneKeyConfig::update_fixed(const lunaticvibes::Time& t)
 {
     if (gNextScene != SceneType::KEYCONFIG)
         return;
@@ -129,12 +128,12 @@ void SceneKeyConfig::_updateAsync()
 
     switch (_state)
     {
-    case SceneKeyConfigState::START: updateStart(); break;
-    case SceneKeyConfigState::MAIN: updateMain(); break;
-    case SceneKeyConfigState::FADEOUT: updateFadeout(); break;
+    case SceneKeyConfigState::START: updateStart(t); break;
+    case SceneKeyConfigState::MAIN: updateMain(t); break;
+    case SceneKeyConfigState::FADEOUT: updateFadeout(t); break;
     }
 
-    updateForceBargraphs();
+    updateForceBargraphs(t);
 
     if (gKeyconfigContext.modeChanged)
     {
@@ -153,9 +152,8 @@ void SceneKeyConfig::_updateAsync()
                std::to_string(State::get(IndexNumber::SCRATCH_AXIS_2P_ANGLE)));
 }
 
-void SceneKeyConfig::updateStart()
+void SceneKeyConfig::updateStart(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
     lunaticvibes::Time rt = t - State::get(IndexTimer::SCENE_START);
     if (rt.norm() > pSkin->info.timeIntro)
     {
@@ -169,9 +167,8 @@ void SceneKeyConfig::updateStart()
     }
 }
 
-void SceneKeyConfig::updateMain()
+void SceneKeyConfig::updateMain(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
     if (exiting)
     {
         State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
@@ -185,9 +182,8 @@ void SceneKeyConfig::updateMain()
     }
 }
 
-void SceneKeyConfig::updateFadeout()
+void SceneKeyConfig::updateFadeout(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
     lunaticvibes::Time rt = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (rt.norm() > pSkin->info.timeOutro)
@@ -462,7 +458,7 @@ void SceneKeyConfig::setInputBindingText(GameModeKeys keys, Input::Pad pad)
     State::set(IndexText::KEYCONFIG_SLOT10, placeholder);
 }
 
-void SceneKeyConfig::updateForceBargraphs()
+void SceneKeyConfig::updateForceBargraphs(const lunaticvibes::Time& t)
 {
     static const std::array wantForceBargraph = {
         Input::Pad::S1L, Input::Pad::K1START,  Input::Pad::S2L, Input::Pad::K2START, Input::Pad::K11,
@@ -477,7 +473,6 @@ void SceneKeyConfig::updateForceBargraphs()
 
     const GameModeKeys keys = gKeyconfigContext.keys;
     const auto input = ConfigMgr::Input(keys);
-    const lunaticvibes::Time t;
 
     // update keyboard force bargraph
     for (auto i = static_cast<unsigned>(Input::Keyboard::K_1); i != static_cast<unsigned>(Input::Keyboard::K_COUNT);

@@ -16,8 +16,6 @@ void GenericInfoUpdater::loop()
 {
     State::set(IndexNumber::FPS, gFrameCount[FRAMECOUNT_IDX_FPS] / _rate);
     gFrameCount[FRAMECOUNT_IDX_FPS] = 0;
-    State::set(IndexNumber::SCENE_UPDATE_FPS, gFrameCount[FRAMECOUNT_IDX_SCENE] / _rate);
-    gFrameCount[FRAMECOUNT_IDX_SCENE] = 0;
     State::set(IndexNumber::INPUT_DETECT_FPS, gFrameCount[FRAMECOUNT_IDX_INPUT] / _rate);
     gFrameCount[FRAMECOUNT_IDX_INPUT] = 0;
 

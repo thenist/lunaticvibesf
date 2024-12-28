@@ -2,24 +2,23 @@
 
 #include <game/scene/scene.h>
 
-class SceneDecide : public SceneBase
+class SceneDecide final : public SceneBase
 {
 public:
     explicit SceneDecide(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneDecide() override;
 
 protected:
-    // Looper callbacks
     enum class eDecideState
     {
         START,
         SKIP,
         CANCEL,
     };
-    void _updateAsync() override;
-    void updateStart();
-    void updateSkip();
-    void updateCancel();
+    void update_fixed(const lunaticvibes::Time& t) override;
+    void updateStart(const lunaticvibes::Time& t);
+    void updateSkip(const lunaticvibes::Time& t);
+    void updateCancel(const lunaticvibes::Time& t);
 
 protected:
     // Register to InputWrapper: judge / keysound

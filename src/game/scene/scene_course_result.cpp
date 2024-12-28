@@ -290,10 +290,9 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
 SceneCourseResult::~SceneCourseResult()
 {
     _input.loopEnd();
-    loopEnd();
 }
 
-void SceneCourseResult::_updateAsync()
+void SceneCourseResult::update_fixed(const lunaticvibes::Time& t)
 {
     if (gNextScene != SceneType::COURSE_RESULT)
         return;
@@ -305,16 +304,15 @@ void SceneCourseResult::_updateAsync()
 
     switch (state)
     {
-    case eCourseResultState::DRAW: updateDraw(); break;
-    case eCourseResultState::STOP: updateStop(); break;
-    case eCourseResultState::RECORD: updateRecord(); break;
-    case eCourseResultState::FADEOUT: updateFadeout(); break;
+    case eCourseResultState::DRAW: updateDraw(t); break;
+    case eCourseResultState::STOP: updateStop(t); break;
+    case eCourseResultState::RECORD: updateRecord(t); break;
+    case eCourseResultState::FADEOUT: updateFadeout(t); break;
     }
 }
 
-void SceneCourseResult::updateDraw()
+void SceneCourseResult::updateDraw(const lunaticvibes::Time& t)
 {
-    auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::SCENE_START);
 
     if (rt.norm() >= pSkin->info.timeResultRank)
@@ -326,9 +324,9 @@ void SceneCourseResult::updateDraw()
     }
 }
 
-void SceneCourseResult::updateStop() {}
+void SceneCourseResult::updateStop(const lunaticvibes::Time& t) {}
 
-void SceneCourseResult::updateRecord()
+void SceneCourseResult::updateRecord(const lunaticvibes::Time& t)
 {
     // TODO sync score in online mode?
     if (true)
@@ -337,9 +335,8 @@ void SceneCourseResult::updateRecord()
     }
 }
 
-void SceneCourseResult::updateFadeout()
+void SceneCourseResult::updateFadeout(const lunaticvibes::Time& t)
 {
-    auto t = lunaticvibes::Time();
     auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (ft >= pSkin->info.timeOutro)

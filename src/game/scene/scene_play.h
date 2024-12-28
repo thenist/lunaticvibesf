@@ -12,7 +12,7 @@
 #include <limits>
 #include <memory>
 
-class ScenePlay : public SceneBase
+class ScenePlay final : public SceneBase
 {
 public:
     enum class ePlayState
@@ -113,6 +113,8 @@ private:
     int pb_exscore = 0;
     int pb_maxcombo = 0;
 
+    bool sceneEnding = false;
+
 public:
     void clearGlobalData();
     bool createChartObj();
@@ -133,22 +135,20 @@ protected:
     void removeInputJudgeCallback();
 
 protected:
-    // Looper callbacks
-    [[nodiscard]] bool readyToStopAsync() const override;
-    void _updateAsync() override;
+    void update_fixed(const lunaticvibes::Time& t) override;
     void updateAsyncLanecover(const lunaticvibes::Time& t);
     void updateAsyncGreenNumber(const lunaticvibes::Time& t);
     void updateAsyncGaugeUpTimer(const lunaticvibes::Time& t);
     void updateAsyncLanecoverDisplay(const lunaticvibes::Time& t);
     void updateAsyncHSGradient(const lunaticvibes::Time& t);
     void updateAsyncAbsoluteAxis(const lunaticvibes::Time& t);
-    void updatePrepare();
-    void updateLoading();
-    void updateLoadEnd();
-    void updatePlaying();
-    void updateFadeout();
-    void updateFailed();
-    void updateWaitArena();
+    void updatePrepare(const lunaticvibes::Time& t);
+    void updateLoading(const lunaticvibes::Time& t);
+    void updateLoadEnd(const lunaticvibes::Time& t);
+    void updatePlaying(const lunaticvibes::Time& t);
+    void updateFadeout(const lunaticvibes::Time& t);
+    void updateFailed(const lunaticvibes::Time& t);
+    void updateWaitArena(const lunaticvibes::Time& t);
 
 protected:
     // Inner-state updates

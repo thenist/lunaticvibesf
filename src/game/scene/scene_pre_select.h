@@ -9,6 +9,7 @@ class ScenePreSelect final : public SceneBase
 public:
     ScenePreSelect();
     ~ScenePreSelect() override;
+    void update_fixed(const lunaticvibes::Time& t) override;
 
 protected:
     enum class SceneState : uint8_t
@@ -20,8 +21,6 @@ protected:
         Finish,
     };
     SceneState _state;
-    bool readyToStopAsync() const override;
-    void _updateAsync() override;
 
     void updateLoadSongs();
     void updateLoadTables();

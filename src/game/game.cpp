@@ -1,4 +1,5 @@
 #include <common/assert.h>
+#include <common/beat.h>
 #include <common/chartformat/chartformat_bms.h>
 #include <common/hash.h>
 #include <common/in_test_mode.h>
@@ -27,6 +28,7 @@
 #include <git_version.h>
 
 #include <format>
+#include <functional>
 #include <memory>
 #include <string_view>
 #include <type_traits>
@@ -321,6 +323,36 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+// Fix your time step.
+struct FixedUpdater
+{
+    explicit FixedUpdater(const lunaticvibes::Time& t) { reset(t); }
+
+    void operator()(const lunaticvibes::Time& t, unsigned rate, auto cb)
+    {
+        _acc += t - _last_update_time;
+
+        const auto dt = lunaticvibes::Time{1000 / rate};
+        while (_acc >= dt)
+        {
+            const auto this_tick_time = t - _acc;
+            cb(this_tick_time);
+            _acc -= dt;
+        }
+
+        _last_update_time = t;
+    }
+
+    void reset(const lunaticvibes::Time& t)
+    {
+        _acc = 0;
+        _last_update_time = t;
+    }
+
+    lunaticvibes::Time _acc;
+    lunaticvibes::Time _last_update_time;
+};
+
 void mainLoop()
 {
     GenericInfoUpdater genericInfo{1};
@@ -328,48 +360,46 @@ void mainLoop()
 
     SceneType currentScene = SceneType::NOT_INIT;
 
+    FixedUpdater update_scene{lunaticvibes::Time::now()};
+    FixedUpdater update_scene_customize{lunaticvibes::Time::now()};
+
     auto skinMgr = std::make_shared<SkinMgr>();
     std::shared_ptr<SceneBase> scene;
     std::shared_ptr<SceneBase> sceneCustomize;
     while (currentScene != SceneType::EXIT && gNextScene != SceneType::EXIT)
     {
+        const auto t = lunaticvibes::Time::now();
+
         // Event handling
         const bool quit = lunaticvibes::event_handle();
         if (quit)
-        {
             gAppIsExiting = true;
-        }
 
         // Scene change
         auto wantSceneChange = [&]() {
             if (!gInCustomize && currentScene != gNextScene)
                 return true;
-            if (gInCustomize && gCustomizeSceneChanged)
+            if (gInCustomize && (gCustomizeSceneChanged || sceneCustomize == nullptr))
                 return true;
             return gExitingCustomize;
         };
-        auto readyForSceneChange = [&]() {
-            if (scene && scene->postAsyncStop() != SceneBase::AsyncStopState::Stopped)
-                return false;
-            if (!gInCustomize || sceneCustomize == nullptr)
-                return true;
-            return !gExitingCustomize || sceneCustomize->postAsyncStop() == SceneBase::AsyncStopState::Stopped;
-        };
-        // TODO: move this under the 'if' below.
-        if (gInCustomize && sceneCustomize == nullptr)
+        if (wantSceneChange())
         {
-            sceneCustomize = lunaticvibes::buildScene(skinMgr, SceneType::CUSTOMIZE);
-            LVF_DEBUG_ASSERT(sceneCustomize != nullptr);
-            sceneCustomize->loopStart();
-            sceneCustomize->inputLoopStart();
-        }
-        if (wantSceneChange() && readyForSceneChange())
-        {
+            LOG_DEBUG << "[Main] Changing scene";
+
+            if (gInCustomize && sceneCustomize == nullptr)
+            {
+                LOG_DEBUG << "[Main] Building customize";
+                sceneCustomize = lunaticvibes::buildScene(skinMgr, SceneType::CUSTOMIZE);
+                LVF_ASSERT(sceneCustomize != nullptr);
+                sceneCustomize->inputLoopStart();
+            }
+
             if (gExitingCustomize && sceneCustomize)
             {
+                LOG_DEBUG << "[Main] Exiting customize";
                 gInCustomize = false;
                 sceneCustomize->inputLoopEnd();
-                sceneCustomize->loopEnd();
                 sceneCustomize.reset();
                 gNextScene = SceneType::SELECT;
             }
@@ -381,7 +411,6 @@ void mainLoop()
             if (scene)
             {
                 scene->inputLoopEnd();
-                scene->loopEnd();
                 scene.reset();
             }
 
@@ -399,7 +428,6 @@ void mainLoop()
                 lunaticvibes::Time t;
                 State::set(IndexTimer::SCENE_START, t.norm());
                 State::set(IndexTimer::START_INPUT, t.norm() + (scene ? scene->getSkinInfo().timeIntro : 0));
-                scene->loopStart();
                 if (!gInCustomize)
                     scene->inputLoopStart();
             }
@@ -409,6 +437,20 @@ void mainLoop()
         {
             graphics_clear();
             doMainThreadTask();
+
+            if (scene)
+                update_scene(t, scene->getRate(),
+                             std::bind_front(std::mem_fn(&SceneBase::update_fixed), std::ref(*scene)));
+            else
+                update_scene.reset(t);
+
+            if (sceneCustomize)
+                update_scene_customize(
+                    t, sceneCustomize->getRate(),
+                    std::bind_front(std::mem_fn(&SceneBase::update_fixed), std::ref(*sceneCustomize)));
+            else
+                update_scene_customize.reset(t);
+
             if (scene)
             {
                 scene->update();
@@ -426,7 +468,6 @@ void mainLoop()
     if (scene)
     {
         scene->inputLoopEnd();
-        scene->loopEnd();
         scene.reset();
     }
 

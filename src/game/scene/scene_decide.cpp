@@ -33,12 +33,11 @@ SceneDecide::SceneDecide(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 SceneDecide::~SceneDecide()
 {
     _input.loopEnd();
-    loopEnd();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void SceneDecide::_updateAsync()
+void SceneDecide::update_fixed(const lunaticvibes::Time& t)
 {
     if (gNextScene != SceneType::DECIDE)
         return;
@@ -50,15 +49,14 @@ void SceneDecide::_updateAsync()
 
     switch (state)
     {
-    case eDecideState::START: updateStart(); break;
-    case eDecideState::SKIP: updateSkip(); break;
-    case eDecideState::CANCEL: updateCancel(); break;
+    case eDecideState::START: updateStart(t); break;
+    case eDecideState::SKIP: updateSkip(t); break;
+    case eDecideState::CANCEL: updateCancel(t); break;
     }
 }
 
-void SceneDecide::updateStart()
+void SceneDecide::updateStart(const lunaticvibes::Time& t)
 {
-    const auto t = lunaticvibes::Time();
     const auto rt = t - State::get(IndexTimer::SCENE_START);
 
     if (!gInCustomize && rt.norm() >= pSkin->info.timeDecideExpiry)
@@ -67,9 +65,8 @@ void SceneDecide::updateStart()
     }
 }
 
-void SceneDecide::updateSkip()
+void SceneDecide::updateSkip(const lunaticvibes::Time& t)
 {
-    const auto t = lunaticvibes::Time();
     const auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (ft.norm() >= pSkin->info.timeOutro)
@@ -78,9 +75,8 @@ void SceneDecide::updateSkip()
     }
 }
 
-void SceneDecide::updateCancel()
+void SceneDecide::updateCancel(const lunaticvibes::Time& t)
 {
-    const auto t = lunaticvibes::Time();
     const auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (ft.norm() >= pSkin->info.timeOutro)

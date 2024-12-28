@@ -19,13 +19,13 @@ enum class CustomizeState : uint8_t
 
 } // namespace lunaticvibes
 
-class SceneCustomize : public SceneBase
+class SceneCustomize final : public SceneBase
 {
 public:
     explicit SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneCustomize() override;
 
-    void update() override;
+    void update_fixed(const lunaticvibes::Time& t) override;
 
     void setIsVirtual(bool is_virtual) { _is_virtual = is_virtual; };
 
@@ -47,12 +47,9 @@ protected:
     SkinType selectedMode;
 
 protected:
-    // Looper callbacks
-    void _updateAsync() override {};
-
-    void updateStart();
-    void updateMain();
-    void updateFadeout();
+    void updateStart(const lunaticvibes::Time& t);
+    void updateMain(const lunaticvibes::Time& t);
+    void updateFadeout(const lunaticvibes::Time& t);
 
 public:
     static StringPath getConfigFileName(StringPathView skinPath);

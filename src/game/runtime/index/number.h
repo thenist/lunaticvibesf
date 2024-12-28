@@ -356,9 +356,8 @@ enum class IndexNumber : unsigned
 
     RANDOM = 999,
 
-    SCENE_UPDATE_FPS = 1000,
-    INPUT_DETECT_FPS,
+    INPUT_DETECT_FPS = 1000,
     NEW_ENTRY_SECONDS,
 
-    NUMBER_COUNT = 1199
+    NUMBER_COUNT
 };

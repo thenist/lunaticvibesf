@@ -25,7 +25,7 @@ class ChartFormatBase;
 class EntryFolderRegular;
 class SceneCustomize;
 
-class SceneSelect : public SceneBase
+class SceneSelect final : public SceneBase
 {
 public:
     explicit SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr);
@@ -104,14 +104,12 @@ public:
     void openHelpFile(const lunaticvibes::Time&, size_t idx);
 
 protected:
-    // Looper callbacks
-    bool readyToStopAsync() const override;
-    void _updateAsync() override;
-    void updatePrepare();
-    void updateSelect();
-    void updateFadeout();
+    void updatePrepare(const lunaticvibes::Time& t);
+    void updateSelect(const lunaticvibes::Time& t);
+    void updateFadeout(const lunaticvibes::Time& t);
 
     void update() override;
+    void update_fixed(const lunaticvibes::Time& t) override;
     [[nodiscard]] bool shouldShowImgui() const override;
     void updateImgui() override;
 

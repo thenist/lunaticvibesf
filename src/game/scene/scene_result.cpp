@@ -1,6 +1,7 @@
 #include <game/scene/scene_result.h>
 
 #include <common/assert.h>
+#include <common/beat.h>
 #include <common/types.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
@@ -232,10 +233,9 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 SceneResult::~SceneResult()
 {
     _input.loopEnd();
-    loopEnd();
 }
 
-void SceneResult::_updateAsync()
+void SceneResult::update_fixed(const lunaticvibes::Time& t)
 {
     if (gNextScene != SceneType::RESULT)
         return;
@@ -247,11 +247,11 @@ void SceneResult::_updateAsync()
 
     switch (state)
     {
-    case eResultState::DRAW: updateDraw(); break;
-    case eResultState::STOP: updateStop(); break;
-    case eResultState::RECORD: updateRecord(); break;
-    case eResultState::FADEOUT: updateFadeout(); break;
-    case eResultState::WAIT_ARENA: updateWaitArena(); break;
+    case eResultState::DRAW: updateDraw(t); break;
+    case eResultState::STOP: updateStop(t); break;
+    case eResultState::RECORD: updateRecord(t); break;
+    case eResultState::FADEOUT: updateFadeout(t); break;
+    case eResultState::WAIT_ARENA: updateWaitArena(t); break;
     }
 
     if (gArenaData.isOnline() && gArenaData.isExpired())
@@ -340,9 +340,8 @@ static void saveReplay(const lunaticvibes::Time t, std::string replayFileName, S
                 scoreOld = pScore;
 }
 
-void SceneResult::updateDraw()
+void SceneResult::updateDraw(const lunaticvibes::Time& t)
 {
-    auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::SCENE_START);
 
     if (!_savedScore and !gChartContext.hash.empty() && saveScore)
@@ -366,9 +365,9 @@ void SceneResult::updateDraw()
     }
 }
 
-void SceneResult::updateStop() {}
+void SceneResult::updateStop(const lunaticvibes::Time& t) {}
 
-void SceneResult::updateRecord()
+void SceneResult::updateRecord(const lunaticvibes::Time& t)
 {
     // TODO sync score in online mode?
     if (true)
@@ -454,9 +453,8 @@ void SceneResult::updateRecord()
     return playScene;
 }
 
-void SceneResult::updateFadeout()
+void SceneResult::updateFadeout(const lunaticvibes::Time& t)
 {
-    auto t = lunaticvibes::Time();
     auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (ft >= pSkin->info.timeOutro)
@@ -533,11 +531,10 @@ void SceneResult::updateFadeout()
     }
 }
 
-void SceneResult::updateWaitArena()
+void SceneResult::updateWaitArena(const lunaticvibes::Time& t)
 {
     LVF_DEBUG_ASSERT(gArenaData.isOnline());
 
-    lunaticvibes::Time t;
     if (!gArenaData.isOnline() || !gSelectContext.isArenaReady)
     {
         State::set(IndexTimer::FADEOUT_BEGIN, t.norm());

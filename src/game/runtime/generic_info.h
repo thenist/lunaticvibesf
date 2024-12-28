@@ -5,10 +5,9 @@
 #include <atomic>
 #include <ctime>
 
-inline std::atomic<unsigned> gFrameCount[3]{0};
+inline std::atomic<unsigned> gFrameCount[2]{0};
 constexpr size_t FRAMECOUNT_IDX_FPS = 0;
-constexpr size_t FRAMECOUNT_IDX_SCENE = 1;
-constexpr size_t FRAMECOUNT_IDX_INPUT = 2;
+constexpr size_t FRAMECOUNT_IDX_INPUT = 1;
 
 class GenericInfoUpdater : public AsyncLooper
 {

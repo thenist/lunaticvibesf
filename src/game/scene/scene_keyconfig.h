@@ -1,32 +1,34 @@
 #pragma once
-#include "common/keymap.h"
+#include "common/beat.h"
 #include "scene.h"
-#include <atomic>
+
+#include <common/keymap.h>
+#include <common/types.h>
+
 #include <shared_mutex>
 
-class SceneKeyConfig : public SceneBase
+class SceneKeyConfig final : public SceneBase
 {
 public:
     explicit SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneKeyConfig() override;
 
 protected:
-    // Looper callbacks
-    enum class SceneKeyConfigState
+    enum class SceneKeyConfigState : uint8_t
     {
         START,
         MAIN,
         FADEOUT,
     };
-    std::atomic<SceneKeyConfigState> _state;
-    void _updateAsync() override;
-    void updateStart();
-    void updateMain();
-    void updateFadeout();
+    SceneKeyConfigState _state;
+    void update_fixed(const lunaticvibes::Time& t) override;
+    void updateStart(const lunaticvibes::Time& t);
+    void updateMain(const lunaticvibes::Time& t);
+    void updateFadeout(const lunaticvibes::Time& t);
 
 protected:
     std::map<Input::Pad, long long> forceBargraphTriggerTimestamp;
-    void updateForceBargraphs();
+    void updateForceBargraphs(const lunaticvibes::Time& t);
 
     void updateInfo(KeyMap k, int slot);
     void updateAllText();

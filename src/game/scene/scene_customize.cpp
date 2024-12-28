@@ -185,12 +185,10 @@ SceneCustomize::~SceneCustomize()
     // save(selectedMode);
 
     _input.loopEnd();
-    loopEnd();
 }
 
-void SceneCustomize::update()
+void SceneCustomize::update_fixed(const lunaticvibes::Time& t)
 {
-    SceneBase::update();
     if (!gInCustomize && gNextScene != SceneType::SELECT)
         return;
 
@@ -205,15 +203,14 @@ void SceneCustomize::update()
 
     switch (_state)
     {
-    case lunaticvibes::CustomizeState::Start: updateStart(); break;
-    case lunaticvibes::CustomizeState::Main: updateMain(); break;
-    case lunaticvibes::CustomizeState::Fadeout: updateFadeout(); break;
+    case lunaticvibes::CustomizeState::Start: updateStart(t); break;
+    case lunaticvibes::CustomizeState::Main: updateMain(t); break;
+    case lunaticvibes::CustomizeState::Fadeout: updateFadeout(t); break;
     }
 }
 
-void SceneCustomize::updateStart()
+void SceneCustomize::updateStart(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
     lunaticvibes::Time rt = t - State::get(IndexTimer::_SCENE_CUSTOMIZE_START);
     if (rt.norm() > pSkin->info.timeIntro)
     {
@@ -299,7 +296,7 @@ static void reload_preview(SkinType selectedMode)
     return lhs;
 }
 
-void SceneCustomize::updateMain()
+void SceneCustomize::updateMain(const lunaticvibes::Time& t)
 {
     // For the virtual customize scene gInCustomize is always false, so this means we are in a virtual scene and are
     // switching to a real customize scene.
@@ -308,8 +305,6 @@ void SceneCustomize::updateMain()
     // lock.
     if (gInCustomize && _is_virtual)
         return;
-
-    lunaticvibes::Time t;
 
     // Mode has changed
     if (gCustomizeContext.mode != selectedMode)
@@ -469,13 +464,13 @@ void SceneCustomize::updateMain()
     }
 }
 
-void SceneCustomize::updateFadeout()
+void SceneCustomize::updateFadeout(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
     lunaticvibes::Time rt = t - State::get(IndexTimer::_SCENE_CUSTOMIZE_FADEOUT);
 
-    if (rt.norm() > pSkin->info.timeOutro)
+    if (!gExitingCustomize && rt.norm() > pSkin->info.timeOutro)
     {
+        LOG_DEBUG << "[Customize] -> Select";
         pSkin->setHandleMouseEvents(false);
         _skinMgr->unload(selectedMode);
         gNextScene = SceneType::SELECT;

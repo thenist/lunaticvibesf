@@ -67,16 +67,7 @@ ScenePreSelect::~ScenePreSelect()
         loadCourseEnd.get();
 }
 
-bool ScenePreSelect::readyToStopAsync() const
-{
-    auto futureReady = [](const std::future<void>& future) {
-        return !future.valid() || future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
-    };
-    return futureReady(loadSongEnd) && futureReady(loadTableEnd) && futureReady(loadCourseEnd) &&
-           futureReady(updateScoreCacheEnd);
-}
-
-void ScenePreSelect::_updateAsync()
+void ScenePreSelect::update_fixed(const lunaticvibes::Time& t)
 {
     if (gNextScene != SceneType::PRE_SELECT && gNextScene != SceneType::SELECT)
         return;

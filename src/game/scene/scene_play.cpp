@@ -1068,7 +1068,6 @@ ScenePlay::~ScenePlay()
     gPlayContext.bgaTexture->reset();
 
     _input.loopEnd();
-    loopEnd();
 }
 
 void ScenePlay::setInitialHealthBMS()
@@ -1370,23 +1369,13 @@ void ScenePlay::removeInputJudgeCallback()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool ScenePlay::readyToStopAsync() const
-{
-    auto futureReady = [](const std::future<void>& future) {
-        return !future.valid() || future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
-    };
-    return futureReady(_loadChartFuture);
-}
-
-void ScenePlay::_updateAsync()
+void ScenePlay::update_fixed(const lunaticvibes::Time& t)
 {
     if (gNextScene != SceneType::PLAY)
         return;
 
     if (gAppIsExiting)
         gNextScene = SceneType::EXIT_TRANS;
-
-    lunaticvibes::Time t;
 
     // update lanecover / hispeed change
     updateAsyncLanecover(t);
@@ -1455,13 +1444,13 @@ void ScenePlay::_updateAsync()
 
     switch (state)
     {
-    case ePlayState::PREPARE: updatePrepare(); break;
-    case ePlayState::LOADING: updateLoading(); break;
-    case ePlayState::LOAD_END: updateLoadEnd(); break;
-    case ePlayState::PLAYING: updatePlaying(); break;
-    case ePlayState::FADEOUT: updateFadeout(); break;
-    case ePlayState::FAILED: updateFailed(); break;
-    case ePlayState::WAIT_ARENA: updateWaitArena(); break;
+    case ePlayState::PREPARE: updatePrepare(t); break;
+    case ePlayState::LOADING: updateLoading(t); break;
+    case ePlayState::LOAD_END: updateLoadEnd(t); break;
+    case ePlayState::PLAYING: updatePlaying(t); break;
+    case ePlayState::FADEOUT: updateFadeout(t); break;
+    case ePlayState::FAILED: updateFailed(t); break;
+    case ePlayState::WAIT_ARENA: updateWaitArena(t); break;
     }
 
     if (gArenaData.isOnline() && gArenaData.isExpired())
@@ -1945,10 +1934,9 @@ void ScenePlay::updateAsyncAbsoluteAxis(const lunaticvibes::Time& t)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ScenePlay::updatePrepare()
+void ScenePlay::updatePrepare(const lunaticvibes::Time& t)
 {
     State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_PREPARE);
-    auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::SCENE_START);
     if (rt.norm() > pSkin->info.timeIntro)
     {
@@ -1960,9 +1948,8 @@ void ScenePlay::updatePrepare()
     }
 }
 
-void ScenePlay::updateLoading()
+void ScenePlay::updateLoading(const lunaticvibes::Time& t)
 {
-    auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::_LOAD_START);
 
     State::set(IndexNumber::PLAY_LOAD_PROGRESS_SYS,
@@ -2006,9 +1993,8 @@ void ScenePlay::updateLoading()
     spinTurntable(false);
 }
 
-void ScenePlay::updateLoadEnd()
+void ScenePlay::updateLoadEnd(const lunaticvibes::Time& t)
 {
-    const auto t = lunaticvibes::Time();
     const auto rt = t - State::get(IndexTimer::PLAY_READY);
     spinTurntable(false);
     if (rt > pSkin->info.timeGetReady)
@@ -2034,35 +2020,30 @@ void ScenePlay::updateLoadEnd()
     }
 }
 
-void ScenePlay::updatePlaying()
+void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
 {
     LVF_DEBUG_ASSERT(gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr);
     LVF_DEBUG_ASSERT(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
 
-    auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::PLAY_START);
     State::set(IndexTimer::MUSIC_BEAT,
                int(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) % 1000);
 
-    {
-        gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->update(rt);
-        gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->update(t);
-    }
-    if (gPlayContext.ruleset[PLAYER_SLOT_MYBEST] != nullptr)
-    {
-        gPlayContext.chartObj[PLAYER_SLOT_MYBEST]->update(rt);
-        gPlayContext.ruleset[PLAYER_SLOT_MYBEST]->update(t);
-    }
-    if (gPlayContext.ruleset[PLAYER_SLOT_TARGET] != nullptr)
-    {
-        gPlayContext.chartObj[PLAYER_SLOT_TARGET]->update(rt);
-        gPlayContext.ruleset[PLAYER_SLOT_TARGET]->update(t);
-    }
+    auto update_play_context = [&](int slot) {
+        auto chart = gPlayContext.chartObj[slot];
+        auto ruleset = gPlayContext.ruleset[slot];
+        if (ruleset == nullptr)
+            return;
+        chart->update(rt);
+        ruleset->update(t);
+    };
+
+    update_play_context(PLAYER_SLOT_PLAYER);
+    update_play_context(PLAYER_SLOT_TARGET);
+    update_play_context(PLAYER_SLOT_MYBEST);
 
     // update replay key timers and lanecover values
-    if (gPlayContext.isReplay ||
-        (gPlayContext.isBattle && State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST))
-    {
+    auto updateReplayKeyAndLanecover = [&, this]() {
         LVF_DEBUG_ASSERT(gPlayContext.replay != nullptr);
         int slot = !gPlayContext.isBattle ? PLAYER_SLOT_PLAYER : PLAYER_SLOT_TARGET;
         InputMask prev = replayKeyPressing;
@@ -2170,6 +2151,11 @@ void ScenePlay::updatePlaying()
         holdingSelect[0] = replayKeyPressing[Input::Pad::K1SELECT];
         holdingStart[1] = replayKeyPressing[Input::Pad::K2START];
         holdingSelect[1] = replayKeyPressing[Input::Pad::K2SELECT];
+    };
+    if (gPlayContext.isReplay ||
+        (gPlayContext.isBattle && State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST))
+    {
+        updateReplayKeyAndLanecover();
     }
 
     // update score numbers
@@ -2278,6 +2264,7 @@ void ScenePlay::updatePlaying()
         playerState[PLAYER_SLOT_TARGET].judgeBP = miss2;
         poorBgaStartTime = t;
     }
+
     gPlayContext.bgaTexture->update(rt, t.norm() - poorBgaStartTime.norm() < poorBgaDuration);
 
     if (gauge1 != playerState[PLAYER_SLOT_PLAYER].seenGaugeType)
@@ -2303,87 +2290,89 @@ void ScenePlay::updatePlaying()
     // update keysound bindings
     changeKeySampleMapping(rt);
 
-    // graphs
-    pushGraphPoints();
-
-    // health check (-> to failed)
-    if (!playInterrupted)
     {
-        if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->isFailed() &&
-            gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->failWhenNoHealth() &&
-            (!gPlayContext.isBattle || gPlayContext.ruleset[PLAYER_SLOT_TARGET] == nullptr ||
-             (gPlayContext.ruleset[PLAYER_SLOT_TARGET]->isFailed() &&
-              gPlayContext.ruleset[PLAYER_SLOT_TARGET]->failWhenNoHealth())))
-        {
-            LOG_DEBUG << "[Play] Failed by health";
+        // graphs
+        pushGraphPoints();
 
-            playInterrupted = true;
-            if (gArenaData.isOnline())
+        // health check (-> to failed)
+        if (!playInterrupted)
+        {
+            if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->isFailed() &&
+                gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->failWhenNoHealth() &&
+                (!gPlayContext.isBattle || gPlayContext.ruleset[PLAYER_SLOT_TARGET] == nullptr ||
+                 (gPlayContext.ruleset[PLAYER_SLOT_TARGET]->isFailed() &&
+                  gPlayContext.ruleset[PLAYER_SLOT_TARGET]->failWhenNoHealth())))
             {
-                State::set(IndexTimer::ARENA_PLAY_WAIT, t.norm());
-                state = ePlayState::WAIT_ARENA;
-                LOG_DEBUG << "[Play] State changed to WAIT_ARENA";
-            }
-            else
-            {
-                State::set(IndexTimer::FAIL_BEGIN, t.norm());
-                State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_FAILED);
-                state = ePlayState::FAILED;
-                SoundMgr::stopSysSamples();
-                SoundMgr::stopNoteSamples();
-                SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_PLAYSTOP);
-                LOG_DEBUG << "[Play] State changed to PLAY_FAILED";
-            }
-            for (size_t i = 0; i < gPlayContext.ruleset.size(); ++i)
-            {
-                _input.unregister_p("SCENE_PRESS");
+                LOG_DEBUG << "[Play] Failed by health";
+
+                playInterrupted = true;
+                if (gArenaData.isOnline())
+                {
+                    State::set(IndexTimer::ARENA_PLAY_WAIT, t.norm());
+                    state = ePlayState::WAIT_ARENA;
+                    LOG_DEBUG << "[Play] State changed to WAIT_ARENA";
+                }
+                else
+                {
+                    State::set(IndexTimer::FAIL_BEGIN, t.norm());
+                    State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_FAILED);
+                    state = ePlayState::FAILED;
+                    SoundMgr::stopSysSamples();
+                    SoundMgr::stopNoteSamples();
+                    SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_PLAYSTOP);
+                    LOG_DEBUG << "[Play] State changed to PLAY_FAILED";
+                }
+                for (size_t i = 0; i < gPlayContext.ruleset.size(); ++i)
+                {
+                    _input.unregister_p("SCENE_PRESS");
+                }
             }
         }
-    }
 
-    // finish check
-    auto finishCheckSide = [&](int slot) {
-        if (!playerState[slot].finished && gPlayContext.ruleset[slot]->isFinished())
-        {
-            State::set(slot == PLAYER_SLOT_PLAYER ? IndexTimer::PLAY_P1_FINISHED : IndexTimer::PLAY_P2_FINISHED,
-                       t.norm());
-
-            if (gPlayContext.ruleset[slot]->getData().combo == gPlayContext.ruleset[slot]->getMaxCombo())
-                State::set(slot == PLAYER_SLOT_PLAYER ? IndexTimer::PLAY_FULLCOMBO_1P : IndexTimer::PLAY_FULLCOMBO_2P,
+        // finish check
+        auto finishCheckSide = [&](int slot) {
+            if (!playerState[slot].finished && gPlayContext.ruleset[slot]->isFinished())
+            {
+                State::set(slot == PLAYER_SLOT_PLAYER ? IndexTimer::PLAY_P1_FINISHED : IndexTimer::PLAY_P2_FINISHED,
                            t.norm());
 
-            playerState[slot].finished = true;
+                if (gPlayContext.ruleset[slot]->getData().combo == gPlayContext.ruleset[slot]->getMaxCombo())
+                    State::set(slot == PLAYER_SLOT_PLAYER ? IndexTimer::PLAY_FULLCOMBO_1P
+                                                          : IndexTimer::PLAY_FULLCOMBO_2P,
+                               t.norm());
 
-            LOG_INFO << "[Play] " << slot + 1 << "P finished";
-        }
-    };
-    finishCheckSide(PLAYER_SLOT_PLAYER);
-    if (gPlayContext.ruleset[PLAYER_SLOT_TARGET])
-        finishCheckSide(PLAYER_SLOT_TARGET);
+                playerState[slot].finished = true;
 
-    if (isPlaymodeDP())
-    {
-        State::set(IndexTimer::PLAY_P2_FINISHED, t.norm());
+                LOG_INFO << "[Play] " << slot + 1 << "P finished";
+            }
+        };
 
-        if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().combo ==
-            gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxCombo())
+        finishCheckSide(PLAYER_SLOT_PLAYER);
+        if (gPlayContext.ruleset[PLAYER_SLOT_TARGET])
+            finishCheckSide(PLAYER_SLOT_TARGET);
+
+        if (isPlaymodeDP())
         {
-            State::set(IndexTimer::PLAY_FULLCOMBO_2P, t.norm());
+            State::set(IndexTimer::PLAY_P2_FINISHED, t.norm());
+
+            if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().combo ==
+                gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxCombo())
+            {
+                State::set(IndexTimer::PLAY_FULLCOMBO_2P, t.norm());
+            }
         }
+
+        if (gArenaData.isOnline())
+        {
+            if (gArenaData.isClient())
+                g_pArenaClient->setPlayingFinished();
+            else
+                g_pArenaHost->setPlayingFinished();
+        }
+
+        playFinished = !playInterrupted && playerState[PLAYER_SLOT_PLAYER].finished &&
+                       (!gPlayContext.isBattle || playerState[PLAYER_SLOT_TARGET].finished);
     }
-
-    if (gArenaData.isOnline())
-    {
-        if (gArenaData.isClient())
-            g_pArenaClient->setPlayingFinished();
-        else
-            g_pArenaHost->setPlayingFinished();
-    }
-
-    playFinished = !playInterrupted && playerState[PLAYER_SLOT_PLAYER].finished &&
-                   (!gPlayContext.isBattle || playerState[PLAYER_SLOT_TARGET].finished);
-
-    //
     spinTurntable(true);
 
     // outro check
@@ -2405,9 +2394,8 @@ void ScenePlay::updatePlaying()
     }
 }
 
-void ScenePlay::updateFadeout()
+void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
 {
-    const auto t = lunaticvibes::Time();
     const auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (const auto start_time = State::get(IndexTimer::PLAY_START); start_time != TIMER_NEVER && gChartContext.started)
@@ -2439,11 +2427,9 @@ void ScenePlay::updateFadeout()
     //
     spinTurntable(gChartContext.started);
 
-    if (ft >= pSkin->info.timeOutro)
+    if (!sceneEnding && ft >= pSkin->info.timeOutro)
     {
-        LVF_ASSERT(!sceneEnding);
         sceneEnding = true;
-        postAsyncStop();
         if (_loadChartFuture.valid())
             _loadChartFuture.wait();
 
@@ -2659,9 +2645,8 @@ void ScenePlay::updateFadeout()
     }
 }
 
-void ScenePlay::updateFailed()
+void ScenePlay::updateFailed(const lunaticvibes::Time& t)
 {
-    auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::PLAY_START);
     auto ft = t - State::get(IndexTimer::FAIL_BEGIN);
 
@@ -2704,9 +2689,8 @@ void ScenePlay::updateFailed()
     }
 }
 
-void ScenePlay::updateWaitArena()
+void ScenePlay::updateWaitArena(const lunaticvibes::Time& t)
 {
-    lunaticvibes::Time t;
     auto rt = t - State::get(IndexTimer::PLAY_START);
 
     gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->update(rt);

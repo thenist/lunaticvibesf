@@ -2,32 +2,31 @@
 #include "game/skin/skin_mgr.h"
 #include "scene.h"
 #include <memory>
-#include <mutex>
 
 class ScoreBase;
-enum class eResultState
-{
-    DRAW,
-    STOP,
-    RECORD,
-    FADEOUT,
-    WAIT_ARENA,
-};
 
-class SceneResult : public SceneBase
+class SceneResult final : public SceneBase
 {
 public:
     explicit SceneResult(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneResult() override;
 
 protected:
-    // Looper callbacks
-    void _updateAsync() override;
-    void updateDraw();
-    void updateStop();
-    void updateRecord();
-    void updateFadeout();
-    void updateWaitArena();
+    enum class eResultState
+    {
+        DRAW,
+        STOP,
+        RECORD,
+        FADEOUT,
+        WAIT_ARENA,
+    };
+
+    void update_fixed(const lunaticvibes::Time& t) override;
+    void updateDraw(const lunaticvibes::Time& t);
+    void updateStop(const lunaticvibes::Time& t);
+    void updateRecord(const lunaticvibes::Time& t);
+    void updateFadeout(const lunaticvibes::Time& t);
+    void updateWaitArena(const lunaticvibes::Time& t);
 
 protected:
     // Register to InputWrapper: judge / keysound

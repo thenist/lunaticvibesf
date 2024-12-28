@@ -11,7 +11,6 @@ Please note that LVF upgrades user profiles such that they can't be used in orig
 
 ## Features
 
-- Multi-threaded update procedure
 - Asynchronous input handling
 - Full Unicode support
 - Built-in difficulty table support
