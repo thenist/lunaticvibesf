@@ -4,6 +4,7 @@
 #include <execution>
 #include <fstream>
 #include <optional>
+#include <random>
 #include <set>
 #include <sstream>
 #include <string_view>
@@ -632,7 +633,6 @@ Path SkinLR2::getCustomizePath(StringContentView input)
     if (pathStr.find(u8"*"_p) != pathStr.npos)
     {
         // Check if the wildcard path is specified by custom settings
-        std::srand(std::time(NULL));
         for (size_t idx = 0; idx < customize.size(); ++idx)
         {
             const auto& cf = customize[idx];
@@ -651,11 +651,9 @@ Path SkinLR2::getCustomizePath(StringContentView input)
         // Or, randomly choose a file
         auto ls = findFiles(path);
         if (ls.empty())
-        {
             return Path();
-        }
-        size_t ranidx = std::rand() % ls.size();
-        return ls[ranidx];
+        static std::random_device rd;
+        return ls[rd() % ls.size()];
     }
 
     // Normal path
@@ -3407,8 +3405,8 @@ int SkinLR2::parseHeader(const Tokens& raw)
         c.value = defVal;
         customize.push_back(c);
 
-        std::srand(std::time(NULL));
-        customizeRandom[customize.size() - 1] = ls.empty() ? 0 : (std::rand() % ls.size());
+        static std::random_device rd;
+        customizeRandom[customize.size() - 1] = ls.empty() ? 0 : (rd() % ls.size());
 
         return 3;
     }

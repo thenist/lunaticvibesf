@@ -1,6 +1,7 @@
 #include "sprite.h"
 
 #include <algorithm>
+#include <random>
 
 #include <common/assert.h>
 #include <common/sysutil.h>
@@ -631,10 +632,12 @@ void SpriteNumber::updateNumber(int n)
 
 void SpriteNumber::updateNumberByInd()
 {
+
+    static std::random_device rd;
     int n;
     switch (numInd)
     {
-    case IndexNumber::RANDOM: n = std::rand(); break;
+    case IndexNumber::RANDOM: n = rd(); break;
     case IndexNumber::ZERO: n = 0; break;
     default: n = State::get(numInd); break;
     }
