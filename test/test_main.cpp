@@ -13,6 +13,7 @@ bool lunaticvibes::in_test_mode()
 int main(int argc, char** argv)
 {
     executablePath = GetExecutablePath();
+    std::filesystem::current_path(executablePath);
     std::filesystem::current_path("test");
 
     SetThreadAsMainThread();
