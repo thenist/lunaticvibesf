@@ -332,18 +332,17 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
     }
     auto icd = icd_it->second.get();
 
-    static constexpr size_t BUF_SIZE = 1024l * 32l;
-    // I wanted to avoid manually allocating here so that we don't have
-    // to clean up manually in all return paths.
-    char out_buf[BUF_SIZE] = {0};
+    // PERF: this buffer is MASSIVE. Don't initialize it or memset will dominate runtime.
+    char out_buf[1024l * 32l];
 
     // BRUH-cast.
     char* buf_ptr = const_cast<char*>(input.data());
-    std::size_t buf_len = input.length();
+    size_t buf_len = input.length();
     char* out_ptr = static_cast<char*>(out_buf);
-    std::size_t out_len = sizeof(out_buf);
+    size_t out_len = sizeof(out_buf);
+    const size_t initial_out_len = out_len;
 
-    std::size_t iconv_ret = iconv(icd, &buf_ptr, &buf_len, &out_ptr, &out_len);
+    size_t iconv_ret = iconv(icd, &buf_ptr, &buf_len, &out_ptr, &out_len);
     if (iconv_ret == static_cast<size_t>(-1))
     {
         const int error = errno;
@@ -351,8 +350,9 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
         out = "(conversion error)";
         return;
     }
+    const size_t bytes_written = initial_out_len - out_len;
 
-    out = static_cast<char*>(out_buf);
+    out = std::string_view{static_cast<char*>(out_buf), bytes_written};
 }
 
 void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& buf)
