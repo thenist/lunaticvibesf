@@ -1,10 +1,10 @@
 #include "skin_lr2_debug.h"
 
+#include <common/assert.h>
 #include <common/sysutil.h>
 #include <game/runtime/state.h>
 #include <game/skin/skin_lr2.h>
 #include <game/skin/skin_lr2_bargraph.h>
-#include <common/assert.h>
 
 #include <imgui.h>
 
