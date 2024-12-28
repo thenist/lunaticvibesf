@@ -21,7 +21,6 @@ SceneDecide::SceneDecide(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
     _input.register_r("SCENE_RELEASE", std::bind_front(&SceneDecide::inputGameRelease, this));
 
     state = eDecideState::START;
-    _updateCallback = std::bind_front(&SceneDecide::updateStart, this);
 
     if (!gInCustomize)
     {
@@ -49,7 +48,12 @@ void SceneDecide::_updateAsync()
         gNextScene = SceneType::EXIT_TRANS;
     }
 
-    _updateCallback();
+    switch (state)
+    {
+    case eDecideState::START: updateStart(); break;
+    case eDecideState::SKIP: updateSkip(); break;
+    case eDecideState::CANCEL: updateCancel(); break;
+    }
 }
 
 void SceneDecide::updateStart()
@@ -104,11 +108,10 @@ void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
         {
         case eDecideState::START:
             State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
-            _updateCallback = std::bind_front(&SceneDecide::updateSkip, this);
             state = eDecideState::SKIP;
             LOG_DEBUG << "[Decide] State changed to SKIP";
             break;
-        case eDecideState::SKIP: break;
+        case eDecideState::SKIP:
         case eDecideState::CANCEL: break;
         }
     }
@@ -122,11 +125,10 @@ void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
             case eDecideState::START:
                 State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
                 SoundMgr::stopSysSamples();
-                _updateCallback = std::bind_front(&SceneDecide::updateCancel, this);
                 state = eDecideState::CANCEL;
                 LOG_DEBUG << "[Decide] State changed to CANCEL";
                 break;
-            case eDecideState::SKIP: break;
+            case eDecideState::SKIP:
             case eDecideState::CANCEL: break;
             }
         }
@@ -151,11 +153,10 @@ void SceneDecide::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
             case eDecideState::START:
                 State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
                 SoundMgr::stopSysSamples();
-                _updateCallback = std::bind_front(&SceneDecide::updateCancel, this);
                 state = eDecideState::CANCEL;
                 LOG_DEBUG << "[Decide] State changed to CANCEL";
                 break;
-            case eDecideState::SKIP: break;
+            case eDecideState::SKIP:
             case eDecideState::CANCEL: break;
             }
         }

@@ -1,13 +1,6 @@
 #pragma once
-#include "scene.h"
-#include <mutex>
 
-enum class eDecideState
-{
-    START,
-    SKIP,
-    CANCEL,
-};
+#include <game/scene/scene.h>
 
 class SceneDecide : public SceneBase
 {
@@ -17,8 +10,13 @@ public:
 
 protected:
     // Looper callbacks
+    enum class eDecideState
+    {
+        START,
+        SKIP,
+        CANCEL,
+    };
     void _updateAsync() override;
-    std::function<void()> _updateCallback;
     void updateStart();
     void updateSkip();
     void updateCancel();
