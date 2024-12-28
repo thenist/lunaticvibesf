@@ -40,7 +40,7 @@ inline std::string ANY_STR(const std::any& a)
 class SQLite
 {
 private:
-    mutable sqlite3* _db = NULL;
+    mutable sqlite3* _db = nullptr;
     std::string tag;
     bool inTransaction = false;
 

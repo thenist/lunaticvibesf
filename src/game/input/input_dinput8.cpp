@@ -7,7 +7,7 @@
 InputDirectInput8::InputDirectInput8()
 {
     HRESULT res =
-        DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8W, (LPVOID*)&lpdi, NULL);
+        DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8W, (LPVOID*)&lpdi, nullptr);
     if (res != DI_OK)
     {
         LOG_ERROR << "[Input] DirectInput create error: " << res;
@@ -105,7 +105,7 @@ int InputDirectInput8::refreshDevices()
     }
 
     // create keyboard
-    if (HRESULT hres = lpdi->CreateDevice(GUID_SysKeyboard, &deviceKeyboard.lpdid, NULL); hres == DI_OK)
+    if (HRESULT hres = lpdi->CreateDevice(GUID_SysKeyboard, &deviceKeyboard.lpdid, nullptr); hres == DI_OK)
     {
         if (HRESULT hres1 = deviceKeyboard.lpdid->SetDataFormat(&c_dfDIKeyboard); hres1 == DI_OK)
         {
@@ -122,7 +122,7 @@ int InputDirectInput8::refreshDevices()
     }
 
     // create mouse
-    if (HRESULT hres = lpdi->CreateDevice(GUID_SysMouse, &deviceMouse.lpdid, NULL); hres == DI_OK)
+    if (HRESULT hres = lpdi->CreateDevice(GUID_SysMouse, &deviceMouse.lpdid, nullptr); hres == DI_OK)
     {
         if (HRESULT hres1 = deviceMouse.lpdid->SetDataFormat(&c_dfDIMouse); hres1 == DI_OK)
         {
@@ -145,12 +145,12 @@ BOOL InputDirectInput8::DIEnumDevicesCallbackJoystick(LPCDIDEVICEINSTANCE lpddi)
 {
     LPDIRECTINPUTDEVICE8 lpdiPad;
 
-    if (HRESULT hres = lpdi->CreateDevice(lpddi->guidInstance, &lpdiPad, NULL); hres != DI_OK)
+    if (HRESULT hres = lpdi->CreateDevice(lpddi->guidInstance, &lpdiPad, nullptr); hres != DI_OK)
     {
         LOG_WARNING << "[Input] DirectInput Joystick CreateDevice error: " << hres;
         return DIENUM_CONTINUE;
     }
-    if (HRESULT hres = lpdiPad->EnumObjects(WDIEnumDeviceObjectsCallback, NULL, DIDFT_ALL); hres != DI_OK)
+    if (HRESULT hres = lpdiPad->EnumObjects(WDIEnumDeviceObjectsCallback, nullptr, DIDFT_ALL); hres != DI_OK)
     {
         LOG_WARNING << "[Input] DirectInput Joystick EnumObjects error: " << hres;
         return DIENUM_CONTINUE;

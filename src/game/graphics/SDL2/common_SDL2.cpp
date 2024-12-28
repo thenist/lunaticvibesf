@@ -362,7 +362,7 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
 
         SDL_SetRenderTarget(gFrameRenderer, oldTarget);
         SDL_SetTextureBlendMode(&*pTextureInverted, SDL_BLENDMODE_BLEND);
-        SDL_RenderCopyExF(gFrameRenderer, &*pTextureInverted, &rc, &dstRectF, angle, center ? &scenter : NULL,
+        SDL_RenderCopyExF(gFrameRenderer, &*pTextureInverted, &rc, &dstRectF, angle, center ? &scenter : nullptr,
                           SDL_RendererFlip(flipFlags));
         return;
     }
@@ -414,7 +414,7 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
         }
     }
 
-    SDL_RenderCopyExF(gFrameRenderer, pTex, srcRect, &dstRectF, angle, center ? &scenter : NULL,
+    SDL_RenderCopyExF(gFrameRenderer, pTex, srcRect, &dstRectF, angle, center ? &scenter : nullptr,
                       SDL_RendererFlip(flipFlags));
 
     // #ifndef NDEBUG

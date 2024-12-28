@@ -359,9 +359,9 @@ std::vector<std::string> getDeviceListASIO()
             ;
 
         DWORD dwNum;
-        dwNum = WideCharToMultiByte(CP_UTF8, NULL, desc, descLength, NULL, 0, NULL, FALSE);
+        dwNum = WideCharToMultiByte(CP_UTF8, 0, desc, descLength, 0, 0, 0, FALSE);
         char ustr[MAX_PATH * 4] = {0};
-        WideCharToMultiByte(CP_UTF8, NULL, desc, descLength, ustr, dwNum, NULL, FALSE);
+        WideCharToMultiByte(CP_UTF8, 0, desc, descLength, ustr, dwNum, 0, FALSE);
 
         if (ret == ERROR_SUCCESS)
         {

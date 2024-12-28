@@ -210,7 +210,7 @@ static std::chrono::high_resolution_clock::time_point frameTimestampPrev;
 static Path screenshotPath;
 void graphics_flush()
 {
-    SDL_SetRenderTarget(gFrameRenderer, NULL);
+    SDL_SetRenderTarget(gFrameRenderer, nullptr);
     {
         // TODO scale internal canvas
         Rect ssRect = canvasRect;
@@ -547,7 +547,7 @@ bool lunaticvibes::event_handle()
 
 void ImGuiNewFrame()
 {
-    SDL_SetRenderTarget(gFrameRenderer, NULL);
+    SDL_SetRenderTarget(gFrameRenderer, nullptr);
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();

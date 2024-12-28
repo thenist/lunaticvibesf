@@ -55,7 +55,7 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
     if (!simple_skin)
     {
         int faceIndex;
-        const Path fontPath = getSysMonoFontPath(NULL, &faceIndex, i18n::getCurrentLanguage());
+        const Path fontPath = getSysMonoFontPath(nullptr, &faceIndex, i18n::getCurrentLanguage());
         const int notificationHeight = 20;
         const int textHeight = 24;
         _fNotifications = std::make_shared<TTFFont>(fontPath, int(textHeight * 1.5), faceIndex);
@@ -327,7 +327,7 @@ void SceneBase::updateImgui()
     {
         ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
         ImGui::PushStyleColor(ImGuiCol_WindowBg, {0.f, 0.f, 0.f, 0.4f});
-        if (ImGui::Begin("##textoverlay", NULL,
+        if (ImGui::Begin("##textoverlay", nullptr,
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
                              ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))

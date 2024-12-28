@@ -71,7 +71,7 @@ Path GetExecutablePath()
 {
     char fullpath[256] = {0};
 
-    if (!GetModuleFileNameA(NULL, fullpath, sizeof(fullpath)))
+    if (!GetModuleFileNameA(nullptr, fullpath, sizeof(fullpath)))
     {
         return {};
     }
@@ -79,7 +79,7 @@ Path GetExecutablePath()
     return fs::path(fullpath).parent_path();
 }
 
-static HWND hwnd = NULL;
+static HWND hwnd = nullptr;
 void setWindowHandle(void* handle)
 {
     hwnd = *(HWND*)handle;
@@ -104,7 +104,7 @@ const char* safe_strerror(int errnum, char* buffer, size_t buffer_length)
 bool lunaticvibes::open(const std::string& link)
 {
     // TODO: check UTF-8 compatibility.
-    auto res = reinterpret_cast<INT_PTR>(ShellExecute(NULL, "open", link.c_str(), NULL, NULL, SW_SHOWDEFAULT));
+    auto res = reinterpret_cast<INT_PTR>(ShellExecute(nullptr, "open", link.c_str(), nullptr, nullptr, SW_SHOWDEFAULT));
     // > .. can be cast only to an INT_PTR
     // > If the function succeeds, it returns a value greater than 32.
     return res > 32;

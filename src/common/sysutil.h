@@ -78,8 +78,8 @@ enum class Languages
     ZHHK,
     // tbd
 };
-Path getSysFontPath(std::string* faceName = NULL, int* faceIndex = NULL, Languages lang = Languages::EN);
-Path getSysMonoFontPath(std::string* faceName = NULL, int* faceIndex = NULL, Languages lang = Languages::EN);
+Path getSysFontPath(std::string* faceName = nullptr, int* faceIndex = nullptr, Languages lang = Languages::EN);
+Path getSysMonoFontPath(std::string* faceName = nullptr, int* faceIndex = nullptr, Languages lang = Languages::EN);
 
 // Thread-safe strerror().
 //

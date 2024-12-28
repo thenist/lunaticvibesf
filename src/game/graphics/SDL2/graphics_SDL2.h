@@ -241,13 +241,13 @@ class TTFFont
     friend class SpriteText;
 
 protected:
-    TTF_Font* _pFont = NULL;
+    TTF_Font* _pFont = nullptr;
     std::string _filePath;
     int _faceIndex = -1;
     bool loaded = false;
     int _ptsize = 0;
 
-    TTF_Font* _pFontOutline = NULL;
+    TTF_Font* _pFontOutline = nullptr;
     Color _outlineColor;
     int _outlineWidth = 0;
 

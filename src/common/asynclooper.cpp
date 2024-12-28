@@ -19,8 +19,8 @@ AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsi
     _rate = rate_per_sec;
 
 #ifdef _WIN32
-    handler = CreateWaitableTimerExA(NULL, NULL, 0, TIMER_ALL_ACCESS);
-    LVF_DEBUG_ASSERT(handler != NULL);
+    handler = CreateWaitableTimerExA(nullptr, nullptr, 0, TIMER_ALL_ACCESS);
+    LVF_DEBUG_ASSERT(handler != nullptr);
 #endif
 }
 
@@ -32,7 +32,7 @@ AsyncLooper::~AsyncLooper()
     if (handler)
     {
         CloseHandle(handler);
-        handler = NULL;
+        handler = nullptr;
     }
 #endif
 }
@@ -89,7 +89,7 @@ void AsyncLooper::loopStart()
                     {
                         if (us > 0 && dueTime.QuadPart < 0)
                         {
-                            SetWaitableTimerEx(handler, &dueTime, 0, NULL, NULL, NULL, 0);
+                            SetWaitableTimerEx(handler, &dueTime, 0, nullptr, nullptr, nullptr, 0);
                             // SleepEx(100, TRUE);
                             WaitForSingleObjectEx(handler, 1000, TRUE);
                         }
@@ -145,7 +145,8 @@ void AsyncLooper::loopEnd()
             if (dwError != ERROR_INVALID_HANDLE)
             {
                 LOG_ERROR << "[Looper] " << _tag << ": Delete timer error: " << dwError;
-                while (dwError == ERROR_IO_PENDING && DeleteTimerQueueTimer(NULL, handler, INVALID_HANDLE_VALUE) != 0)
+                while (dwError == ERROR_IO_PENDING &&
+                       DeleteTimerQueueTimer(nullptr, handler, INVALID_HANDLE_VALUE) != 0)
                 {
                     dwError = GetLastError();
                 }

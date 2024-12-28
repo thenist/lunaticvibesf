@@ -131,7 +131,7 @@ void KeyCreate(const char* Source, unsigned char* Key)
 {
     size_t Len;
 
-    if (Source == NULL)
+    if (Source == nullptr)
     {
         memset(Key, 0xaaaaaaaa, DXA_KEYSTR_LENGTH_VER5);
     }
@@ -224,7 +224,7 @@ int Decompress(void* Src, void* Dest)
     keycode = srcp[8];
 
     // 出力先がない場合はサイズだけ返す
-    if (Dest == NULL)
+    if (Dest == nullptr)
         return destsize;
 
     // 展開開始
@@ -580,13 +580,13 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
     return 0;
 }
 
-static int DecodeArchive(const Path& path, DXArchive* output = NULL)
+static int DecodeArchive(const Path& path, DXArchive* output = nullptr)
 {
     DARC_HEAD_VER5 Head;
     u8 Key[DXA_KEYSTR_LENGTH_VER5];
 
     // 鍵文字列の作成
-    KeyCreate(NULL, Key);
+    KeyCreate(nullptr, Key);
 
     // アーカイブファイルを開く
     std::ifstream ArcP(path, std::ios_base::binary);
@@ -636,7 +636,7 @@ static int DecodeArchive(const Path& path, DXArchive* output = NULL)
         DirP = NameP + Head.DirectoryTableStartAddress;
 
         // アーカイブの展開を開始する
-        if (output != NULL)
+        if (output != nullptr)
             DirectoryDecode(NameP, DirP, FileP, &Head, (DARC_DIRECTORY_VER5*)DirP, ArcP, Key, ".", *output);
         else
             DirectoryDecode(NameP, DirP, FileP, &Head, (DARC_DIRECTORY_VER5*)DirP, ArcP, Key,

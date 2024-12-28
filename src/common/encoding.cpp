@@ -231,13 +231,13 @@ void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding,
 
     DWORD dwNum;
 
-    dwNum = MultiByteToWideChar(cp, 0, input.c_str(), -1, NULL, 0);
+    dwNum = MultiByteToWideChar(cp, 0, input.c_str(), -1, nullptr, 0);
     wchar_t* wstr = new wchar_t[dwNum];
     MultiByteToWideChar(cp, 0, input.c_str(), -1, wstr, dwNum);
 
-    dwNum = WideCharToMultiByte(CP_UTF8, NULL, wstr, -1, NULL, 0, NULL, FALSE);
+    dwNum = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, 0, 0, 0, FALSE);
     char* ustr = new char[dwNum];
-    WideCharToMultiByte(CP_UTF8, NULL, wstr, -1, ustr, dwNum, NULL, FALSE);
+    WideCharToMultiByte(CP_UTF8, 0, wstr, -1, ustr, dwNum, 0, FALSE);
 
     out = ustr;
 
@@ -260,13 +260,13 @@ std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
 
     DWORD dwNum;
 
-    dwNum = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, NULL, 0);
+    dwNum = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, nullptr, 0);
     wchar_t* wstr = new wchar_t[dwNum];
     MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, wstr, dwNum);
 
-    dwNum = WideCharToMultiByte(cp, NULL, wstr, -1, NULL, 0, NULL, FALSE);
+    dwNum = WideCharToMultiByte(cp, 0, wstr, -1, 0, 0, 0, FALSE);
     char* lstr = new char[dwNum];
-    WideCharToMultiByte(cp, NULL, wstr, -1, lstr, dwNum, NULL, FALSE);
+    WideCharToMultiByte(cp, 0, wstr, -1, lstr, dwNum, 0, FALSE);
 
     std::string ret(lstr);
 

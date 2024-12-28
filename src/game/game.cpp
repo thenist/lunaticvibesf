@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 
     // imgui font
     int fontIndex = 0;
-    Path imguiFontPath = getSysFontPath(NULL, &fontIndex, i18n::getCurrentLanguage());
+    Path imguiFontPath = getSysFontPath(nullptr, &fontIndex, i18n::getCurrentLanguage());
     if (!fs::exists(imguiFontPath))
     {
         constexpr auto&& msg = "Font file not found. Please reinstall the game.";
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
         gNextScene = SceneType::PLAY;
         gQuitOnFinish = true;
 
-        std::shared_ptr<ChartFormatBase> bms = ChartFormatBase::createFromFile(bmsFile, std::time(NULL));
+        std::shared_ptr<ChartFormatBase> bms = ChartFormatBase::createFromFile(bmsFile, std::time(nullptr));
         gPlayContext.mode = lunaticvibes::skinTypeForKeys(bms->gamemode);
         gChartContext = ChartContextParams{
             bmsFile,
@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
 #ifdef _WIN32
     timeBeginPeriod(1);
 
-    HRESULT oleInitializeResult = OleInitialize(NULL);
+    HRESULT oleInitializeResult = OleInitialize(nullptr);
     if (oleInitializeResult < 0)
     {
         LOG_ERROR << "OleInitialize Failed";

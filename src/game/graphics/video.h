@@ -105,7 +105,7 @@ public:
     void decodeLoop();
 
     int64_t getDecodedFrames() const { return decoded_frames; }
-    AVFrame* getFrame() const { return valid ? pFrame.get() : NULL; }
+    AVFrame* getFrame() const { return valid ? pFrame.get() : nullptr; }
 
 public:
     std::shared_mutex video_frame_mutex;

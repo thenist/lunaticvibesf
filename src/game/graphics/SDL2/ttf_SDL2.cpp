@@ -62,14 +62,14 @@ void TTFFont::setOutline(int width, const Color& c)
 
     if (width == 0)
     {
-        if (_pFontOutline != NULL)
+        if (_pFontOutline != nullptr)
         {
             TTF_CloseFont(_pFontOutline);
         }
     }
     else
     {
-        if (_pFontOutline == NULL)
+        if (_pFontOutline == nullptr)
         {
             if (_faceIndex >= 0)
                 _pFontOutline = TTF_OpenFontIndex(_filePath.c_str(), _ptsize, _faceIndex);

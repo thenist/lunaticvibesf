@@ -198,7 +198,7 @@ void SceneSelect::imguiSettings()
         ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
                                         static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
                                  ImGuiCond_Always);
-        if (ImGui::Begin("Main", NULL,
+        if (ImGui::Begin("Main", nullptr,
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
                              ImGuiWindowFlags_NoCollapse))
@@ -511,42 +511,42 @@ void SceneSelect::imguiPageOptions()
     using namespace i18nText;
 
     ImGui::SetNextItemWidth(tabItemWidth);
-    if (ImGui::BeginTabItem(i18n::c(SETTINGS_GENERAL), NULL, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem(i18n::c(SETTINGS_GENERAL), nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         imguiPageOptionsGeneral();
         ImGui::EndTabItem();
     }
 
     ImGui::SetNextItemWidth(tabItemWidth);
-    if (ImGui::BeginTabItem(i18n::c(SETTINGS_JUKEBOX), NULL, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem(i18n::c(SETTINGS_JUKEBOX), nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         imguiPageOptionsJukebox();
         ImGui::EndTabItem();
     }
 
     ImGui::SetNextItemWidth(tabItemWidth);
-    if (ImGui::BeginTabItem(i18n::c(SETTINGS_VIDEO), NULL, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem(i18n::c(SETTINGS_VIDEO), nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         imguiPageOptionsVideo();
         ImGui::EndTabItem();
     }
 
     ImGui::SetNextItemWidth(tabItemWidth);
-    if (ImGui::BeginTabItem(i18n::c(SETTINGS_AUDIO), NULL, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem(i18n::c(SETTINGS_AUDIO), nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         imguiPageOptionsAudio();
         ImGui::EndTabItem();
     }
 
     ImGui::SetNextItemWidth(tabItemWidth);
-    if (ImGui::BeginTabItem(i18n::c(SETTINGS_PLAY), NULL, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem(i18n::c(SETTINGS_PLAY), nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         imguiPageOptionsPlay();
         ImGui::EndTabItem();
     }
 
     ImGui::SetNextItemWidth(tabItemWidth);
-    if (ImGui::BeginTabItem(i18n::c(SETTINGS_SELECT), NULL, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem(i18n::c(SETTINGS_SELECT), nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         imguiPageOptionsSelect();
         ImGui::EndTabItem();
@@ -1138,7 +1138,7 @@ void SceneSelect::imguiPageAbout()
     using namespace i18nText;
 
     ImGui::SetNextItemWidth(tabItemWidth);
-    if (ImGui::BeginTabItem("Lunatic Vibes F", NULL, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem("Lunatic Vibes F", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         if (ImGui::BeginChild("##pagesub21"))
         {
@@ -1217,7 +1217,7 @@ Special Thanks:
         ImGui::EndTabItem();
     }
 
-    if (ImGui::BeginTabItem("3rd-party Softwares", NULL, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem("3rd-party Softwares", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         if (ImGui::BeginChild("##pagesub22"))
         {
@@ -1637,7 +1637,7 @@ bool SceneSelect::imguiApplyResolution()
     if (imgui_video_mode != old_video_mode)
     {
         old_video_mode = imgui_video_mode;
-        const char* windowMode = NULL;
+        const char* windowMode = nullptr;
         switch (imgui_video_mode)
         {
         case 0: windowMode = cfg::V_WINMODE_WINDOWED; break;
@@ -1770,7 +1770,7 @@ bool SceneSelect::imguiArenaJoinLobbyPrompt()
         ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
                                         static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
                                  ImGuiCond_Always);
-        if (ImGui::Begin("Join Lobby Main", NULL,
+        if (ImGui::Begin("Join Lobby Main", nullptr,
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
                              ImGuiWindowFlags_NoCollapse))

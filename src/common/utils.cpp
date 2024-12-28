@@ -146,7 +146,7 @@ HashMD5 md5(std::string_view s)
     HCRYPTPROV hProv = 0;
     HCRYPTHASH hHash = 0;
 
-    CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
+    CryptAcquireContext(&hProv, nullptr, nullptr, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
     CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash);
 
     CryptHashData(hHash, (const BYTE*)s.data(), s.size(), 0);
@@ -172,7 +172,7 @@ HashMD5 md5file(const Path& filePath)
     HCRYPTPROV hProv = 0;
     HCRYPTHASH hHash = 0;
 
-    CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
+    CryptAcquireContext(&hProv, nullptr, nullptr, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
     CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash);
 
     std::ifstream ifs(filePath, std::ios::in | std::ios::binary);
@@ -224,7 +224,7 @@ template <typename DigestUpdater> HashMD5 md5_impl(DigestUpdater updater)
     unsigned char digest[EVP_MAX_MD_SIZE];
     unsigned int digest_len;
 
-    if (!EVP_DigestInit_ex2(ctx.get(), EVP_md5(), NULL))
+    if (!EVP_DigestInit_ex2(ctx.get(), EVP_md5(), nullptr))
     {
         lunaticvibes::verify_failed("EVP_DigestInit_ex2()");
         return {};
@@ -464,14 +464,14 @@ void preciseSleep(long long sleep_ns)
 #ifdef _WIN32
     static constexpr auto nsInMs = std::chrono::duration_cast<nanoseconds>(milliseconds{1}).count();
 
-    static HANDLE timer = CreateWaitableTimer(NULL, FALSE, NULL);
+    static HANDLE timer = CreateWaitableTimer(nullptr, FALSE, nullptr);
     while (sleep_ns > nsInMs)
     {
         LARGE_INTEGER due{};
         due.QuadPart = -int64_t((sleep_ns - sleep_ns % nsInMs) / 100); // wrap to 1ms
 
         const auto start = high_resolution_clock::now();
-        SetWaitableTimerEx(timer, &due, 0, NULL, NULL, NULL, 0);
+        SetWaitableTimerEx(timer, &due, 0, nullptr, nullptr, nullptr, 0);
         WaitForSingleObjectEx(timer, INFINITE, TRUE);
         const auto end = high_resolution_clock::now();
 

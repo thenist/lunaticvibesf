@@ -58,7 +58,7 @@ void KeyMap::loadFromStringK(const std::string_view name)
     auto keystr = name.substr(2);
     for (size_t i = 0; i < Input::keyboardKeyCount; ++i)
     {
-        if (Input::keyboardNameMap[i] != NULL && keystr == Input::keyboardNameMap[i])
+        if (Input::keyboardNameMap[i] != nullptr && keystr == Input::keyboardNameMap[i])
         {
             keyboard = static_cast<Input::Keyboard>(i);
             return;

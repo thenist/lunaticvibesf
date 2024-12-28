@@ -198,7 +198,7 @@ private:
 
     // buttons
     bool imguiApplyPlayerName();
-    bool imguiAddFolder(const char* path = NULL);
+    bool imguiAddFolder(const char* path = nullptr);
     bool imguiDelFolder();
     bool imguiBrowseFolder();
     bool imguiAddTable();
