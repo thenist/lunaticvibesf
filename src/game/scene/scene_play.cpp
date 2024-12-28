@@ -587,8 +587,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
 void ScenePlay::clearGlobalDatas()
 {
     // reset
-    IndexNumber numbersReset[] = {IndexNumber::PLAY_1P_SCORE,
-                                  IndexNumber::PLAY_1P_EXSCORE,
+    IndexNumber numbersReset[] = {IndexNumber::PLAY_1P_EXSCORE,
                                   IndexNumber::PLAY_1P_RATE,
                                   IndexNumber::PLAY_1P_RATEDECIMAL,
                                   IndexNumber::PLAY_1P_NOWCOMBO,
@@ -602,7 +601,6 @@ void ScenePlay::clearGlobalDatas()
                                   IndexNumber::PLAY_1P_POOR,
                                   IndexNumber::PLAY_1P_TOTAL_RATE,
                                   IndexNumber::PLAY_1P_TOTAL_RATE_DECIMAL2,
-                                  IndexNumber::PLAY_2P_SCORE,
                                   IndexNumber::PLAY_2P_EXSCORE,
                                   IndexNumber::PLAY_2P_RATE,
                                   IndexNumber::PLAY_2P_RATEDECIMAL,

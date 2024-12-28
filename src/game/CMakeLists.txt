@@ -86,6 +86,8 @@ add_library(
     skin/skin_lr2_converters.cpp
     skin/skin_lr2_dst.cpp
     skin/skin_lr2_debug.cpp
+    skin/skin_lr2_number.cpp
+    skin/skin_lr2_number_animation.cpp
     skin/skin_mgr.cpp
     sound/sound_fmod.cpp
     sound/sound_fmod_callback.cpp

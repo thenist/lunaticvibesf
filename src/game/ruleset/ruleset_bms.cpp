@@ -286,6 +286,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     using namespace std::string_literals;
 
     _basic.health = health;
+    _healthAnim.to = health;
     initGaugeParams(mods.gauge);
 
     _side = side;
@@ -1064,6 +1065,7 @@ void RulesetBMS::_updateHp(double diff)
         diff *= 1.0 * std::max(pTotal, pNotes);
     }
 
+    _healthAnim.from = _basic.health;
     double tmp = _basic.health;
 
     // 30% buff
@@ -1076,7 +1078,19 @@ void RulesetBMS::_updateHp(double diff)
         tmp += diff;
     }
 
-    _basic.health = std::max(_minHealth, std::min(1.0, tmp));
+    const auto new_hp = std::max(_minHealth, std::min(1.0, tmp));
+    if (_healthAnim.from != new_hp)
+    {
+        // TODO: verify this. Try with hard gauge something where one miss makes you lose like 90% HP.
+        auto get_lr2_hp_animation_time = [](double from, double to) {
+            return std::abs(static_cast<int>(from - to)) * 10;
+        };
+        _healthAnim.from = _healthAnim.animate(lunaticvibes::Time::now());
+        _healthAnim.to = new_hp;
+        _healthAnim.start = lunaticvibes::Time::now();
+        _healthAnim.end = _healthAnim.start + get_lr2_hp_animation_time(_healthAnim.from, _healthAnim.to);
+    }
+    _basic.health = new_hp;
 
     if (failWhenNoHealth() && _basic.health <= _minHealth)
     {
@@ -1099,6 +1113,9 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
         ++_basic.judge[i];
     }
 
+    // Matches LR2.
+    static constexpr lunaticvibes::Time MONEY_SCORE_ANIMATION_TIME{500};
+
     switch (judge)
     {
     case JudgeArea::EARLY_PERFECT:
@@ -1106,7 +1123,11 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     case JudgeArea::LATE_PERFECT:
         // moneyScore += 150000.0 / getNoteCount() +
         //     std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        _moneyScoreAnim.from = moneyScore;
         moneyScore += 1.0 * maxMoneyScore / getNoteCount();
+        _moneyScoreAnim.to = moneyScore;
+        _moneyScoreAnim.start = lunaticvibes::Time{};
+        _moneyScoreAnim.end = _moneyScoreAnim.start + MONEY_SCORE_ANIMATION_TIME;
         exScore += 2;
         ++_basic.combo;
         break;
@@ -1115,7 +1136,11 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     case JudgeArea::LATE_GREAT:
         // moneyScore += 100000.0 / getNoteCount() +
         //     std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        _moneyScoreAnim.from = moneyScore;
         moneyScore += 0.5 * maxMoneyScore / getNoteCount();
+        _moneyScoreAnim.to = moneyScore;
+        _moneyScoreAnim.start = lunaticvibes::Time{};
+        _moneyScoreAnim.end = _moneyScoreAnim.start + MONEY_SCORE_ANIMATION_TIME;
         exScore += 1;
         ++_basic.combo;
         break;
@@ -1124,7 +1149,11 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     case JudgeArea::LATE_GOOD:
         // moneyScore += 20000.0 / getNoteCount() +
         //     std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        _moneyScoreAnim.from = moneyScore;
         moneyScore += 0.25 * maxMoneyScore / getNoteCount();
+        _moneyScoreAnim.to = moneyScore;
+        _moneyScoreAnim.start = lunaticvibes::Time{};
+        _moneyScoreAnim.end = _moneyScoreAnim.start + MONEY_SCORE_ANIMATION_TIME;
         ++_basic.combo;
         break;
 
@@ -1785,7 +1814,6 @@ void RulesetBMS::updateGlobals()
     if (_side == PlaySide::SINGLE || _side == PlaySide::DOUBLE || _side == PlaySide::BATTLE_1P ||
         _side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE) // includes DP
     {
-        State::set(IndexNumber::PLAY_1P_SCORE, int(std::round(moneyScore)));
         State::set(IndexNumber::PLAY_1P_EXSCORE, exScore);
         State::set(IndexNumber::PLAY_1P_NOWCOMBO, _basic.combo + _basic.comboDisplay);
         State::set(IndexNumber::PLAY_1P_MAXCOMBO, _basic.maxComboDisplay);
@@ -1800,8 +1828,8 @@ void RulesetBMS::updateGlobals()
         State::set(IndexNumber::PLAY_1P_GOOD, _basic.judge[JUDGE_GOOD]);
         State::set(IndexNumber::PLAY_1P_BAD, _basic.judge[JUDGE_BAD]);
         State::set(IndexNumber::PLAY_1P_POOR, _basic.judge[JUDGE_POOR]);
+        // TODO: remove as it can be calculated. This is needed right now for internal state.
         State::set(IndexNumber::PLAY_1P_GROOVEGAUGE, int(_basic.health * 100));
-        State::set(IndexNumber::PLAY_1P_GROOVEGAUGE_AFTER_DOT, int(_basic.health * 100'00) % 100);
 
         State::set(IndexNumber::PLAY_1P_MISS, _basic.judge[JUDGE_MISS]);
         State::set(IndexNumber::PLAY_1P_FAST_COUNT, _basic.judge[JUDGE_EARLY]);
@@ -1923,7 +1951,6 @@ void RulesetBMS::updateGlobals()
     }
     else if (_side == PlaySide::BATTLE_2P || _side == PlaySide::AUTO_2P || _side == PlaySide::RIVAL) // excludes DP
     {
-        State::set(IndexNumber::PLAY_2P_SCORE, int(std::round(moneyScore)));
         if (_side == PlaySide::RIVAL)
         {
             // target exscore is affected by target type. Handle in ScenePlay
@@ -1945,6 +1972,7 @@ void RulesetBMS::updateGlobals()
         State::set(IndexNumber::PLAY_2P_GOOD, _basic.judge[JUDGE_GOOD]);
         State::set(IndexNumber::PLAY_2P_BAD, _basic.judge[JUDGE_BAD]);
         State::set(IndexNumber::PLAY_2P_POOR, _basic.judge[JUDGE_POOR]);
+        // TODO: remove as it can be calculated. This is needed right now for internal state.
         State::set(IndexNumber::PLAY_2P_GROOVEGAUGE, int(_basic.health * 100));
 
         State::set(IndexNumber::PLAY_2P_MISS, _basic.judge[JUDGE_MISS]);

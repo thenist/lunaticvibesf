@@ -6,6 +6,7 @@
 #include <common/assert.h>
 #include <common/sysutil.h>
 #include <game/skin/skin_lr2_bargraph.h>
+#include <game/skin/skin_lr2_number.h>
 
 constexpr double grad(int dst, int src, double t)
 {
@@ -639,7 +640,7 @@ void SpriteNumber::updateNumberByInd()
     {
     case IndexNumber::RANDOM: n = rd(); break;
     case IndexNumber::ZERO: n = 0; break;
-    default: n = State::get(numInd); break;
+    default: n = lunaticvibes::get_number(numInd); break;
     }
     updateNumber(n);
 }
@@ -1145,7 +1146,7 @@ void SpriteGaugeGrid::updateVal(unsigned v)
 
 void SpriteGaugeGrid::updateValByInd()
 {
-    updateVal(State::get(numInd));
+    updateVal(lunaticvibes::get_number(numInd));
 }
 
 bool SpriteGaugeGrid::update(const lunaticvibes::Time& t)

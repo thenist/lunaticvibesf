@@ -1,8 +1,10 @@
 #pragma once
 
-#include "common//chartformat/chartformat_bms.h"
-#include "game/scene/scene_context.h"
 #include "ruleset.h"
+
+#include <common/chartformat/chartformat_bms.h>
+#include <game/scene/scene_context.h>
+#include <game/skin/skin_lr2_number_animation.h>
 
 #include <memory>
 
@@ -204,6 +206,9 @@ protected:
     double maxMoneyScore = 200000.0;
     unsigned exScore = 0;
 
+    lunaticvibes::NumberAnimation _healthAnim;
+    lunaticvibes::NumberAnimation _moneyScoreAnim;
+
 public:
     // fiveKeyMapIndex - if not 5k, set to -1.
     RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart, PlayModifiers mods,
@@ -254,6 +259,9 @@ public:
     [[nodiscard]] unsigned getJudgeCountEx(JudgeIndex idx) const;
     [[nodiscard]] std::string getModifierText() const;
     [[nodiscard]] std::string getModifierTextShort() const;
+
+    [[nodiscard]] const lunaticvibes::NumberAnimation& getMoneyScoreAnimation() const { return _moneyScoreAnim; };
+    [[nodiscard]] const lunaticvibes::NumberAnimation& getHealthAnimation() const { return _healthAnim; };
 
     [[nodiscard]] bool isNoScore() const override { return moneyScore == 0.0; }
     [[nodiscard]] bool isCleared() const override
