@@ -74,11 +74,11 @@ public:
     // PERFECT, GREAT, GOOD, BAD, ПеPOOR respectively.
     struct JudgeTime
     {
-        lunaticvibes::Time PERFECT;
-        lunaticvibes::Time GREAT;
-        lunaticvibes::Time GOOD;
-        lunaticvibes::Time BAD;
-        lunaticvibes::Time KPOOR;
+        int PERFECT;
+        int GREAT;
+        int GOOD;
+        int BAD;
+        int KPOOR;
     };
     // https://github.com/wcko87/lr2oraja/blob/readme/README.md
     // https://iidx.org/misc/iidx_lr2_beatoraja_diff#timing-window

@@ -636,7 +636,7 @@ RulesetBMS::JudgeRes RulesetBMS::_calcJudgeByTimes(const Note& note, const lunat
 {
     // spot judge area
     JudgeArea a = JudgeArea::NOTHING;
-    lunaticvibes::Time error = time - note.time;
+    int error = time.norm() - note.time.norm();
     if (error > -judgeTime[(size_t)_judgeDifficulty].KPOOR)
     {
         if (error < -judgeTime[(size_t)_judgeDifficulty].BAD)
@@ -1497,9 +1497,9 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Note, idx);
                 while (!_chart->isLastNote(NoteLaneCategory::Note, idx, itNote) && !itNote->expired)
                 {
-                    const lunaticvibes::Time latePoorWindow =
+                    const auto latePoorWindow =
                         (!scratch || _judgeScratch) ? judgeTime[(size_t)_judgeDifficulty].BAD : 0;
-                    if (rt - itNote->time >= latePoorWindow)
+                    if (rt.norm() - itNote->time.norm() >= latePoorWindow)
                     {
                         itNote->expired = true;
 
@@ -1539,15 +1539,15 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                     {
                         if (rt >= itNote->time)
                         {
-                            lunaticvibes::Time hitTime = itNote->time + judgeTime[(size_t)_judgeDifficulty].BAD;
+                            auto hitTime = itNote->time.norm() + judgeTime[(size_t)_judgeDifficulty].BAD;
                             auto itTail = itNote;
                             itTail++;
                             if (!_chart->isLastNote(NoteLaneCategory::LN, idx, itTail) &&
-                                (itTail->flags & Note::LN_TAIL) && hitTime > itTail->time)
+                                (itTail->flags & Note::LN_TAIL) && hitTime > itTail->time.norm())
                             {
-                                hitTime = itTail->time;
+                                hitTime = itTail->time.norm();
                             }
-                            if (rt >= hitTime)
+                            if (rt.norm() >= hitTime)
                             {
                                 itNote->expired = true;
 
@@ -1598,10 +1598,10 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
             idx = _chart->getLaneFromKey(NoteLaneCategory::Invs, (Input::Pad)k);
             if (idx != NoteLaneIndex::_)
             {
-                const lunaticvibes::Time& hitTime = -judgeTime[(size_t)_judgeDifficulty].BAD;
+                const auto& hitTime = -judgeTime[(size_t)_judgeDifficulty].BAD;
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Invs, idx);
                 while (!_chart->isLastNote(NoteLaneCategory::Invs, idx, itNote) && !itNote->expired &&
-                       rt - itNote->time >= hitTime)
+                       rt.norm() - itNote->time.norm() >= hitTime)
                 {
                     itNote->expired = true;
                     itNote++;
@@ -1613,7 +1613,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Mine, idx);
                 while (!_chart->isLastNote(NoteLaneCategory::Mine, idx, itNote) && !itNote->expired &&
-                       rt >= itNote->time)
+                       rt.norm() >= itNote->time.norm())
                 {
                     itNote->expired = true;
                     itNote++;
