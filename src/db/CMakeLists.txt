@@ -5,7 +5,7 @@ add_library(db STATIC db_conn.cpp db_lr2_score.cpp db_score.cpp db_song.cpp)
 
 target_include_directories(db PRIVATE ${PROJECT_INCLUDE_DIR})
 
-set_target_properties(db PROPERTIES CXX_STANDARD 20)
+set_target_properties(db PROPERTIES CXX_STANDARD 23)
 
 target_link_libraries(db PUBLIC SQLite::SQLite3 PUBLIC common PUBLIC re2::re2)
 

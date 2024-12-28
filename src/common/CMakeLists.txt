@@ -32,7 +32,7 @@ add_library(
 
 target_include_directories(common PRIVATE ${PROJECT_INCLUDE_DIR})
 
-set_target_properties(common PROPERTIES CXX_STANDARD 20)
+set_target_properties(common PROPERTIES CXX_STANDARD 23)
 
 target_link_libraries(
     common

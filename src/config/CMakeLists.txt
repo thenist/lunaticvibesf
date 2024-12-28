@@ -13,7 +13,7 @@ add_library(
 
 target_include_directories(config PRIVATE ${PROJECT_INCLUDE_DIR})
 
-set_target_properties(config PROPERTIES CXX_STANDARD 20)
+set_target_properties(config PROPERTIES CXX_STANDARD 23)
 
 target_link_libraries(config PUBLIC yaml-cpp::yaml-cpp PUBLIC common)
 

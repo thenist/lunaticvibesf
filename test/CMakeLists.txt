@@ -30,7 +30,7 @@ gtest_discover_tests(apptest WORKING_DIRECTORY "$<TARGET_FILE_DIR:apptest>")
 
 set_target_properties(
     apptest
-    PROPERTIES CXX_STANDARD 20 CTEST_OUTPUT_ON_FAILURE TRUE GTEST_COLOR TRUE
+    PROPERTIES CXX_STANDARD 23 CTEST_OUTPUT_ON_FAILURE TRUE GTEST_COLOR TRUE
 )
 
 target_link_libraries(apptest PUBLIC gamelib PUBLIC plog::plog)

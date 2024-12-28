@@ -106,7 +106,7 @@ add_library(
 
 target_include_directories(gamelib PUBLIC ${PROJECT_INCLUDE_DIR})
 
-set_target_properties(gamelib PROPERTIES CXX_STANDARD 20)
+set_target_properties(gamelib PROPERTIES CXX_STANDARD 23)
 
 target_link_libraries(
     gamelib
@@ -143,7 +143,7 @@ target_precompile_headers(gamelib REUSE_FROM common)
 # WIN32 - graphical application/don't spawn a console (Windows only).
 add_executable(LunaticVibesF WIN32 game.cpp LunaticVibesF.exe.manifest)
 target_link_libraries(LunaticVibesF PRIVATE gamelib PRIVATE tinyfiledialogs)
-set_target_properties(LunaticVibesF PROPERTIES CXX_STANDARD 20)
+set_target_properties(LunaticVibesF PROPERTIES CXX_STANDARD 23)
 install(TARGETS LunaticVibesF COMPONENT Game)
 
 add_custom_command(
