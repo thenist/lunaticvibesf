@@ -1,5 +1,6 @@
 #include "chart_bms.h"
 
+#include <algorithm>
 #include <bitset>
 #include <random>
 
@@ -603,8 +604,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                     }
                                 }
                                 LVF_ASSERT(!placableMin.empty());
-                                std::sort(placableMin.begin(), placableMin.end());
-                                gameLaneIdxMod = placableMin.begin()->second;
+                                gameLaneIdxMod = std::ranges::min_element(placableMin)->second;
                             }
                         }
                         break;
@@ -720,8 +720,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                         }
                                     }
                                     LVF_ASSERT(!placableMin.empty());
-                                    std::sort(placableMin.begin(), placableMin.end());
-                                    gameLaneIdxMod = placableMin.begin()->second;
+                                    gameLaneIdxMod = std::ranges::min_element(placableMin)->second;
                                 }
                             }
                             else
