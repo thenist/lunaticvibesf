@@ -460,9 +460,10 @@ static RulesetBMS::GaugeType get_gauge(PlayModifierGaugeType gauge)
 
 void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 {
-    // Reference: https://github.com/aeventyr/LR2GAS_pub
+    // Older reference: https://github.com/aeventyr/LR2GAS_pub
+    // Health gain later updated from LR2 disassembly.
     // Note that regarding gauge lr2oraja is wrong.
-    // TODO: also check by disassembled LR2.
+    // HARD and GATTACK have additional multipliers applied elsewhere.
 
     _gauge = get_gauge(gauge);
 
@@ -530,12 +531,12 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
         _minHealth = 0;
         _clearHealth = 0;
         _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 1.0 / 1001.0;
-        _healthGain[JudgeType::GREAT] = 1.0 / 1001.0 / 2;
+        _healthGain[JudgeType::PERFECT] = 0.0;
+        _healthGain[JudgeType::GREAT] = 0.0;
         _healthGain[JudgeType::GOOD] = 0.0;
         _healthGain[JudgeType::BAD] = -1.0;
         _healthGain[JudgeType::MISS] = -1.0;
-        _healthGain[JudgeType::KPOOR] = -0.02;
+        _healthGain[JudgeType::KPOOR] = 0.0;
         break;
 
     case GaugeType::P_ATK:
@@ -584,7 +585,7 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
         _healthGain[JudgeType::GREAT] = 0.01 * total / noteCount * 1.2;
         _healthGain[JudgeType::GOOD] = 0.01 * total / noteCount / 2 * 1.2;
         _healthGain[JudgeType::BAD] = -0.032;
-        _healthGain[JudgeType::MISS] = -0.048;
+        _healthGain[JudgeType::MISS] = -0.04800000000000001;
         _healthGain[JudgeType::KPOOR] = -0.016;
         break;
 
@@ -603,13 +604,12 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 
     case GaugeType::GRADE:
         //_basic.health             = 1.0;
-        // TODO: check numbers.
         _minHealth = 0;
         _clearHealth = 0;
         _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 1.0 / 1001.0;
-        _healthGain[JudgeType::GREAT] = 1.0 / 1001.0;
-        _healthGain[JudgeType::GOOD] = 1.0 / 1001.0 / 2;
+        _healthGain[JudgeType::PERFECT] = 0.001;
+        _healthGain[JudgeType::GREAT] = 0.001;
+        _healthGain[JudgeType::GOOD] = 0.0004;
         _healthGain[JudgeType::BAD] = -0.02;
         _healthGain[JudgeType::MISS] = -0.03;
         _healthGain[JudgeType::KPOOR] = -0.02;
@@ -617,16 +617,15 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 
     case GaugeType::EXGRADE:
         //_basic.health             = 1.0;
-        // TODO: check numbers.
         _minHealth = 0;
         _clearHealth = 0;
         _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 1.0 / 1001.0;
-        _healthGain[JudgeType::GREAT] = 1.0 / 1001.0;
-        _healthGain[JudgeType::GOOD] = 1.0 / 1001.0 / 2;
-        _healthGain[JudgeType::BAD] = -0.12;
+        _healthGain[JudgeType::PERFECT] = 0.001;
+        _healthGain[JudgeType::GREAT] = 0.001;
+        _healthGain[JudgeType::GOOD] = 0.0004;
+        _healthGain[JudgeType::BAD] = -0.06;
         _healthGain[JudgeType::MISS] = -0.1;
-        _healthGain[JudgeType::KPOOR] = -0.1;
+        _healthGain[JudgeType::KPOOR] = -0.2;
         break;
 
     default: break;
@@ -1011,7 +1010,7 @@ void RulesetBMS::_updateHp(double diff)
 {
     // TOTAL補正, totalnotes補正
     // ref: https://web.archive.org/web/20150226213104/http://2nd.geocities.jp/yoshi_65c816/bms/LR2.html
-    // TODO: instead match https://github.com/aeventyr/LR2GAS_pub/blob/main/src/gas.cpp
+    // TODO: instead match https://github.com/aeventyr/LR2GAS_pub/blob/main/src/gas.cpp and also check LR2 disassembly.
     if ((_gauge == RulesetBMS::GaugeType::HARD || _gauge == RulesetBMS::GaugeType::EXHARD) && diff < 0)
     {
         double pTotal = 1.0;

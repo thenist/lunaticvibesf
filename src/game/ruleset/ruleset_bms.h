@@ -82,12 +82,15 @@ public:
     };
     // https://github.com/wcko87/lr2oraja/blob/readme/README.md
     // https://iidx.org/misc/iidx_lr2_beatoraja_diff#timing-window
+    // This has been verified with LR2 disassembly.
     inline static const JudgeTime judgeTime[] = {
         {8, 24, 40, 200, 1000},   // VERY HARD
         {15, 30, 60, 200, 1000},  // HARD
         {18, 40, 100, 200, 1000}, // NORMAL
         {21, 60, 120, 200, 1000}, // EASY
         // TODO: VERY EASY? beatoraja uses EASY*1.25 windows, lr2oraja uses NORMAL.
+        // {8, 24, 40, 200, 1000}, // GAMBOL LEVEL 1
+        // {8, 12, 12, 200, 1000}, // GAMBOL LEVEL 2
     };
 
     // Judge area definitions.
