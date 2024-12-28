@@ -483,7 +483,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
         {
         case PLAYER_SLOT_PLAYER: return GLOBAL_SPRITE_IDX_1PGAUGE;
         case PLAYER_SLOT_TARGET: return GLOBAL_SPRITE_IDX_2PGAUGE;
-        default: LVF_DEBUG_ASSERT(false); return {};
+        default: lunaticvibes::assert_failed("spriteIdxForSlot");
         }
     };
     auto gaugeDisplayTypeToSpriteType = [](GaugeDisplayType type) -> SpriteGaugeGrid::GaugeType {
