@@ -58,21 +58,11 @@ void SpriteLine::updateProgress(const lunaticvibes::Time& t)
 
 void SpriteLine::updateRects()
 {
-    /*
-    for (size_t i = 0; i < _rects.size(); ++i)
-    {
-        const auto& r = _current.rect;
-        _rects[i].x = r.x + r.w * _points[i].xf;
-        _rects[i].y = r.y - r.h * _points[i].yf;
-    }
-    */
-
     if (!gPlayContext.ruleset[_player])
         return;
 
-    auto pushRects = [this](
-                         size_t size, const std::vector<int>& points, unsigned maxh,
-                         const std::function<bool(int val1, int val2)>& cond = [](int, int) { return true; }) {
+    auto pushRects = [this](size_t size, const std::vector<int>& points, unsigned maxh,
+                            const std::function<bool(int val1, int val2)>& cond) {
         std::vector<std::pair<Point, Point>> tmp;
         const auto& r = _current.rect;
         size_t region = static_cast<size_t>(std::floor(size * _progress));
@@ -118,9 +108,8 @@ void SpriteLine::updateRects()
         }
     };
 
-    auto pushRectsF = [this](
-                          size_t size, const std::vector<double>& points, double maxh,
-                          const std::function<bool(int val1, int val2)>& cond = [](int, int) { return true; }) {
+    auto pushRectsF = [this](size_t size, const std::vector<double>& points, double maxh) {
+        auto cond = [](int, int) { return true; };
         std::vector<std::pair<Point, Point>> tmp;
         const auto& r = _current.rect;
         size_t region = static_cast<size_t>(std::floor(size * _progress));
