@@ -16,14 +16,10 @@ void GenericInfoUpdater::loop()
 {
     State::set(IndexNumber::FPS, gFrameCount[FRAMECOUNT_IDX_FPS] / _rate);
     gFrameCount[FRAMECOUNT_IDX_FPS] = 0;
-
-    for (unsigned i = 1; i < std::size(gFrameCount); ++i)
-    {
-        State::set((IndexNumber)((int)IndexNumber::_PPS1 + i - 1), gFrameCount[i] / _rate);
-        gFrameCount[i] = 0;
-    }
-    State::set(IndexNumber::SCENE_UPDATE_FPS, State::get(IndexNumber::_PPS1));
-    State::set(IndexNumber::INPUT_DETECT_FPS, State::get(IndexNumber::_PPS2));
+    State::set(IndexNumber::SCENE_UPDATE_FPS, gFrameCount[FRAMECOUNT_IDX_SCENE] / _rate);
+    gFrameCount[FRAMECOUNT_IDX_SCENE] = 0;
+    State::set(IndexNumber::INPUT_DETECT_FPS, gFrameCount[FRAMECOUNT_IDX_INPUT] / _rate);
+    gFrameCount[FRAMECOUNT_IDX_INPUT] = 0;
 
     std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     tm tt;
