@@ -3,10 +3,10 @@
 #include <bitset>
 #include <random>
 
-#include "common/log.h"
-#include "game/runtime/state.h"
-#include "game/scene/scene_context.h"
 #include <common/assert.h>
+#include <common/log.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
 
 using namespace chart;
 
@@ -602,7 +602,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                         placableMin.emplace_back(0, i);
                                     }
                                 }
-                                LVF_DEBUG_ASSERT(!placableMin.empty());
+                                LVF_ASSERT(!placableMin.empty());
                                 std::sort(placableMin.begin(), placableMin.end());
                                 gameLaneIdxMod = placableMin.begin()->second;
                             }
@@ -719,7 +719,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                             placableMin.emplace_back(0, i);
                                         }
                                     }
-                                    LVF_DEBUG_ASSERT(!placableMin.empty());
+                                    LVF_ASSERT(!placableMin.empty());
                                     std::sort(placableMin.begin(), placableMin.end());
                                     gameLaneIdxMod = placableMin.begin()->second;
                                 }
