@@ -49,7 +49,6 @@ void SkinBase::update()
     {
         gUpdateContext.metre = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre();
         gUpdateContext.bar = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBar();
-        State::set(IndexNumber::_TEST3, (int)(gUpdateContext.metre * 1000));
     }
 
     std::for_each(std::execution::par, _sprites.begin(), _sprites.end(),

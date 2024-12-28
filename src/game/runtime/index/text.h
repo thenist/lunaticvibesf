@@ -180,7 +180,6 @@ enum class IndexText : unsigned
     _OVERLAY_NOTIFICATION_MAX = 249,
 
     _TEST1 = 250,
-    _TEST2,
     LVF_INTERNAL_README,
 
     ARENA_LOBBY_STATUS = 260,

@@ -102,7 +102,7 @@ enum class IndexOption : unsigned
 
     ARENA_PLAYDATA_ALL_MAX = ARENA_PLAYDATA_BASE + (ARENA_PLAYDATA_MAX - ARENA_PLAYDATA_BASE + 1) * 8 - 1,
 
-    _TEST1 = 150,
+    _TEST1,
 
     OPTION_COUNT
 };

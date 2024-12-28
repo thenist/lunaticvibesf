@@ -345,25 +345,6 @@ enum class IndexNumber : unsigned
 
     // internal numbers
     _TEST1 = 800,
-    _TEST2,
-    _TEST3,
-    _TEST4,
-    _TEST5,
-    _TEST6,
-    _TEST7,
-    _TEST8,
-    _TEST9,
-    _TEST10,
-
-    _PPS1,
-    _PPS2,
-    _PPS3,
-    _PPS4,
-    _PPS5,
-    _PPS6,
-    _PPS7,
-    _PPS8,
-    _PPS9,
 
     _DISP_NOWCOMBO_1P,
     _DISP_NOWCOMBO_2P,

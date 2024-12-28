@@ -423,13 +423,9 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
     // update beat
     lunaticvibes::Time currentMeasureTimePassed = vt - _barTimestamp[_currentBarTemp];
     lunaticvibes::Time timeFromBPMChange = currentMeasureTimePassed - _lastChangedBPMTime;
-    State::set(IndexNumber::_TEST4, (int)currentMeasureTimePassed.norm());
     _currentMetreTemp = _lastChangedBPMMetre + (double)timeFromBPMChange.hres() / _currentBeatLength.hres() / 4;
 
     postUpdate(vt);
-
-    State::set(IndexNumber::_TEST1, _currentBarTemp);
-    State::set(IndexNumber::_TEST2, (int)std::floor(_currentMetreTemp * 1000));
 
     _currentBar = _currentBarTemp;
     _currentMetre = _currentMetreTemp;
