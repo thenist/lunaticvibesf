@@ -353,6 +353,17 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
     const size_t bytes_written = initial_out_len - out_len;
 
     out = std::string_view{static_cast<char*>(out_buf), bytes_written};
+
+    // "In each series of calls to iconv(), the last should be one with inbuf or *inbuf equal to NULL, in order to flush
+    // out any partially converted input".
+    iconv_ret = iconv(icd, nullptr, nullptr, nullptr, nullptr);
+    if (iconv_ret == static_cast<size_t>(-1))
+    {
+        const int error = errno;
+        LOG_ERROR << "iconv() error: " << safe_strerror(error) << " (" << error << ")";
+        out = "(conversion error)";
+        return;
+    }
 }
 
 void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& buf)
