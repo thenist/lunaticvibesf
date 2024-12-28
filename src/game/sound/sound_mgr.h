@@ -8,8 +8,8 @@ class SoundMgr
 private:
     SoundMgr() = default;
     ~SoundMgr() = default;
+    static SoundMgr& inst();
     bool _initialized = false;
-    static SoundMgr _inst;
 
 private:
     std::unique_ptr<SoundDriver> driver;
