@@ -128,7 +128,7 @@ protected:
     SpriteBase(const SpriteTypes type, int srcLine) : _type(type), srcLine(srcLine) {}
 
 public:
-    void setSrcLine(int i) { srcLine = i; }
+    void setSrcLine(unsigned i) { srcLine = static_cast<int>(i); }
 
     virtual void appendMotionKeyFrame(const MotionKeyFrame& f);
     virtual void setMotionLoopTo(int time);
