@@ -3,7 +3,6 @@
 
 #include <cstdlib>
 #include <functional>
-#include <type_traits>
 
 #include <common/assert.h>
 #include <common/log.h>
@@ -292,11 +291,33 @@ void SoundDriverFMOD::createChannelGroups()
 
 SoundDriverFMOD::~SoundDriverFMOD()
 {
-    // FIXME: free FMOD::DSP*, valgrind complains.
-
     // release before system release
     freeNoteSamples();
     freeSysSamples();
+
+    auto remove_and_release = [](FMOD::ChannelGroup& cq, FMOD::DSP* dsp) {
+        if (dsp == nullptr)
+        {
+            // TODO: this sounds wrong?
+            LOG_DEBUG << "[FMOD] DSP is nullptr";
+            return;
+        }
+        cq.removeDSP(dsp);
+        dsp->release();
+    };
+    for (auto& [e, cg] : channelGroup)
+    {
+        for (auto& filter : DSPMaster)
+            remove_and_release(*cg, filter[e]);
+        for (auto& filter : DSPKey)
+            remove_and_release(*cg, filter[e]);
+        for (auto& filter : DSPBgm)
+            remove_and_release(*cg, filter[e]);
+        remove_and_release(*cg, PitchShiftFilter[e]);
+        for (auto& filter : EQFilter)
+            remove_and_release(*cg, filter[e]);
+    }
+
     channelGroup.clear();
 
     if (initRet == FMOD_OK && fmodSystem != nullptr)
