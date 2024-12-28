@@ -183,7 +183,7 @@ void select_difficulty_filter(int iterateCount, int plus)
 {
     if (!gSelectContext.backtrace.front().ignoreFilters && iterateCount < 6)
     {
-        int val = (State::get(IndexOption::SELECT_FILTER_DIFF) + 6 + plus) % 6;
+        unsigned val = (State::get(IndexOption::SELECT_FILTER_DIFF) + 6 + plus) % 6;
         if (val == Option::DIFF_ANY && ConfigMgr::get('P', cfg::P_DISABLE_DIFFICULTY_ALL, false))
         {
             val++;
@@ -222,7 +222,7 @@ void select_keys_filter(int iterateCount, int plus)
 {
     if (!gSelectContext.backtrace.front().ignoreFilters && iterateCount < 8)
     {
-        int val = (State::get(IndexOption::SELECT_FILTER_KEYS) + 8 + plus) % 8;
+        unsigned val = (State::get(IndexOption::SELECT_FILTER_KEYS) + 8 + plus) % 8;
         if (val == Option::FILTER_KEYS_ALL && ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_ALL, false))
         {
             val++;
@@ -352,7 +352,7 @@ void fx_type(int idx, int plus)
 
     // OFF/REVERB/DELAY/LOWPASS/HIGHPASS/FLANGER/CHORUS/DISTORTION/PITCH
     // pitch is unused, remaining 8 options
-    int val = (State::get(op) + 8 + plus) % 8;
+    unsigned val = (State::get(op) + 8 + plus) % 8;
     State::set(op, val);
 
     if (val == Option::FX_LOWPASS)
@@ -413,7 +413,7 @@ void fx_target(int idx, int plus)
     auto [op, sw, num_p1, num_p2, sli_p1, sli_p2, target, ch] = disp_fx(idx);
 
     // MASTER/KEY/BGM
-    int val = (State::get(target) + 3 + plus) % 3;
+    unsigned val = (State::get(target) + 3 + plus) % 3;
     State::set(target, val);
 
     if (State::get(sw))
@@ -510,7 +510,7 @@ void pitch_switch(int plus)
 void pitch_type(int plus)
 {
     // FREQENCY/PITCH/SPEED
-    int val = (State::get(IndexOption::SOUND_PITCH_TYPE) + 3 + plus) % 3;
+    unsigned val = (State::get(IndexOption::SOUND_PITCH_TYPE) + 3 + plus) % 3;
     State::set(IndexOption::SOUND_PITCH_TYPE, val);
 
     if (State::get(IndexSwitch::SOUND_PITCH))
@@ -545,7 +545,7 @@ void gauge_type(int player, int plus)
 
     // PlayModifierGaugeType
     int types = ConfigMgr::get('P', cfg::P_ENABLE_NEW_GAUGE, false) ? 8 : 4;
-    int val = (State::get(op) + types + plus) % types;
+    unsigned val = (State::get(op) + types + plus) % types;
     if (val == Option::GAUGE_PATTACK || val == Option::GAUGE_GATTACK)
     {
         val = (plus >= 0) ? Option::GAUGE_EXHARD : Option::GAUGE_EASY;
@@ -584,7 +584,7 @@ void random_type(int player, int plus)
     // PlayModifierRandomType
     int types = ConfigMgr::get('P', cfg::P_ENABLE_NEW_RANDOM, false) ? 9 : 6;
     int oldVal = State::get(op);
-    int val = (State::get(op) + types + plus) % types;
+    unsigned val = (State::get(op) + types + plus) % types;
     if (val == Option::RAN_DB_SYNCHRONIZE_RANDOM || val == Option::RAN_DB_SYMMETRY_RANDOM)
     {
         if (State::get(IndexOption::PLAY_BATTLE_TYPE) != Option::BATTLE_DB)
@@ -738,7 +738,7 @@ void lane_effect(int player, int plus)
 
     //
     int types = ConfigMgr::get('P', cfg::P_ENABLE_NEW_LANE_OPTION, false) ? 6 : 4;
-    int val = (State::get(op) + types + plus) % types;
+    unsigned val = (State::get(op) + types + plus) % types;
     State::set(op, val);
     State::set(tx, Option::s_lane_effect_type[val]);
 
@@ -802,7 +802,7 @@ void hs_fix(int plus)
 {
     // PlayModifierHispeedFixType
     // OFF/MAXBPM/MINBPM/AVERAGE/CONSTANT/INITIAL/MAIN
-    int val = (State::get(IndexOption::PLAY_HSFIX_TYPE) + 7 + plus) % 7;
+    unsigned val = (State::get(IndexOption::PLAY_HSFIX_TYPE) + 7 + plus) % 7;
 
     if (val == Option::SPEED_NORMAL)
     {
@@ -841,7 +841,7 @@ void battle(int plus)
         auto it = std::find(modesSP.begin(), modesSP.end(), State::get(IndexOption::PLAY_BATTLE_TYPE));
         if (it != modesSP.end())
         {
-            int idx = std::distance(modesSP.begin(), it);
+            size_t idx = std::distance(modesSP.begin(), it);
             idx = (idx + modesSP.size() + plus) % modesSP.size();
             State::set(IndexOption::PLAY_BATTLE_TYPE, modesSP[idx]);
 
@@ -857,7 +857,7 @@ void battle(int plus)
         auto it = std::find(modesDP.begin(), modesDP.end(), State::get(IndexOption::PLAY_BATTLE_TYPE));
         if (it != modesDP.end())
         {
-            int idx = std::distance(modesDP.begin(), it);
+            size_t idx = std::distance(modesDP.begin(), it);
             idx = (idx + modesDP.size() + plus) % modesDP.size();
             State::set(IndexOption::PLAY_BATTLE_TYPE, modesDP[idx]);
 
@@ -960,7 +960,7 @@ void score_graph(int plus)
 // 71
 void ghost_type(int plus)
 {
-    int val = (State::get(IndexOption::PLAY_GHOST_TYPE_1P) + 4 + plus) % 4;
+    unsigned val = (State::get(IndexOption::PLAY_GHOST_TYPE_1P) + 4 + plus) % 4;
 
     State::set(IndexOption::PLAY_GHOST_TYPE_1P, val);
     State::set(IndexOption::PLAY_GHOST_TYPE_2P, val);
@@ -972,7 +972,7 @@ void ghost_type(int plus)
 // 72
 void bga(int plus)
 {
-    int val = (State::get(IndexOption::PLAY_BGA_TYPE) + 3 + plus) % 3;
+    unsigned val = (State::get(IndexOption::PLAY_BGA_TYPE) + 3 + plus) % 3;
 
     State::set(IndexOption::PLAY_BGA_TYPE, val);
     State::set(IndexText::BGA, Option::s_bga_type[val]);
@@ -986,7 +986,7 @@ void bga(int plus)
 // 73
 void bga_size(int plus)
 {
-    int val = (State::get(IndexOption::PLAY_BGA_SIZE) + 2 + plus) % 2;
+    unsigned val = (State::get(IndexOption::PLAY_BGA_SIZE) + 2 + plus) % 2;
 
     State::set(IndexOption::PLAY_BGA_SIZE, val);
     State::set(IndexText::BGA_SIZE, Option::s_bga_size[val]);
@@ -1000,7 +1000,7 @@ void bga_size(int plus)
 // 75
 void judge_auto_adjust(int plus)
 {
-    int val = (State::get(IndexOption::PLAY_AUTOADJUST) + 2 + plus) % 2;
+    unsigned val = (State::get(IndexOption::PLAY_AUTOADJUST) + 2 + plus) % 2;
 
     State::set(IndexOption::PLAY_AUTOADJUST, val);
     State::set(IndexText::AUTOADJUST, Option::s_autoadjust[val]);
@@ -1023,7 +1023,7 @@ void default_target_rate(int plus)
 // 77
 void target_type(int plus)
 {
-    int val = (State::get(IndexOption::PLAY_TARGET_TYPE) + 6 + plus) % 6;
+    unsigned val = (State::get(IndexOption::PLAY_TARGET_TYPE) + 6 + plus) % 6;
 
     State::set(IndexOption::PLAY_TARGET_TYPE, val);
     if (val == Option::TARGET_DEFAULT)
@@ -1050,9 +1050,9 @@ void window_mode(int plus)
 void vsync(int plus)
 {
 #ifdef _WIN32
-    int val = (State::get(IndexOption::SYS_VSYNC) + 2 + plus) % 2;
+    unsigned val = (State::get(IndexOption::SYS_VSYNC) + 2 + plus) % 2;
 #else
-    int val = (State::get(IndexOption::SYS_VSYNC) + 3 + plus) % 3;
+    unsigned val = (State::get(IndexOption::SYS_VSYNC) + 3 + plus) % 3;
 #endif
 
     State::set(IndexOption::SYS_VSYNC, val);
