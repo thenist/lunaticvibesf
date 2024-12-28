@@ -857,13 +857,44 @@ static bool isCourseGrade(RulesetBMS::GaugeType gauge)
     lunaticvibes::assert_failed("isCourseGrade");
 }
 
+extern bool g_enable_gas_for_test;
+
 void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 {
     const int total = _format != nullptr ? getTotal(_format) : 0;
     auto bms_gauge = get_gauge(gauge);
     LOG_VERBOSE << "[RulesetBMS] initGaugeParams " << bms_gauge;
-    _gaugeProc = lunaticvibes::GaugeHolderProxy{
-        std::array{lunaticvibes::GaugeHolder{getGauge(bms_gauge, total, getNoteCount()), _basic.health}}};
+
+    // FIXME: adjust result graph per gauge.
+    if (g_enable_gas_for_test)
+    {
+        auto build = [this, total](GaugeType type) -> lunaticvibes::GaugeHolder {
+            return {getGauge(type, total, getNoteCount())};
+        };
+        std::vector<lunaticvibes::GaugeHolder> gauges;
+        if (isCourseGrade(bms_gauge))
+        {
+            for (auto g : std::array{GaugeType::EXGRADE, GaugeType::GRADE})
+                gauges.push_back(build(g));
+        }
+        else if (ConfigMgr::get('P', cfg::P_ENABLE_NEW_GAUGE, false))
+        {
+            for (auto g : std::array{GaugeType::DEATH, GaugeType::EXHARD, GaugeType::HARD, GaugeType::GROOVE,
+                                     GaugeType::EASY, GaugeType::ASSIST})
+                gauges.push_back(build(g));
+        }
+        else
+        {
+            for (auto g : std::array{GaugeType::DEATH, GaugeType::HARD, GaugeType::GROOVE, GaugeType::EASY})
+                gauges.push_back(build(g));
+        }
+        _gaugeProc = lunaticvibes::GaugeHolderProxy{gauges};
+    }
+    else
+    {
+        _gaugeProc = lunaticvibes::GaugeHolderProxy{
+            std::array{lunaticvibes::GaugeHolder{getGauge(bms_gauge, total, getNoteCount()), _basic.health}}};
+    }
     // TODO: can't use 'this' in constructor :(
     // _gaugeProc.update_for_show(*this);
     // >>>> copy-paste:

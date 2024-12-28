@@ -31,6 +31,8 @@
 // TODO: translations.
 #define _(String) String
 
+bool g_enable_gas_for_test = false;
+
 // from imgui_demo.cpp
 // Helper to display a little (?) mark which shows a tooltip when hovered.
 // In your own code you may want to display an actual icon if you are using a merged icon fonts (see docs/FONTS.md)
@@ -1051,7 +1053,6 @@ void SceneSelect::imguiPageDebug()
 
     if (ImGui::BeginTabItem("Main", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
-        // TODO: translations.
         if (ImGui::BeginChild("##imguiPageOptionsDebug"))
         {
             imguiPageDebugMain();
@@ -1110,6 +1111,8 @@ void SceneSelect::imguiPageDebugMain()
         SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_F_OPEN);
     }
     // TODO: rebuild profile stats button.
+
+    ImGui::Checkbox("Enable GAS", &g_enable_gas_for_test);
 
     ImGui::Checkbox("Enable skin debug monitors", &lunaticvibes::g_enable_imgui_debug_monitor);
     ImGui::SameLine();
