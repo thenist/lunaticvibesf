@@ -3,10 +3,14 @@
 #include <cstdint>
 #include <execution>
 #include <fstream>
+#include <initializer_list>
+#include <iterator>
 #include <optional>
 #include <random>
 #include <set>
+#include <span>
 #include <sstream>
+#include <string>
 #include <string_view>
 
 #include <boost/algorithm/string/classification.hpp>
@@ -60,24 +64,24 @@ size_t convertLine(const Tokens& tokens, int* pData, size_t start, size_t count)
     return i;
 }
 
-size_t convertOpsToInt(const Tokens& tokens, int* pData, size_t offset, size_t size)
+static int optToInt(std::string_view opt)
 {
-    if (tokens.size() < offset)
-        return 0;
+    if (opt.empty())
+        return {};
+    if (opt.starts_with('!') || opt.starts_with('-'))
+        return -toInt(opt.substr(1));
+    return toInt(opt);
+}
 
-    size_t i;
-    for (i = 0; i < size && offset + i < tokens.size(); ++i)
+// offset_tokens MUST be as big as data.
+static void convertOpsToInt(const std::span<const StringContent> offset_tokens, std::initializer_list<int*> data)
+{
+    size_t i = 0;
+    for (auto* p : data)
     {
-        auto ops = tokens[offset + i];
-        if (ops.empty())
-            continue;
-
-        if (ops[0] == '!' || ops[0] == '-')
-            pData[offset + i] = -toInt(ops.substr(1));
-        else
-            pData[offset + i] = toInt(ops);
+        *p = optToInt(offset_tokens[i]);
+        i++;
     }
-    return i;
 }
 
 static bool flipSideFlag = false;
@@ -112,6 +116,7 @@ static int flipTimer(int timer)
 
 struct s_basic
 {
+    static constexpr size_t MEMBERS = 10;
     int _null = 0;
     int gr = 0;
     int x = 0;
@@ -124,8 +129,7 @@ struct s_basic
     int timer = 0;
     s_basic(const Tokens& tokens, size_t csvLineNumber = 0)
     {
-        int count = sizeof(s_basic) / sizeof(int);
-        convertLine(tokens, (int*)this, 0, count);
+        convertLine(tokens, (int*)this, 0, static_cast<int>(MEMBERS));
 
         if (w == -1)
             w = RECT_FULL.w;
@@ -150,12 +154,18 @@ struct s_basic
 
 struct s_image : s_basic
 {
+    static constexpr size_t MEMBERS = s_basic::MEMBERS + 3;
     int op1 = 0;
     int op2 = 0;
     int op3 = 0;
     s_image(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
     {
-        convertOpsToInt(tokens, (int*)this, &op1 - &_null, 3);
+        if (tokens.size() < MEMBERS)
+        {
+            LOG_DEBUG << "[Skin] #SRC_IMAGE: invalid token count";
+            return;
+        }
+        convertOpsToInt(std::span{tokens}.subspan<s_basic::MEMBERS>(), {&op1, &op2, &op3});
     }
 };
 
@@ -422,6 +432,7 @@ using s_scorechart = s_gaugechart;
 
 struct dst
 {
+    static constexpr size_t MEMBERS = 21;
     int _null = 0; // 0
     int time = 0;  // 1
     int x = 0;
@@ -442,9 +453,13 @@ struct dst
     int op[4]{DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE};
     dst(const Tokens& tokens)
     {
-        int count = sizeof(dst) / sizeof(int);
-        convertLine(tokens, (int*)this, 0, count);
-        convertOpsToInt(tokens, (int*)this, &op[0] - &_null, sizeof(op) / sizeof(op[0]));
+        if (tokens.size() < MEMBERS)
+        {
+            LOG_DEBUG << "[Skin] #DST_: invalid token count";
+            return;
+        }
+        convertLine(tokens, (int*)this, 0, MEMBERS);
+        convertOpsToInt(std::span{tokens}.subspan(MEMBERS - std::size(op)), {&op[0], &op[1], &op[2], &op[3]});
 
         if (flipSide)
             timer = flipTimer(timer);
