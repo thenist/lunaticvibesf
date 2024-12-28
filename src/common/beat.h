@@ -30,12 +30,13 @@ public:
     long long multiple_level() const { return _denominator; }
 };
 
-typedef fraction Segment; // Normal rhythm indicator, must be normalized (value: [0, 1)).
+// Normal rhythm indicator, must be normalized (value: [0, 1)).
+using Segment = fraction;
 
-typedef std::chrono::milliseconds
-    timeNormRes; // Regular time, expect millisecond (1/1e3 second). Used for general timing demand
-typedef std::chrono::nanoseconds
-    timeHighRes; // High resolution time, expect nanosecond (1/1e9 second). Used for note timings
+// Regular time, expect millisecond (1/1e3 second). Used for general timing demand
+using timeNormRes = std::chrono::milliseconds;
+// High resolution time, expect nanosecond (1/1e9 second). Used for note timings
+using timeHighRes = std::chrono::nanoseconds;
 
 namespace lunaticvibes
 {
@@ -58,24 +59,26 @@ public:
         _regular = std::chrono::duration_cast<timeNormRes>(now).count();
         _highres = std::chrono::duration_cast<timeHighRes>(now).count();
     }
+    static Time now() { return Time{}; };
     constexpr Time(long long n, bool init_with_high_resolution_timestamp = false) : _regular(), _highres()
     {
+        // PERF: avoid chrono::duration_cast here, it's ungodly slow with ASAN.
         if (init_with_high_resolution_timestamp || n > std::numeric_limits<long long>::max() / nsInMs)
         {
             _highres = n;
-            _regular = std::chrono::duration_cast<timeNormRes>(timeHighRes(n)).count();
+            _regular = n / nsInMs;
         }
         else
         {
             _regular = n;
-            _highres = std::chrono::duration_cast<timeHighRes>(timeNormRes(n)).count();
+            _highres = n * nsInMs;
         }
     }
 
     [[nodiscard]] static constexpr Time singleBeatLengthFromBPM(BPM bpm)
     {
         using namespace std::chrono;
-        return {static_cast<long long>(6e4 / bpm * duration_cast<timeHighRes>(1ms).count()), true};
+        return {static_cast<long long>(6e4 / bpm * nsInMs), true};
     }
 
     constexpr Time operator-() const { return {-_highres, true}; }
