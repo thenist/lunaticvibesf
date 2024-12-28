@@ -16,6 +16,25 @@ RulesetBMSNetwork::RulesetBMSNetwork(GameModeKeys keys, unsigned playerIndex)
     _judgeScratch = false;
 }
 
+static Option::e_lamp_type gaugeToOption(RulesetBMS::GaugeType _gauge)
+{
+    using GT = RulesetBMS::GaugeType;
+    switch (_gauge)
+    {
+    case GT::HARD: return Option::LAMP_HARD;
+    case GT::EXHARD: return Option::LAMP_EXHARD;
+    case GT::DEATH: return Option::LAMP_FULLCOMBO;
+    case GT::P_ATK: // return Option::LAMP_FULLCOMBO; // TODO: check this.
+    case GT::G_ATK: // return Option::LAMP_FULLCOMBO; // TODO: check this.
+    case GT::GROOVE: return Option::LAMP_NORMAL;
+    case GT::EASY: return Option::LAMP_EASY;
+    case GT::ASSIST: return Option::LAMP_ASSIST;
+    case GT::GRADE:
+    case GT::EXGRADE: return Option::LAMP_NOPLAY;
+    }
+    lunaticvibes::assert_failed("gaugeToOption");
+}
+
 void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
 {
     if (!_hasStartTime)
@@ -83,6 +102,7 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
         State::set(N(IndexNumber::ARENA_PLAYDATA_PLAYER_EX_DIFF), player->getExScore() - exScore);
 
     Option::e_lamp_type lamp = Option::LAMP_NOPLAY;
+    // TODO: deduplicate with calculateLamp. Seems to be the same but isFinished().
     if (!isNoScore() && isFinished())
     {
         if (_basic.judge[JUDGE_CB] == 0)
@@ -100,22 +120,7 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
         }
         else
         {
-            switch (_gauge)
-            {
-            case GaugeType::HARD: lamp = Option::LAMP_HARD; break;
-            case GaugeType::EXHARD: lamp = Option::LAMP_EXHARD; break;
-            case GaugeType::DEATH:
-                lamp = Option::LAMP_FULLCOMBO;
-                break;
-                // case GaugeType::P_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-                // case GaugeType::G_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-            case GaugeType::GROOVE: lamp = Option::LAMP_NORMAL; break;
-            case GaugeType::EASY: lamp = Option::LAMP_EASY; break;
-            case GaugeType::ASSIST: lamp = Option::LAMP_ASSIST; break;
-            case GaugeType::GRADE:
-            case GaugeType::EXGRADE: lamp = Option::LAMP_NOPLAY; break;
-            default: break;
-            }
+            lamp = gaugeToOption(getGaugeType());
         }
     }
     State::set(O(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE), std::min(lamp, saveLampMax));

@@ -1,5 +1,7 @@
 #include "ruleset_bms.h"
 
+#include <algorithm>
+#include <array>
 #include <iterator>
 #include <utility>
 
@@ -54,11 +56,415 @@ void setJudgeInternalTimer2P(RulesetBMS::JudgeType judge, long long t)
     }
 }
 
+static RulesetBMS::GaugeType get_gauge(PlayModifierGaugeType gauge)
+{
+    using P = PlayModifierGaugeType;
+    using G = RulesetBMS::GaugeType;
+    switch (gauge)
+    {
+    case P::NORMAL: return G::GROOVE;
+    case P::HARD: return G::HARD;
+    case P::DEATH: return G::DEATH;
+    case P::EASY: return G::EASY;
+    // TODO: check these.
+    case P::PATTACK:
+    case P::GATTACK: return G::GROOVE;
+    // case P::PATTACK: return G::P_ATK;
+    // case P::GATTACK: return G::G_ATK;
+    case P::EXHARD: return G::EXHARD;
+    case P::ASSISTEASY: return G::ASSIST;
+    case P::GRADE_NORMAL: return G::GRADE;
+    case P::GRADE_DEATH:
+    case P::GRADE_HARD: return G::EXGRADE;
+    }
+    lunaticvibes::assert_failed("invalid PlayModifierGaugeType");
+}
+
+static double calculateHardNegativeHpDiffMultiplier(unsigned total, unsigned note_count)
+{
+    double by_total = 1.0;
+    if (total >= 240)
+        ;
+    else if (total >= 230)
+        by_total = 10.0 / 9;
+    else if (total >= 210)
+        by_total = 1.25;
+    else if (total >= 200)
+        by_total = 1.5;
+    else if (total >= 180)
+        by_total = 5.0 / 3;
+    else if (total >= 160)
+        by_total = 2.0;
+    else if (total >= 150)
+        by_total = 2.5;
+    else if (total >= 130)
+        by_total = 10.0 / 3;
+    else if (total >= 120)
+        by_total = 5.0;
+    else
+        by_total = 10.0;
+
+    double by_notes = 1.0;
+    if (note_count >= 1000)
+        ;
+    else if (note_count >= 500)
+        by_notes = (note_count - 500) * 0.002;
+    else if (note_count >= 250)
+        by_notes = 1.0 + (note_count - 250) * 0.004;
+    else if (note_count >= 125)
+        by_notes = 2.0 + (note_count - 125) * 0.008;
+    else if (note_count >= 62)
+        by_notes = 3.0 + (note_count - 62) * (1.0 / 62);
+    else if (note_count >= 31)
+        by_notes = 4.0 + (note_count - 31) * (1.0 / 31);
+    else if (note_count >= 16)
+        by_notes = 5.0 + (note_count - 16) * 0.0625;
+    else if (note_count >= 8)
+        by_notes = 6.0 + (note_count - 8) * 0.125;
+    else if (note_count >= 4)
+        by_notes = 7.0 + (note_count - 4) * 0.25;
+    else if (note_count >= 2)
+        by_notes = 8.0 + (note_count - 2) * 0.50;
+    else if (note_count == 1)
+        by_notes = 9.0;
+    else
+        by_notes = 10.0;
+
+    return std::max(by_total, by_notes);
+}
+
+static unsigned getDefaultTotal(RulesetBMS::GaugeType gauge)
+{
+    switch (gauge)
+    {
+        using enum RulesetBMS::GaugeType;
+    case HARD:
+    case EXHARD:
+    case DEATH:
+    case GRADE:
+    case EXGRADE: return 300;
+    case P_ATK: // ?
+    case G_ATK: // ?
+    case GROOVE:
+    case EASY:
+    case ASSIST: return 160;
+    }
+    lunaticvibes::assert_failed("getDefaultTotal");
+}
+
+static lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, int total, unsigned note_count)
+{
+    // Older reference: https://github.com/aeventyr/LR2GAS_pub
+    // Health gain later updated from LR2 disassembly project.
+    // HARD and GATTACK have additional multipliers applied elsewhere.
+    //
+    // ASSISTEASY and EXHARD match lr2oraja.
+    // https://github.com/wcko87/lr2oraja/blob/4e9df9a5394561a1c24fe48d52c1c6539de559f3/src/bms/player/beatoraja/play/GaugeProperty.java
+
+    // NOTE: LR2 handles #TOTAL 0 as if total was not set.
+    if (total <= 0)
+        total = getDefaultTotal(type);
+
+    switch (type)
+    {
+        using enum RulesetBMS::GaugeType;
+    case GROOVE:
+        return {.health_gain =
+                    {
+                        0.01 * total / note_count,     // PG
+                        0.01 * total / note_count,     // GR
+                        0.01 * total / note_count / 2, // GD
+                        -0.04,                         // BD
+                        -0.02,                         // KPR
+                        -0.06,                         // MISS
+                    },
+                .start_health = 0.2,
+                .min_health = 0.02,
+                .clear_health = 0.8,
+                .type = type,
+                .fail_no_health = false};
+    case EASY:
+        return {.health_gain =
+                    {
+                        0.01 * total / note_count * 1.2,
+                        0.01 * total / note_count * 1.2,
+                        0.01 * total / note_count / 2 * 1.2,
+                        -0.032,
+                        -0.016,
+                        -0.04800000000000001,
+                    },
+                .start_health = 0.2,
+                .min_health = 0.02,
+                .clear_health = 0.8,
+                .type = type,
+                .fail_no_health = false};
+    case ASSIST:
+        return {.health_gain =
+                    {
+                        0.01 * total / note_count * 1.2,
+                        0.01 * total / note_count * 1.2,
+                        0.01 * total / note_count / 2 * 1.2,
+                        -0.032,
+                        -0.016,
+                        -0.048,
+                    },
+                .start_health = 0.2,
+                .min_health = 0.02,
+                .clear_health = 0.6,
+                .type = type,
+                .fail_no_health = false};
+    case HARD:
+        return {.health_gain =
+                    {
+                        0.001,
+                        0.001,
+                        0.001 / 2,
+                        -0.06,
+                        -0.02,
+                        -0.1,
+                    },
+                .start_health = 1.0,
+                .min_health = 0,
+                .clear_health = 0,
+                .hp_lose_multiplier = calculateHardNegativeHpDiffMultiplier(total, note_count),
+                .type = type,
+                .fail_no_health = true,
+                .reduce_below_30_hp_damage = true};
+    case EXHARD:
+        return {.health_gain =
+                    {
+                        0.001,
+                        0.001,
+                        0.001 / 2,
+                        -0.12,
+                        -0.02,
+                        -0.2,
+                    },
+                .start_health = 1.0,
+                .min_health = 0,
+                .clear_health = 0,
+                .hp_lose_multiplier = calculateHardNegativeHpDiffMultiplier(total, note_count),
+                .type = type,
+                .fail_no_health = true};
+    case DEATH:
+        return {.health_gain =
+                    {
+                        0.0,
+                        0.0,
+                        0.0,
+                        -1.0,
+                        0.0,
+                        -1.0,
+                    },
+                .start_health = 1.0,
+                .min_health = 0,
+                .clear_health = 0,
+                .type = type,
+                .fail_no_health = true};
+    case P_ATK:
+        return {.health_gain =
+                    {
+                        0.001,
+                        -0.01,
+                        -1.0,
+                        -1.0,
+                        -1.0,
+                        -1.0,
+                    },
+                .start_health = 1.0,
+                .min_health = 0,
+                .clear_health = 0,
+                .type = type,
+                .fail_no_health = true};
+    case G_ATK:
+        return {.health_gain =
+                    {
+                        -0.1,
+                        -0.01,
+                        0.001,
+                        -0.06,
+                        -0.02,
+                        -0.1,
+                    },
+                .start_health = 1.0,
+                .min_health = 0,
+                .clear_health = 0,
+                .type = type,
+                .fail_no_health = true};
+    case GRADE:
+        return {.health_gain =
+                    {
+                        0.001,
+                        0.001,
+                        0.0004,
+                        -0.02,
+                        -0.02,
+                        -0.03,
+                    },
+                .start_health = 1.0,
+                .min_health = 0,
+                .clear_health = 0,
+                .type = type,
+                .fail_no_health = true,
+                .reduce_below_30_hp_damage = true};
+    case EXGRADE:
+        return {.health_gain =
+                    {
+                        0.001,
+                        0.001,
+                        0.0004,
+                        -0.06,
+                        -0.2,
+                        -0.1,
+                    },
+                .start_health = 1.0,
+                .min_health = 0,
+                .clear_health = 0,
+                .type = type,
+                .fail_no_health = true};
+    }
+    lunaticvibes::assert_failed("getGauge");
+}
+
+static int getTotal(const std::shared_ptr<ChartFormatBase>& format)
+{
+    switch (format->type())
+    {
+    case eChartFormat::BMS: return std::reinterpret_pointer_cast<ChartFormatBMSMeta>(format)->total;
+    case eChartFormat::UNKNOWN:
+    case eChartFormat::BMSON: return -1;
+    }
+    lunaticvibes::assert_failed("getTotal");
+}
+
+namespace lunaticvibes
+{
+
+void GaugeHolder::feed(RulesetBMS::JudgeArea judge)
+{
+    // LOG_VERBOSE << "[RulesetBMS] GaugeHolder::feed " << static_cast<int>(judge);
+    if (_did_fail)
+        return;
+    process(_gauge.health_gain[static_cast<unsigned>(RulesetBMS::JudgeAreaTypeMap.at(judge))]);
+}
+
+void GaugeHolder::feed_mine(long long mine_value)
+{
+    if (_did_fail)
+        return;
+    process(-0.01 * mine_value / 2);
+}
+
+std::ostream& operator<<(std::ostream& os, const BmsGaugeType& type)
+{
+    switch (type)
+    {
+    case BmsGaugeType::GROOVE: return os << "GROOVE";
+    case BmsGaugeType::EASY: return os << "EASY";
+    case BmsGaugeType::ASSIST: return os << "ASSIST";
+    case BmsGaugeType::HARD: return os << "HARD";
+    case BmsGaugeType::EXHARD: return os << "EXHARD";
+    case BmsGaugeType::DEATH: return os << "DEATH";
+    case BmsGaugeType::P_ATK: return os << "P_ATK";
+    case BmsGaugeType::G_ATK: return os << "G_ATK";
+    case BmsGaugeType::GRADE: return os << "GRADE";
+    case BmsGaugeType::EXGRADE: return os << "EXGRADE";
+    }
+    lunaticvibes::assert_failed("operator<<(BmsGaugeType)");
+}
+
+void GaugeHolder::update_for_show(RulesetBMS& ruleset)
+{
+    // LOG_VERBOSE << "GaugeHolder update_for_show side=" << (int)ruleset._side << " gauge=" << _gauge.type;
+    // >>>> copy-paste this to initGaugeParams :(
+    ruleset._basic.health = _health.to;
+    ruleset._clearHealth = _gauge.clear_health;
+    ruleset._failWhenNoHealth = _gauge.fail_no_health;
+    ruleset._minHealth = _gauge.min_health;
+    if (_did_fail && !ruleset._isFailed)
+    {
+        LOG_DEBUG << "[RulesetBMS] Gauge failed: " << _gauge.type;
+        ruleset.fail();
+    }
+}
+
+void GaugeHolder::process(double diff)
+{
+    // LOG_VERBOSE << "[GaugeHolder] <- process, current=" << _health.to << " diff=" << diff;
+    LVF_DEBUG_ASSERT(!_did_fail);
+
+    // TOTAL補正, totalnotes補正
+    // ref: https://web.archive.org/web/20150226213104/http://2nd.geocities.jp/yoshi_65c816/bms/LR2.html
+    // TODO: instead match https://github.com/aeventyr/LR2GAS_pub/blob/main/src/gas.cpp and also check LR2
+    // disassembly.
+    if (diff < 0)
+        diff *= _gauge.hp_lose_multiplier;
+
+    if (_gauge.reduce_below_30_hp_damage && _health.to < 0.32 && diff < 0.0)
+        diff *= 0.6;
+
+    // TODO: verify the animation. Try with hard gauge something where one miss makes you lose like 90% HP.
+    _health.from = _health.to;
+    const double new_hp_tmp = _health.to + diff;
+    const auto new_hp = std::max(_gauge.min_health, std::min(1.0, new_hp_tmp));
+    if (_health.from != new_hp)
+    {
+        auto get_lr2_hp_animation_time = [](double from, double to) {
+            return std::abs(static_cast<int>(from - to)) * 10;
+        };
+        _health.from = _health.animate(lunaticvibes::Time::now());
+        _health.to = new_hp;
+        _health.start = lunaticvibes::Time::now();
+        _health.end = _health.start + get_lr2_hp_animation_time(_health.from, _health.to);
+    }
+
+    if (_gauge.fail_no_health && _health.to <= _gauge.min_health)
+    {
+        LOG_DEBUG << "[GaugeHolder] Gauge failed: " << _gauge.type;
+        _did_fail = true;
+    }
+
+    // LOG_VERBOSE << "[GaugeHolder] -> process, new=" << _health.to;
+}
+
+void GaugeHolderProxy::feed(BmsJudgeArea judge)
+{
+    for (auto& gauge : _gauges)
+        gauge.feed(judge);
+}
+
+void GaugeHolderProxy::feed_mine(long long mine_value)
+{
+    for (auto& gauge : _gauges)
+        gauge.feed_mine(mine_value);
+}
+
+void GaugeHolderProxy::update_for_show(RulesetBMS& ruleset)
+{
+    // LOG_VERBOSE << "GaugeHolderProxy update_for_show";
+    current_gauge().update_for_show(ruleset);
+}
+
+const Lr2GaugeIncrements& GaugeHolderProxy::get_gauge() const
+{
+    return current_gauge().get_gauge();
+}
+
+const NumberAnimation& GaugeHolderProxy::get_health() const
+{
+    return current_gauge().get_health();
+}
+
+} // namespace lunaticvibes
+
 RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart,
                        PlayModifiers mods, GameModeKeys keys, JudgeDifficulty difficulty, double health,
                        RulesetBMS::PlaySide side, const int fiveKeyMapIndex,
                        std::shared_ptr<PlayContextParams::MutexReplayChart> replayNew)
-    : RulesetBase(std::move(format), std::move(chart)), _judgeDifficulty(difficulty), _replayNew(std::move(replayNew))
+    : RulesetBase(std::move(format), std::move(chart)),
+      _gaugeProc(std::array{
+          lunaticvibes::GaugeHolder{getGauge(GaugeType::GROOVE, /*total*/ 0, /*note_count=*/0), _basic.health}}),
+      _judgeDifficulty(difficulty), _replayNew(std::move(replayNew))
 {
     if (_replayNew)
     {
@@ -286,7 +692,6 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     using namespace std::string_literals;
 
     _basic.health = health;
-    _healthAnim.to = health;
     initGaugeParams(mods.gauge);
 
     _side = side;
@@ -434,202 +839,38 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     }
 }
 
-static RulesetBMS::GaugeType get_gauge(PlayModifierGaugeType gauge)
+static bool isCourseGrade(RulesetBMS::GaugeType gauge)
 {
-    using P = PlayModifierGaugeType;
-    using G = RulesetBMS::GaugeType;
     switch (gauge)
     {
-    case P::NORMAL: return G::GROOVE;
-    case P::HARD: return G::HARD;
-    case P::DEATH: return G::DEATH;
-    case P::EASY: return G::EASY;
-    // TODO: check these.
-    case P::PATTACK:
-    case P::GATTACK: return G::GROOVE;
-    // case P::PATTACK: return G::P_ATK;
-    // case P::GATTACK: return G::G_ATK;
-    case P::EXHARD: return G::EXHARD;
-    case P::ASSISTEASY: return G::ASSIST;
-    case P::GRADE_NORMAL: return G::GRADE;
-    case P::GRADE_DEATH:
-    case P::GRADE_HARD: return G::EXGRADE;
+    case RulesetBMS::GaugeType::GROOVE:
+    case RulesetBMS::GaugeType::EASY:
+    case RulesetBMS::GaugeType::ASSIST:
+    case RulesetBMS::GaugeType::HARD:
+    case RulesetBMS::GaugeType::EXHARD:
+    case RulesetBMS::GaugeType::DEATH:
+    case RulesetBMS::GaugeType::P_ATK:
+    case RulesetBMS::GaugeType::G_ATK: return false;
+    case RulesetBMS::GaugeType::GRADE:
+    case RulesetBMS::GaugeType::EXGRADE: return true;
     }
-    lunaticvibes::assert_failed("invalid PlayModifierGaugeType");
+    lunaticvibes::assert_failed("isCourseGrade");
 }
 
 void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 {
-    // Older reference: https://github.com/aeventyr/LR2GAS_pub
-    // Health gain later updated from LR2 disassembly.
-    // HARD and GATTACK have additional multipliers applied elsewhere.
-    //
-    // ASSISTEASY and EXHARD match lr2oraja.
-    // https://github.com/wcko87/lr2oraja/blob/4e9df9a5394561a1c24fe48d52c1c6539de559f3/src/bms/player/beatoraja/play/GaugeProperty.java
-
-    _gauge = get_gauge(gauge);
-
-    if (_format)
-    {
-        switch (_format->type())
-        {
-        case eChartFormat::BMS: {
-            auto bms = std::reinterpret_pointer_cast<ChartFormatBMSMeta>(_format);
-            total = bms->total;
-            break;
-        }
-        case eChartFormat::UNKNOWN:
-        case eChartFormat::BMSON: break;
-        }
-    }
-    // NOTE: LR2 handles #TOTAL 0 as if total was not set.
-    if (total <= 0)
-    {
-        switch (_gauge)
-        {
-        case RulesetBMS::GaugeType::HARD:
-        case RulesetBMS::GaugeType::EXHARD:
-        case RulesetBMS::GaugeType::DEATH:
-        case RulesetBMS::GaugeType::GRADE:
-        case RulesetBMS::GaugeType::EXGRADE: total = 300; break;
-        case RulesetBMS::GaugeType::GROOVE:
-        case RulesetBMS::GaugeType::EASY:
-        case RulesetBMS::GaugeType::ASSIST:
-        default: total = 160; break;
-        }
-    }
-
-    switch (_gauge)
-    {
-    case GaugeType::HARD:
-        //_basic.health             = 1.0;
-        _minHealth = 0;
-        _clearHealth = 0;
-        _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 0.001;
-        _healthGain[JudgeType::GREAT] = 0.001;
-        _healthGain[JudgeType::GOOD] = 0.001 / 2;
-        _healthGain[JudgeType::BAD] = -0.06;
-        _healthGain[JudgeType::MISS] = -0.1;
-        _healthGain[JudgeType::KPOOR] = -0.02;
-        break;
-
-    case GaugeType::EXHARD:
-        //_basic.health             = 1.0;
-        _minHealth = 0;
-        _clearHealth = 0;
-        _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 0.001;
-        _healthGain[JudgeType::GREAT] = 0.001;
-        _healthGain[JudgeType::GOOD] = 0.001 / 2;
-        _healthGain[JudgeType::BAD] = -0.12;
-        _healthGain[JudgeType::MISS] = -0.2;
-        _healthGain[JudgeType::KPOOR] = -0.02;
-        break;
-
-    case GaugeType::DEATH:
-        //_basic.health               = 1.0;
-        _minHealth = 0;
-        _clearHealth = 0;
-        _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 0.0;
-        _healthGain[JudgeType::GREAT] = 0.0;
-        _healthGain[JudgeType::GOOD] = 0.0;
-        _healthGain[JudgeType::BAD] = -1.0;
-        _healthGain[JudgeType::MISS] = -1.0;
-        _healthGain[JudgeType::KPOOR] = 0.0;
-        break;
-
-    case GaugeType::P_ATK:
-        //_basic.health             = 1.0;
-        _minHealth = 0;
-        _clearHealth = 0;
-        _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 0.001;
-        _healthGain[JudgeType::GREAT] = -0.01;
-        _healthGain[JudgeType::GOOD] = -1.0;
-        _healthGain[JudgeType::BAD] = -1.0;
-        _healthGain[JudgeType::MISS] = -1.0;
-        _healthGain[JudgeType::KPOOR] = -1.0;
-        break;
-
-    case GaugeType::G_ATK:
-        //_basic.health             = 1.0;
-        _minHealth = 0;
-        _clearHealth = 0;
-        _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = -0.1;
-        _healthGain[JudgeType::GREAT] = -0.01;
-        _healthGain[JudgeType::GOOD] = 0.001;
-        _healthGain[JudgeType::BAD] = -0.06;
-        _healthGain[JudgeType::MISS] = -0.1;
-        _healthGain[JudgeType::KPOOR] = -0.02;
-        break;
-
-    case GaugeType::GROOVE:
-        //_basic.health             = 0.2;
-        _minHealth = 0.02;
-        _clearHealth = 0.8;
-        _healthGain[JudgeType::PERFECT] = 0.01 * total / noteCount;
-        _healthGain[JudgeType::GREAT] = 0.01 * total / noteCount;
-        _healthGain[JudgeType::GOOD] = 0.01 * total / noteCount / 2;
-        _healthGain[JudgeType::BAD] = -0.04;
-        _healthGain[JudgeType::MISS] = -0.06;
-        _healthGain[JudgeType::KPOOR] = -0.02;
-        break;
-
-    case GaugeType::EASY:
-        //_basic.health             = 0.2;
-        _minHealth = 0.02;
-        _clearHealth = 0.8;
-        _healthGain[JudgeType::PERFECT] = 0.01 * total / noteCount * 1.2;
-        _healthGain[JudgeType::GREAT] = 0.01 * total / noteCount * 1.2;
-        _healthGain[JudgeType::GOOD] = 0.01 * total / noteCount / 2 * 1.2;
-        _healthGain[JudgeType::BAD] = -0.032;
-        _healthGain[JudgeType::MISS] = -0.04800000000000001;
-        _healthGain[JudgeType::KPOOR] = -0.016;
-        break;
-
-    case GaugeType::ASSIST:
-        //_basic.health             = 0.2;
-        _minHealth = 0.02;
-        _clearHealth = 0.6;
-        _healthGain[JudgeType::PERFECT] = 0.01 * total / noteCount * 1.2;
-        _healthGain[JudgeType::GREAT] = 0.01 * total / noteCount * 1.2;
-        _healthGain[JudgeType::GOOD] = 0.01 * total / noteCount / 2 * 1.2;
-        _healthGain[JudgeType::BAD] = -0.032;
-        _healthGain[JudgeType::MISS] = -0.048;
-        _healthGain[JudgeType::KPOOR] = -0.016;
-        break;
-
-    case GaugeType::GRADE:
-        //_basic.health             = 1.0;
-        _minHealth = 0;
-        _clearHealth = 0;
-        _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 0.001;
-        _healthGain[JudgeType::GREAT] = 0.001;
-        _healthGain[JudgeType::GOOD] = 0.0004;
-        _healthGain[JudgeType::BAD] = -0.02;
-        _healthGain[JudgeType::MISS] = -0.03;
-        _healthGain[JudgeType::KPOOR] = -0.02;
-        break;
-
-    case GaugeType::EXGRADE:
-        //_basic.health             = 1.0;
-        _minHealth = 0;
-        _clearHealth = 0;
-        _failWhenNoHealth = true;
-        _healthGain[JudgeType::PERFECT] = 0.001;
-        _healthGain[JudgeType::GREAT] = 0.001;
-        _healthGain[JudgeType::GOOD] = 0.0004;
-        _healthGain[JudgeType::BAD] = -0.06;
-        _healthGain[JudgeType::MISS] = -0.1;
-        _healthGain[JudgeType::KPOOR] = -0.2;
-        break;
-
-    default: break;
-    }
+    const int total = _format != nullptr ? getTotal(_format) : 0;
+    auto bms_gauge = get_gauge(gauge);
+    LOG_VERBOSE << "[RulesetBMS] initGaugeParams " << bms_gauge;
+    _gaugeProc = lunaticvibes::GaugeHolderProxy{
+        std::array{lunaticvibes::GaugeHolder{getGauge(bms_gauge, total, getNoteCount()), _basic.health}}};
+    // TODO: can't use 'this' in constructor :(
+    // _gaugeProc.update_for_show(*this);
+    // >>>> copy-paste:
+    _basic.health = _gaugeProc.get_health().to;
+    _clearHealth = _gaugeProc.get_gauge().clear_health;
+    _failWhenNoHealth = _gaugeProc.get_gauge().fail_no_health;
+    _minHealth = _gaugeProc.get_gauge().min_health;
 }
 
 RulesetBMS::JudgeRes RulesetBMS::_calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const
@@ -847,7 +1088,7 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
         {
             note.hit = true;
             note.expired = true;
-            _updateHp(-0.01 * note.dvalue / 2);
+            processHpHitMine(note.dvalue);
 
             // kpoor + 1
             for (auto& i : JudgeAreaIndexAccMap.at(JudgeArea::MINE_KPOOR))
@@ -1006,100 +1247,16 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
     }
 }
 
-void RulesetBMS::_updateHp(double diff)
+void RulesetBMS::processHp(JudgeArea judge)
 {
-    // TOTAL補正, totalnotes補正
-    // ref: https://web.archive.org/web/20150226213104/http://2nd.geocities.jp/yoshi_65c816/bms/LR2.html
-    // TODO: instead match https://github.com/aeventyr/LR2GAS_pub/blob/main/src/gas.cpp and also check LR2 disassembly.
-    if ((_gauge == RulesetBMS::GaugeType::HARD || _gauge == RulesetBMS::GaugeType::EXHARD) && diff < 0)
-    {
-        double pTotal = 1.0;
-        if (total >= 240)
-            ;
-        else if (total >= 230)
-            pTotal = 10.0 / 9;
-        else if (total >= 210)
-            pTotal = 1.25;
-        else if (total >= 200)
-            pTotal = 1.5;
-        else if (total >= 180)
-            pTotal = 5.0 / 3;
-        else if (total >= 160)
-            pTotal = 2.0;
-        else if (total >= 150)
-            pTotal = 2.5;
-        else if (total >= 130)
-            pTotal = 10.0 / 3;
-        else if (total >= 120)
-            pTotal = 5.0;
-        else
-            pTotal = 10.0;
-
-        double pNotes = 1.0;
-        unsigned notes = getNoteCount();
-        if (notes >= 1000)
-            ;
-        else if (notes >= 500)
-            pNotes = (notes - 500) * 0.002;
-        else if (notes >= 250)
-            pNotes = 1.0 + (notes - 250) * 0.004;
-        else if (notes >= 125)
-            pNotes = 2.0 + (notes - 125) * 0.008;
-        else if (notes >= 62)
-            pNotes = 3.0 + (notes - 62) * (1.0 / 62);
-        else if (notes >= 31)
-            pNotes = 4.0 + (notes - 31) * (1.0 / 31);
-        else if (notes >= 16)
-            pNotes = 5.0 + (notes - 16) * 0.0625;
-        else if (notes >= 8)
-            pNotes = 6.0 + (notes - 8) * 0.125;
-        else if (notes >= 4)
-            pNotes = 7.0 + (notes - 4) * 0.25;
-        else if (notes >= 2)
-            pNotes = 8.0 + (notes - 2) * 0.50;
-        else if (notes == 1)
-            pNotes = 9.0;
-        else
-            pNotes = 10.0;
-
-        diff *= 1.0 * std::max(pTotal, pNotes);
-    }
-
-    _healthAnim.from = _basic.health;
-    double tmp = _basic.health;
-
-    // 30% buff
-    if ((_gauge == RulesetBMS::GaugeType::HARD || _gauge == RulesetBMS::GaugeType::GRADE) && tmp < 0.32 && diff < 0.0)
-    {
-        tmp += diff * 0.6;
-    }
-    else
-    {
-        tmp += diff;
-    }
-
-    const auto new_hp = std::max(_minHealth, std::min(1.0, tmp));
-    if (_healthAnim.from != new_hp)
-    {
-        // TODO: verify this. Try with hard gauge something where one miss makes you lose like 90% HP.
-        auto get_lr2_hp_animation_time = [](double from, double to) {
-            return std::abs(static_cast<int>(from - to)) * 10;
-        };
-        _healthAnim.from = _healthAnim.animate(lunaticvibes::Time::now());
-        _healthAnim.to = new_hp;
-        _healthAnim.start = lunaticvibes::Time::now();
-        _healthAnim.end = _healthAnim.start + get_lr2_hp_animation_time(_healthAnim.from, _healthAnim.to);
-    }
-    _basic.health = new_hp;
-
-    if (failWhenNoHealth() && _basic.health <= _minHealth)
-    {
-        fail();
-    }
+    _gaugeProc.feed(judge);
+    _gaugeProc.update_for_show(*this);
 }
-void RulesetBMS::_updateHp(JudgeArea judge)
+
+void RulesetBMS::processHpHitMine(long long mine_value)
 {
-    _updateHp(_healthGain.at(JudgeAreaTypeMap.at(judge)));
+    _gaugeProc.feed_mine(mine_value);
+    _gaugeProc.update_for_show(*this);
 }
 
 void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch, const RulesetBMS::JudgeArea judge,
@@ -1170,7 +1327,7 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     case JudgeArea::MINE_KPOOR: break;
     }
 
-    _updateHp(judge);
+    processHp(judge);
     if (_basic.combo > _basic.maxCombo)
         _basic.maxCombo = _basic.combo;
     if (_basic.combo + _basic.comboDisplay > _basic.maxComboDisplay)
@@ -1720,12 +1877,60 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
         updateScratch(t, Input::S2L, Input::S2R, playerScratchAccumulator[PLAYER_SLOT_TARGET], PLAYER_SLOT_TARGET);
     }
 
+    _gaugeProc.update_for_show(*this); // Would not need to call this once health is taken from the gauge instead of
+                                       // _basic.
     _isCleared = isCleared();
-
+    // LOG_VERBOSE << "ruleset_bms update isFailed()=" << isFailed() << " _isFailed=" << _isFailed;
     if (isFinished())
         _isFailed |= _basic.health < getClearHealth();
 
     updateGlobals();
+}
+
+static Option::e_lamp_type gaugeToOption(RulesetBMS::GaugeType _gauge)
+{
+    using GT = RulesetBMS::GaugeType;
+    switch (_gauge)
+    {
+    case GT::HARD: return Option::LAMP_HARD;
+    case GT::EXHARD: return Option::LAMP_EXHARD;
+    case GT::DEATH: return Option::LAMP_FULLCOMBO;
+    case GT::P_ATK: // return Option::LAMP_FULLCOMBO; // TODO: check this.
+    case GT::G_ATK: // return Option::LAMP_FULLCOMBO; // TODO: check this.
+    case GT::GROOVE: return Option::LAMP_NORMAL;
+    case GT::EASY: return Option::LAMP_EASY;
+    case GT::ASSIST: return Option::LAMP_ASSIST;
+    case GT::GRADE:
+    case GT::EXGRADE: return Option::LAMP_NOPLAY;
+    }
+    lunaticvibes::assert_failed("gaugeToOption");
+}
+
+Option::e_lamp_type RulesetBMS::calculateLamp() const
+{
+    Option::e_lamp_type lamp = Option::LAMP_NOPLAY;
+    if (isNoScore() && _basic.judge[JUDGE_BP] == 0)
+    {
+        lamp = Option::LAMP_NOPLAY;
+    }
+    else if (_basic.judge[JUDGE_CB] == 0)
+    {
+        if (_basic.acc >= 100.0)
+            lamp = Option::LAMP_MAX;
+        else if (_basic.judge[JUDGE_GOOD] == 0)
+            lamp = Option::LAMP_PERFECT;
+        else
+            lamp = Option::LAMP_FULLCOMBO;
+    }
+    else if (!isFailed())
+    {
+        lamp = gaugeToOption(getGaugeType());
+    }
+    else
+    {
+        lamp = Option::LAMP_FAILED;
+    }
+    return std::min(lamp, saveLampMax);
 }
 
 double RulesetBMS::getScore() const
@@ -1796,6 +2001,7 @@ unsigned RulesetBMS::getMaxCombo() const
 
 void RulesetBMS::fail()
 {
+    LOG_VERBOSE << "[RulesetBMS] fail()";
     _isFailed = true;
 
     _basic.health = _minHealth;
@@ -1807,6 +2013,30 @@ void RulesetBMS::fail()
     notesExpired = notesReached = getNoteCount();
 
     //_basic.acc = _basic.total_acc;
+}
+
+// 1:fast 2:slow
+static unsigned getFastSlow(RulesetBMS::JudgeArea area)
+{
+    switch (area)
+    {
+        using enum RulesetBMS::JudgeArea;
+    case EARLY_GREAT:
+    case EARLY_GOOD:
+    case EARLY_BAD:
+    case EARLY_KPOOR: return 1;
+    case LATE_GREAT:
+    case LATE_GOOD:
+    case LATE_BAD:
+    case MISS:
+    case LATE_KPOOR: return 2;
+    case NOTHING:
+    case EARLY_PERFECT:
+    case EXACT_PERFECT:
+    case LATE_PERFECT:
+    case MINE_KPOOR: return 0;
+    }
+    lunaticvibes::assert_failed("getFastSlow");
 }
 
 void RulesetBMS::updateGlobals()
@@ -1843,29 +2073,8 @@ void RulesetBMS::updateGlobals()
 
         if (showJudge)
         {
-            // 1:fast 2:slow
-            auto get_fastslow = [](JudgeArea area) {
-                switch (area)
-                {
-                case JudgeArea::EARLY_GREAT:
-                case JudgeArea::EARLY_GOOD:
-                case JudgeArea::EARLY_BAD:
-                case JudgeArea::EARLY_KPOOR: return 1;
-                case JudgeArea::LATE_GREAT:
-                case JudgeArea::LATE_GOOD:
-                case JudgeArea::LATE_BAD:
-                case JudgeArea::MISS:
-                case JudgeArea::LATE_KPOOR: return 2;
-                case JudgeArea::NOTHING:
-                case JudgeArea::EARLY_PERFECT:
-                case JudgeArea::EXACT_PERFECT:
-                case JudgeArea::LATE_PERFECT:
-                case JudgeArea::MINE_KPOOR: return 0;
-                }
-                lunaticvibes::assert_failed("get_fastslow");
-            };
 
-            const int fs_of_player = get_fastslow(_lastNoteJudge[PLAYER_SLOT_PLAYER].area);
+            const int fs_of_player = getFastSlow(_lastNoteJudge[PLAYER_SLOT_PLAYER].area);
             State::set(IndexNumber::LR2IR_REPLACE_PLAY_1P_FAST_SLOW, fs_of_player);
             State::set(IndexOption::PLAY_LAST_JUDGE_FASTSLOW_1P, fs_of_player);
             State::set(IndexNumber::LR2IR_REPLACE_PLAY_1P_JUDGE_TIME_ERROR_MS,
@@ -1874,7 +2083,7 @@ void RulesetBMS::updateGlobals()
 
             if (_side == PlaySide::DOUBLE || _side == PlaySide::AUTO_DOUBLE)
             {
-                const int fs_of_target = get_fastslow(_lastNoteJudge[PLAYER_SLOT_TARGET].area);
+                const int fs_of_target = getFastSlow(_lastNoteJudge[PLAYER_SLOT_TARGET].area);
                 State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_FAST_SLOW, fs_of_target);
                 State::set(IndexOption::PLAY_LAST_JUDGE_FASTSLOW_2P, fs_of_target);
                 State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_JUDGE_TIME_ERROR_MS,
@@ -1912,42 +2121,7 @@ void RulesetBMS::updateGlobals()
         State::set(IndexNumber::LR2IR_REPLACE_PLAY_RUNNING_NOTES, notesExpired);
         State::set(IndexNumber::LR2IR_REPLACE_PLAY_REMAIN_NOTES, getNoteCount() - notesExpired);
 
-        Option::e_lamp_type lamp = Option::LAMP_NOPLAY;
-        if (isNoScore() && _basic.judge[JUDGE_BP] == 0)
-        {
-            lamp = Option::LAMP_NOPLAY;
-        }
-        else if (_basic.judge[JUDGE_CB] == 0)
-        {
-            if (_basic.acc >= 100.0)
-                lamp = Option::LAMP_MAX;
-            else if (_basic.judge[JUDGE_GOOD] == 0)
-                lamp = Option::LAMP_PERFECT;
-            else
-                lamp = Option::LAMP_FULLCOMBO;
-        }
-        else if (!isFailed())
-        {
-            switch (_gauge)
-            {
-            case GaugeType::HARD: lamp = Option::LAMP_HARD; break;
-            case GaugeType::EXHARD: lamp = Option::LAMP_EXHARD; break;
-            case GaugeType::DEATH: lamp = Option::LAMP_FULLCOMBO; break;
-            // case GaugeType::P_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-            // case GaugeType::G_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-            case GaugeType::GROOVE: lamp = Option::LAMP_NORMAL; break;
-            case GaugeType::EASY: lamp = Option::LAMP_EASY; break;
-            case GaugeType::ASSIST: lamp = Option::LAMP_ASSIST; break;
-            case GaugeType::GRADE:
-            case GaugeType::EXGRADE: lamp = Option::LAMP_NOPLAY; break;
-            default: break;
-            }
-        }
-        else
-        {
-            lamp = Option::LAMP_FAILED;
-        }
-        State::set(IndexOption::RESULT_CLEAR_TYPE_1P, std::min(lamp, saveLampMax));
+        State::set(IndexOption::RESULT_CLEAR_TYPE_1P, calculateLamp());
     }
     else if (_side == PlaySide::BATTLE_2P || _side == PlaySide::AUTO_2P || _side == PlaySide::RIVAL) // excludes DP
     {
@@ -1984,25 +2158,7 @@ void RulesetBMS::updateGlobals()
 
         if (showJudge)
         {
-            int fastslow = 0; // 1:fast 2:slow
-            switch (_lastNoteJudge[PLAYER_SLOT_TARGET].area)
-            {
-            case JudgeArea::EARLY_GREAT:
-            case JudgeArea::EARLY_GOOD:
-            case JudgeArea::EARLY_BAD:
-            case JudgeArea::EARLY_KPOOR: fastslow = 1; break;
-
-            case JudgeArea::LATE_GREAT:
-            case JudgeArea::LATE_GOOD:
-            case JudgeArea::LATE_BAD:
-            case JudgeArea::MISS:
-            case JudgeArea::LATE_KPOOR: fastslow = 2; break;
-            case JudgeArea::NOTHING:
-            case JudgeArea::EARLY_PERFECT:
-            case JudgeArea::EXACT_PERFECT:
-            case JudgeArea::LATE_PERFECT:
-            case JudgeArea::MINE_KPOOR: break;
-            }
+            const unsigned fastslow = getFastSlow(_lastNoteJudge[PLAYER_SLOT_TARGET].area);
             State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_FAST_SLOW, fastslow);
             State::set(IndexOption::PLAY_LAST_JUDGE_FASTSLOW_2P, fastslow);
             State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_JUDGE_TIME_ERROR_MS,
@@ -2035,43 +2191,6 @@ void RulesetBMS::updateGlobals()
         else
             State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 2.0 / 9)); // E-
 
-        Option::e_lamp_type lamp = Option::LAMP_NOPLAY;
-        if (isNoScore() && _basic.judge[JUDGE_BP] == 0)
-        {
-            lamp = Option::LAMP_NOPLAY;
-        }
-        else if (_basic.judge[JUDGE_CB] == 0)
-        {
-            if (_basic.acc >= 100.0)
-                lamp = Option::LAMP_MAX;
-            else if (_basic.judge[JUDGE_GOOD] == 0)
-                lamp = Option::LAMP_PERFECT;
-            else
-                lamp = Option::LAMP_FULLCOMBO;
-        }
-        else if (!isFailed())
-        {
-            switch (_gauge)
-            {
-            case GaugeType::HARD: lamp = Option::LAMP_HARD; break;
-            case GaugeType::EXHARD: lamp = Option::LAMP_EXHARD; break;
-            case GaugeType::DEATH:
-                lamp = Option::LAMP_FULLCOMBO;
-                break;
-                // case GaugeType::P_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-                // case GaugeType::G_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-            case GaugeType::GROOVE: lamp = Option::LAMP_NORMAL; break;
-            case GaugeType::EASY: lamp = Option::LAMP_EASY; break;
-            case GaugeType::ASSIST: lamp = Option::LAMP_ASSIST; break;
-            case GaugeType::GRADE:
-            case GaugeType::EXGRADE: lamp = Option::LAMP_NOPLAY; break;
-            default: break;
-            }
-        }
-        else
-        {
-            lamp = Option::LAMP_FAILED;
-        }
-        State::set(IndexOption::RESULT_CLEAR_TYPE_2P, std::min(lamp, saveLampMax));
+        State::set(IndexOption::RESULT_CLEAR_TYPE_2P, calculateLamp());
     }
 }

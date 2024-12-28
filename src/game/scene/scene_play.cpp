@@ -1,5 +1,4 @@
 #include "scene_play.h"
-#include "common/thread_pool.h"
 
 #include <algorithm>
 #include <array>
@@ -11,6 +10,8 @@
 #include <common/chartformat/chartformat_bms.h>
 #include <common/log.h>
 #include <common/sysutil.h>
+#include <common/thread_pool.h>
+#include <common/types.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
 #include <game/arena/arena_client.h>
@@ -134,6 +135,61 @@ static std::pair<int, double> calcGreenNumber(double bpm, int slot, double hs)
     int green = den != 0.0 ? int(std::round(visible * 120.0 * 1200 / hs / bpm)) : 0;
 
     return {green, speedValue};
+}
+
+static GaugeDisplayType playModifierGaugeTypeToDisplay(PlayModifierGaugeType type)
+{
+    switch (type)
+    {
+    case PlayModifierGaugeType::NORMAL: return GaugeDisplayType::GROOVE;
+    case PlayModifierGaugeType::HARD: return GaugeDisplayType::SURVIVAL;
+    case PlayModifierGaugeType::DEATH: return GaugeDisplayType::EX_SURVIVAL;
+    case PlayModifierGaugeType::EASY: return GaugeDisplayType::GROOVE;
+    case PlayModifierGaugeType::PATTACK:                                       // TODO: check this
+    case PlayModifierGaugeType::GATTACK: return GaugeDisplayType::EX_SURVIVAL; // TODO: check this
+    case PlayModifierGaugeType::ASSISTEASY: return GaugeDisplayType::ASSIST_EASY;
+    case PlayModifierGaugeType::EXHARD: return GaugeDisplayType::EX_SURVIVAL;
+    case PlayModifierGaugeType::GRADE_NORMAL: return GaugeDisplayType::SURVIVAL;
+    case PlayModifierGaugeType::GRADE_HARD:
+    case PlayModifierGaugeType::GRADE_DEATH: return GaugeDisplayType::EX_SURVIVAL;
+    }
+    lunaticvibes::assert_failed("playModifierGaugeTypeToDisplay");
+};
+
+static GaugeDisplayType gaugeDisplay(lunaticvibes::BmsGaugeType type)
+{
+    switch (type)
+    {
+    case lunaticvibes::BmsGaugeType::GROOVE:
+    case lunaticvibes::BmsGaugeType::EASY: return GaugeDisplayType::GROOVE;
+    case lunaticvibes::BmsGaugeType::ASSIST: return GaugeDisplayType::ASSIST_EASY;
+    case lunaticvibes::BmsGaugeType::HARD: return GaugeDisplayType::SURVIVAL;
+    case lunaticvibes::BmsGaugeType::EXHARD:
+    case lunaticvibes::BmsGaugeType::DEATH:
+    case lunaticvibes::BmsGaugeType::P_ATK:                                       // TODO: check this
+    case lunaticvibes::BmsGaugeType::G_ATK: return GaugeDisplayType::EX_SURVIVAL; // TODO: check this
+    case lunaticvibes::BmsGaugeType::GRADE: return GaugeDisplayType::SURVIVAL;
+    case lunaticvibes::BmsGaugeType::EXGRADE: return GaugeDisplayType::EX_SURVIVAL;
+    }
+    lunaticvibes::assert_failed("gaugeDisplay");
+}
+
+static Option::e_gauge_type gaugeToOption(lunaticvibes::BmsGaugeType gauge)
+{
+    switch (gauge)
+    {
+    case lunaticvibes::BmsGaugeType::GROOVE: return Option::e_gauge_type::GAUGE_NORMAL;
+    case lunaticvibes::BmsGaugeType::EASY: return Option::e_gauge_type::GAUGE_EASY;
+    case lunaticvibes::BmsGaugeType::ASSIST: return Option::e_gauge_type::GAUGE_ASSISTEASY;
+    case lunaticvibes::BmsGaugeType::HARD: return Option::e_gauge_type::GAUGE_HARD;
+    case lunaticvibes::BmsGaugeType::EXHARD: return Option::e_gauge_type::GAUGE_EXHARD;
+    case lunaticvibes::BmsGaugeType::DEATH: return Option::e_gauge_type::GAUGE_DEATH;
+    case lunaticvibes::BmsGaugeType::P_ATK: return Option::e_gauge_type::GAUGE_PATTACK;
+    case lunaticvibes::BmsGaugeType::G_ATK: return Option::e_gauge_type::GAUGE_GATTACK;
+    case lunaticvibes::BmsGaugeType::GRADE: return Option::e_gauge_type::GAUGE_NORMAL;
+    case lunaticvibes::BmsGaugeType::EXGRADE: return Option::e_gauge_type::GAUGE_HARD;
+    }
+    lunaticvibes::assert_failed("gaugeToOption");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,24 +341,9 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
     playerState[PLAYER_SLOT_TARGET].healthLastTick = State::get(IndexNumber::PLAY_2P_GROOVEGAUGE);
 
     auto initDisplayGaugeType = [&](int slot) {
-        auto playModifierGaugeTypeToDisplay = [](PlayModifierGaugeType type) -> GaugeDisplayType {
-            switch (type)
-            {
-            case PlayModifierGaugeType::NORMAL: return GaugeDisplayType::GROOVE;
-            case PlayModifierGaugeType::HARD: return GaugeDisplayType::SURVIVAL;
-            case PlayModifierGaugeType::DEATH: return GaugeDisplayType::EX_SURVIVAL;
-            case PlayModifierGaugeType::EASY: return GaugeDisplayType::GROOVE;
-            case PlayModifierGaugeType::PATTACK:                                       // TODO: check this
-            case PlayModifierGaugeType::GATTACK: return GaugeDisplayType::EX_SURVIVAL; // TODO: check this
-            case PlayModifierGaugeType::ASSISTEASY: return GaugeDisplayType::ASSIST_EASY;
-            case PlayModifierGaugeType::EXHARD: return GaugeDisplayType::EX_SURVIVAL;
-            case PlayModifierGaugeType::GRADE_NORMAL: return GaugeDisplayType::SURVIVAL;
-            case PlayModifierGaugeType::GRADE_HARD:
-            case PlayModifierGaugeType::GRADE_DEATH: return GaugeDisplayType::EX_SURVIVAL;
-            }
-            lunaticvibes::assert_failed("playModifierGaugeTypeToDisplay");
-        };
-        pSkin->setGaugeDisplayType(slot, playModifierGaugeTypeToDisplay(gPlayContext.mods[slot].gauge));
+        auto gauge = playModifierGaugeTypeToDisplay(gPlayContext.mods[slot].gauge);
+        playerState[slot].seenGaugeType = gauge;
+        pSkin->setGaugeDisplayType(slot, gauge);
     };
     initDisplayGaugeType(PLAYER_SLOT_PLAYER);
     if (gPlayContext.isBattle)
@@ -854,6 +895,15 @@ bool ScenePlay::createRuleset()
         gPlayContext.ruleset[PLAYER_SLOT_PLAYER] = rulesetFactoryFunc(PLAYER_SLOT_PLAYER);
         gPlayContext.ruleset[PLAYER_SLOT_TARGET] = rulesetFactoryFunc(PLAYER_SLOT_TARGET);
         gPlayContext.ruleset[PLAYER_SLOT_MYBEST] = rulesetFactoryFunc(PLAYER_SLOT_MYBEST);
+
+        if (auto ptr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]))
+        {
+            const auto bms_gauge = ptr->getGaugeType();
+            const auto gauge = gaugeDisplay(bms_gauge);
+            playerState[PLAYER_SLOT_PLAYER].seenGaugeType = gauge;
+            pSkin->setGaugeDisplayType(PLAYER_SLOT_PLAYER, gauge);
+            State::set(IndexOption::PLAY_GAUGE_TYPE_1P, gaugeToOption(bms_gauge));
+        }
 
         if (gPlayContext.isCourse)
         {
@@ -1624,7 +1674,6 @@ void ScenePlay::updateAsyncGreenNumber(const lunaticvibes::Time& t)
 
 void ScenePlay::updateAsyncGaugeUpTimer(const lunaticvibes::Time& t)
 {
-    // TODO: use an enum for 'slot'
     auto updateSide = [&](unsigned slot) {
         IndexNumber indNum = IndexNumber::PLAY_1P_GROOVEGAUGE;
         IndexTimer indAdd = IndexTimer::PLAY_GAUGE_1P_ADD;
@@ -2133,6 +2182,8 @@ void ScenePlay::updatePlaying()
     // update score numbers
     int miss1 = 0;
     int miss2 = 0;
+    GaugeDisplayType gauge1{};
+    GaugeDisplayType gauge2{};
     if (true)
     {
         long long exScore1P = 0;
@@ -2142,6 +2193,9 @@ void ScenePlay::updatePlaying()
         {
             exScore1P = pr->getExScore();
             miss1 = pr->getJudgeCountEx(RulesetBMS::JUDGE_BP);
+            const auto bms_gauge = pr->getGaugeType();
+            gauge1 = gaugeDisplay(bms_gauge);
+            State::set(IndexOption::PLAY_GAUGE_TYPE_1P, gaugeToOption(bms_gauge));
         }
 
         if (gPlayContext.ruleset[PLAYER_SLOT_MYBEST] != nullptr)
@@ -2185,6 +2239,9 @@ void ScenePlay::updatePlaying()
             {
                 exScore2P = pr2->getExScore();
                 miss2 = pr2->getJudgeCountEx(RulesetBMS::JUDGE_BP);
+                const auto bms_gauge = pr2->getGaugeType();
+                gauge2 = gaugeDisplay(bms_gauge);
+                State::set(IndexOption::PLAY_GAUGE_TYPE_2P, gaugeToOption(bms_gauge));
             }
         }
         State::set(IndexNumber::RESULT_MYBEST_EX, exScoreMybest);
@@ -2221,6 +2278,17 @@ void ScenePlay::updatePlaying()
         poorBgaStartTime = t;
     }
     gPlayContext.bgaTexture->update(rt, t.norm() - poorBgaStartTime.norm() < poorBgaDuration);
+
+    if (gauge1 != playerState[PLAYER_SLOT_PLAYER].seenGaugeType)
+    {
+        playerState[PLAYER_SLOT_PLAYER].seenGaugeType = gauge1;
+        pSkin->setGaugeDisplayType(PLAYER_SLOT_PLAYER, gauge1);
+    }
+    if (gPlayContext.isBattle && gauge2 != playerState[PLAYER_SLOT_TARGET].seenGaugeType)
+    {
+        playerState[PLAYER_SLOT_TARGET].seenGaugeType = gauge2;
+        pSkin->setGaugeDisplayType(PLAYER_SLOT_TARGET, gauge2);
+    }
 
     // BPM
     State::set(IndexNumber::PLAY_BPM, int(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
@@ -2267,6 +2335,7 @@ void ScenePlay::updatePlaying()
              (gPlayContext.ruleset[PLAYER_SLOT_TARGET]->isFailed() &&
               gPlayContext.ruleset[PLAYER_SLOT_TARGET]->failWhenNoHealth())))
         {
+            LOG_DEBUG << "[Play] Failed by health";
             pushGraphPoints();
 
             playInterrupted = true;

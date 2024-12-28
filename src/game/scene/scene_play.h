@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/types.h"
 #include <common/chartformat/chartformat.h>
 #include <game/chart/chart.h>
 #include <game/input/input_wrapper.h>
@@ -7,7 +8,6 @@
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_mgr.h>
 
-#include <atomic>
 #include <future>
 #include <memory>
 
@@ -81,6 +81,7 @@ private:
 
         int judgeBP = 0; // used for displaying poor bga
 
+        GaugeDisplayType seenGaugeType;
     } playerState[2];
 
     lunaticvibes::Time delayedReadyTime = 0;
@@ -119,16 +120,6 @@ private:
     std::array<size_t, 128> _bgmSampleIdxBuf{};
     std::array<size_t, 128> _keySampleIdxBuf{};
 
-private:
-    // std::map<size_t, std::variant<std::monostate, pVideo, pTexture>> _bgaIdxBuf{};
-    // std::map<size_t, std::list<std::shared_ptr<SpriteVideo>>> _bgaVideoSprites{};	// set when loading skins, to
-    // bind videos while loading chart size_t bgaBaseIdx = -1u; size_t bgaLayerIdx = -1u; size_t bgaPoorIdx = -1u;
-    // pTexture bgaBaseTexture;
-    // pTexture bgaLayerTexture;
-    // pTexture bgaPoorTexture;
-public:
-    // void bindBgaVideoSprite(size_t idx, std::shared_ptr<SpriteVideo> pv) { _bgaVideoSprites[idx].push_back(pv); }
-
 protected:
     // common
     void loadChart();
@@ -138,7 +129,7 @@ protected:
 
 protected:
     // Looper callbacks
-    bool readyToStopAsync() const override;
+    [[nodiscard]] bool readyToStopAsync() const override;
     void _updateAsync() override;
     void updateAsyncLanecover(const lunaticvibes::Time& t);
     void updateAsyncGreenNumber(const lunaticvibes::Time& t);

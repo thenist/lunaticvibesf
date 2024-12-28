@@ -6,12 +6,134 @@
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_number_animation.h>
 
+#include <array>
 #include <memory>
+#include <ranges>
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
 
+class RulesetBMS;
+
+namespace lunaticvibes
+{
+
+// Judge area definitions.
+// e.g. EARLY_PERFECT: Perfect early half part
+enum class BmsJudgeArea
+{
+    NOTHING = 0,
+    EARLY_KPOOR,
+    EARLY_BAD,
+    EARLY_GOOD,
+    EARLY_GREAT,
+    EARLY_PERFECT,
+    EXACT_PERFECT,
+    LATE_PERFECT,
+    LATE_GREAT,
+    LATE_GOOD,
+    LATE_BAD,
+    MISS,
+    LATE_KPOOR,
+    MINE_KPOOR,
+};
+
+enum class BmsGaugeType
+{
+    GROOVE,
+    EASY,
+    ASSIST,
+    HARD,
+    EXHARD,
+    DEATH,
+    P_ATK,
+    G_ATK,
+    GRADE,
+    EXGRADE,
+};
+
+struct Lr2GaugeIncrements
+{
+    static constexpr size_t JUDGE_TYPE_COUNT = 6; // Count of enum class JudgeType.
+
+    std::array<double, JUDGE_TYPE_COUNT> health_gain{}; // How much health to add for note hit.
+    double start_health{};
+    double min_health{};
+    double clear_health{}; // Minimal health for clear at the end of the chart.
+    double hp_lose_multiplier = 1.;
+    BmsGaugeType type{};
+    bool fail_no_health{};
+    bool reduce_below_30_hp_damage{};
+};
+
+class GaugeHolder
+{
+public:
+    constexpr GaugeHolder(Lr2GaugeIncrements gauge) : GaugeHolder(gauge, gauge.start_health) {}
+    // health - use following health instead of gauge default.
+    constexpr GaugeHolder(Lr2GaugeIncrements gauge, double health)
+        : _gauge(gauge), _health({.to = health}), _did_fail(false)
+    {
+    }
+
+    void feed(BmsJudgeArea judge);
+    void feed_mine(long long mine_value);
+    void update_for_show(RulesetBMS& ruleset);
+    [[nodiscard]] bool did_fail() const { return _did_fail; };
+    [[nodiscard]] const Lr2GaugeIncrements& get_gauge() const { return _gauge; };
+    [[nodiscard]] const NumberAnimation& get_health() const { return _health; };
+
+private:
+    void process(double diff);
+
+    Lr2GaugeIncrements _gauge;
+    NumberAnimation _health;
+    bool _did_fail;
+};
+
+// Holds GaugeHolder objects. If there are several, show methods use the highest one.
+class GaugeHolderProxy
+{
+public:
+    // gauges - earlier objects get priority.
+    constexpr GaugeHolderProxy(std::ranges::sized_range auto gauges)
+    {
+        // static_assert(!gauges.empty());
+        for (auto gauge : gauges)
+            _gauges.push_back(gauge);
+    }
+
+    void feed(BmsJudgeArea judge);
+    void feed_mine(long long mine_value);
+    void update_for_show(RulesetBMS& ruleset);
+    [[nodiscard]] const Lr2GaugeIncrements& get_gauge() const;
+    [[nodiscard]] const NumberAnimation& get_health() const;
+
+private:
+    // deducing this pls
+    [[nodiscard]] GaugeHolder& current_gauge()
+    {
+        for (auto& gauge : _gauges)
+            if (gauge.get_health().to >= gauge.get_gauge().clear_health && !gauge.did_fail())
+                return gauge;
+        return _gauges.back();
+    }
+    [[nodiscard]] const GaugeHolder& current_gauge() const
+    {
+        for (auto& gauge : _gauges)
+            if (gauge.get_health().to >= gauge.get_gauge().clear_health && !gauge.did_fail())
+                return gauge;
+        return _gauges.back();
+    }
+
+    std::vector<GaugeHolder> _gauges;
+};
+
+} // namespace lunaticvibes
+
 class RulesetBMS : virtual public RulesetBase
 {
+    friend lunaticvibes::GaugeHolder;
+
 public:
     enum JudgeIndex
     {
@@ -57,19 +179,7 @@ public:
         {JudgeType::BAD, Option::JUDGE_3},     {JudgeType::KPOOR, Option::JUDGE_4}, {JudgeType::MISS, Option::JUDGE_5},
     };
 
-    enum class GaugeType
-    {
-        GROOVE,
-        EASY,
-        ASSIST,
-        HARD,
-        EXHARD,
-        DEATH,
-        P_ATK,
-        G_ATK,
-        GRADE,
-        EXGRADE,
-    };
+    using GaugeType = lunaticvibes::BmsGaugeType;
 
     // Judge Time definitions.
     // Values are one-way judge times in ms, representing
@@ -95,25 +205,7 @@ public:
         // {8, 12, 12, 200, 1000}, // GAMBOL LEVEL 2
     };
 
-    // Judge area definitions.
-    // e.g. EARLY_PERFECT: Perfect early half part
-    enum class JudgeArea
-    {
-        NOTHING = 0,
-        EARLY_KPOOR,
-        EARLY_BAD,
-        EARLY_GOOD,
-        EARLY_GREAT,
-        EARLY_PERFECT,
-        EXACT_PERFECT,
-        LATE_PERFECT,
-        LATE_GREAT,
-        LATE_GOOD,
-        LATE_BAD,
-        MISS,
-        LATE_KPOOR,
-        MINE_KPOOR,
-    };
+    using JudgeArea = ::lunaticvibes::BmsJudgeArea;
     inline static const std::map<JudgeArea, JudgeType> JudgeAreaTypeMap = {
         {JudgeArea::NOTHING, JudgeType::MISS},          {JudgeArea::EARLY_KPOOR, JudgeType::KPOOR},
         {JudgeArea::EARLY_BAD, JudgeType::BAD},         {JudgeArea::EARLY_GOOD, JudgeType::GOOD},
@@ -166,13 +258,11 @@ public:
 
 protected:
     // members set on construction
+    lunaticvibes::GaugeHolderProxy _gaugeProc;
     PlaySide _side = PlaySide::SINGLE;
     bool _k1P = false, _k2P = false;
     JudgeDifficulty _judgeDifficulty = LR2_DEFAULT_RANK;
-    GaugeType _gauge = GaugeType::GROOVE;
     std::shared_ptr<PlayContextParams::MutexReplayChart> _replayNew;
-
-    std::map<JudgeType, double> _healthGain;
 
     bool _judgeScratch = true;
 
@@ -180,7 +270,6 @@ protected:
     const NoteLaneTimerMap* _bombTimerMap = nullptr;
     const NoteLaneTimerMap* _bombLNTimerMap = nullptr;
 
-    int total = -1;
     unsigned noteCount = 0;
 
     std::string modifierText, modifierTextShort;
@@ -206,7 +295,6 @@ protected:
     double maxMoneyScore = 200000.0;
     unsigned exScore = 0;
 
-    lunaticvibes::NumberAnimation _healthAnim;
     lunaticvibes::NumberAnimation _moneyScoreAnim;
 
 public:
@@ -231,8 +319,9 @@ private:
     void judgeNotePress(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot);
     void judgeNoteHold(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot);
     void judgeNoteRelease(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot);
-    void _updateHp(double diff);
-    void _updateHp(JudgeArea judge);
+
+    void processHp(JudgeArea judge);
+    void processHpHitMine(long long mine_value);
 
 public:
     // Register to InputWrapper
@@ -250,7 +339,9 @@ public:
     void updateJudge(const lunaticvibes::Time& t, chart::NoteLaneIndex ch, JudgeArea judge, int slot);
 
 public:
-    [[nodiscard]] GaugeType getGaugeType() const { return _gauge; }
+    [[nodiscard]] GaugeType getGaugeType() const { return _gaugeProc.get_gauge().type; }
+
+    [[nodiscard]] Option::e_lamp_type calculateLamp() const;
 
     [[nodiscard]] double getScore() const;
     [[nodiscard]] double getMaxMoneyScore() const;
@@ -261,7 +352,7 @@ public:
     [[nodiscard]] std::string getModifierTextShort() const;
 
     [[nodiscard]] const lunaticvibes::NumberAnimation& getMoneyScoreAnimation() const { return _moneyScoreAnim; };
-    [[nodiscard]] const lunaticvibes::NumberAnimation& getHealthAnimation() const { return _healthAnim; };
+    [[nodiscard]] const lunaticvibes::NumberAnimation& getHealthAnimation() const { return _gaugeProc.get_health(); };
 
     [[nodiscard]] bool isNoScore() const override { return moneyScore == 0.0; }
     [[nodiscard]] bool isCleared() const override

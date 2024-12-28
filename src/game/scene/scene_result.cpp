@@ -63,11 +63,11 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
         saveScore = saveScoreType;
         saveLampMax = optionLampToBms(saveLampMaxType);
     }
-    lamp[PLAYER_SLOT_PLAYER] = optionLampToBms((Option::e_lamp_type)State::get(IndexOption::RESULT_CLEAR_TYPE_1P));
-    lamp[PLAYER_SLOT_TARGET] = optionLampToBms((Option::e_lamp_type)State::get(IndexOption::RESULT_CLEAR_TYPE_2P));
 
     std::map<std::string, int> param;
 
+    lamp[PLAYER_SLOT_PLAYER] = optionLampToBms(Option::LAMP_NOPLAY);
+    lamp[PLAYER_SLOT_TARGET] = optionLampToBms(Option::LAMP_NOPLAY);
     if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER])
     {
         gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->updateGlobals();
@@ -79,6 +79,7 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 
         if (auto pr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); pr)
         {
+            lamp[PLAYER_SLOT_PLAYER] = optionLampToBms(pr->calculateLamp());
             param["1pexscore"] = pr->getExScore();
             param["1pbp"] = pr->getJudgeCountEx(RulesetBMS::JUDGE_BP);
         }
@@ -93,6 +94,7 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 
             if (auto pr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); pr)
             {
+                lamp[PLAYER_SLOT_TARGET] = optionLampToBms(pr->calculateLamp());
                 param["2pexscore"] = pr->getExScore();
                 param["2pbp"] = pr->getJudgeCountEx(RulesetBMS::JUDGE_BP);
             }
