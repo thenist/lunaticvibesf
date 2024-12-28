@@ -16,13 +16,21 @@ extern "C"
 #include <common/log.h>
 #include <common/types.h>
 
-void lunaticvibes::AVFrameDeleter::operator()(AVFrame* avp)
+void lunaticvibes::AVCodecContextDeleter::operator()(AVCodecContext* avctx)
 {
-    av_frame_free(&avp);
+    avcodec_free_context(&avctx);
 }
-void lunaticvibes::AVPacketDeleter::operator()(AVPacket* avp)
+void lunaticvibes::AVFormatContextDeleter::operator()(AVFormatContext* s)
 {
-    av_packet_free(&avp);
+    avformat_close_input(&s);
+}
+void lunaticvibes::AVFrameDeleter::operator()(AVFrame* frame)
+{
+    av_frame_free(&frame);
+}
+void lunaticvibes::AVPacketDeleter::operator()(AVPacket* pkt)
+{
+    av_packet_free(&pkt);
 }
 
 void video_init() {}
@@ -53,7 +61,10 @@ int sVideo::setVideo(const Path& file, double speed, bool loop)
     this->speed = speed;
     loop_playback = loop;
 
-    if (int ret = avformat_open_input(&pFormatCtx, lunaticvibes::cs(file.u8string()), NULL, NULL); ret != 0)
+    AVFormatContext* formatCtxRet = pFormatCtx.release();
+    int ret = avformat_open_input(&formatCtxRet, lunaticvibes::cs(file.u8string()), nullptr, nullptr);
+    pFormatCtx.reset(formatCtxRet);
+    if (ret != 0)
     {
         char buf[256];
         av_strerror(ret, buf, 256);
@@ -61,7 +72,8 @@ int sVideo::setVideo(const Path& file, double speed, bool loop)
         return -1;
     }
 
-    if (int ret = avformat_find_stream_info(pFormatCtx, NULL); ret < 0)
+    ret = avformat_find_stream_info(pFormatCtx.get(), nullptr);
+    if (ret < 0)
     {
         char buf[256];
         av_strerror(ret, buf, 256);
@@ -97,14 +109,15 @@ int sVideo::setVideo(const Path& file, double speed, bool loop)
         return -3;
     }
 
-    pCodecCtx = avcodec_alloc_context3(pCodec);
+    pCodecCtx.reset(avcodec_alloc_context3(pCodec));
     if (pCodecCtx == nullptr)
     {
         LOG_WARNING << "[Video] Could not alloc codec context of " << file;
         return -4;
     }
 
-    if (int ret = avcodec_parameters_to_context(pCodecCtx, pFormatCtx->streams[videoIndex]->codecpar); ret < 0)
+    ret = avcodec_parameters_to_context(pCodecCtx.get(), pFormatCtx->streams[videoIndex]->codecpar);
+    if (ret < 0)
     {
         char buf[256];
         av_strerror(ret, buf, 256);
@@ -125,10 +138,8 @@ int sVideo::unsetVideo()
     firstFrame = true;
     pPacket.reset();
     pFrame.reset();
-    if (pCodecCtx)
-        avcodec_free_context(&pCodecCtx);
-    if (pFormatCtx)
-        avformat_close_input(&pFormatCtx);
+    pCodecCtx.reset();
+    pFormatCtx.reset();
     return 0;
 }
 
@@ -191,7 +202,8 @@ void sVideo::decodeLoop()
         return;
     }
 
-    if (int ret = avcodec_open2(pCodecCtx, pCodec, NULL); ret < 0)
+    int ret = avcodec_open2(pCodecCtx.get(), pCodec, nullptr);
+    if (ret < 0)
     {
         char buf[256];
         av_strerror(ret, buf, 256);
@@ -210,7 +222,7 @@ void sVideo::decodeLoop()
 
     do
     {
-        while (av_read_frame(pFormatCtx, pPacket.get()) == 0 && pPacket != nullptr)
+        while (av_read_frame(pFormatCtx.get(), pPacket.get()) == 0 && pPacket != nullptr)
         {
             if (!playing)
                 return;
@@ -219,9 +231,9 @@ void sVideo::decodeLoop()
             if (pPacket->stream_index != videoIndex)
                 continue;
 
-            avcodec_send_packet(pCodecCtx, pPacket.get());
+            avcodec_send_packet(pCodecCtx.get(), pPacket.get());
 
-            int ret = avcodec_receive_frame(pCodecCtx, pFrame1.get());
+            int ret = avcodec_receive_frame(pCodecCtx.get(), pFrame1.get());
             av_packet_unref(pPacket.get());
 
             if (ret < 0)
@@ -281,10 +293,11 @@ void sVideo::decodeLoop()
         else
         {
             // drain
-            avcodec_send_packet(pCodecCtx, NULL);
+            avcodec_send_packet(pCodecCtx.get(), nullptr);
             {
                 // av_frame_unref(frame) is omitted
-                if (int ret = avcodec_receive_frame(pCodecCtx, pFrame1.get()))
+                int ret = avcodec_receive_frame(pCodecCtx.get(), pFrame1.get());
+                if (ret != 0)
                 {
                     char buf[128];
                     av_strerror(ret, buf, 128);
@@ -322,12 +335,12 @@ void sVideo::seek(int64_t second, bool backwards)
                       ? AV_TIME_BASE
                       : av_q2d(av_inv_q(pFormatCtx->streams[videoIndex]->time_base));
 
-    if (int ret = av_seek_frame(pFormatCtx, videoIndex, int64_t(std::round(second / tsps)),
-                                backwards ? AVSEEK_FLAG_BACKWARD : 0);
-        ret >= 0)
+    int ret = av_seek_frame(pFormatCtx.get(), videoIndex, int64_t(std::round(second / tsps)),
+                            backwards ? AVSEEK_FLAG_BACKWARD : 0);
+    if (ret >= 0)
     {
         finished = false;
-        avcodec_flush_buffers(pCodecCtx);
+        avcodec_flush_buffers(pCodecCtx.get());
     }
     else
     {

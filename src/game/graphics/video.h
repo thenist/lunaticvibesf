@@ -29,14 +29,24 @@ void video_init();
 
 namespace lunaticvibes
 {
+struct AVCodecContextDeleter
+{
+    void operator()(AVCodecContext*);
+};
+using AVCodecContextPtr = std::unique_ptr<AVCodecContext, AVCodecContextDeleter>;
+struct AVFormatContextDeleter
+{
+    void operator()(AVFormatContext*);
+};
+using AVFormatContextPtr = std::unique_ptr<AVFormatContext, AVFormatContextDeleter>;
 struct AVFrameDeleter
 {
-    void operator()(AVFrame* avp);
+    void operator()(AVFrame*);
 };
 using AVFramePtr = std::unique_ptr<AVFrame, AVFrameDeleter>;
 struct AVPacketDeleter
 {
-    void operator()(AVPacket* avp);
+    void operator()(AVPacket*);
 };
 using AVPacketPtr = std::unique_ptr<AVPacket, AVPacketDeleter>;
 } // namespace lunaticvibes
@@ -53,9 +63,9 @@ public:
 
 private:
     // decoder params
-    AVFormatContext* pFormatCtx = nullptr;
+    lunaticvibes::AVFormatContextPtr pFormatCtx;
     const AVCodec* pCodec = nullptr;
-    AVCodecContext* pCodecCtx = nullptr;
+    lunaticvibes::AVCodecContextPtr pCodecCtx;
     lunaticvibes::AVFramePtr pFrame;
     lunaticvibes::AVPacketPtr pPacket;
     int videoIndex = -1;
