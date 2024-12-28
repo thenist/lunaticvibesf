@@ -9,14 +9,13 @@
 #include <functional>
 #include <string_view>
 
-SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::KEY_CONFIG, 240)
+SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr)
+    : SceneBase(skinMgr, SkinType::KEY_CONFIG, 240), _state(SceneKeyConfigState::START)
 {
     _type = SceneType::KEYCONFIG;
     gKeyconfigContext.skinHasAbsAxis = pSkin->isSupportKeyConfigAbsAxis;
 
     InputMgr::updateDevices();
-
-    _updateCallback = std::bind_front(&SceneKeyConfig::updateStart, this);
 
     State::set(IndexSwitch::K11_CONFIG, false);
     State::set(IndexSwitch::K12_CONFIG, false);
@@ -128,7 +127,12 @@ void SceneKeyConfig::_updateAsync()
         gNextScene = SceneType::EXIT_TRANS;
     }
 
-    _updateCallback();
+    switch (_state)
+    {
+    case SceneKeyConfigState::START: updateStart(); break;
+    case SceneKeyConfigState::MAIN: updateMain(); break;
+    case SceneKeyConfigState::FADEOUT: updateFadeout(); break;
+    }
 
     updateForceBargraphs();
 
@@ -155,7 +159,7 @@ void SceneKeyConfig::updateStart()
     lunaticvibes::Time rt = t - State::get(IndexTimer::SCENE_START);
     if (rt.norm() > pSkin->info.timeIntro)
     {
-        _updateCallback = std::bind_front(&SceneKeyConfig::updateMain, this);
+        _state = SceneKeyConfigState::MAIN;
         _input.register_p("SCENE_PRESS", std::bind_front(&SceneKeyConfig::inputGamePress, this));
         _input.register_a("SCENE_AXIS", std::bind_front(&SceneKeyConfig::inputGameAxis, this));
         _input.register_kb("SCENE_KEYPRESS", std::bind_front(&SceneKeyConfig::inputGamePressKeyboard, this));
@@ -171,7 +175,7 @@ void SceneKeyConfig::updateMain()
     if (exiting)
     {
         State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
-        _updateCallback = std::bind_front(&SceneKeyConfig::updateFadeout, this);
+        _state = SceneKeyConfigState::FADEOUT;
         _input.unregister_p("SCENE_PRESS");
         _input.unregister_a("SCENE_AXIS");
         _input.unregister_kb("SCENE_KEYPRESS");

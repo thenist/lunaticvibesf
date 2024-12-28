@@ -1,6 +1,7 @@
 #pragma once
 #include "common/keymap.h"
 #include "scene.h"
+#include <atomic>
 #include <shared_mutex>
 
 class SceneKeyConfig : public SceneBase
@@ -11,8 +12,14 @@ public:
 
 protected:
     // Looper callbacks
+    enum class SceneKeyConfigState
+    {
+        START,
+        MAIN,
+        FADEOUT,
+    };
+    std::atomic<SceneKeyConfigState> _state;
     void _updateAsync() override;
-    std::function<void()> _updateCallback;
     void updateStart();
     void updateMain();
     void updateFadeout();
