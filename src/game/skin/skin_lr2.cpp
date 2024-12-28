@@ -3360,6 +3360,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
         c.dst_op = dst_op;
         c.label = std::move(op_label);
         c.value = 0;
+        c.defIdx = 0;
         customize.push_back(c);
 
         return 2;
