@@ -1640,9 +1640,6 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                 {
                 case AxisDir::AXIS_DOWN: judgeNoteHold(dn, t, rt, slot); break;
                 case AxisDir::AXIS_UP:
-                    judgeNoteRelease(up, t, rt, slot);
-                    judgeNotePress(dn, t, rt, slot);
-                    break;
                 case AxisDir::AXIS_NONE:
                     judgeNoteRelease(up, t, rt, slot);
                     judgeNotePress(dn, t, rt, slot);
@@ -1661,9 +1658,6 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                 {
                 case AxisDir::AXIS_UP: judgeNoteHold(up, t, rt, slot); break;
                 case AxisDir::AXIS_DOWN:
-                    judgeNoteRelease(dn, t, rt, slot);
-                    judgeNotePress(up, t, rt, slot);
-                    break;
                 case AxisDir::AXIS_NONE:
                     judgeNoteRelease(dn, t, rt, slot);
                     judgeNotePress(up, t, rt, slot);
