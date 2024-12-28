@@ -42,7 +42,9 @@ protected:
 
 protected:
     // Looper callbacks
-    void _updateAsync() override;
+    void _updateAsync() override {};
+
+    void update() override;
     void updateStart();
     void updateMain();
     void updateFadeout();

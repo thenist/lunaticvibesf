@@ -185,8 +185,9 @@ SceneCustomize::~SceneCustomize()
     loopEnd();
 }
 
-void SceneCustomize::_updateAsync()
+void SceneCustomize::update()
 {
+    SceneBase::update();
     if (!gInCustomize && gNextScene != SceneType::SELECT)
         return;
 
