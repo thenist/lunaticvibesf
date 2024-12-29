@@ -2315,7 +2315,6 @@ void ScenePlay::updatePlaying()
               gPlayContext.ruleset[PLAYER_SLOT_TARGET]->failWhenNoHealth())))
         {
             LOG_DEBUG << "[Play] Failed by health";
-            pushGraphPoints();
 
             playInterrupted = true;
             if (gArenaData.isOnline())
@@ -2951,12 +2950,21 @@ void ScenePlay::requestExit()
             gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->updateGlobals();
             LOG_INFO << "[Play] 1P finished by exit";
         }
+        else
+        {
+            // TODO: fill to the end, by this point HP can't change.
+            // pushGraphPoints();
+        }
         if (!playerState[PLAYER_SLOT_TARGET].finished && gPlayContext.isBattle &&
             gPlayContext.ruleset[PLAYER_SLOT_TARGET])
         {
             gPlayContext.ruleset[PLAYER_SLOT_TARGET]->fail();
             gPlayContext.ruleset[PLAYER_SLOT_TARGET]->updateGlobals();
             LOG_INFO << "[Play] 2P finished by exit";
+        }
+        else
+        {
+            // TODO: same as above, fill to the end.
         }
 
         if (gArenaData.isOnline())
@@ -2976,8 +2984,6 @@ void ScenePlay::requestExit()
                 gPlayContext.replayNew->replay->commands.push_back({ms, ReplayChart::Commands::Type::ESC, 0});
             }
         }
-
-        pushGraphPoints();
     }
 
     if (gArenaData.isOnline())

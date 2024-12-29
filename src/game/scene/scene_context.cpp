@@ -110,8 +110,8 @@ void clearContextPlayForRetry()
     }
     for (size_t i = 0; i < MAX_PLAYERS; ++i)
     {
-        gPlayContext.graphGauge[i].clear();
-        gPlayContext.graphAcc[i].clear();
+        gPlayContext.graphGauge[i].fill(0);
+        gPlayContext.graphAcc[i].fill(0);
         if (gPlayContext.ruleset[i])
             gPlayContext.ruleset[i].reset();
     }
@@ -146,29 +146,49 @@ void clearContextPlay()
     gPlayContext.replayMybest.reset(); // load at decide() @ scene_select.cpp
 }
 
+template <typename T> T map_value_range(T x, T in_min, T in_max, T out_min, T out_max)
+{
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 void pushGraphPoints()
 {
+    const auto t = lunaticvibes::Time();
+    const auto rt = t - State::get(IndexTimer::PLAY_START);
+    const auto song_len = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength();
+    using HighresT = decltype(lunaticvibes::Time{}.hres());
+    constexpr auto zero = static_cast<HighresT>(0); // Windows...
+    const auto idx = map_value_range(rt.hres(), zero, song_len.hres(), zero,
+                                     static_cast<HighresT>(PlayContextParams::GRAPH_POINT_NUMBER - 1));
+    LVF_DEBUG_ASSERT(idx >= 0 && idx < PlayContextParams::GRAPH_POINT_NUMBER);
+
+    auto fill_missing = [idx](int slot) {
+        auto& last_write = gPlayContext.graphLastWriteIdx[slot];
+        auto& gauge = gPlayContext.graphGauge[slot];
+        auto& acc = gPlayContext.graphAcc[slot];
+        if (last_write - idx <= 1)
+            return;
+        for (int i = last_write + 1; i < idx; ++i)
+        {
+            gauge[i] = gauge[last_write];
+            acc[i] = acc[last_write];
+        }
+        last_write = idx;
+    };
+
+    auto push = [&](int slot) {
+        gPlayContext.graphGauge[slot][idx] = gPlayContext.ruleset[slot]->getData().health * 100;
+        gPlayContext.graphAcc[slot][idx] = gPlayContext.ruleset[slot]->getData().total_acc;
+        fill_missing(slot);
+    };
+
     std::unique_lock l(gPlayContext._mutex);
 
-    gPlayContext.graphGauge[PLAYER_SLOT_PLAYER].push_back(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().health *
-                                                          100);
-    gPlayContext.graphAcc[PLAYER_SLOT_PLAYER].push_back(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().total_acc);
-
+    push(PLAYER_SLOT_PLAYER);
     if (gPlayContext.ruleset[PLAYER_SLOT_TARGET])
-    {
-        gPlayContext.graphGauge[PLAYER_SLOT_TARGET].push_back(
-            gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().health * 100);
-        gPlayContext.graphAcc[PLAYER_SLOT_TARGET].push_back(
-            gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().total_acc);
-    }
-
+        push(PLAYER_SLOT_TARGET);
     if (!gPlayContext.isAuto && !gPlayContext.isReplay && gPlayContext.replayMybest)
-    {
-        gPlayContext.graphGauge[PLAYER_SLOT_MYBEST].push_back(
-            gPlayContext.ruleset[PLAYER_SLOT_MYBEST]->getData().health * 100);
-        gPlayContext.graphAcc[PLAYER_SLOT_MYBEST].push_back(
-            gPlayContext.ruleset[PLAYER_SLOT_MYBEST]->getData().total_acc);
-    }
+        push(PLAYER_SLOT_MYBEST);
 }
 
 void loadSongList()

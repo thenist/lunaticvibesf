@@ -79,10 +79,12 @@ struct PlayContextParams
 
     std::shared_ptr<TextureBmsBga> bgaTexture = std::make_shared<TextureBmsBga>();
 
+    static constexpr auto GRAPH_POINT_NUMBER = 500L;
     std::array<std::shared_ptr<ChartObjectBase>, MAX_PLAYERS> chartObj{nullptr, nullptr, nullptr};
     std::array<double, MAX_PLAYERS> initialHealth{1.0, 1.0, 1.0};
-    std::array<std::vector<int>, MAX_PLAYERS> graphGauge;
-    std::array<std::vector<double>, MAX_PLAYERS> graphAcc;
+    std::array<size_t, MAX_PLAYERS> graphLastWriteIdx;
+    std::array<std::array<double, GRAPH_POINT_NUMBER>, MAX_PLAYERS> graphAcc;
+    std::array<std::array<uint8_t, GRAPH_POINT_NUMBER>, MAX_PLAYERS> graphGauge;
     std::array<GaugeDisplayType, MAX_PLAYERS> gaugeType{}; // resolve on ruleset construction
     std::array<PlayModifiers, MAX_PLAYERS> mods{};         // eMod:
 

@@ -59,7 +59,9 @@ void SpriteLine::updateRects()
     if (!gPlayContext.ruleset[_player])
         return;
 
-    auto pushRects = [this](size_t size, const std::vector<int>& points, unsigned maxh, auto cond, auto clip) {
+    auto pushRects = [this](const std::array<uint8_t, PlayContextParams::GRAPH_POINT_NUMBER> points, unsigned maxh,
+                            auto cond, auto clip) {
+        const size_t size = points.size();
         _rects.clear();
 
         const auto& r = _current.rect;
@@ -84,7 +86,8 @@ void SpriteLine::updateRects()
         }
     };
 
-    auto pushRectsF = [this](size_t size, const std::vector<double>& points, double maxh) {
+    auto pushRectsF = [this](const std::array<double, PlayContextParams::GRAPH_POINT_NUMBER> points, double maxh) {
+        const size_t size = points.size();
         auto cond = [](int, int) { return true; };
         std::vector<std::pair<Point, Point>> tmp;
         const auto& r = _current.rect;
@@ -119,7 +122,7 @@ void SpriteLine::updateRects()
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
         pushRects(
-            p.size(), p, 100.0, [h](int val1, int val2) { return val1 <= h || val2 <= h; },
+            p, 100.0, [h](int val1, int val2) { return val1 <= h || val2 <= h; },
             [h](int val2) { return val2 > h ? h : val2; });
         break;
     }
@@ -128,14 +131,14 @@ void SpriteLine::updateRects()
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
         pushRects(
-            p.size(), p, 100.0, [h](int val1, int val2) { return val1 >= h || val2 >= h; },
+            p, 100.0, [h](int val1, int val2) { return val1 >= h || val2 >= h; },
             [h](int val1) { return val1 < h ? h : val1; });
         break;
     }
     case LineType::SCORE: {
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphAcc[_player];
-        pushRectsF(p.size(), p, 100.0);
+        pushRectsF(p, 100.0);
         break;
     }
     case LineType::SCORE_MYBEST: {
@@ -143,14 +146,14 @@ void SpriteLine::updateRects()
         {
             std::shared_lock l(gPlayContext._mutex);
             const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_MYBEST];
-            pushRectsF(p.size(), p, 100.0);
+            pushRectsF(p, 100.0);
         }
         break;
     }
     case LineType::SCORE_TARGET: {
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_TARGET];
-        pushRectsF(p.size(), p, 100.0);
+        pushRectsF(p, 100.0);
         break;
     }
     }
