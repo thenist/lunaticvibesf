@@ -60,7 +60,8 @@ void SpriteLine::updateRects()
         return;
 
     auto pushRects = [this](size_t size, const std::vector<int>& points, unsigned maxh, auto cond, auto clip) {
-        std::vector<std::pair<Point, Point>> tmp;
+        _rects.clear();
+
         const auto& r = _current.rect;
         auto region = static_cast<size_t>(std::floor(size * _progress));
         if (region == 0)
@@ -75,15 +76,11 @@ void SpriteLine::updateRects()
                     return {r.x + _field_w * (double(ii) / (size - 1)),
                             r.y - _field_h * (double(clip(points[ii])) / maxh)};
                 };
-                tmp.emplace_back(make_pos(i), make_pos(i + 1));
+                _rects.emplace_back(make_pos(i), make_pos(i + 1));
+                if (static_cast<int>(_rects.back().first.x) == static_cast<int>(_rects.back().second.x) &&
+                    static_cast<int>(_rects.back().first.y) == static_cast<int>(_rects.back().second.y))
+                    _rects.pop_back();
             }
-        }
-
-        _rects.clear();
-        for (auto& [p1, p2] : tmp)
-        {
-            if (int(p1.x) != int(p2.x) || int(p1.y) != int(p2.y))
-                _rects.emplace_back(p1, p2);
         }
     };
 
