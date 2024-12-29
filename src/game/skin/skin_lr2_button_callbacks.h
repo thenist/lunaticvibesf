@@ -1,5 +1,4 @@
 #pragma once
-
 #include "common/keymap.h"
 #include <functional>
 
@@ -21,6 +20,7 @@ void hs_fix(int plus);
 void battle(int plus);
 void hs(int player, int plus);
 void lock_speed_value(int player, int plus);
+void open_ir_page();
 void enter_key_config();
 void enter_skin_config();
 void target_type(int plus);
@@ -30,4 +30,5 @@ void key_config_mode_rotate();
 void skinselect_mode(int mode);
 void skinselect_skin(int plus);
 void skinselect_option(int index, int plus);
+
 } // namespace lr2skin::button

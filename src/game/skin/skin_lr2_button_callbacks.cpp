@@ -1434,7 +1434,7 @@ void skinselect_option(int index, int plus)
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 }
 
-static void open_ir_page()
+void open_ir_page()
 {
     // TODO: dans
 
@@ -1631,7 +1631,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 207:
     case 208:
     case 209: return std::bind(requestOpenHelpFile, type - 200);
-    case 210: return [](auto) { open_ir_page(); };
+    case 210: return [](auto) { lr2skin::button::open_ir_page(); };
     case 220:
     case 221:
     case 222:

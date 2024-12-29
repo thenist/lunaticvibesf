@@ -1299,6 +1299,9 @@ void SceneSelect::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
     auto input = _inputAvailable & m;
     if (input.any())
     {
+        if (input[Input::F5])
+            lr2skin::button::open_ir_page();
+
         if (input[Pad::K15])
             isHoldingK15 = true;
         if (input[Pad::K16])
