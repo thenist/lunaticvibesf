@@ -59,8 +59,7 @@ void SpriteLine::updateRects()
     if (!gPlayContext.ruleset[_player])
         return;
 
-    auto pushRects = [this](size_t size, const std::vector<int>& points, unsigned maxh,
-                            const std::function<bool(int val1, int val2)>& cond) {
+    auto pushRects = [this](size_t size, const std::vector<int>& points, unsigned maxh, auto cond, auto clip) {
         std::vector<std::pair<Point, Point>> tmp;
         const auto& r = _current.rect;
         auto region = static_cast<size_t>(std::floor(size * _progress));
@@ -72,8 +71,9 @@ void SpriteLine::updateRects()
         {
             if (cond(points[i], points[i + 1]))
             {
-                auto make_pos = [&](int i) -> Point {
-                    return {r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i]) / maxh)};
+                auto make_pos = [&](int ii) -> Point {
+                    return {r.x + _field_w * (double(ii) / (size - 1)),
+                            r.y - _field_h * (double(clip(points[ii])) / maxh)};
                 };
                 tmp.emplace_back(make_pos(i), make_pos(i + 1));
             }
@@ -121,14 +121,18 @@ void SpriteLine::updateRects()
         const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
-        pushRects(p.size(), p, 100.0, [h](int val1, int val2) { return (val1 <= h && val2 <= h); });
+        pushRects(
+            p.size(), p, 100.0, [h](int val1, int val2) { return val1 <= h || val2 <= h; },
+            [h](int val2) { return val2 > h ? h : val2; });
         break;
     }
     case LineType::GAUGE_C: {
         const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
-        pushRects(p.size(), p, 100.0, [h](int val1, int val2) { return (val1 >= h && val2 >= h); });
+        pushRects(
+            p.size(), p, 100.0, [h](int val1, int val2) { return val1 >= h || val2 >= h; },
+            [h](int val1) { return val1 < h ? h : val1; });
         break;
     }
     case LineType::SCORE: {
