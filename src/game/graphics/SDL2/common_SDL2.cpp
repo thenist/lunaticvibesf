@@ -318,7 +318,7 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
 
     SDL_SetTextureColorMod(pTex, c.r, c.g, c.b);
 
-    // NOTE: only the last call to SDL_SetTextureScaleMode within a rendering cycle applies.
+    // FIXME: only the last call to SDL_SetTextureScaleMode within a rendering cycle applies.
     // Hence right now this takes FPS but doesn't actually do any help.
     const SDL_ScaleMode mode = filter ? SDL_ScaleModeLinear : SDL_ScaleModeNearest;
     SDL_ScaleMode current_mode;
