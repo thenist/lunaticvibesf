@@ -16,8 +16,6 @@ enum class LineType
     GAUGE_F,
     GAUGE_C,
     SCORE,
-    SCORE_MYBEST,
-    SCORE_TARGET,
 };
 
 class SpriteLine : public SpriteStatic

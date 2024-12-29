@@ -115,23 +115,10 @@ void SpriteLine::updateRects()
         break;
     }
     case LineType::SCORE: {
+        if (gPlayContext.ruleset[_player] == nullptr)
+            break;
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphAcc[_player];
-        pushRects(p, 100.0);
-        break;
-    }
-    case LineType::SCORE_MYBEST: {
-        if (gPlayContext.ruleset[PLAYER_SLOT_MYBEST])
-        {
-            std::shared_lock l(gPlayContext._mutex);
-            const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_MYBEST];
-            pushRects(p, 100.0);
-        }
-        break;
-    }
-    case LineType::SCORE_TARGET: {
-        std::shared_lock l(gPlayContext._mutex);
-        const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_TARGET];
         pushRects(p, 100.0);
         break;
     }
@@ -165,18 +152,21 @@ bool SpriteLine::update(const lunaticvibes::Time& t)
             break;
 
         case LineType::SCORE:
-            _current.color.r = 0;
-            _current.color.g = 0;
-            break;
-
-        case LineType::SCORE_MYBEST:
-            _current.color.r = 0;
-            _current.color.b = 0;
-            break;
-
-        case LineType::SCORE_TARGET:
-            _current.color.g = 0;
-            _current.color.b = 0;
+            switch (_player)
+            {
+            case PLAYER_SLOT_PLAYER:
+                _current.color.r = 0;
+                _current.color.g = 0;
+                break;
+            case PLAYER_SLOT_MYBEST:
+                _current.color.r = 0;
+                _current.color.b = 0;
+                break;
+            case PLAYER_SLOT_TARGET:
+                _current.color.g = 0;
+                _current.color.b = 0;
+                break;
+            }
             break;
         }
 

@@ -1681,7 +1681,7 @@ ParseRet SkinLR2::SRC_GAUGECHART(unsigned playerSlot)
     {
     case 0: builder.lineType = LineType::GAUGE_F; break;
     case 1: builder.lineType = LineType::GAUGE_C; break;
-    default: LOG_DEBUG << "[SkinLR2] Invalid _null=" << d._null;
+    default: LOG_WARNING << "[SkinLR2] #SRC_GAUGECHART: invalid _null=" << d._null; return ParseRet::PARAM_INVALID;
     }
 
     _sprites.push_back(builder.build());
@@ -1695,7 +1695,6 @@ ParseRet SkinLR2::SRC_SCORECHART()
 
     SpriteLine::SpriteLineBuilder builder;
     builder.srcLine = csvLineNumber;
-    builder.player = 0;
     builder.canvasW = d.field_w;
     builder.canvasH = d.field_h;
     builder.start = d.start;
@@ -1705,18 +1704,21 @@ ParseRet SkinLR2::SRC_SCORECHART()
     switch (d._null)
     {
     case 0:
+        builder.player = PLAYER_SLOT_PLAYER;
         builder.lineType = LineType::SCORE;
         builder.color = {20, 20, 255, 255};
         break;
     case 1:
-        builder.lineType = LineType::SCORE_MYBEST;
+        builder.player = PLAYER_SLOT_MYBEST;
+        builder.lineType = LineType::SCORE;
         builder.color = {20, 255, 20, 255};
         break;
     case 2:
-        builder.lineType = LineType::SCORE_TARGET;
+        builder.player = PLAYER_SLOT_TARGET;
+        builder.lineType = LineType::SCORE;
         builder.color = {255, 20, 20, 255};
         break;
-    default: break;
+    default: LOG_WARNING << "[SkinLR2] #SRC_SCORECHART: invalid _null"; return ParseRet::PARAM_INVALID;
     }
 
     _sprites.push_back(builder.build());
