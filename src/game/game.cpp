@@ -144,6 +144,10 @@ int main(int argc, char* argv[])
     if (auto sinit = SoundMgr::initFMOD())
         return sinit;
     SoundMgr::startUpdate();
+    struct BbSoundMgr
+    {
+        ~BbSoundMgr() { SoundMgr::stopUpdate(); }
+    } _bbsoundmgr;
 
     // load input bindings
     InputMgr::init();
@@ -217,6 +221,13 @@ int main(int argc, char* argv[])
         gQuitOnFinish = true;
 
         std::shared_ptr<ChartFormatBase> bms = ChartFormatBase::createFromFile(bmsFile, std::time(nullptr));
+        if (bms == nullptr)
+        {
+            constexpr auto&& msg = "[Main] Invalid chart file path";
+            LOG_FATAL << msg;
+            tinyfd_messageBox("Fatal error", msg, "ok", "error", 0);
+            return 1;
+        }
         gPlayContext.mode = lunaticvibes::skinTypeForKeys(bms->gamemode);
         gChartContext = ChartContextParams{
             bmsFile,
@@ -296,8 +307,6 @@ int main(int argc, char* argv[])
 
     timeEndPeriod(1);
 #endif
-
-    SoundMgr::stopUpdate();
 
     graphics_free();
 
