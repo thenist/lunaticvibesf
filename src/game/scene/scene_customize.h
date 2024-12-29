@@ -21,6 +21,8 @@ public:
     explicit SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneCustomize() override;
 
+    void update() override;
+
     void setIsVirtual(bool is_virtual) { _is_virtual = is_virtual; };
 
 protected:
@@ -44,7 +46,6 @@ protected:
     // Looper callbacks
     void _updateAsync() override {};
 
-    void update() override;
     void updateStart();
     void updateMain();
     void updateFadeout();

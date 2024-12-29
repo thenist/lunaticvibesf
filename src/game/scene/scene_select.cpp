@@ -1249,7 +1249,8 @@ void SceneSelect::updateFadeout()
 void SceneSelect::update()
 {
     SceneBase::update();
-
+    if (_virtualSceneCustomize)
+        _virtualSceneCustomize->update();
     if (_virtualSceneLoadSongs)
         _virtualSceneLoadSongs->update();
 }
