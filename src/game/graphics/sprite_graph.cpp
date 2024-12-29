@@ -3,8 +3,6 @@
 
 #include <shared_mutex>
 
-static constexpr size_t RT_GRAPH_THRESHOLD = 50;
-
 SpriteLine::SpriteLine(const SpriteLineBuilder& builder) : SpriteStatic(builder)
 {
     _type = SpriteTypes::LINE;
@@ -70,33 +68,14 @@ void SpriteLine::updateRects()
             return;
         region--;
 
-        if (size > RT_GRAPH_THRESHOLD)
+        for (size_t i = 0; i < region; ++i)
         {
-            for (size_t i = 0; i < region; ++i)
+            if (cond(points[i], points[i + 1]))
             {
-                if (cond(points[i], points[i + 1]))
-                {
-                    tmp.push_back(
-                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i]) / maxh)},
-                         {r.x + _field_w * (double(i + 1) / (size - 1)),
-                          r.y - _field_h * (double(points[i + 1]) / maxh)}});
-                }
-            }
-        }
-        else
-        {
-            for (size_t i = 0; i < region; ++i)
-            {
-                if (cond(points[i], points[i + 1]))
-                {
-                    tmp.push_back(
-                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i]) / maxh)},
-                         {r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i + 1]) / maxh)}});
-                    tmp.push_back(
-                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i + 1]) / maxh)},
-                         {r.x + _field_w * (double(i + 1) / (size - 1)),
-                          r.y - _field_h * (double(points[i + 1]) / maxh)}});
-                }
+                auto make_pos = [&](int i) -> Point {
+                    return {r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i]) / maxh)};
+                };
+                tmp.emplace_back(make_pos(i), make_pos(i + 1));
             }
         }
 
@@ -117,30 +96,14 @@ void SpriteLine::updateRects()
             return;
         region--;
 
-        if (size > RT_GRAPH_THRESHOLD)
+        for (size_t i = 0; i < region; ++i)
         {
-            for (size_t i = 0; i < region; ++i)
+            if (cond(points[i], points[i + 1]))
             {
-                if (cond(points[i], points[i + 1]))
-                {
-                    tmp.push_back(
-                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i] / maxh},
-                         {r.x + _field_w * (double(i + 1) / (size - 1)), r.y - _field_h * points[i + 1] / maxh}});
-                }
-            }
-        }
-        else
-        {
-            for (size_t i = 0; i < region; ++i)
-            {
-                if (cond(points[i], points[i + 1]))
-                {
-                    tmp.push_back({{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i] / maxh},
-                                   {r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i + 1] / maxh}});
-                    tmp.push_back(
-                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i + 1] / maxh},
-                         {r.x + _field_w * (double(i + 1) / (size - 1)), r.y - _field_h * points[i + 1] / maxh}});
-                }
+                auto make_pos = [&](int i) -> Point {
+                    return {r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i] / maxh};
+                };
+                tmp.emplace_back(make_pos(i), make_pos(i + 1));
             }
         }
 
