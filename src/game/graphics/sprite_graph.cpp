@@ -1,6 +1,8 @@
 #include "sprite_graph.h"
 #include "game/scene/scene_context.h"
 
+#include <concepts>
+#include <functional>
 #include <shared_mutex>
 
 SpriteLine::SpriteLine(const SpriteLineBuilder& builder) : SpriteStatic(builder)
@@ -54,66 +56,43 @@ void SpriteLine::updateProgress(const lunaticvibes::Time& t)
     }
 }
 
+template <typename T> struct DefaultTruePredicate
+{
+    bool operator()(T, T) { return true; };
+};
+
 void SpriteLine::updateRects()
 {
     if (!gPlayContext.ruleset[_player])
         return;
 
-    auto pushRects = [this](const std::array<uint8_t, PlayContextParams::GRAPH_POINT_NUMBER> points, unsigned maxh,
-                            auto cond, auto clip) {
-        const size_t size = points.size();
-        _rects.clear();
+    auto pushRects =
+        [this]<typename T, typename Identity = std::identity, std::predicate<T, T> Pred = DefaultTruePredicate<T>>(
+            const std::array<T, PlayContextParams::GRAPH_POINT_NUMBER> points, T maxh, Pred cond = Pred{},
+            Identity clip = Identity{}) {
+            _rects.clear();
 
-        const auto& r = _current.rect;
-        auto region = static_cast<size_t>(std::floor(size * _progress));
-        if (region == 0)
-            return;
-        region--;
+            const auto& r = _current.rect;
+            auto region = static_cast<size_t>(std::floor(points.size() * _progress));
+            if (region == 0)
+                return;
+            region--;
 
-        for (size_t i = 0; i < region; ++i)
-        {
-            if (cond(points[i], points[i + 1]))
+            for (size_t i = 0; i < region; ++i)
             {
-                auto make_pos = [&](int ii) -> Point {
-                    return {r.x + _field_w * (double(ii) / (size - 1)),
-                            r.y - _field_h * (double(clip(points[ii])) / maxh)};
-                };
-                _rects.emplace_back(make_pos(i), make_pos(i + 1));
-                if (static_cast<int>(_rects.back().first.x) == static_cast<int>(_rects.back().second.x) &&
-                    static_cast<int>(_rects.back().first.y) == static_cast<int>(_rects.back().second.y))
-                    _rects.pop_back();
+                if (cond(points[i], points[i + 1]))
+                {
+                    auto make_pos = [&](int ii) -> Point {
+                        return {r.x + _field_w * (double(ii) / (points.size() - 1)),
+                                r.y - _field_h * (double(clip(points[ii])) / maxh)};
+                    };
+                    _rects.emplace_back(make_pos(i), make_pos(i + 1));
+                    if (static_cast<int>(_rects.back().first.x) == static_cast<int>(_rects.back().second.x) &&
+                        static_cast<int>(_rects.back().first.y) == static_cast<int>(_rects.back().second.y))
+                        _rects.pop_back();
+                }
             }
-        }
-    };
-
-    auto pushRectsF = [this](const std::array<double, PlayContextParams::GRAPH_POINT_NUMBER> points, double maxh) {
-        const size_t size = points.size();
-        auto cond = [](int, int) { return true; };
-        std::vector<std::pair<Point, Point>> tmp;
-        const auto& r = _current.rect;
-        auto region = static_cast<size_t>(std::floor(size * _progress));
-        if (region == 0)
-            return;
-        region--;
-
-        for (size_t i = 0; i < region; ++i)
-        {
-            if (cond(points[i], points[i + 1]))
-            {
-                auto make_pos = [&](int i) -> Point {
-                    return {r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i] / maxh};
-                };
-                tmp.emplace_back(make_pos(i), make_pos(i + 1));
-            }
-        }
-
-        _rects.clear();
-        for (auto& [p1, p2] : tmp)
-        {
-            if (int(p1.x) != int(p2.x) || int(p1.y) != int(p2.y))
-                _rects.emplace_back(p1, p2);
-        }
-    };
+        };
 
     switch (_ltype)
     {
@@ -122,7 +101,7 @@ void SpriteLine::updateRects()
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
         pushRects(
-            p, 100.0, [h](int val1, int val2) { return val1 <= h || val2 <= h; },
+            p, static_cast<uint8_t>(100), [h](int val1, int val2) { return val1 <= h || val2 <= h; },
             [h](int val2) { return val2 > h ? h : val2; });
         break;
     }
@@ -131,14 +110,14 @@ void SpriteLine::updateRects()
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
         pushRects(
-            p, 100.0, [h](int val1, int val2) { return val1 >= h || val2 >= h; },
+            p, static_cast<uint8_t>(100), [h](int val1, int val2) { return val1 >= h || val2 >= h; },
             [h](int val1) { return val1 < h ? h : val1; });
         break;
     }
     case LineType::SCORE: {
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphAcc[_player];
-        pushRectsF(p, 100.0);
+        pushRects(p, 100.0);
         break;
     }
     case LineType::SCORE_MYBEST: {
@@ -146,14 +125,14 @@ void SpriteLine::updateRects()
         {
             std::shared_lock l(gPlayContext._mutex);
             const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_MYBEST];
-            pushRectsF(p, 100.0);
+            pushRects(p, 100.0);
         }
         break;
     }
     case LineType::SCORE_TARGET: {
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_TARGET];
-        pushRectsF(p, 100.0);
+        pushRects(p, 100.0);
         break;
     }
     }
