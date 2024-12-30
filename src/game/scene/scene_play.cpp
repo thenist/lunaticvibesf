@@ -1014,10 +1014,11 @@ bool ScenePlay::createRuleset()
 
         // load mybest score
         auto pScore = g_pScoreDB->getChartScoreBMS(gChartContext.hash);
-        // TODO: save best score as member, set DST options 330-332 while playing.
-        // https://github.com/chown2/lunaticvibesf/issues/15
         if (pScore)
         {
+            pb_bp = pScore->bp;
+            pb_exscore = pScore->exscore;
+            pb_maxcombo = pScore->maxcombo;
             if (!gArenaData.isOnline())
             {
                 gPlayContext.bargraph_mybest_final =
@@ -2189,10 +2190,12 @@ void ScenePlay::updatePlaying()
         long long exScore1P = 0;
         long long exScore2P = 0;
         long long exScoreMybest = 0;
+        int maxCombo1P = 0;
         if (auto pr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); pr)
         {
             exScore1P = pr->getExScore();
             miss1 = pr->getJudgeCountEx(RulesetBMS::JUDGE_BP);
+            maxCombo1P = pr->getMaxCombo();
             const auto bms_gauge = pr->getGaugeType();
             gauge1 = gaugeDisplay(bms_gauge);
             State::set(IndexOption::PLAY_GAUGE_TYPE_1P, gaugeToOption(bms_gauge));
@@ -2263,6 +2266,10 @@ void ScenePlay::updatePlaying()
         State::set(IndexNumber::PLAY_1P_EXSCORE_DIFF, p1target);
         State::set(IndexNumber::PLAY_2P_EXSCORE_DIFF, exScore2P - exScore1P);
         State::set(IndexOption::RESULT_BATTLE_WIN_LOSE, (p1target > 0) ? 1 : (p1target < 0) ? 2 : 0);
+
+        State::set(IndexSwitch::RESULT_UPDATED_SCORE, pb_exscore < exScore1P);
+        State::set(IndexSwitch::RESULT_UPDATED_MAXCOMBO, pb_maxcombo < maxCombo1P);
+        State::set(IndexSwitch::RESULT_UPDATED_BP, pb_bp < miss1);
 
         State::set(IndexNumber::RESULT_TARGET_EX, exScore2P);
         State::set(IndexNumber::RESULT_TARGET_DIFF, exScore1P - exScore2P);

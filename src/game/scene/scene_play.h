@@ -9,6 +9,7 @@
 #include <game/skin/skin_mgr.h>
 
 #include <future>
+#include <limits>
 #include <memory>
 
 class ScenePlay : public SceneBase
@@ -107,6 +108,10 @@ private:
     bool adjustLanecoverWithStart67 = false;
     bool adjustLanecoverWithMousewheel = false;
     bool adjustLanecoverWithLeftRight = false;
+
+    int pb_bp = std::numeric_limits<int>::max();
+    int pb_exscore = 0;
+    int pb_maxcombo = 0;
 
 public:
     void clearGlobalDatas();
