@@ -8,6 +8,11 @@
 #include <common/u8.h>
 #include <db/db_conn.h>
 
+void lunaticvibes::SqliteDeleter::operator()(sqlite3* db)
+{
+    sqlite3_close(db);
+}
+
 SQLite::SQLite(const char* path, std::string tag_, SQLite::OpenMode mode) : tag(std::move(tag_))
 {
     int flags = 0;
@@ -16,25 +21,24 @@ SQLite::SQLite(const char* path, std::string tag_, SQLite::OpenMode mode) : tag(
     case OpenMode::ReadWrite: flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE; break;
     case OpenMode::ReadOnly: flags = SQLITE_OPEN_READONLY; break;
     }
-    int ret = sqlite3_open_v2(path, &_db, flags, nullptr);
+    sqlite3* db = nullptr;
+    int ret = sqlite3_open_v2(path, &db, flags, nullptr);
     if (ret != SQLITE_OK)
     {
         LOG_ERROR << "[sqlite3] sql failed to open db at path '" << path << "' (tag '" << tag << "'): [" << ret << "] "
                   << errmsg();
     }
+    _db.reset(db);
 
     exec("PRAGMA temp_store = memory");
     exec("PRAGMA mmap_size = 536870912"); // 512MB
 }
 
-SQLite::~SQLite()
-{
-    sqlite3_close(_db);
-}
+SQLite::~SQLite() = default;
 
 const char* SQLite::errmsg() const
 {
-    return sqlite3_errmsg(_db);
+    return sqlite3_errmsg(_db.get());
 }
 
 #ifndef NDEBUG
@@ -136,7 +140,7 @@ std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql,
                                                  std::initializer_list<std::any> args) const
 {
     sqlite3_stmt* stmt = nullptr;
-    int ret = sqlite3_prepare_v3(_db, zsql.data(), static_cast<int>(zsql.size()), 0, &stmt, nullptr);
+    int ret = sqlite3_prepare_v3(_db.get(), zsql.data(), static_cast<int>(zsql.size()), 0, &stmt, nullptr);
     if (ret != 0)
     {
         LOG_ERROR << "[sqlite3] sql \"" << zsql << "\" prepare error: [" << ret << "] " << errmsg();
@@ -202,7 +206,7 @@ std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql,
 int SQLite::exec(const std::string_view zsql, std::initializer_list<std::any> args)
 {
     sqlite3_stmt* stmt = nullptr;
-    int ret = sqlite3_prepare_v3(_db, zsql.data(), static_cast<int>(zsql.size()), 0, &stmt, nullptr);
+    int ret = sqlite3_prepare_v3(_db.get(), zsql.data(), static_cast<int>(zsql.size()), 0, &stmt, nullptr);
     if (ret != 0)
     {
         LOG_ERROR << "[sqlite3] sql \"" << zsql << "\" prepare error: [" << ret << "] " << errmsg();
@@ -250,7 +254,7 @@ void SQLite::transactionStart()
     inTransaction = true;
 
     sqlite3_stmt* stmt = nullptr;
-    int ret = sqlite3_prepare_v3(_db, "BEGIN", 6, 0, &stmt, nullptr);
+    int ret = sqlite3_prepare_v3(_db.get(), "BEGIN", 6, 0, &stmt, nullptr);
     if (ret)
     {
         LOG_ERROR << "[sqlite3] " << tag << ": " << "sqlite3_prepare_v3 error";
@@ -288,7 +292,7 @@ void SQLite::commitOrRollback(const std::string_view sql)
     inTransaction = false;
 
     sqlite3_stmt* stmt = nullptr;
-    int ret = sqlite3_prepare_v3(_db, sql.data(), static_cast<int>(sql.size()), 0, &stmt, nullptr);
+    int ret = sqlite3_prepare_v3(_db.get(), sql.data(), static_cast<int>(sql.size()), 0, &stmt, nullptr);
     if (ret)
     {
         LOG_ERROR << "[sqlite3] " << tag << ": " << "sqlite3_prepare_v3 error";
@@ -358,7 +362,7 @@ bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& 
 
 bool SQLite::isReadOnly() const
 {
-    int ret = sqlite3_db_readonly(_db, nullptr);
+    int ret = sqlite3_db_readonly(_db.get(), nullptr);
     // TODO: remove this check when SQLite can't construct invalid object.
     if (ret == -1)
     {

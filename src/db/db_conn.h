@@ -2,6 +2,7 @@
 
 #include <any>
 #include <functional>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -35,12 +36,23 @@ inline std::string ANY_STR(const std::any& a)
     return std::any_cast<std::string>(a);
 }
 
+namespace lunaticvibes
+{
+
+struct SqliteDeleter
+{
+    void operator()(sqlite3* conn);
+};
+using SqlitePtr = std::unique_ptr<sqlite3, SqliteDeleter>;
+
+} // namespace lunaticvibes
+
 #define SQLITE_OK 0
 
 class SQLite
 {
 private:
-    mutable sqlite3* _db = nullptr;
+    mutable lunaticvibes::SqlitePtr _db;
     std::string tag;
     bool inTransaction = false;
 
