@@ -128,7 +128,7 @@ void clearContextPlay()
     for (size_t i = 0; i < MAX_PLAYERS; ++i)
     {
         gPlayContext.gaugeType[i] = GaugeDisplayType::GROOVE;
-        gPlayContext.mods[i].clear();
+        gPlayContext.mods[i] = {};
     }
     gPlayContext.remainTime = 0;
 

@@ -174,17 +174,6 @@ struct PlayModifiers
     PlayModifierHispeedFixType hispeedFix = PlayModifierHispeedFixType::NONE;
     PlayModifierLaneEffectType laneEffect = PlayModifierLaneEffectType::OFF;
     bool DPFlip = false;
-
-    void clear()
-    {
-        randomLeft = PlayModifierRandomType::NONE;
-        randomRight = PlayModifierRandomType::NONE;
-        gauge = PlayModifierGaugeType::NORMAL;
-        assist_mask = 0;
-        hispeedFix = PlayModifierHispeedFixType::NONE;
-        laneEffect = PlayModifierLaneEffectType::OFF;
-        DPFlip = false;
-    }
 };
 
 enum class GaugeDisplayType
