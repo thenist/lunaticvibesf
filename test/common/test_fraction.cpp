@@ -1,5 +1,9 @@
-#include "common/fraction.h"
-#include "gmock/gmock.h"
+#include <common/fraction.h>
+
+#include <cmath>
+
+#include <gtest/gtest.h>
+
 TEST(Fraction, trim)
 {
     EXPECT_EQ(fraction(1, 2), fraction(2, 4));
@@ -17,14 +21,14 @@ TEST(Fraction, negatives)
     EXPECT_EQ(fraction(0, 2), fraction(0, -2));
 }
 
-TEST(Fraction, cast_to_double)
+TEST(Fraction, CastToDouble)
 {
     EXPECT_DOUBLE_EQ(0.5, fraction(1, 2));
     EXPECT_DOUBLE_EQ(0.1, fraction(1, 10));
     EXPECT_DOUBLE_EQ(-0.5, fraction(-1, 2));
 }
 
-TEST(Fraction, cast_from_double)
+TEST(Fraction, CastFromDouble)
 {
     EXPECT_EQ(d2fr(0.25), fraction(1, 4));
     EXPECT_EQ(d2fr(0.3), fraction(3, 10));

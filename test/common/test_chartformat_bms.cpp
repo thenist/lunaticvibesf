@@ -1,16 +1,16 @@
 // NOTE: when working with BMS file hashes, make sure to check them out with CRLF endings.
 // =======================================================================================
 
-#include "gmock/gmock.h"
+#include <common/chartformat/chartformat_bms.h>
+#include <common/hash.h>
+#include <common/utils.h>
 
 #include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
 
-#include "../../src/common/utils.h"
-#include "common/chartformat/chartformat_bms.h"
-#include "common/hash.h"
+#include <gtest/gtest.h>
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
 
@@ -29,21 +29,21 @@ bool ExpectNotePosition(const ChartFormatBMS& bms, LaneCode area, int ch, int ba
     }
     return true;
 };
-TEST(tBMS, folder_not_exist)
+TEST(tBMS, FolderNotExist)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bbb/asdlfkjasdlfkjsdalgjsdalgjasd.bms"));
     EXPECT_EQ(bms->isLoaded(), false);
 }
 
-TEST(tBMS, file_not_exist)
+TEST(tBMS, FileNotExist)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/asdlfkjasdlfkjsdalgjsdalgjasd.bms"));
     EXPECT_EQ(bms->isLoaded(), false);
 }
 
-TEST(tBMS, utf8_file_path)
+TEST(tBMS, Utf8FilePath)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>(PathFromUTF8("bms/5k_世界.bms")));
@@ -51,7 +51,7 @@ TEST(tBMS, utf8_file_path)
     EXPECT_EQ(bms->title, "ザ・ワールド");
 }
 
-TEST(tBMS, meta_basic)
+TEST(tBMS, MetaBasic)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/bgm32.bms"));
@@ -145,7 +145,7 @@ TEST(tBMS, RankVeryHardParsedCorrectly)
     EXPECT_EQ(bms->rank, JudgeDifficulty::HARD);
 }
 
-TEST(tBMS, metre_change)
+TEST(tBMS, MetreChange)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/bar.bms"));
@@ -158,7 +158,7 @@ TEST(tBMS, metre_change)
     EXPECT_EQ(bms->metres[3], Metre(4, 4));
 }
 
-TEST(tBMS, bpm_change)
+TEST(tBMS, BpmChange)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/bpm.bms"));
@@ -196,7 +196,7 @@ TEST(tBMS, stop)
     EXPECT_EQ(bms->stop[it->value], 192);
 }
 
-TEST(tBMS, note_5k)
+TEST(tBMS, Note5k)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/5k.bms"));
@@ -223,7 +223,7 @@ TEST(tBMS, note_5k)
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE1, 5, 2, 4, std::vector<int>{0}));
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE1, 0, 2, 4, std::vector<int>{0, 1, 2, 3}));
 }
-TEST(tBMS, note_7k)
+TEST(tBMS, Note7k)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/7k.bme"));
@@ -271,7 +271,7 @@ TEST(tBMS, note_7k)
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE1, 6, 2, 8, std::vector<int>{6}));
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE1, 7, 2, 8, std::vector<int>{7}));
 }
-TEST(tBMS, note_9k_mixed_channels)
+TEST(tBMS, Note9kMixedChannels)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/9k_mixed_channels.pms"));
@@ -301,7 +301,7 @@ TEST(tBMS, note_9k_mixed_channels)
     EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 8, 2).notes.size(), 0);
     EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 9, 2).notes.size(), 0);
 }
-TEST(tBMS, note_10k)
+TEST(tBMS, Note10k)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/10k.bms"));
@@ -335,7 +335,7 @@ TEST(tBMS, note_10k)
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE2, 5, 1, 8, std::vector<int>{4}));
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE2, 0, 2, 8, std::vector<int>{0}));
 }
-TEST(tBMS, note_14k)
+TEST(tBMS, Note14k)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/14k.bme"));

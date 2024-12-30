@@ -22,7 +22,7 @@ public:
     }
 };
 
-TEST(Config, file_create)
+TEST(Config, FileCreate)
 {
     auto file = u8"test_create.cfg"_p;
     {

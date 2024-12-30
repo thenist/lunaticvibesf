@@ -5,6 +5,7 @@ Checks: |
   cert-*,
   clang-analyzer-*,
   concurrency-*,
+  google-readability-avoid-underscore-in-googletest-name,
   llvm-namespace-comment,
   misc-*,
   modernize-avoid-bind,

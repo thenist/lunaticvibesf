@@ -50,7 +50,7 @@ TEST(Color, arithmetic)
     // EXPECT_EQ(2 * c, d);
 }
 
-TEST(Rect, self_equal)
+TEST(Rect, SelfEqual)
 {
     Rect r1{0, 0, 40, 60};
     EXPECT_EQ(r1, r1);
@@ -82,7 +82,7 @@ TEST(Rect, construct)
     EXPECT_EQ(r, r1);
 }
 
-TEST(Rect, add_normal)
+TEST(Rect, AddNormal)
 {
     Rect r1{0, 0, 40, 60};
     Rect r2{0, 0, 40, 60};
@@ -99,11 +99,11 @@ class mock_SpriteBase : public SpriteBase
 public:
     mock_SpriteBase(const SpriteBuilder& builder) : SpriteBase(builder) {}
     MOCK_CONST_METHOD0(draw, void());
-    FRIEND_TEST(test_SpriteBase, rectConstruct);
-    FRIEND_TEST(test_SpriteBase, func_update);
+    FRIEND_TEST(TestSpriteBase, rectConstruct);
+    FRIEND_TEST(TestSpriteBase, FuncUpdate);
 };
 
-class test_SpriteBase : public ::testing::Test
+class TestSpriteBase : public ::testing::Test
 {
 protected:
     std::shared_ptr<mock_Texture> pt{std::make_shared<mock_Texture>()};
@@ -113,7 +113,7 @@ protected:
     mock_SpriteBase ss1_2{builder};
 
 public:
-    test_SpriteBase()
+    TestSpriteBase()
     {
         ss1.setMotionStartTimer(IndexTimer::K11_BOMB);
         ss1_1.setMotionStartTimer(IndexTimer::K11_BOMB);
@@ -139,7 +139,7 @@ public:
     }
 };
 
-TEST_F(test_SpriteBase, func_update)
+TEST_F(TestSpriteBase, FuncUpdate)
 {
     State::set(IndexTimer::K11_BOMB, 0);
     lunaticvibes::Time t(0), t1(128), t2(255), t3(256), t4(512);
@@ -413,15 +413,15 @@ public:
     mock_SpriteNumber(const SpriteNumber::SpriteNumberBuilder& builder) : SpriteNumber(builder) {}
 
     FRIEND_TEST(sNumber, construct);
-    FRIEND_TEST(sNumber, num_1);
-    FRIEND_TEST(sNumber, num_23);
-    FRIEND_TEST(sNumber, num_456);
-    FRIEND_TEST(sNumber, num_1234);
-    FRIEND_TEST(sNumber, num_0);
-    FRIEND_TEST(sNumber, num_norm_9999);
-    FRIEND_TEST(sNumber, num_norm_m1);
-    FRIEND_TEST(sNumber, num_full_m65532);
-    FRIEND_TEST(sNumber, num_full_0);
+    FRIEND_TEST(sNumber, Num1);
+    FRIEND_TEST(sNumber, Num23);
+    FRIEND_TEST(sNumber, Num456);
+    FRIEND_TEST(sNumber, Num1234);
+    FRIEND_TEST(sNumber, Num0);
+    FRIEND_TEST(sNumber, NumNorm9999);
+    FRIEND_TEST(sNumber, NumNormM1);
+    FRIEND_TEST(sNumber, NumFullM65532);
+    FRIEND_TEST(sNumber, NumFull0);
     FRIEND_TEST(sNumber, animUpdate);
 };
 
@@ -505,7 +505,7 @@ TEST_F(sNumber, construct)
     EXPECT_EQ(sa24.numberType, NumberType::NUM_TYPE_FULL);
 }
 
-TEST_F(sNumber, num_1)
+TEST_F(sNumber, Num1)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -519,7 +519,7 @@ TEST_F(sNumber, num_1)
     EXPECT_EQ(sa24.digitNumber[0], 1);
     EXPECT_EQ(sa24.digitNumber[1], NUM_FULL_PLUS);
 }
-TEST_F(sNumber, num_23)
+TEST_F(sNumber, Num23)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -535,7 +535,7 @@ TEST_F(sNumber, num_23)
     EXPECT_EQ(sa24.digitNumber[1], 2);
     EXPECT_EQ(sa24.digitNumber[2], NUM_FULL_PLUS);
 }
-TEST_F(sNumber, num_456)
+TEST_F(sNumber, Num456)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -550,7 +550,7 @@ TEST_F(sNumber, num_456)
     sa24.update(t0);
     EXPECT_THAT(sa24.digitNumber, ElementsAre(6, 5, 4, NUM_FULL_PLUS));
 }
-TEST_F(sNumber, num_1234)
+TEST_F(sNumber, Num1234)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -563,7 +563,7 @@ TEST_F(sNumber, num_1234)
     sa24.update(t0);
     EXPECT_THAT(sa24.digitNumber, ElementsAre(4, 3, 2, NUM_FULL_PLUS));
 }
-TEST_F(sNumber, num_0)
+TEST_F(sNumber, Num0)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -578,7 +578,7 @@ TEST_F(sNumber, num_0)
     EXPECT_EQ(sa24.digitNumber[1], NUM_FULL_PLUS);
 }
 
-TEST_F(sNumber, num_norm_9999)
+TEST_F(sNumber, NumNorm9999)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -588,7 +588,7 @@ TEST_F(sNumber, num_norm_9999)
     EXPECT_THAT(s.digitNumber, ElementsAre(9, 9, 9, 9));
 }
 
-TEST_F(sNumber, num_norm_m1)
+TEST_F(sNumber, NumNormM1)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -598,7 +598,7 @@ TEST_F(sNumber, num_norm_m1)
     EXPECT_THAT(s.digitNumber, ElementsAre(7, 4, 6, 3));
 }
 
-TEST_F(sNumber, num_full_m65532)
+TEST_F(sNumber, NumFullM65532)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -612,7 +612,7 @@ TEST_F(sNumber, num_full_m65532)
     EXPECT_THAT(sa24.digitNumber, ElementsAre(12 + 2, 12 + 3, 12 + 5, NUM_FULL_MINUS));
 }
 
-TEST_F(sNumber, num_full_0)
+TEST_F(sNumber, NumFull0)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -627,7 +627,7 @@ TEST_F(sNumber, num_full_0)
     EXPECT_EQ(sa24.digitNumber[1], NUM_FULL_PLUS);
 }
 
-TEST_F(sNumber, rect_normal_1)
+TEST_F(sNumber, RectNormal1)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
 
@@ -638,7 +638,7 @@ TEST_F(sNumber, rect_normal_1)
     s1.draw();
 }
 
-TEST_F(sNumber, rect_normal_4)
+TEST_F(sNumber, RectNormal4)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -689,7 +689,7 @@ TEST_F(sNumber, rect_normal_4)
     }
 }
 
-TEST_F(sNumber, rect_bzero_4)
+TEST_F(sNumber, RectBzero4)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -732,7 +732,7 @@ TEST_F(sNumber, rect_bzero_4)
     }
 }
 
-TEST_F(sNumber, rect_full_4)
+TEST_F(sNumber, RectFull4)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -784,7 +784,7 @@ TEST_F(sNumber, rect_full_4)
     }
 }
 
-TEST_F(sNumber, rect_bzero_4_right)
+TEST_F(sNumber, RectBzero4Right)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -823,7 +823,7 @@ TEST_F(sNumber, rect_bzero_4_right)
     }
 }
 
-TEST_F(sNumber, rect_bzero_4_anim_1_123)
+TEST_F(sNumber, RectBzero4Anim1123)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -841,7 +841,7 @@ TEST_F(sNumber, rect_bzero_4_anim_1_123)
         sa11.draw();
     }
 }
-TEST_F(sNumber, rect_bzero_4_anim_1_6789)
+TEST_F(sNumber, RectBzero4Anim16789)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -857,7 +857,7 @@ TEST_F(sNumber, rect_bzero_4_anim_1_6789)
         sa11.draw();
     }
 }
-TEST_F(sNumber, rect_bzero_4_anim_1_0)
+TEST_F(sNumber, RectBzero4Anim10)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -874,7 +874,7 @@ TEST_F(sNumber, rect_bzero_4_anim_1_0)
         sa11.draw();
     }
 }
-TEST_F(sNumber, rect_bzero_4_anim_3_123)
+TEST_F(sNumber, RectBzero4Anim3123)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -892,7 +892,7 @@ TEST_F(sNumber, rect_bzero_4_anim_3_123)
         sa11.draw();
     }
 }
-TEST_F(sNumber, rect_bzero_4_anim_3_6789)
+TEST_F(sNumber, RectBzero4Anim36789)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
@@ -908,7 +908,7 @@ TEST_F(sNumber, rect_bzero_4_anim_3_6789)
         sa11.draw();
     }
 }
-TEST_F(sNumber, rect_bzero_4_anim_3_0)
+TEST_F(sNumber, RectBzero4Anim30)
 {
     State::set(IndexTimer::K11_BOMB, t0.norm());
     using namespace ::testing;
