@@ -3171,13 +3171,13 @@ ParseRet SkinLR2::DST_BAR_TITLE()
     // timers are ignored for bars
     d.timer = 0;
 
-    auto type = BarTitleType(d._null);
     if (d._null >= (int)BarTitleType::TITLE_TYPE_COUNT)
     {
-        LOG_DEBUG << "[SkinLR2] BarEntry title type (" << int(type) << ") Invalid!"
+        LOG_DEBUG << "[SkinLR2] BarEntry title type (" << d._null << ") Invalid!"
                   << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
+    auto type = BarTitleType(d._null);
 
     for (auto& bar : barSprites)
     {
@@ -4347,6 +4347,9 @@ void SkinLR2::postLoad()
             }
         }
     }
+
+    for (auto& bar : barSprites)
+        bar->postProcess();
 }
 
 void SkinLR2::findAndExtractDXA(const Path& path)

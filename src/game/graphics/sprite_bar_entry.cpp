@@ -151,6 +151,15 @@ int SpriteBarEntry::setRivalLampRival(BarLampType type, const SpriteAnimated::Sp
     return 0;
 }
 
+void SpriteBarEntry::postProcess()
+{
+    if (auto& e = sTitle[static_cast<size_t>(BarTitleType::FOLDER)]; e == nullptr)
+    {
+        LOG_VERBOSE << "[Sprite] BarEntry no dedicated folder font, falling back to normal";
+        e = sTitle[static_cast<size_t>(BarTitleType::NORMAL)];
+    }
+}
+
 static BarType entry_bar_type(eEntryType e)
 {
     switch (e)
@@ -213,6 +222,33 @@ static BarLampType score_to_bar_lamp_lv(ScoreBMS::Lamp lamp)
     }
     lunaticvibes::assert_failed("score_to_bar_lamp_lv");
 };
+
+static bool isFolderEntry(eEntryType type)
+{
+    switch (type)
+    {
+    case eEntryType::NEW_SONG_FOLDER:
+    case eEntryType::FOLDER:
+    case eEntryType::CUSTOM_FOLDER:
+    case eEntryType::COURSE_FOLDER: return true;
+    case eEntryType::UNKNOWN:
+    case eEntryType::SONG:
+    case eEntryType::CHART:
+    case eEntryType::RANDOM_CHART:
+    case eEntryType::RIVAL:
+    case eEntryType::RIVAL_SONG:
+    case eEntryType::RIVAL_CHART:
+    case eEntryType::NEW_COURSE:
+    case eEntryType::COURSE:
+    case eEntryType::RANDOM_COURSE:
+    case eEntryType::ARENA_FOLDER:
+    case eEntryType::ARENA_COMMAND:
+    case eEntryType::ARENA_LOBBY:
+    case eEntryType::CHART_LINK:
+    case eEntryType::REPLAY: return false;
+    }
+    lunaticvibes::assert_failed("isFolderEntry");
+}
 
 bool SpriteBarEntry::update(const lunaticvibes::Time& time)
 {
@@ -321,7 +357,12 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
         _current.angle = parentRenderParam.angle;
 
         drawTitle = false;
-        drawTitleType = size_t(isNewEntry ? BarTitleType::NEW_SONG : BarTitleType::NORMAL);
+        if (isNewEntry)
+            drawTitleType = static_cast<size_t>(BarTitleType::NEW_SONG);
+        else if (isFolderEntry(pEntry->type()))
+            drawTitleType = static_cast<size_t>(BarTitleType::FOLDER);
+        else
+            drawTitleType = static_cast<size_t>(BarTitleType::NORMAL);
         if (sTitle[drawTitleType])
         {
             sTitle[drawTitleType]->update(time);

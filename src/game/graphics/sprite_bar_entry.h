@@ -80,6 +80,7 @@ enum class BarTitleType : uint8_t
 {
     NORMAL,
     NEW_SONG,
+    FOLDER, // LVF extension.
     TITLE_TYPE_COUNT
 };
 
@@ -142,6 +143,8 @@ public:
     int setRivalWinLose(BarRivalType type, const SpriteAnimated::SpriteAnimatedBuilder& builder);
     int setRivalLampSelf(BarLampType type, const SpriteAnimated::SpriteAnimatedBuilder& builder);
     int setRivalLampRival(BarLampType type, const SpriteAnimated::SpriteAnimatedBuilder& builder);
+
+    void postProcess();
 
 public:
     bool update(const lunaticvibes::Time& time) override;
