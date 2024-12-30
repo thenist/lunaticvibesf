@@ -1014,7 +1014,7 @@ bool ScenePlay::createRuleset()
 
         // load mybest score
         auto pScore = g_pScoreDB->getChartScoreBMS(gChartContext.hash);
-        // TODO: save best score as member, set DST options 330-332, 352-354 while playing.
+        // TODO: save best score as member, set DST options 330-332 while playing.
         // https://github.com/chown2/lunaticvibesf/issues/15
         if (pScore)
         {
@@ -2259,8 +2259,10 @@ void ScenePlay::updatePlaying()
             }
             State::set(IndexNumber::PLAY_2P_EXSCORE, exScore2P);
         }
-        State::set(IndexNumber::PLAY_1P_EXSCORE_DIFF, exScore1P - exScore2P);
+        auto p1target = exScore1P - exScore2P;
+        State::set(IndexNumber::PLAY_1P_EXSCORE_DIFF, p1target);
         State::set(IndexNumber::PLAY_2P_EXSCORE_DIFF, exScore2P - exScore1P);
+        State::set(IndexOption::RESULT_BATTLE_WIN_LOSE, (p1target > 0) ? 1 : (p1target < 0) ? 2 : 0);
 
         State::set(IndexNumber::RESULT_TARGET_EX, exScore2P);
         State::set(IndexNumber::RESULT_TARGET_DIFF, exScore1P - exScore2P);
