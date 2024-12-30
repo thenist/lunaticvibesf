@@ -4,14 +4,15 @@ Lunatic Vibes F (LVF) is a BMS client - a rhythm game that plays community-made 
 
 The project is still in development stage. Please do not expect a bug-free experience. Feel free to open issues.
 
-It is a fork of [Lunatic Vibes](https://github.com/yaasdf/lunaticvibes), a clone of Lunatic Rave 2 (beta3 100201).
-After using LVF, profiles will not be compatible with Lunatic Vibes anymore, so make sure to have backups before moving.
-Replays set in LVF will not work in Lunatic Vibes either.
+It is a clone of Lunatic Rave 2 (beta3 100201).
+
+It is also a fork of [Lunatic Vibes](https://github.com/yaasdf/lunaticvibes).
+Please note that LVF upgrades user profiles such that they can't be used in original Lunatic Vibes anymore.
 
 ## Features
 
 - Multi-threaded update procedure
-- Async input handling
+- Asynchronous input handling
 - Full Unicode support
 - Built-in difficulty table support
 - Mixed skin resolution support (SD, HD, FHD, UHD)
@@ -39,6 +40,8 @@ automatically.
 
 ### Linux
 
+#### vcpkg
+
 ```sh
 # export VCPKG_ROOT=/path/to/vcpkg
 cmake --preset linux-vcpkg -B ./build
@@ -46,8 +49,26 @@ cmake --build ./build --config=Debug
 ls build/bin/Debug
 ```
 
-To enable additional warnings when compiling with GCC change preset above to `linux-vcpkg-gcc`.
-Similarly for clang use `linux-vcpkg-clang`.
+For additional compilation warnings when compiling with GCC or clang,
+change the preset above to `linux-vcpkg-gcc` or `linux-vcpkg-clang` respectively.
+
+#### Using system dependencies
+
+For NixOS, a flake with required dependencies is included.
+
+For other distros, building with system dependencies should be possible, but the exact list is not documented.
+Feel free to contribute.
+
+```sh
+# NixOS: nix develop
+# Other: apt install ...
+cmake --preset linux -B ./build
+cmake --build ./build --config=Debug
+ls build/bin/Debug
+```
+
+For additional compilation warnings when compiling with GCC or clang,
+change the preset above to `linux-gcc` or `linux-clang` respectively.
 
 ## License
 
