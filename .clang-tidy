@@ -5,6 +5,7 @@ Checks: |
   cert-*,
   clang-analyzer-*,
   concurrency-*,
+  llvm-namespace-comment,
   misc-*,
   modernize-avoid-bind,
   modernize-concat-nested-namespaces,
