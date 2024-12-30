@@ -6,6 +6,7 @@ Checks: |
   clang-analyzer-*,
   concurrency-*,
   google-readability-avoid-underscore-in-googletest-name,
+  # google-readability-casting, # TODO
   llvm-namespace-comment,
   misc-*,
   modernize-avoid-bind,
