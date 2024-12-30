@@ -1098,6 +1098,12 @@ void SceneSelect::imguiPageDebugMain()
         }
         SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_F_OPEN);
     }
+    ImGui::SameLine();
+    HelpMarker(_("This will populate score cache with clears from LR2 database."
+                 " Rebuilding the cache will remove these scores."
+                 " This doesn't import *all* data from LR2."
+                 " If you are moving from LR2, do not delete its database!"
+                 " At least not yet. :)"));
 
     if (ImGui::Button("Rebuild score cache"))
     {
