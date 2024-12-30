@@ -238,6 +238,7 @@ enum class Keyboard : unsigned
 };
 inline constexpr size_t keyboardKeyCount = static_cast<size_t>(Keyboard::K_COUNT);
 
+// clang-format off
 inline const char* keyboardNameMap[]{
     "", // ERROR
 
@@ -378,6 +379,7 @@ inline const char* keyboardNameMap[]{
     "NUM_STAR",
     "NUM_ENTER"
 };
+// clang-format on
 static_assert(sizeof(keyboardNameMap) / sizeof(keyboardNameMap[0]) == keyboardKeyCount);
 
 enum class JoystickAxis
