@@ -111,6 +111,7 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
         itReplayCommand++;
         prevReplayT = replayT;
     }
+    prevReplayT = t;
     updateInput();
 }
 
