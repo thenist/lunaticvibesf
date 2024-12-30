@@ -4,6 +4,44 @@
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
+TEST(DbConn, CommitRollbackWorks)
+{
+    struct TestSQLite : public SQLite
+    {
+        TestSQLite() : SQLite(IN_MEMORY_DB_PATH, "CommitRollbackWorks") {};
+        void runTest()
+        {
+            ASSERT_EQ(exec("CREATE TABLE some_data(id INTEGER);"), SQLITE_OK);
+            auto insert = [this]() { ASSERT_EQ(exec("INSERT INTO some_data(id) VALUES (1337);"), SQLITE_OK); };
+            auto check_fetch = [this]() {
+                auto res = query("SELECT id FROM some_data;");
+                return res.size() == 1 && res[0].size() == 1 && ANY_INT(res[0][0]) == 1337;
+            };
+
+            {
+                Transaction transaction(*this);
+                insert();
+                transaction.rollback();
+            }
+            EXPECT_FALSE(check_fetch());
+
+            {
+                Transaction transaction(*this);
+                insert();
+            }
+            EXPECT_FALSE(check_fetch());
+
+            {
+                Transaction transaction(*this);
+                insert();
+                transaction.commit();
+            }
+            EXPECT_TRUE(check_fetch());
+        }
+    };
+    TestSQLite{}.runTest();
+}
+
 TEST(DbConn, MigrationSystemWorks)
 {
     struct TestSQLite : public SQLite

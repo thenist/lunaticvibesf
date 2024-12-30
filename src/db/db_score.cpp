@@ -430,7 +430,7 @@ bool ScoreDB::isBmsPbCacheEmpty()
 void ScoreDB::rebuildBmsPbCache()
 {
     LOG_DEBUG << "[ScoreDB] Asked to rebuild BMS score PB cache";
-    transactionStart();
+    Transaction transaction(*this);
     exec("DELETE FROM score_cache_bms");
     for (const auto& raw_score : query("SELECT * FROM score_bms ORDER BY addtime"))
     {
@@ -450,7 +450,7 @@ void ScoreDB::rebuildBmsPbCache()
         convertHistoryScoreBms(*score, raw_score);
         updateCachedChartPbBms(HashMD5{md5}, *score);
     }
-    commit();
+    transaction.commit();
     preloadScore();
 }
 

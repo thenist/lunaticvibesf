@@ -54,7 +54,7 @@ class SQLite
 private:
     mutable lunaticvibes::SqlitePtr _db;
     std::string tag;
-    bool inTransaction = false;
+    bool _isinTransaction = false;
 
 public:
     enum class OpenMode
@@ -85,14 +85,26 @@ protected:
     [[nodiscard]] bool applyMigration(std::string_view name, const std::function<bool()>& migrate);
     [[nodiscard]] bool isReadOnly() const;
 
-private:
-    void commitOrRollback(const std::string_view sql);
-
 public:
-    // TODO: RAII.
-    void transactionStart();
-    void commit();
-    void rollback();
+    class Transaction
+    {
+    public:
+        Transaction(SQLite&);
+        ~Transaction();
+
+        void commit();
+        void rollback();
+
+        Transaction(const Transaction&) = delete;
+        Transaction(Transaction&&) = delete;
+        Transaction& operator=(const Transaction&) = delete;
+        Transaction& operator=(Transaction&&) = delete;
+
+    private:
+        void exec(std::string_view sql);
+        SQLite& _db;
+        bool _finished = false;
+    };
 
     void optimize();
     [[nodiscard]] const char* errmsg() const;

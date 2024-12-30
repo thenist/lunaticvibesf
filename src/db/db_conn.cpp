@@ -243,69 +243,47 @@ int SQLite::exec(const std::string_view zsql, std::initializer_list<std::any> ar
     return SQLITE_OK;
 }
 
-void SQLite::transactionStart()
+SQLite::Transaction::Transaction(SQLite& db) : _db(db)
 {
-    if (inTransaction)
-    {
-        LOG_ERROR << "[sqlite3] [" << tag << "] Ignoring nested transactionStart";
-        LVF_DEBUG_ASSERT(false && "nested transactionStart");
-        return;
-    }
-    inTransaction = true;
+    LVF_ASSERT(!db._isinTransaction && "Transaction()");
+    db._isinTransaction = true;
+    db.exec("BEGIN");
+}
 
+SQLite::Transaction::~Transaction()
+{
+    if (!_finished)
+        rollback();
+    _db._isinTransaction = false;
+}
+
+void SQLite::Transaction::commit()
+{
+    LVF_ASSERT(!_finished && "commit");
+    exec("COMMIT");
+    _finished = true;
+}
+
+void SQLite::Transaction::rollback()
+{
+    LVF_ASSERT(!_finished && "rollback");
+    exec("ROLLBACK");
+    _finished = true;
+}
+
+void SQLite::Transaction::exec(const std::string_view sql)
+{
     sqlite3_stmt* stmt = nullptr;
-    int ret = sqlite3_prepare_v3(_db.get(), "BEGIN", 6, 0, &stmt, nullptr);
-    if (ret)
-    {
-        LOG_ERROR << "[sqlite3] " << tag << ": " << "sqlite3_prepare_v3 error";
-        return;
-    }
+    int ret = sqlite3_prepare_v3(_db._db.get(), sql.data(), static_cast<int>(sql.size()), 0, &stmt, nullptr);
+    LVF_ASSERT(ret == SQLITE_OK && "sqlite3_prepare_v3");
     ret = sqlite3_step(stmt);
     if (ret != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE)
     {
-        LOG_ERROR << "[sqlite3] " << tag << ": " << "Transaction start failed with error: " << errmsg();
+        LOG_ERROR << "[sqlite3] " << _db.tag << ": Transaction '" << sql << "' failed: " << _db.errmsg();
     }
     else
     {
-        LOG_DEBUG << "[sqlite3] " << tag << ": " << "Transaction start";
-    }
-    sqlite3_finalize(stmt);
-}
-
-void SQLite::commit()
-{
-    commitOrRollback("COMMIT");
-}
-void SQLite::rollback()
-{
-    commitOrRollback("ROLLBACK");
-}
-void SQLite::commitOrRollback(const std::string_view sql)
-{
-    if (!inTransaction)
-    {
-        LOG_ERROR << "[sqlite3] [" << tag << "] commit or rollback outside of a transaction";
-        LVF_DEBUG_ASSERT(false && "commit or rollback outside of a transaction");
-        return;
-    }
-
-    inTransaction = false;
-
-    sqlite3_stmt* stmt = nullptr;
-    int ret = sqlite3_prepare_v3(_db.get(), sql.data(), static_cast<int>(sql.size()), 0, &stmt, nullptr);
-    if (ret)
-    {
-        LOG_ERROR << "[sqlite3] " << tag << ": " << "sqlite3_prepare_v3 error";
-        return;
-    }
-    ret = sqlite3_step(stmt);
-    if (ret != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE)
-    {
-        LOG_ERROR << "[sqlite3] " << tag << ": " << "Transaction '" << sql << "' failed: " << errmsg();
-    }
-    else
-    {
-        LOG_DEBUG << "[sqlite3] " << tag << ": " << "Transaction '" << sql << "' success";
+        LOG_DEBUG << "[sqlite3] " << _db.tag << ": Transaction '" << sql << "' success";
     }
     sqlite3_finalize(stmt);
 }
@@ -329,33 +307,26 @@ bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& 
         return false;
     }
 
-    transactionStart();
-
     auto didAlreadyMigrate = query("SELECT EXISTS (SELECT 1 FROM __lvf_schema_migrations WHERE name=?);", {name});
     LVF_DEBUG_ASSERT(didAlreadyMigrate.size() == 1 && didAlreadyMigrate[0].size() == 1);
     if (ANY_INT(didAlreadyMigrate[0][0]) == 1)
     {
         LOG_VERBOSE << "[sqlite3] Migration has already been applied";
-        commit();
         return true;
     }
+
+    Transaction transaction(*this);
+
     if (!migrate())
     {
         LOG_ERROR << "[sqlite3] Migration '" << name << "' failed";
-        rollback();
         return false;
     }
 
     ret = exec("INSERT INTO __lvf_schema_migrations(name, date) VALUES (?, datetime());", {name});
-    if (ret != SQLITE_OK)
-    {
-        LOG_FATAL << "[sqlite3] Insertion into __lvf_schema_migrations failed: " << errmsg();
-        LVF_DEBUG_ASSERT(false && "Insertion into __lvf_schema_migrations failed");
-        rollback();
-        return false;
-    }
+    LVF_ASSERT(ret == SQLITE_OK && "INSERT INTO __lvf_schema_migrations");
 
-    commit();
+    transaction.commit();
     LOG_VERBOSE << "[sqlite3] Migration has been successfully applied";
     return true;
 }
