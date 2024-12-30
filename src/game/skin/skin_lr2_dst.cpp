@@ -448,22 +448,11 @@ static bool getDstOptAbs(unsigned d)
     case 400: return State::get(IndexOption::KEY_CONFIG_MODE) == KEYCFG_7;
     case 401: return State::get(IndexOption::KEY_CONFIG_MODE) == KEYCFG_9;
     case 402: return State::get(IndexOption::KEY_CONFIG_MODE) == KEYCFG_5;
-    case 500:
-        return getDstOptAbs(2) && !State::get(IndexOption::CHART_DIFFICULTY) &&
-               !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_1);
-    case 501:
-        return getDstOptAbs(2) && !State::get(IndexOption::CHART_DIFFICULTY) &&
-               !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_2);
-    case 502:
-        return getDstOptAbs(2) && !State::get(IndexOption::CHART_DIFFICULTY) &&
-               !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_3);
-    case 503:
-        return getDstOptAbs(2) && !State::get(IndexOption::CHART_DIFFICULTY) &&
-               !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_4);
-    case 504:
-        return getDstOptAbs(2) && !State::get(IndexOption::CHART_DIFFICULTY) &&
-               !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_5);
-
+    case 500: return getDstOptAbs(2) && !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_1);
+    case 501: return getDstOptAbs(2) && !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_2);
+    case 502: return getDstOptAbs(2) && !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_3);
+    case 503: return getDstOptAbs(2) && !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_4);
+    case 504: return getDstOptAbs(2) && !State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_5);
     case 505: return getDstOptAbs(2) && State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_1);
     case 506: return getDstOptAbs(2) && State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_2);
     case 507: return getDstOptAbs(2) && State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_3);
@@ -473,16 +462,7 @@ static bool getDstOptAbs(unsigned d)
     case 511: return getDstOptAbs(506) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_2);
     case 512: return getDstOptAbs(507) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_3);
     case 513: return getDstOptAbs(508) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_4);
-    case 514:
-        return getDstOptAbs(509) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_5);
-
-        // TODO: check this. This was incorrectly duplicated before.
-        // case 505: case 510: return State::get(IndexOption::CHART_DIFFICULTY) == DIFF_BEGINNER;
-        // case 506: case 511: return State::get(IndexOption::CHART_DIFFICULTY) == DIFF_NORMAL;
-        // case 507: case 512: return State::get(IndexOption::CHART_DIFFICULTY) == DIFF_HYPER;
-        // case 508: case 513: return State::get(IndexOption::CHART_DIFFICULTY) == DIFF_ANOTHER;
-        // case 509: case 514: return State::get(IndexOption::CHART_DIFFICULTY) == DIFF_INSANE;
-
+    case 514: return getDstOptAbs(509) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_5);
     case 515: return getDstOptAbs(505) && State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_1);
     case 516: return getDstOptAbs(506) && State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_2);
     case 517: return getDstOptAbs(507) && State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_3);
