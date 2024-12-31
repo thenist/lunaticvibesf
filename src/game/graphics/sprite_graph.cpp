@@ -115,8 +115,6 @@ void SpriteLine::updateRects()
         break;
     }
     case LineType::SCORE: {
-        if (gPlayContext.ruleset[_player] == nullptr)
-            break;
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphAcc[_player];
         pushRects(p, 100.0);
