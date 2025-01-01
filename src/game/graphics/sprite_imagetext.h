@@ -35,7 +35,10 @@ public:
         int height = 0;
         int margin = 0;
 
-        std::shared_ptr<SpriteImageText> build() const { return std::make_shared<SpriteImageText>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteImageText> build() const
+        {
+            return std::make_shared<SpriteImageText>(*this);
+        }
     };
 
 public:

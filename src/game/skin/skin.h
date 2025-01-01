@@ -1,7 +1,9 @@
 #pragma once
-#include "common/types.h"
-#include "game/graphics/sprite.h"
-#include "game/graphics/video.h"
+
+#include <common/types.h>
+#include <game/graphics/sprite.h>
+#include <game/graphics/video.h>
+
 #include <map>
 #include <memory>
 #include <string>

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "common/types.h"
-#include "game/graphics/texture_extra.h"
 #include "sprite.h"
+
+#include <game/graphics/graphics.h>
+
 #include <memory>
 
 class sVideo;

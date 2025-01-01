@@ -235,7 +235,7 @@ public:
     {
         Rect textureRect = RECT_FULL;
 
-        std::shared_ptr<SpriteStatic> build() const { return std::make_shared<SpriteStatic>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteStatic> build() const { return std::make_shared<SpriteStatic>(*this); }
     };
 
 public:
@@ -270,7 +270,10 @@ public:
         unsigned textureSheetCols = 0;
         bool textureSheetVerticalIndexing = false;
 
-        std::shared_ptr<SpriteSelection> build() const { return std::make_shared<SpriteSelection>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteSelection> build() const
+        {
+            return std::make_shared<SpriteSelection>(*this);
+        }
     };
 
 public:
@@ -309,7 +312,7 @@ public:
         unsigned animationDurationPerLoop = 0;
         IndexTimer animationTimer = IndexTimer::SCENE_START;
 
-        std::shared_ptr<SpriteAnimated> build() const { return std::make_shared<SpriteAnimated>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteAnimated> build() const { return std::make_shared<SpriteAnimated>(*this); }
     };
 
 public:
@@ -362,7 +365,7 @@ public:
         bool editable = false;
         bool lvf_use_readme_line = false;
 
-        std::shared_ptr<SpriteText> build() const { return std::make_shared<SpriteText>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteText> build() const { return std::make_shared<SpriteText>(*this); }
     };
 
 public:
@@ -451,7 +454,7 @@ public:
         IndexNumber numInd = IndexNumber::ZERO;
         bool hideLeadingZeros = false;
 
-        std::shared_ptr<SpriteNumber> build() const { return std::make_shared<SpriteNumber>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteNumber> build() const { return std::make_shared<SpriteNumber>(*this); }
     };
 
 public:
@@ -498,7 +501,7 @@ public:
         int sliderRange = 0;
         std::function<void(double)> callOnChanged;
 
-        std::shared_ptr<SpriteSlider> build() const { return std::make_shared<SpriteSlider>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteSlider> build() const { return std::make_shared<SpriteSlider>(*this); }
     };
 
 public:
@@ -541,7 +544,7 @@ public:
         BargraphDirection barDirection = BargraphDirection::RIGHT;
         IndexBargraph barInd = IndexBargraph::ZERO;
 
-        std::shared_ptr<SpriteBargraph> build() const { return std::make_shared<SpriteBargraph>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteBargraph> build() const { return std::make_shared<SpriteBargraph>(*this); }
     };
 
 public:
@@ -585,7 +588,7 @@ public:
         opType optionType;
         unsigned optionInd;
 
-        std::shared_ptr<SpriteOption> build() const { return std::make_shared<SpriteOption>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteOption> build() const { return std::make_shared<SpriteOption>(*this); }
     };
 
 public:
@@ -617,7 +620,7 @@ public:
         int plusonlyDelta = 0;
         std::function<void(int)> callOnClick;
 
-        std::shared_ptr<SpriteButton> build() const { return std::make_shared<SpriteButton>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteButton> build() const { return std::make_shared<SpriteButton>(*this); }
     };
 
 public:
@@ -687,7 +690,10 @@ public:
         int gridCount = 50;
         IndexNumber numInd = IndexNumber::PLAY_1P_GROOVEGAUGE;
 
-        std::shared_ptr<SpriteGaugeGrid> build() const { return std::make_shared<SpriteGaugeGrid>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteGaugeGrid> build() const
+        {
+            return std::make_shared<SpriteGaugeGrid>(*this);
+        }
     };
 
 public:
@@ -720,7 +726,7 @@ public:
         int visibleOnPanel = -1;
         Rect mouseArea;
 
-        std::shared_ptr<SpriteOnMouse> build() const { return std::make_shared<SpriteOnMouse>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteOnMouse> build() const { return std::make_shared<SpriteOnMouse>(*this); }
     };
 
 public:
@@ -743,7 +749,7 @@ class SpriteCursor : public SpriteAnimated, public iSpriteMouse
 public:
     struct SpriteCursorBuilder : SpriteAnimatedBuilder
     {
-        std::shared_ptr<SpriteCursor> build() const { return std::make_shared<SpriteCursor>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteCursor> build() const { return std::make_shared<SpriteCursor>(*this); }
     };
 
 public:

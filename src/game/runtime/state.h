@@ -45,7 +45,7 @@ protected:
     public:
         Value get(Key n) const
         {
-            size_t idx = (size_t)n;
+            auto idx = (size_t)n;
             if (idx < _size)
             {
                 std::shared_lock l{_mutex};
@@ -56,7 +56,7 @@ protected:
 
         bool set(Key n, const Value& value)
         {
-            size_t idx = static_cast<size_t>(n);
+            auto idx = static_cast<size_t>(n);
             if (idx < _size)
             {
                 std::unique_lock l{_mutex};
@@ -69,7 +69,7 @@ protected:
         template <typename = typename std::enable_if<std::is_same_v<Value, std::string>>>
         bool set(Key n, std::string_view value)
         {
-            size_t idx = (size_t)n;
+            auto idx = (size_t)n;
             if (idx < _size)
             {
                 std::unique_lock l{_mutex};
@@ -81,7 +81,7 @@ protected:
 
         bool setDefault(Key n, Value value)
         {
-            size_t idx = (size_t)n;
+            auto idx = (size_t)n;
             if (idx < _size)
             {
                 _dataDefault[idx] = std::move(value);

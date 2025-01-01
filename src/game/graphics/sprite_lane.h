@@ -33,7 +33,10 @@ public:
         chart::NoteLaneCategory laneCategory = chart::NoteLaneCategory::_;
         chart::NoteLaneIndex laneIndex = chart::NoteLaneIndex::_;
 
-        std::shared_ptr<SpriteLaneVertical> build() const { return std::make_shared<SpriteLaneVertical>(*this); }
+        [[nodiscard]] std::shared_ptr<SpriteLaneVertical> build() const
+        {
+            return std::make_shared<SpriteLaneVertical>(*this);
+        }
     };
 
 public:
