@@ -18,7 +18,7 @@ IndexText text(int n)
     return IndexText(n);
 }
 
-static const std::vector<std::variant<std::monostate, IndexSwitch, IndexOption, unsigned>> buttonAdapter{
+static const std::array buttonAdapter{std::to_array<std::variant<std::monostate, IndexSwitch, IndexOption, unsigned>>({
     // 0
     std::monostate(),
 
@@ -412,7 +412,7 @@ static const std::vector<std::variant<std::monostate, IndexSwitch, IndexOption, 
     IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) +
                 (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 7),
     IndexSwitch::_FALSE,
-};
+})};
 
 bool buttonSw(int n, IndexSwitch& out)
 {
