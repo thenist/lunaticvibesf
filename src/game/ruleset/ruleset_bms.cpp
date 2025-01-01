@@ -730,17 +730,11 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
                       ? ""
                       : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)]);
-        ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
-                           ? ""
-                           : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)]);
         if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_1P))
         {
             if (!ssMod.str().empty())
                 ssMod << ", ";
-            if (!ssModShort.str().empty())
-                ssModShort << ",";
             ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
-            ssModShort << "" << Option::s_assist_type_short[Option::ASSIST_AUTOSCR];
         }
         break;
 
@@ -750,17 +744,11 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
                       ? ""
                       : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
-        ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
-                           ? ""
-                           : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
         if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_2P))
         {
             if (!ssMod.str().empty())
                 ssMod << ", ";
-            if (!ssModShort.str().empty())
-                ssModShort << ",";
             ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
-            ssModShort << "" << Option::s_assist_type_short[Option::ASSIST_AUTOSCR];
         }
         break;
 
@@ -771,36 +759,23 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         {
             ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
                           ? "-"
-                          : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)])
+                          : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)])
                   << "/"
                   << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
                           ? "-"
-                          : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
-            ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
-                               ? "-"
-                               : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)])
-                       << "/"
-                       << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
-                               ? "-"
-                               : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
+                          : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
         }
         if (State::get(IndexSwitch::PLAY_OPTION_DP_FLIP))
         {
             if (!ssMod.str().empty())
                 ssMod << ", ";
-            if (!ssModShort.str().empty())
-                ssModShort << ",";
             ssMod << "FLIP";
-            ssModShort << "F";
         }
         if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_1P))
         {
             if (!ssMod.str().empty())
                 ssMod << ", ";
-            if (!ssModShort.str().empty())
-                ssModShort << ",";
             ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
-            ssModShort << "" << Option::s_assist_type_short[Option::ASSIST_AUTOSCR];
         }
         break;
 
@@ -809,10 +784,8 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     }
     modifierText = ssMod.str();
     if (modifierText.empty())
-    {
         modifierText = "NONE";
-    }
-    modifierTextShort = ssMod.str();
+    modifierTextShort = modifierText;
 
     saveLampMax = getSaveScoreType(false).second;
 
