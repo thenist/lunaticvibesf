@@ -1,5 +1,6 @@
 #include "scene_context.h"
 
+#include <algorithm>
 #include <atomic>
 #include <mutex>
 #include <random>
@@ -31,6 +32,8 @@ std::shared_ptr<SongDB> g_pSongDB;
 std::shared_ptr<ScoreDB> g_pScoreDB;
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
+namespace r = std::ranges;
+namespace v = r::views;
 
 std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge)
 {
@@ -176,19 +179,26 @@ void pushGraphPoints()
         last_write = idx;
     };
 
-    auto push = [&](int slot) {
-        gPlayContext.graphGauge[slot][idx] = gPlayContext.ruleset[slot]->getData().health * 100;
-        gPlayContext.graphAcc[slot][idx] = gPlayContext.ruleset[slot]->getData().total_acc;
+    auto update = [&](int slot) {
+        const auto data = gPlayContext.ruleset[slot]->getData();
+        gPlayContext.graphAcc[slot][idx] = data.total_acc;
+        gPlayContext.graphGauge[slot][idx] = data.health * 100;
         fill_missing(slot);
+        if (gPlayContext.ruleset[slot]->isFinished())
+        {
+            constexpr auto but_not_this = 1;
+            r::fill(v::drop(gPlayContext.graphAcc[slot], idx + but_not_this), gPlayContext.graphAcc[slot][idx]);
+            r::fill(v::drop(gPlayContext.graphGauge[slot], idx + but_not_this), gPlayContext.graphGauge[slot][idx]);
+        }
     };
 
     std::unique_lock l(gPlayContext._mutex);
 
-    push(PLAYER_SLOT_PLAYER);
+    update(PLAYER_SLOT_PLAYER);
     if (gPlayContext.ruleset[PLAYER_SLOT_TARGET])
-        push(PLAYER_SLOT_TARGET);
+        update(PLAYER_SLOT_TARGET);
     if (!gPlayContext.isAuto && !gPlayContext.isReplay && gPlayContext.replayMybest)
-        push(PLAYER_SLOT_MYBEST);
+        update(PLAYER_SLOT_MYBEST);
 }
 
 void loadSongList()

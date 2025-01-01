@@ -2961,8 +2961,7 @@ void ScenePlay::requestExit()
         }
         else
         {
-            // TODO: fill to the end, by this point HP can't change.
-            // pushGraphPoints();
+            pushGraphPoints(); // Fill to the end.
         }
         if (!playerState[PLAYER_SLOT_TARGET].finished && gPlayContext.isBattle &&
             gPlayContext.ruleset[PLAYER_SLOT_TARGET])
@@ -2973,7 +2972,7 @@ void ScenePlay::requestExit()
         }
         else
         {
-            // TODO: same as above, fill to the end.
+            pushGraphPoints(); // Fill to the end.
         }
 
         if (gArenaData.isOnline())
