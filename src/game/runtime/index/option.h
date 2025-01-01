@@ -363,7 +363,6 @@ enum e_lamp_type
 
 enum e_rank_type
 {
-    RANK_NONE, // -
     RANK_0,    // MAX
     RANK_1,    // AAA
     RANK_2,    // AA
@@ -373,29 +372,29 @@ enum e_rank_type
     RANK_6,    // D
     RANK_7,    // E
     RANK_8,    // F
+    RANK_NONE, // -
 };
-constexpr e_rank_type getRankType(double rate)
+inline constexpr e_rank_type getRankType(double rate)
 {
     if (rate >= 100.0)
         return e_rank_type::RANK_0;
-    else if (rate >= 100.0 * 8 / 9)
+    if (rate >= 100.0 * 8 / 9)
         return e_rank_type::RANK_1;
-    else if (rate >= 100.0 * 7 / 9)
+    if (rate >= 100.0 * 7 / 9)
         return e_rank_type::RANK_2;
-    else if (rate >= 100.0 * 6 / 9)
+    if (rate >= 100.0 * 6 / 9)
         return e_rank_type::RANK_3;
-    else if (rate >= 100.0 * 5 / 9)
+    if (rate >= 100.0 * 5 / 9)
         return e_rank_type::RANK_4;
-    else if (rate >= 100.0 * 4 / 9)
+    if (rate >= 100.0 * 4 / 9)
         return e_rank_type::RANK_5;
-    else if (rate >= 100.0 * 3 / 9)
+    if (rate >= 100.0 * 3 / 9)
         return e_rank_type::RANK_6;
-    else if (rate >= 100.0 * 2 / 9)
+    if (rate >= 100.0 * 2 / 9)
         return e_rank_type::RANK_7;
-    else if (rate > 0.0)
+    if (rate > 0.0)
         return e_rank_type::RANK_8;
-    else
-        return e_rank_type::RANK_NONE;
+    return e_rank_type::RANK_NONE;
 }
 
 enum e_health_range
@@ -412,30 +411,29 @@ enum e_health_range
     HEALTH_90, //
     HEALTH_100
 };
-constexpr e_health_range getHealthType(double health)
+inline constexpr e_health_range getHealthType(double health)
 {
     if (health >= 1.0)
         return e_health_range::HEALTH_100;
-    else if (health >= 0.9)
+    if (health >= 0.9)
         return e_health_range::HEALTH_90;
-    else if (health >= 0.8)
+    if (health >= 0.8)
         return e_health_range::HEALTH_80;
-    else if (health >= 0.7)
+    if (health >= 0.7)
         return e_health_range::HEALTH_70;
-    else if (health >= 0.6)
+    if (health >= 0.6)
         return e_health_range::HEALTH_60;
-    else if (health >= 0.5)
+    if (health >= 0.5)
         return e_health_range::HEALTH_50;
-    else if (health >= 0.4)
+    if (health >= 0.4)
         return e_health_range::HEALTH_40;
-    else if (health >= 0.3)
+    if (health >= 0.3)
         return e_health_range::HEALTH_30;
-    else if (health >= 0.2)
+    if (health >= 0.2)
         return e_health_range::HEALTH_20;
-    else if (health >= 0.1)
+    if (health >= 0.1)
         return e_health_range::HEALTH_10;
-    else
-        return e_health_range::HEALTH_0;
+    return e_health_range::HEALTH_0;
 }
 
 enum e_judge_diff
