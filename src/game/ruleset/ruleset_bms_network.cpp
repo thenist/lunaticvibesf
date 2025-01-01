@@ -102,28 +102,9 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
         State::set(N(IndexNumber::ARENA_PLAYDATA_PLAYER_EX_DIFF), player->getExScore() - exScore);
 
     Option::e_lamp_type lamp = Option::LAMP_NOPLAY;
-    // TODO: deduplicate with calculateLamp. Seems to be the same but isFinished().
     if (!isNoScore() && isFinished())
-    {
-        if (_basic.judge[JUDGE_CB] == 0)
-        {
-            if (_basic.acc >= 100.0)
-                lamp = Option::LAMP_MAX;
-            else if (_basic.judge[JUDGE_GOOD] == 0)
-                lamp = Option::LAMP_PERFECT;
-            else if (isCleared())
-                lamp = Option::LAMP_FULLCOMBO;
-        }
-        else if (isFailed())
-        {
-            lamp = Option::LAMP_FAILED;
-        }
-        else
-        {
-            lamp = gaugeToOption(getGaugeType());
-        }
-    }
-    State::set(O(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE), std::min(lamp, saveLampMax));
+        lamp = calculateLamp();
+    State::set(O(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE), lamp);
 }
 
 std::vector<unsigned char> RulesetBMSNetwork::packInit(const std::shared_ptr<RulesetBMS>& local)

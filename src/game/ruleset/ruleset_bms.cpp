@@ -1950,16 +1950,16 @@ Option::e_lamp_type RulesetBMS::calculateLamp() const
             lamp = Option::LAMP_MAX;
         else if (_basic.judge[JUDGE_GOOD] == 0)
             lamp = Option::LAMP_PERFECT;
-        else
+        else if (isCleared())
             lamp = Option::LAMP_FULLCOMBO;
     }
-    else if (!isFailed())
+    else if (isFailed())
     {
-        lamp = gaugeToOption(getGaugeType());
+        lamp = Option::LAMP_FAILED;
     }
     else
     {
-        lamp = Option::LAMP_FAILED;
+        lamp = gaugeToOption(getGaugeType());
     }
     return std::min(lamp, saveLampMax);
 }
