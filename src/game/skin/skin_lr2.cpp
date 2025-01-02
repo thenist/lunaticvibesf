@@ -42,7 +42,7 @@ using uint8_t = std::uint8_t;
     case 0: return accelType::CONSTANT;
     case 1: return accelType::ACCEL;
     case 2: return accelType::DECEL;
-    case 3: return accelType::DISCONTINOUS;
+    case 3: return accelType::DISCONTINUOUS;
     default: break;
     }
     LOG_DEBUG << "[SkinLR2] Invalid accelType '" << value << "'";
@@ -3923,16 +3923,16 @@ bool SkinLR2::loadCSV(Path p)
             }
             else if (matchToken(*tokens.begin(), "#ELSE"))
             {
-                LOG_DEBUG << "[Skin] Unexcepted #ELSE found without precedent #IF " << "(Line " << csvLineNumber << ")";
+                LOG_DEBUG << "[Skin] Unexpected #ELSE found without precedent #IF " << "(Line " << csvLineNumber << ")";
             }
             else if (matchToken(*tokens.begin(), "#ELSEIF"))
             {
-                LOG_DEBUG << "[Skin] Unexcepted #ELSEIF found without precedent #IF " << "(Line " << csvLineNumber
+                LOG_DEBUG << "[Skin] Unexpected #ELSEIF found without precedent #IF " << "(Line " << csvLineNumber
                           << ")";
             }
             else if (matchToken(*tokens.begin(), "#ENDIF"))
             {
-                LOG_DEBUG << "[Skin] Unexcepted #ENDIF found without precedent #IF " << "(Line " << csvLineNumber
+                LOG_DEBUG << "[Skin] Unexpected #ENDIF found without precedent #IF " << "(Line " << csvLineNumber
                           << ")";
             }
             else

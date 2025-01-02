@@ -51,7 +51,7 @@ struct MotionKeyFrameParams
         CONSTANT = 0,
         ACCEL,
         DECEL,
-        DISCONTINOUS
+        DISCONTINUOUS
     } accel;
     Color color;
     BlendMode blend;

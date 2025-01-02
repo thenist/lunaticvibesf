@@ -114,7 +114,7 @@ private:
     int pb_maxcombo = 0;
 
 public:
-    void clearGlobalDatas();
+    void clearGlobalData();
     bool createChartObj();
     bool createRuleset();
 

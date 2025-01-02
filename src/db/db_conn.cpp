@@ -150,7 +150,7 @@ std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql,
     const int columnCount = sqlite3_column_count(stmt);
     if (columnCount == 0)
     {
-        LOG_ERROR << "[sqlite3] Query returns 0 colums";
+        LOG_ERROR << "[sqlite3] Query returns 0 columns";
         return {};
     }
 

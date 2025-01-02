@@ -1,8 +1,8 @@
 #pragma once
 
 /*
- * These indices are dymanically converted to LR2skin indices.
- * You may modify the sequnce order freely.
+ * These indices are dynamically converted to LR2skin indices.
+ * You may modify the sequence order freely.
  */
 enum class IndexSwitch : unsigned
 {

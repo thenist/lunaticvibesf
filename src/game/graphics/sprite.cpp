@@ -159,7 +159,7 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
                 // prog = std::sin(prog * 1.57079632679);
                 prog = 1.0 - ((1.0 - prog) * (1.0 - prog) * (1.0 - prog));
                 break;
-            case MotionKeyFrameParams::DISCONTINOUS: prog = 0.0;
+            case MotionKeyFrameParams::DISCONTINUOUS: prog = 0.0;
             }
 
             // calculate parameters

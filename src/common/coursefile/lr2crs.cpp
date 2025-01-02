@@ -16,7 +16,7 @@
 
 std::stringstream readIntoUtf8StringStream(const Path& filePath)
 {
-    // .lr2crs is a standard xml file. A file may contain muiltiple courses.
+    // .lr2crs is a standard xml file. A file may contain multiple courses.
 
     // load file
     std::ifstream ifs(filePath);

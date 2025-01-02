@@ -509,7 +509,7 @@ void pitch_switch(int plus)
 // 33
 void pitch_type(int plus)
 {
-    // FREQENCY/PITCH/SPEED
+    // FREQUENCY/PITCH/SPEED
     unsigned val = (State::get(IndexOption::SOUND_PITCH_TYPE) + 3 + plus) % 3;
     State::set(IndexOption::SOUND_PITCH_TYPE, val);
 

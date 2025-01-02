@@ -493,16 +493,16 @@ void SceneSelect::imguiPageDebugArena()
         ImGui::Text("hostRequestChartHash: %s", s.hostRequestChartHash.hexdigest().c_str());
 
         std::shared_lock l(s.clientsMutex);
-        static std::map<std::string, std::string> hashs;
+        static std::map<std::string, std::string> hashes;
         for (auto& [key, c] : s.clients)
         {
-            hashs[key] = c.requestChartHash.hexdigest();
+            hashes[key] = c.requestChartHash.hexdigest();
             ImGui::Text("%s %d: %s ping:%dms send:%d recv:%d hb:%lds [%s%s%s ] req:%s", key.c_str(), c.id,
                         c.name.c_str(), c.ping, c.sendMessageIndex, c.recvMessageIndex,
                         (lunaticvibes::Time() - c.heartbeatRecvTime).norm() / 1000,
                         c.isLoadingFinished ? " isLoadingFinished" : "",
                         c.isPlayingFinished ? " isPlayingFinished" : "", c.isResultFinished ? " isResultFinished" : "",
-                        hashs[key].c_str());
+                        hashes[key].c_str());
         }
 #endif
     }
@@ -1227,7 +1227,7 @@ Special Thanks:
         ImGui::EndTabItem();
     }
 
-    if (ImGui::BeginTabItem("3rd-party Softwares", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    if (ImGui::BeginTabItem("3rd-party Software", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
     {
         if (ImGui::BeginChild("##pagesub22"))
         {

@@ -278,7 +278,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
-    clearGlobalDatas();
+    clearGlobalData();
     // global info
     //
     // basic info
@@ -625,7 +625,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
     SoundMgr::setNoteVolume(1.0);
 }
 
-void ScenePlay::clearGlobalDatas()
+void ScenePlay::clearGlobalData()
 {
     // reset
     IndexNumber numbersReset[] = {IndexNumber::PLAY_1P_EXSCORE,

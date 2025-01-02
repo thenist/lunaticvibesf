@@ -1,8 +1,8 @@
 #pragma once
 
 /*
- * These indices are dymanically converted to LR2skin indices.
- * You may modify the sequnce order freely.
+ * These indices are dynamically converted to LR2skin indices.
+ * You may modify the sequence order freely.
  */
 enum class IndexOption : unsigned
 {
@@ -17,7 +17,7 @@ enum class IndexOption : unsigned
     SOUND_TARGET_FX0, // MASTER/KEY/BGM
     SOUND_TARGET_FX1,
     SOUND_TARGET_FX2,
-    SOUND_PITCH_TYPE, // FREQENCY/PITCH/SPEED
+    SOUND_PITCH_TYPE, // FREQUENCY/PITCH/SPEED
 
     SELECT_ENTRY_TYPE,
     SELECT_DIFFICULTY,
