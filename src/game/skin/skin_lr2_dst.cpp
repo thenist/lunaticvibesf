@@ -337,7 +337,7 @@ static bool getDstOptAbs(unsigned d)
     case 224:                                                                     // C
     case 225:                                                                     // D
     case 226:                                                                     // E
-    case 227: return State::get(IndexOption::PLAY_RANK_BORDER_1P) <= d + 2 - 220; // F // See enum e_rank_type.
+    case 227: return State::get(IndexOption::PLAY_RANK_BORDER_1P) <= d + 1 - 220; // F // See enum e_rank_type.
     case 230: return State::get(IndexOption::PLAY_HEALTH_1P) == HEALTH_0;
     case 231: return State::get(IndexOption::PLAY_HEALTH_1P) == HEALTH_10;
     case 232: return State::get(IndexOption::PLAY_HEALTH_1P) == HEALTH_20;
