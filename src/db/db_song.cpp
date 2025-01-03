@@ -579,17 +579,16 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
 {
     resetAddSummary();
 
-    std::future<void> sessionFuture;
-    std::chrono::system_clock::time_point sessionTimestamp = std::chrono::system_clock::now();
-
     std::atomic<bool> inAddFolderSession = true;
-    sessionFuture = std::async(std::launch::async, [&]() {
-        SetThreadName("SongFolderInit");
+    std::future<void> flush_db_task = std::async(std::launch::async, [&inAddFolderSession, this]() {
+        SetThreadName("flush db task");
         while (inAddFolderSession)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            if (inAddFolderSession && std::chrono::system_clock::now() - sessionTimestamp >= std::chrono::seconds(10))
-                sessionTimestamp = std::chrono::system_clock::now();
+            Transaction t(*this);
+            // PERF: without transactions, inserts and updates are immediately flushed to disk, making the whole process
+            // UNGODLY slow.
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            t.commit();
         }
     });
 
@@ -602,7 +601,6 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
     }
 
     inAddFolderSession = false;
-    sessionFuture.wait_for(std::chrono::seconds(10));
 
     waitLoadingFinish();
 
