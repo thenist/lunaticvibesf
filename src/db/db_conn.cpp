@@ -15,6 +15,8 @@ void lunaticvibes::SqliteDeleter::operator()(sqlite3* db)
 
 SQLite::SQLite(const char* path, std::string tag_, SQLite::OpenMode mode) : tag(std::move(tag_))
 {
+    LVF_ASSERT(sqlite3_threadsafe() == 1);
+
     int flags = 0;
     switch (mode)
     {
