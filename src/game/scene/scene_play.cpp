@@ -1208,18 +1208,12 @@ void ScenePlay::loadChart()
                     if (shouldDiscard(*this))
                         return;
                     Path pWav = PathFromUTF8(wav);
-                    if (pWav.is_absolute())
-                    {
-                        LOG_WARNING << "[Play] Absolute path to sample, this is forbidden";
-                    }
-                    else
-                    {
-                        fs::path p{chartDir / pWav};
+                    LOG_WARNING << "[Play] Absolute path to sample, this is forbidden";
+                    fs::path p{chartDir / pWav};
 #ifndef _WIN32
-                        p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
+                    p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
 #endif // _WIN32
-                        SoundMgr::loadNoteSample(p, i);
-                    }
+                    SoundMgr::loadNoteSample(p, i);
                     ++gPlayContext.wavLoaded;
                 });
             }
@@ -1280,18 +1274,11 @@ void ScenePlay::loadChart()
                         if (shouldDiscard(*this))
                             break;
                         const auto pBmp = PathFromUTF8(bmp);
-                        if (pBmp.is_absolute())
-                        {
-                            LOG_WARNING << "[Play] Absolute path to BGA picture, this is forbidden";
-                        }
-                        else
-                        {
-                            fs::path p{chartDir / pBmp};
+                        fs::path p{chartDir / pBmp};
 #ifndef _WIN32
-                            p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
+                        p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
 #endif // _WIN32
-                            gPlayContext.bgaTexture->addBmp(i, p);
-                        }
+                        gPlayContext.bgaTexture->addBmp(i, p);
                         ++gPlayContext.bmpLoaded;
                     }
                 }

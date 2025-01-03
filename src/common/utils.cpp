@@ -420,10 +420,7 @@ Path convertLR2Path(const std::string& lr2path, std::string_view relative_path_u
     if (raw.empty())
         return {};
     if (auto p = PathFromUTF8(raw); p.is_absolute())
-    {
-        LOG_WARNING << "[Utils] Absolute LR2 paths are forbidden: " << raw;
-        return {};
-    }
+        return p;
 
     std::string_view prefix = raw.substr(0, 2);
     if (prefix == "./" || prefix == ".\\")

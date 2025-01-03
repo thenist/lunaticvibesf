@@ -3173,17 +3173,10 @@ bool tryLoadDedicatedPreview(ChartFormatBMS& bms)
     if (!bms.dedicatedPreview.empty())
     {
         Path pWav = PathFromUTF8(bms.dedicatedPreview);
-        if (pWav.is_absolute())
-        {
-            LOG_WARNING << "[Select] #PREVIEW contains absolute path, this is forbidden";
-        }
-        else
-        {
-            pWav = bms.getDirectory() / pWav;
-            if (SoundMgr::loadNoteSample(pWav, STANDALONE_PREVIEW_SAMPLE_INDEX) == 0)
-                return true;
-            LOG_WARNING << "[Select] Failed to load #PREVIEW sample (" << pWav << ")";
-        }
+        pWav = bms.getDirectory() / pWav;
+        if (SoundMgr::loadNoteSample(pWav, STANDALONE_PREVIEW_SAMPLE_INDEX) == 0)
+            return true;
+        LOG_WARNING << "[Select] Failed to load #PREVIEW sample (" << pWav << ")";
     }
 
     // check if preview(*).ogg is valid
@@ -3339,11 +3332,6 @@ void SceneSelect::updatePreview()
                             if (shouldDiscard(*this, bms))
                                 return;
                             Path pWav = PathFromUTF8(wav);
-                            if (pWav.is_absolute())
-                            {
-                                LOG_WARNING << "[Select] Absolute path to sample, this is forbidden";
-                                return;
-                            }
                             fs::path p{chartDir / pWav};
 #ifndef _WIN32
                             p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));

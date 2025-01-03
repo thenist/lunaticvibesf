@@ -10,11 +10,12 @@ TEST(Paths, ResolvesLr2PathsCorrectlty)
 
 // fs::path::is_absolute only works for native paths, tested on libstdc++ with GCC 13.2.1 and some MSVC version.
 #ifdef _WIN32
-    EXPECT_EQ(conv("D:\\Games\\LunaticVibes", "C:\\something\\somewhere"), "");
-    EXPECT_EQ(conv("D:\\Games\\LunaticVibes", R"(D:\Games\LunaticVibes\LR2files\Config\config.xml)"), "");
+    EXPECT_EQ(conv("D:\\Games\\LunaticVibes", "C:\\something\\somewhere"), "C:\\something\\somewhere");
+    EXPECT_EQ(conv("D:\\Games\\LunaticVibes", R"(D:\Games\LunaticVibes\LR2files\Config\config.xml)"),
+              R"(D:\Games\LunaticVibes\LR2files\Config\config.xml)");
 #else
-    EXPECT_EQ(conv("/home/me/lv", "/etc/passwd"), "");
-    EXPECT_EQ(conv("/opt/lv", "/opt/lv/LR2files/Config/config.xml"), "");
+    EXPECT_EQ(conv("/home/me/lv", "/etc/passwd"), "/etc/passwd");
+    EXPECT_EQ(conv("/opt/lv", "/opt/lv/LR2files/Config/config.xml"), "/opt/lv/LR2files/Config/config.xml");
 #endif // _WIN32
 
     EXPECT_EQ(conv("/home/me/lv", u8" テスト "), " テスト ");
