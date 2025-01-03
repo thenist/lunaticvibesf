@@ -808,32 +808,27 @@ int SkinLR2::LR2FONT()
         // create a blank texture if not exist
         std::string fontNameKey = std::to_string(LR2FontNameMap.size());
         if (auto it = prevSkinLR2FontNameMap.find(fontNameKey); it != prevSkinLR2FontNameMap.end())
-        {
             LR2FontNameMap.insert_or_assign(fontNameKey, it->second);
-        }
         else
-        {
             LR2FontNameMap.erase(fontNameKey);
-        }
         return 1;
     }
     else
     {
-        Path path = getCustomizePath(parseParamBuf[0]);
-        path = std::filesystem::absolute(path);
+        Path path = std::filesystem::absolute(getCustomizePath(parseParamBuf[0]));
+#ifndef _WIN32
+        path = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(path));
+#endif // _WIN32
         std::string fontNameKey = std::to_string(LR2FontNameMap.size());
 
-        if (LR2FontCache.find(path) != LR2FontCache.end())
+        if (auto it = LR2FontCache.find(path); it != LR2FontCache.end())
         {
-            LR2FontNameMap.insert_or_assign(fontNameKey, LR2FontCache[path]);
-            LR2SkinFontPathCache[fontNameKey] = path;
+            LR2FontNameMap.insert_or_assign(fontNameKey, it->second);
+            LR2SkinFontPathCache.insert_or_assign(fontNameKey, path);
             return 1;
         }
 
         findAndExtractDXA(path);
-#ifndef _WIN32
-        path = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(path));
-#endif // _WIN32
 
         if (!fs::is_regular_file(path))
         {
