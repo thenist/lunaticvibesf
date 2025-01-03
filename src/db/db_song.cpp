@@ -624,11 +624,6 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
     if (!isParentPath(executablePath, path) || parentHash.empty())
         path = fs::absolute(path);
 
-    // check if the folder is already added
-    int count = 0;
-    HashMD5 folderHash = md5(lunaticvibes::s(path.u8string()));
-    long long folderModifyTime = getFileLastWriteTime(path);
-
     if (auto q = query("SELECT pathmd5,path,type,modtime FROM folder WHERE path=?", {path.u8string()}); !q.empty())
     {
         LOG_VERBOSE << "[SongDB] Sub folder already exists (" << path << ")";
@@ -638,43 +633,28 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
         auto folderType = (FolderType)ANY_INT(q[0][2]);
         long long folderModifyTimeDB = ANY_INT(q[0][3]);
 
-        if (folderType == FolderType::SONG_BMS)
+        const bool step_in_subfolder = folderType != FolderType::SONG_BMS;
+        if (getFileLastWriteTime(path) <= folderModifyTimeDB && !step_in_subfolder)
         {
-            // only update song folder if recently modified
-            if (folderModifyTime > folderModifyTimeDB)
-            {
-                count = refreshExistingFolder(folderMD5, path, folderType);
-            }
-            else
-            {
-                LOG_VERBOSE << "[SongDB] Skip refreshing song folder: " << path;
-            }
+            LOG_VERBOSE << "[SongDB] Skip refreshing song folder: " << path;
+            return 0;
         }
-        else
-        {
-            // step in sub folders
-            count = refreshExistingFolder(folderMD5, path, folderType);
-        }
-    }
-    else
-    {
-        count = addNewFolder(folderHash, path, parentHash);
+
+        return refreshExistingFolder(folderMD5, path, folderType);
     }
 
-    return count;
+    HashMD5 folderHash = md5(lunaticvibes::s(path.u8string()));
+    return addNewFolder(folderHash, path, parentHash);
 }
 
 int SongDB::removeFolder(const HashMD5& hash, bool removeSong)
 {
-    if (removeSong)
-    {
-        if (SQLITE_OK != exec("DELETE FROM song WHERE parent=?", {hash.hexdigest()}))
-        {
-            LOG_WARNING << "[SongDB] remove song from db error: " << errmsg();
-        }
-    }
-
-    return exec("DELETE FROM folder WHERE pathmd5=?", {hash.hexdigest()});
+    const auto digest = hash.hexdigest();
+    if (removeSong && exec("DELETE FROM song WHERE parent=?", {digest}) != SQLITE_OK)
+        LOG_WARNING << "[SongDB] Remove song from db error: " << errmsg();
+    if (exec("DELETE FROM folder WHERE pathmd5=?", {digest}))
+        LOG_WARNING << "[SongDB] Remove folder from db error: " << errmsg();
+    return 0;
 }
 
 void SongDB::waitLoadingFinish()
@@ -685,35 +665,37 @@ void SongDB::waitLoadingFinish()
     LOG_DEBUG << "[SongDB] All loading threads finished, continue";
 }
 
+static SongDB::FolderType analyzeFolderType(const Path& path)
+{
+    for (auto& f : std::filesystem::directory_iterator(path))
+    {
+        switch (analyzeChartType(f))
+        {
+        case eChartFormat::UNKNOWN: break;
+        case eChartFormat::BMS:
+        case eChartFormat::BMSON: return SongDB::FolderType::SONG_BMS;
+        }
+    }
+    return SongDB::FolderType::FOLDER;
+}
+
 int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& parentHash)
 {
     LOG_DEBUG << "[SongDB] Add new folder " << path;
 
-    FolderType type = FolderType::FOLDER;
-    for (auto& f : std::filesystem::directory_iterator(path))
-    {
-        if (analyzeChartType(f) == eChartFormat::BMS)
-        {
-            type = FolderType::SONG_BMS;
-            break; // break for
-        }
-        // else ...
-    }
+    const FolderType type = analyzeFolderType(path);
+    const bool isSongFolder = type == FolderType::SONG_BMS;
 
     int ret;
     auto folderName = fs::weakly_canonical(path).filename();
     long long folderModifyTime = getFileLastWriteTime(path);
     if (!parentHash.empty())
-    {
         ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)",
                    {hash.hexdigest(), parentHash.hexdigest(), folderName.u8string(), (int)type, path.u8string(),
                     folderModifyTime});
-    }
     else
-    {
         ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)",
                    {hash.hexdigest(), nullptr, folderName.u8string(), (int)type, path.u8string(), folderModifyTime});
-    }
     if (SQLITE_OK != ret)
     {
         LOG_WARNING << "[SongDB] Insert folder into db fail: [" << ret << "] " << errmsg() << " (" << path << ")";
@@ -721,19 +703,6 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
     }
 
     int count = 0;
-
-    bool isSongFolder = false;
-    for (const auto& f : fs::directory_iterator(path))
-    {
-        if (_asyncLoadStopRequested)
-            break;
-
-        if (analyzeChartType(f) != eChartFormat::UNKNOWN)
-        {
-            isSongFolder = true;
-            break;
-        }
-    }
 
     std::vector<Path> subFolderList;
     for (const auto& f : fs::directory_iterator(path))
@@ -771,15 +740,7 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
 {
     LOG_DEBUG << "[SongDB] Refreshing contents of " << path;
 
-    bool isSongFolder = false;
-    for (auto& f : fs::directory_iterator(path))
-    {
-        if (analyzeChartType(f) != eChartFormat::UNKNOWN)
-        {
-            isSongFolder = true;
-            break;
-        }
-    }
+    const bool isSongFolder = analyzeFolderType(path) == FolderType::SONG_BMS;
     if (!isSongFolder && (type == FolderType::SONG_BMS))
     {
         LOG_DEBUG << "[SongDB] Re-analyzing" << " (" << path << ")";
@@ -1022,13 +983,6 @@ std::pair<bool, Path> SongDB::getFolderPath(const HashMD5& folder) const
         if (!result.empty())
         {
             auto leaf = result[0];
-            // if (ANY_INT(leaf[0]) != FOLDER)
-            //{
-            //     LOG_WARNING << "[SongDB] Get folder path type error: excepted " << FOLDER << ", get " <<
-            //     ANY_INT(leaf[0]) <<
-            //         " (" << folder << ")";
-            //     return Path();
-            // }
             return {true, PathFromUTF8(ANY_STR(leaf[1]))};
         }
     }
