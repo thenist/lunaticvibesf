@@ -896,14 +896,18 @@ bool ScenePlay::createRuleset()
         gPlayContext.ruleset[PLAYER_SLOT_TARGET] = rulesetFactoryFunc(PLAYER_SLOT_TARGET);
         gPlayContext.ruleset[PLAYER_SLOT_MYBEST] = rulesetFactoryFunc(PLAYER_SLOT_MYBEST);
 
-        if (auto ptr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]))
-        {
-            const auto bms_gauge = ptr->getGaugeType();
-            const auto gauge = gaugeDisplay(bms_gauge);
-            playerState[PLAYER_SLOT_PLAYER].seenGaugeType = gauge;
-            pSkin->setGaugeDisplayType(PLAYER_SLOT_PLAYER, gauge);
-            State::set(IndexOption::PLAY_GAUGE_TYPE_1P, gaugeToOption(bms_gauge));
-        }
+        auto set_gauge_things = [this](int slot, IndexOption gauge_type) {
+            if (auto ptr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[slot]))
+            {
+                const auto bms_gauge = ptr->getGaugeType();
+                const auto gauge = gaugeDisplay(bms_gauge);
+                playerState[slot].seenGaugeType = gauge;
+                pSkin->setGaugeDisplayType(slot, gauge);
+                State::set(gauge_type, gaugeToOption(bms_gauge));
+            }
+        };
+        set_gauge_things(PLAYER_SLOT_PLAYER, IndexOption::PLAY_GAUGE_TYPE_1P);
+        set_gauge_things(PLAYER_SLOT_TARGET, IndexOption::PLAY_GAUGE_TYPE_2P);
 
         if (gPlayContext.isCourse)
         {
@@ -930,7 +934,7 @@ bool ScenePlay::createRuleset()
             gPlayContext.replayNew->replay = std::make_shared<ReplayChart>();
             gPlayContext.replayNew->replay->chartHash = gChartContext.hash;
             gPlayContext.replayNew->replay->randomSeed = gPlayContext.randomSeed;
-            gPlayContext.replayNew->replay->gaugeType = gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge;
+            gPlayContext.replayNew->replay->gaugeType = gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge; // TODO: GAS
             gPlayContext.replayNew->replay->randomTypeLeft = gPlayContext.mods[PLAYER_SLOT_PLAYER].randomLeft;
             gPlayContext.replayNew->replay->randomTypeRight = gPlayContext.mods[PLAYER_SLOT_PLAYER].randomRight;
             gPlayContext.replayNew->replay->assistMask = gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask;
