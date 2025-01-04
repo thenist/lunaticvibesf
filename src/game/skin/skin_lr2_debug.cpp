@@ -5,6 +5,7 @@
 #include <game/runtime/state.h>
 #include <game/skin/skin_lr2.h>
 #include <game/skin/skin_lr2_bargraph.h>
+#include <game/skin/skin_lr2_number.h>
 
 #include <imgui.h>
 
@@ -58,7 +59,7 @@ void imguiMonitorNumber()
             {
                 for (int j = 0; j <= 20; j++)
                 {
-                    ImGui::Text("% 4d: %d", i + j, State::get((IndexNumber)(i + j)));
+                    ImGui::Text("% 4d: %d", i + j, lunaticvibes::get_number((IndexNumber)(i + j)));
                 }
             }
         }
@@ -71,7 +72,7 @@ void imguiMonitorNumber()
                 IndexNumber::NEW_ENTRY_SECONDS,
             };
             for (auto& e : etcNumbers)
-                ImGui::Text("% 4d: %d", (int)e, State::get(e));
+                ImGui::Text("% 4d: %d", (int)e, lunaticvibes::get_number(e));
         }
         ImGui::End();
     }
