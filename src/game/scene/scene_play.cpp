@@ -2341,25 +2341,18 @@ void ScenePlay::updatePlaying()
 
     // finish check
     auto finishCheckSide = [&](int slot) {
-        if (!playerState[slot].finished)
+        if (!playerState[slot].finished && gPlayContext.ruleset[slot]->isFinished())
         {
-            bool fullCombo = gPlayContext.ruleset[slot]->getData().combo == gPlayContext.ruleset[slot]->getMaxCombo();
-            if (gPlayContext.ruleset[slot]->isFinished() || fullCombo)
-            {
-                State::set(slot == PLAYER_SLOT_PLAYER ? IndexTimer::PLAY_P1_FINISHED : IndexTimer::PLAY_P2_FINISHED,
+            State::set(slot == PLAYER_SLOT_PLAYER ? IndexTimer::PLAY_P1_FINISHED : IndexTimer::PLAY_P2_FINISHED,
+                       t.norm());
+
+            if (gPlayContext.ruleset[slot]->getData().combo == gPlayContext.ruleset[slot]->getMaxCombo())
+                State::set(slot == PLAYER_SLOT_PLAYER ? IndexTimer::PLAY_FULLCOMBO_1P : IndexTimer::PLAY_FULLCOMBO_2P,
                            t.norm());
 
-                if (fullCombo)
-                {
-                    State::set(slot == PLAYER_SLOT_PLAYER ? IndexTimer::PLAY_FULLCOMBO_1P
-                                                          : IndexTimer::PLAY_FULLCOMBO_2P,
-                               t.norm());
-                }
+            playerState[slot].finished = true;
 
-                playerState[slot].finished = true;
-
-                LOG_INFO << "[Play] " << slot + 1 << "P finished";
-            }
+            LOG_INFO << "[Play] " << slot + 1 << "P finished";
         }
     };
     finishCheckSide(PLAYER_SLOT_PLAYER);
