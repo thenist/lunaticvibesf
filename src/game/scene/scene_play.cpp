@@ -1212,7 +1212,6 @@ void ScenePlay::loadChart()
                     if (shouldDiscard(*this))
                         return;
                     Path pWav = PathFromUTF8(wav);
-                    LOG_WARNING << "[Play] Absolute path to sample, this is forbidden";
                     fs::path p{chartDir / pWav};
 #ifndef _WIN32
                     p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
