@@ -43,15 +43,24 @@ add_library(
     chart/chart.cpp
     chart/chart_bms.cpp
     ${GRAPHICS_BACKEND_SRC}
+    graphics/dxa.cpp
     graphics/sprite.cpp
     graphics/sprite_bar_entry.cpp
+    graphics/sprite_bargraph.cpp
+    graphics/sprite_button.cpp
+    graphics/sprite_cursor.cpp
+    graphics/sprite_gauge_grid.cpp
     graphics/sprite_graph.cpp
     graphics/sprite_imagetext.cpp
     graphics/sprite_lane.cpp
+    graphics/sprite_number.cpp
+    graphics/sprite_on_mouse.cpp
+    graphics/sprite_option.cpp
+    graphics/sprite_slider.cpp
+    graphics/sprite_text.cpp
     graphics/sprite_video.cpp
     graphics/texture_extra.cpp
     graphics/video.cpp
-    graphics/dxa.cpp
     input/input_mgr.cpp
     input/input_mgr_sdl.cpp
     input/input_dinput8.cpp
