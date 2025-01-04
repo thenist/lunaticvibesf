@@ -155,8 +155,11 @@ void SpriteBarEntry::postProcess()
 {
     if (auto& e = sTitle[static_cast<size_t>(BarTitleType::FOLDER)]; e == nullptr)
     {
-        LOG_VERBOSE << "[Sprite] BarEntry no dedicated folder font, falling back to normal";
-        e = sTitle[static_cast<size_t>(BarTitleType::NORMAL)];
+        if (auto& e2 = sTitle[static_cast<size_t>(BarTitleType::NORMAL)]; e2 != nullptr)
+        {
+            LOG_VERBOSE << "[Sprite] BarEntry has no dedicated folder font, falling back to normal";
+            e = e2;
+        }
     }
 }
 
