@@ -200,8 +200,6 @@ public:
     int64_t addtime = 0;
     int64_t playcount = 0;
     int64_t clearcount = 0;
-    int64_t reserved[1]{0};
-    double reservedlf[2]{0.0};
 
     std::string replayFileName;
 
