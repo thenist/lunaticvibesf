@@ -29,7 +29,7 @@ int lunaticvibes::get_number(IndexNumber ind)
         break;
     case IndexNumber::PLAY_2P_GROOVEGAUGE:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
-            return static_cast<int>(ruleset->getHealthAnimation().animate({}));
+            return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
         break;
     default: break;
     }
