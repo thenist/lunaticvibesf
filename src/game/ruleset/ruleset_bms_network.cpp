@@ -16,25 +16,6 @@ RulesetBMSNetwork::RulesetBMSNetwork(GameModeKeys keys, unsigned playerIndex)
     _judgeScratch = false;
 }
 
-static Option::e_lamp_type gaugeToOption(RulesetBMS::GaugeType _gauge)
-{
-    using GT = RulesetBMS::GaugeType;
-    switch (_gauge)
-    {
-    case GT::HARD: return Option::LAMP_HARD;
-    case GT::EXHARD: return Option::LAMP_EXHARD;
-    case GT::DEATH: return Option::LAMP_FULLCOMBO;
-    case GT::P_ATK: // return Option::LAMP_FULLCOMBO; // TODO: check this.
-    case GT::G_ATK: // return Option::LAMP_FULLCOMBO; // TODO: check this.
-    case GT::GROOVE: return Option::LAMP_NORMAL;
-    case GT::EASY: return Option::LAMP_EASY;
-    case GT::ASSIST: return Option::LAMP_ASSIST;
-    case GT::GRADE:
-    case GT::EXGRADE: return Option::LAMP_NOPLAY;
-    }
-    lunaticvibes::assert_failed("gaugeToOption");
-}
-
 void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
 {
     if (!_hasStartTime)
