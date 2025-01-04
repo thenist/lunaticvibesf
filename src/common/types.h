@@ -187,12 +187,6 @@ enum class GaugeDisplayType
 class ScoreBase
 {
 public:
-    enum class Type
-    {
-        UNKNOWN,
-        BMS,
-    };
-
     int notes = 0;
     int score = 0;
     double rate = 0.0;
@@ -214,7 +208,6 @@ public:
 public:
     ScoreBase() = default;
     virtual ~ScoreBase() = default;
-    [[nodiscard]] virtual Type getType() const { return Type::UNKNOWN; }
 };
 
 class ScoreBMS : public ScoreBase
@@ -254,8 +247,6 @@ public:
     unsigned rival_win = 3; // win / lose / draw / noplay
     double rival_rate = 0;
     Lamp rival_lamp = Lamp::NOPLAY;
-
-    [[nodiscard]] Type getType() const override { return Type::BMS; }
 };
 
 class AxisDir
