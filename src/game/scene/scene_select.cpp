@@ -1617,8 +1617,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
             {
             case eEntryType::CHART:
             case eEntryType::RIVAL_CHART: selectDownTimestamp = t; break;
-
-            default: lr2skin::button::select_difficulty_filter(1); break;
+            default: lr2skin::button::select_difficulty_filter(0, 1); break;
             }
         }
     }
@@ -1779,7 +1778,7 @@ void SceneSelect::inputGamePressPanel(InputMask& input, const lunaticvibes::Time
 
             // 1: KEYS
             if (input[Pad::K11])
-                lr2skin::button::select_keys_filter(1);
+                lr2skin::button::select_keys_filter(0, 1);
             if (input[Pad::K12])
                 lr2skin::button::random_type(PLAYER_SLOT_PLAYER, 1);
             if (input[Pad::K13])
@@ -1823,7 +1822,7 @@ void SceneSelect::inputGamePressPanel(InputMask& input, const lunaticvibes::Time
 
                 // 1: KEYS
                 if (input[Pad::K21])
-                    lr2skin::button::select_keys_filter(1);
+                    lr2skin::button::select_keys_filter(0, 1);
                 if (input[Pad::K22])
                     lr2skin::button::random_type(PLAYER_SLOT_TARGET, 1);
                 if (input[Pad::K23])
@@ -1869,7 +1868,7 @@ void SceneSelect::inputGamePressPanel(InputMask& input, const lunaticvibes::Time
 
                 // 1: KEYS
                 if (input[Pad::K21])
-                    lr2skin::button::select_keys_filter(1);
+                    lr2skin::button::select_keys_filter(0, 1);
                 if (input[Pad::K22])
                     lr2skin::button::random_type(PLAYER_SLOT_TARGET, 1);
                 if (input[Pad::K23])
@@ -1913,7 +1912,7 @@ void SceneSelect::inputGamePressPanel(InputMask& input, const lunaticvibes::Time
 
                 // 1: KEYS
                 if (input[Pad::K21])
-                    lr2skin::button::select_keys_filter(1);
+                    lr2skin::button::select_keys_filter(0, 1);
                 if (input[Pad::K22])
                     lr2skin::button::random_type(PLAYER_SLOT_PLAYER, 1);
                 if (input[Pad::K23])
@@ -2861,7 +2860,7 @@ void SceneSelect::navigateVersionEnter(const lunaticvibes::Time& t)
     // show list
 
     // For now we just switch difficulty filter
-    lr2skin::button::select_difficulty_filter(1);
+    lr2skin::button::select_difficulty_filter(0, 1);
 }
 
 void SceneSelect::navigateVersionBack(const lunaticvibes::Time& t)
