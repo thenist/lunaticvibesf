@@ -10,6 +10,7 @@
 #include <game/arena/arena_host.h>
 #include <game/ruleset/ruleset.h>
 #include <game/ruleset/ruleset_bms.h>
+#include <game/runtime/index/option.h>
 #include <game/scene/scene_context.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
@@ -66,6 +67,13 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 
     std::map<std::string, int> param;
 
+    struct Params
+    {
+        Option::e_rank_type db_rank = Option::e_rank_type::RANK_NONE;
+        Option::e_rank_type p1_rank = Option::e_rank_type::RANK_NONE;
+        Option::e_rank_type p2_rank = Option::e_rank_type::RANK_NONE;
+    } param_new;
+
     lamp[PLAYER_SLOT_PLAYER] = optionLampToBms(Option::LAMP_NOPLAY);
     lamp[PLAYER_SLOT_TARGET] = optionLampToBms(Option::LAMP_NOPLAY);
     if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER])
@@ -74,7 +82,7 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 
         // set options
         auto d1p = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData();
-        param["1prank"] = Option::getRankType(d1p.total_acc);
+        param_new.p1_rank = Option::getRankType(d1p.total_acc);
         param["1pmaxcombo"] = d1p.maxCombo;
 
         if (auto pr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); pr)
@@ -89,7 +97,7 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
             gPlayContext.ruleset[PLAYER_SLOT_TARGET]->updateGlobals();
 
             auto d2p = gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData();
-            param["2prank"] = Option::getRankType(d1p.total_acc);
+            param_new.p2_rank = Option::getRankType(d1p.total_acc);
             param["2pmaxcombo"] = d2p.maxCombo;
 
             if (auto pr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); pr)
@@ -121,7 +129,7 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
             param["newbpdiff"] = param["newbp"] - pScore->bp;
             param["dbrate"] = (int)(pScore->rate);
             param["dbrated2"] = (int)(pScore->rate * 100.0) % 100;
-            param["dbrank"] = Option::getRankType(pScore->rate);
+            param_new.db_rank = Option::getRankType(pScore->rate);
 
             param["updatedscore"] = pScore->exscore < param["1pexscore"];
             param["updatedmaxcombo"] = pScore->maxcombo < d1p.maxCombo;
@@ -159,8 +167,8 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 
     // save
     {
-        State::set(IndexOption::RESULT_RANK_1P, param["1prank"]);
-        State::set(IndexOption::RESULT_RANK_2P, param["2prank"]);
+        State::set(IndexOption::RESULT_RANK_1P, param_new.p1_rank);
+        State::set(IndexOption::RESULT_RANK_2P, param_new.p2_rank);
         State::set(IndexNumber::PLAY_1P_EXSCORE, param["1pexscore"]);
         State::set(IndexNumber::PLAY_2P_EXSCORE, param["2pexscore"]);
         State::set(IndexNumber::PLAY_1P_EXSCORE_DIFF, param["1ptarget"]);
@@ -189,8 +197,8 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
         State::set(IndexNumber::RESULT_MYBEST_RATE, param["dbrate"]);
         State::set(IndexNumber::RESULT_MYBEST_RATE_DECIMAL2, param["dbrated2"]);
 
-        State::set(IndexOption::RESULT_MYBEST_RANK, param["dbrank"]);
-        State::set(IndexOption::RESULT_UPDATED_RANK, param["1prank"]);
+        State::set(IndexOption::RESULT_MYBEST_RANK, param_new.db_rank);
+        State::set(IndexOption::RESULT_UPDATED_RANK, param_new.p1_rank);
 
         State::set(IndexSwitch::RESULT_UPDATED_SCORE, param["updatedscore"]);
         State::set(IndexSwitch::RESULT_UPDATED_MAXCOMBO, param["updatedmaxcombo"]);

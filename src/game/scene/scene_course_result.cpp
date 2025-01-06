@@ -1,16 +1,17 @@
 #include "scene_course_result.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/types.h>
 #include <db/db_score.h>
 #include <game/ruleset/ruleset.h>
 #include <game/ruleset/ruleset_bms.h>
+#include <game/runtime/index/option.h>
 #include <game/scene/scene_context.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
+
+#include <boost/algorithm/string.hpp>
 
 SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::COURSE_RESULT, 1000), _inputAvailable(INPUT_MASK_FUNC)
@@ -30,6 +31,13 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
     state = eCourseResultState::DRAW;
 
     std::map<std::string, int> param;
+
+    struct Params
+    {
+        Option::e_rank_type db_rank = Option::e_rank_type::RANK_NONE;
+        Option::e_rank_type p1_rank = Option::e_rank_type::RANK_NONE;
+        Option::e_rank_type p2_rank = Option::e_rank_type::RANK_NONE;
+    } param_new;
 
     if (!gPlayContext.courseStageRulesetCopy[0].empty())
     {
@@ -65,7 +73,7 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
         }
 
         // set options
-        param["1prank"] = Option::getRankType(acc);
+        param_new.p1_rank = Option::getRankType(acc);
         param["1ptarget"] = summary[ARG_EXSCORE];
         param["1pexscore"] = summary[ARG_EXSCORE];
         param["1pmaxcombo"] = summary[ARG_MAXCOMBO];
@@ -126,7 +134,7 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
                 }
             }
 
-            param["2prank"] = Option::getRankType(acc2P);
+            param_new.p2_rank = Option::getRankType(acc2P);
             param["2ptarget"] = summary2P[ARG_EXSCORE];
             param["2pexscore"] = summary2P[ARG_EXSCORE];
             param["2pmaxcombo"] = summary2P[ARG_MAXCOMBO];
@@ -171,7 +179,7 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
             param["newbpdiff"] = param["newbp"] - pScore->bp;
             param["dbrate"] = (int)(pScore->rate);
             param["dbrated2"] = (int)(pScore->rate * 100.0) % 100;
-            param["dbrank"] = Option::getRankType(pScore->rate);
+            param_new.db_rank = Option::getRankType(pScore->rate);
 
             param["updatedscore"] = pScore->exscore < param["1pexscore"];
             param["updatedmaxcombo"] = pScore->maxcombo < param["1pmaxcombo"];
@@ -194,8 +202,8 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
 
     // save
     {
-        State::set(IndexOption::RESULT_RANK_1P, param["1prank"]);
-        State::set(IndexOption::RESULT_RANK_2P, param["2prank"]);
+        State::set(IndexOption::RESULT_RANK_1P, param_new.p1_rank);
+        State::set(IndexOption::RESULT_RANK_2P, param_new.p2_rank);
         State::set(IndexNumber::PLAY_1P_EXSCORE_DIFF, param["1ptarget"]);
         State::set(IndexNumber::PLAY_2P_EXSCORE_DIFF, param["2ptarget"]);
         State::set(IndexOption::RESULT_BATTLE_WIN_LOSE, param["winlose"]);
@@ -250,8 +258,8 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
         State::set(IndexNumber::RESULT_MYBEST_RATE, param["dbrate"]);
         State::set(IndexNumber::RESULT_MYBEST_RATE_DECIMAL2, param["dbrated2"]);
 
-        State::set(IndexOption::RESULT_MYBEST_RANK, param["dbrank"]);
-        State::set(IndexOption::RESULT_UPDATED_RANK, param["1prank"]);
+        State::set(IndexOption::RESULT_MYBEST_RANK, param_new.p1_rank);
+        State::set(IndexOption::RESULT_UPDATED_RANK, param_new.p2_rank);
 
         State::set(IndexSwitch::RESULT_UPDATED_SCORE, param["updatedscore"]);
         State::set(IndexSwitch::RESULT_UPDATED_MAXCOMBO, param["updatedmaxcombo"]);
