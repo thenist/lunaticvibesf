@@ -1,6 +1,7 @@
 #include <common/assert.h>
 #include <game/arena/arena_data.h>
 #include <game/ruleset/ruleset_bms.h>
+#include <game/runtime/index/option.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2.h>
 
@@ -218,11 +219,11 @@ static bool getDstOptAbs(unsigned d)
     case 103: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_NORMAL;
     case 104: return any_of({LAMP_EXHARD, LAMP_HARD}, State::get(IndexOption::SELECT_ENTRY_LAMP));
     case 105: return any_of({LAMP_FULLCOMBO, LAMP_MAX, LAMP_PERFECT}, State::get(IndexOption::SELECT_ENTRY_LAMP));
-    case 106: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_EXHARD;  // lunaticvibes
-    case 107: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_PERFECT; // lunaticvibes
-    case 108: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_MAX;     // lunaticvibes
-    case 109: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_ASSIST;  // lunaticvibes
-    case 110: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_1;
+    case 106: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_EXHARD;            // lunaticvibes
+    case 107: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_PERFECT;           // lunaticvibes
+    case 108: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_MAX;               // lunaticvibes
+    case 109: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_ASSIST;            // lunaticvibes
+    case 110: return any_of({RANK_0, RANK_1}, State::get(IndexOption::SELECT_ENTRY_RANK)); // AAA/MAX
     case 111: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_2;
     case 112: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_3;
     case 113: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_4;
@@ -314,7 +315,7 @@ static bool getDstOptAbs(unsigned d)
     case 195: return State::get(IndexSwitch::CHART_HAVE_BACKBMP);
     case 196: return !State::get(IndexSwitch::CHART_HAVE_REPLAY);
     case 197: return State::get(IndexSwitch::CHART_HAVE_REPLAY);
-    case 200: return State::get(IndexOption::PLAY_RANK_ESTIMATED_1P) == RANK_1;
+    case 200: return any_of({RANK_0, RANK_1}, State::get(IndexOption::PLAY_RANK_ESTIMATED_1P)); // AAA/MAX
     case 201: return State::get(IndexOption::PLAY_RANK_ESTIMATED_1P) == RANK_2;
     case 202: return State::get(IndexOption::PLAY_RANK_ESTIMATED_1P) == RANK_3;
     case 203: return State::get(IndexOption::PLAY_RANK_ESTIMATED_1P) == RANK_4;
@@ -322,7 +323,7 @@ static bool getDstOptAbs(unsigned d)
     case 205: return State::get(IndexOption::PLAY_RANK_ESTIMATED_1P) == RANK_6;
     case 206: return State::get(IndexOption::PLAY_RANK_ESTIMATED_1P) == RANK_7;
     case 207: return State::get(IndexOption::PLAY_RANK_ESTIMATED_1P) == RANK_8;
-    case 210: return State::get(IndexOption::PLAY_RANK_ESTIMATED_2P) == RANK_1;
+    case 210: return any_of({RANK_0, RANK_1}, State::get(IndexOption::PLAY_RANK_ESTIMATED_2P)); // AAA/MAX
     case 211: return State::get(IndexOption::PLAY_RANK_ESTIMATED_2P) == RANK_2;
     case 212: return State::get(IndexOption::PLAY_RANK_ESTIMATED_2P) == RANK_3;
     case 213: return State::get(IndexOption::PLAY_RANK_ESTIMATED_2P) == RANK_4;
@@ -400,7 +401,7 @@ static bool getDstOptAbs(unsigned d)
     case 293:
         return State::get(IndexOption::SELECT_ENTRY_TYPE) == Option::ENTRY_COURSE &&
                State::get(IndexOption::COURSE_TYPE) == Option::COURSE_GRADE;
-    case 300: return any_of({RANK_1, RANK_0}, State::get(IndexOption::RESULT_RANK_1P));
+    case 300: return any_of({RANK_0, RANK_1}, State::get(IndexOption::RESULT_RANK_1P));
     case 301: return State::get(IndexOption::RESULT_RANK_1P) == RANK_2;
     case 302: return State::get(IndexOption::RESULT_RANK_1P) == RANK_3;
     case 303: return State::get(IndexOption::RESULT_RANK_1P) == RANK_4;
@@ -409,7 +410,7 @@ static bool getDstOptAbs(unsigned d)
     case 306: return State::get(IndexOption::RESULT_RANK_1P) == RANK_7;
     case 307: return State::get(IndexOption::RESULT_RANK_1P) == RANK_8;
     case 308: return State::get(IndexOption::RESULT_RANK_1P) == RANK_NONE;
-    case 310: return any_of({RANK_1, RANK_0}, State::get(IndexOption::RESULT_RANK_2P));
+    case 310: return any_of({RANK_0, RANK_1}, State::get(IndexOption::RESULT_RANK_2P));
     case 311: return State::get(IndexOption::RESULT_RANK_2P) == RANK_2;
     case 312: return State::get(IndexOption::RESULT_RANK_2P) == RANK_3;
     case 313: return State::get(IndexOption::RESULT_RANK_2P) == RANK_4;
@@ -418,7 +419,7 @@ static bool getDstOptAbs(unsigned d)
     case 316: return State::get(IndexOption::RESULT_RANK_2P) == RANK_7;
     case 317: return State::get(IndexOption::RESULT_RANK_2P) == RANK_8;
     case 318: return State::get(IndexOption::RESULT_RANK_2P) == RANK_NONE;
-    case 320: return any_of({RANK_1, RANK_0}, State::get(IndexOption::RESULT_MYBEST_RANK));
+    case 320: return any_of({RANK_0, RANK_1}, State::get(IndexOption::RESULT_MYBEST_RANK));
     case 321: return State::get(IndexOption::RESULT_MYBEST_RANK) == RANK_2;
     case 322: return State::get(IndexOption::RESULT_MYBEST_RANK) == RANK_3;
     case 323: return State::get(IndexOption::RESULT_MYBEST_RANK) == RANK_4;
@@ -432,7 +433,7 @@ static bool getDstOptAbs(unsigned d)
     case 333: return State::get(IndexSwitch::RESULT_UPDATED_TRIAL);
     case 334: return State::get(IndexSwitch::RESULT_UPDATED_IRRANK);
     case 335: return State::get(IndexSwitch::RESULT_UPDATED_RANK);
-    case 340: return any_of({RANK_1, RANK_0}, State::get(IndexOption::RESULT_UPDATED_RANK));
+    case 340: return any_of({RANK_0, RANK_1}, State::get(IndexOption::RESULT_UPDATED_RANK));
     case 341: return State::get(IndexOption::RESULT_UPDATED_RANK) == RANK_2;
     case 342: return State::get(IndexOption::RESULT_UPDATED_RANK) == RANK_3;
     case 343: return State::get(IndexOption::RESULT_UPDATED_RANK) == RANK_4;
