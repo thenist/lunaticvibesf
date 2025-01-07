@@ -939,35 +939,6 @@ RulesetBMS::JudgeRes RulesetBMS::_calcJudgeByTimes(const Note& note, const lunat
     return {a, error};
 }
 
-// TODO: nuke this and JUDGE_* replay commands.
-static const std::map<RulesetBMS::JudgeArea, ReplayChart::Commands::Type> judgeAreaReplayCommandType[] = {
-    {
-        {RulesetBMS::JudgeArea::EXACT_PERFECT, ReplayChart::Commands::Type::JUDGE_LEFT_EXACT_0},
-        {RulesetBMS::JudgeArea::EARLY_PERFECT, ReplayChart::Commands::Type::JUDGE_LEFT_EARLY_0},
-        {RulesetBMS::JudgeArea::EARLY_GREAT, ReplayChart::Commands::Type::JUDGE_LEFT_EARLY_1},
-        {RulesetBMS::JudgeArea::EARLY_GOOD, ReplayChart::Commands::Type::JUDGE_LEFT_EARLY_2},
-        {RulesetBMS::JudgeArea::EARLY_BAD, ReplayChart::Commands::Type::JUDGE_LEFT_EARLY_3},
-        {RulesetBMS::JudgeArea::EARLY_KPOOR, ReplayChart::Commands::Type::JUDGE_LEFT_EARLY_5},
-        {RulesetBMS::JudgeArea::LATE_PERFECT, ReplayChart::Commands::Type::JUDGE_LEFT_LATE_0},
-        {RulesetBMS::JudgeArea::LATE_GREAT, ReplayChart::Commands::Type::JUDGE_LEFT_LATE_1},
-        {RulesetBMS::JudgeArea::LATE_GOOD, ReplayChart::Commands::Type::JUDGE_LEFT_LATE_2},
-        {RulesetBMS::JudgeArea::LATE_BAD, ReplayChart::Commands::Type::JUDGE_LEFT_LATE_3},
-        {RulesetBMS::JudgeArea::MISS, ReplayChart::Commands::Type::JUDGE_LEFT_LATE_4},
-    },
-    {
-        {RulesetBMS::JudgeArea::EXACT_PERFECT, ReplayChart::Commands::Type::JUDGE_RIGHT_EXACT_0},
-        {RulesetBMS::JudgeArea::EARLY_PERFECT, ReplayChart::Commands::Type::JUDGE_RIGHT_EARLY_0},
-        {RulesetBMS::JudgeArea::EARLY_GREAT, ReplayChart::Commands::Type::JUDGE_RIGHT_EARLY_1},
-        {RulesetBMS::JudgeArea::EARLY_GOOD, ReplayChart::Commands::Type::JUDGE_RIGHT_EARLY_2},
-        {RulesetBMS::JudgeArea::EARLY_BAD, ReplayChart::Commands::Type::JUDGE_RIGHT_EARLY_3},
-        {RulesetBMS::JudgeArea::EARLY_KPOOR, ReplayChart::Commands::Type::JUDGE_RIGHT_EARLY_5},
-        {RulesetBMS::JudgeArea::LATE_PERFECT, ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_0},
-        {RulesetBMS::JudgeArea::LATE_GREAT, ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_1},
-        {RulesetBMS::JudgeArea::LATE_GOOD, ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_2},
-        {RulesetBMS::JudgeArea::LATE_BAD, ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_3},
-        {RulesetBMS::JudgeArea::MISS, ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_4},
-    }};
-
 void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
                              const lunaticvibes::Time& t, int slot)
 {
@@ -980,7 +951,6 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
             State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
     }
 
-    bool pushReplayCommand = false;
     switch (cat)
     {
     case NoteLaneCategory::Note:
@@ -993,7 +963,6 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
         case JudgeArea::LATE_GREAT:
         case JudgeArea::EARLY_GOOD:
         case JudgeArea::LATE_GOOD:
-            pushReplayCommand = true;
             note.hit = true;
             note.expired = true;
             notesExpired++;
@@ -1002,16 +971,12 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
 
         case JudgeArea::EARLY_BAD:
         case JudgeArea::LATE_BAD:
-            pushReplayCommand = true;
             note.expired = true;
             notesExpired++;
             updateJudge(t, idx, judge.area, slot);
             break;
 
-        case JudgeArea::EARLY_KPOOR:
-            pushReplayCommand = true;
-            updateJudge(t, idx, judge.area, slot);
-            break;
+        case JudgeArea::EARLY_KPOOR: updateJudge(t, idx, judge.area, slot); break;
 
         case JudgeArea::NOTHING:
         case JudgeArea::MISS:
@@ -1045,14 +1010,10 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
             case JudgeArea::LATE_BAD:
                 note.expired = true;
                 notesExpired++;
-                pushReplayCommand = true;
                 updateJudge(t, idx, judge.area, slot);
                 break;
 
-            case JudgeArea::EARLY_KPOOR:
-                pushReplayCommand = true;
-                updateJudge(t, idx, judge.area, slot);
-                break;
+            case JudgeArea::EARLY_KPOOR: updateJudge(t, idx, judge.area, slot); break;
 
             case JudgeArea::NOTHING:
             case JudgeArea::MISS:
@@ -1070,23 +1031,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
     }
 
     if (note.expired || judge.area == JudgeArea::EARLY_KPOOR || judge.area == JudgeArea::MINE_KPOOR)
-    {
         _lastNoteJudge[slot] = judge;
-    }
-
-    // push replay command
-    if (pushReplayCommand && _hasStartTime && _replayNew)
-    {
-        std::unique_lock rl{_replayNew->mutex};
-        if (judgeAreaReplayCommandType[slot].find(judge.area) != judgeAreaReplayCommandType[slot].end())
-        {
-            long long ms = t.norm() - _startTime.norm();
-            ReplayChart::Commands cmd;
-            cmd.ms = ms;
-            cmd.type = judgeAreaReplayCommandType[slot].at(judge.area);
-            _replayNew->replay->commands.push_back(cmd);
-        }
-    }
 }
 
 // Judges LNs in the case of overhold.
@@ -1125,18 +1070,6 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
             }
 
             _lastNoteJudge = {{JudgeArea::MINE_KPOOR, t.norm()}};
-
-            // push replay command
-            if (_hasStartTime && _replayNew)
-            {
-                std::unique_lock rl{_replayNew->mutex};
-                long long ms = t.norm() - _startTime.norm();
-                ReplayChart::Commands cmd;
-                cmd.ms = ms;
-                cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LANDMINE
-                                                      : ReplayChart::Commands::Type::JUDGE_RIGHT_LANDMINE;
-                _replayNew->replay->commands.push_back(cmd);
-            }
         }
         break;
     }
@@ -1158,20 +1091,6 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 _lastNoteJudge[slot].area = _lnJudge[idx];
                 _lastNoteJudge[slot].time = 0;
 
-                // push replay command
-                if (_hasStartTime && _replayNew)
-                {
-                    std::unique_lock rl{_replayNew->mutex};
-                    if (judgeAreaReplayCommandType[slot].find(_lnJudge[idx]) != judgeAreaReplayCommandType[slot].end())
-                    {
-                        long long ms = t.norm() - _startTime.norm();
-                        ReplayChart::Commands cmd;
-                        cmd.ms = ms;
-                        cmd.type = judgeAreaReplayCommandType[slot].at(_lnJudge[idx]);
-                        _replayNew->replay->commands.push_back(cmd);
-                    }
-                }
-
                 _lnJudge[idx] = RulesetBMS::JudgeArea::NOTHING;
             }
         }
@@ -1183,7 +1102,6 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
 void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
                                const lunaticvibes::Time& t, int slot)
 {
-    bool pushReplayCommand = false;
     switch (cat)
     {
     case NoteLaneCategory::LN:
@@ -1233,7 +1151,6 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
             updateJudge(t, idx, lnJudge, slot);
             _lnJudge[idx] = RulesetBMS::JudgeArea::NOTHING;
             _lastNoteJudge[slot] = judge;
-            pushReplayCommand = true;
 
             if (showJudge && _bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
                 State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
@@ -1243,20 +1160,6 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
         break;
 
     default: break;
-    }
-
-    // push replay command
-    if (pushReplayCommand && _hasStartTime && _replayNew)
-    {
-        std::unique_lock rl{_replayNew->mutex};
-        if (judgeAreaReplayCommandType[slot].find(judge.area) != judgeAreaReplayCommandType[slot].end())
-        {
-            long long ms = t.norm() - _startTime.norm();
-            ReplayChart::Commands cmd;
-            cmd.ms = ms;
-            cmd.type = judgeAreaReplayCommandType[slot].at(judge.area);
-            _replayNew->replay->commands.push_back(cmd);
-        }
     }
 }
 
@@ -1357,12 +1260,8 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     {
         const bool should_show_bomb = judgeType == JudgeType::PERFECT || judgeType == JudgeType::GREAT;
         if (should_show_bomb && _bombTimerMap != nullptr)
-        {
             if (auto it = _bombTimerMap->find(ch); it != _bombTimerMap->end())
-            {
                 State::set(it->second, t.norm());
-            }
-        }
 
         if (slot == PLAYER_SLOT_PLAYER)
         {
@@ -1706,18 +1605,6 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                             updateJudge(t, idx, JudgeArea::MISS, slot);
                             _lastNoteJudge[slot].area = JudgeArea::MISS;
                             _lastNoteJudge[slot].time = latePoorWindow;
-
-                            // push replay command
-                            if (_hasStartTime && _replayNew)
-                            {
-                                std::unique_lock rl{_replayNew->mutex};
-                                long long ms = t.norm() - _startTime.norm();
-                                ReplayChart::Commands cmd;
-                                cmd.ms = ms;
-                                cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LATE_4
-                                                                      : ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_4;
-                                _replayNew->replay->commands.push_back(cmd);
-                            }
                         }
 
                         notesExpired++;
@@ -1754,19 +1641,6 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                                     updateJudge(t, idx, JudgeArea::MISS, slot);
                                     _lastNoteJudge[slot].area = JudgeArea::MISS;
                                     _lastNoteJudge[slot].time = hitTime;
-
-                                    // push replay command
-                                    if (_hasStartTime && _replayNew)
-                                    {
-                                        std::unique_lock rl{_replayNew->mutex};
-                                        long long ms = t.norm() - _startTime.norm();
-                                        ReplayChart::Commands cmd;
-                                        cmd.ms = ms;
-                                        cmd.type = slot == PLAYER_SLOT_PLAYER
-                                                       ? ReplayChart::Commands::Type::JUDGE_LEFT_LATE_3
-                                                       : ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_3;
-                                        _replayNew->replay->commands.push_back(cmd);
-                                    }
                                 }
 
                                 // LOG_DEBUG << "LATE   POOR    "; break;

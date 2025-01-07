@@ -14,7 +14,7 @@
 
 template <class Archive, size_t bytes> void serialize(Archive& ar, Hash<bytes>& hash)
 {
-    unsigned char* hashBytes = const_cast<unsigned char*>(hash.hex());
+    auto* hashBytes = const_cast<unsigned char*>(hash.hex());
     for (size_t i = 0; i < bytes; ++i)
         ar(hashBytes[i]);
 }
@@ -94,52 +94,50 @@ public:
             S2A_MINUS,
             S2A_STOP,
 
-            JUDGE_LEFT_EXACT_0, // PGREAT
-            JUDGE_LEFT_EARLY_0, // PGREAT
-            JUDGE_LEFT_EARLY_1, // GREAT
-            JUDGE_LEFT_EARLY_2, // GOOD
-            JUDGE_LEFT_EARLY_3, // BAD
-            JUDGE_LEFT_EARLY_4, // POOR
-            JUDGE_LEFT_EARLY_5, // KPOOR
-            JUDGE_LEFT_EARLY_6,
-            JUDGE_LEFT_EARLY_7,
-            JUDGE_LEFT_EARLY_8,
-            JUDGE_LEFT_EARLY_9,
-            JUDGE_LEFT_LATE_0, // PGREAT
-            JUDGE_LEFT_LATE_1, // GREAT
-            JUDGE_LEFT_LATE_2, // GOOD
-            JUDGE_LEFT_LATE_3, // BAD
-            JUDGE_LEFT_LATE_4, // POOR
-            JUDGE_LEFT_LATE_5, // KPOOR
-            JUDGE_LEFT_LATE_6,
-            JUDGE_LEFT_LATE_7,
-            JUDGE_LEFT_LATE_8,
-            JUDGE_LEFT_LATE_9,
-
-            JUDGE_RIGHT_EXACT_0, // PGREAT
-            JUDGE_RIGHT_EARLY_0, // PGREAT
-            JUDGE_RIGHT_EARLY_1, // GREAT
-            JUDGE_RIGHT_EARLY_2, // GOOD
-            JUDGE_RIGHT_EARLY_3, // BAD
-            JUDGE_RIGHT_EARLY_4, // POOR
-            JUDGE_RIGHT_EARLY_5, // KPOOR
-            JUDGE_RIGHT_EARLY_6,
-            JUDGE_RIGHT_EARLY_7,
-            JUDGE_RIGHT_EARLY_8,
-            JUDGE_RIGHT_EARLY_9,
-            JUDGE_RIGHT_LATE_0, // PGREAT
-            JUDGE_RIGHT_LATE_1, // GREAT
-            JUDGE_RIGHT_LATE_2, // GOOD
-            JUDGE_RIGHT_LATE_3, // BAD
-            JUDGE_RIGHT_LATE_4, // POOR
-            JUDGE_RIGHT_LATE_5, // KPOOR
-            JUDGE_RIGHT_LATE_6,
-            JUDGE_RIGHT_LATE_7,
-            JUDGE_RIGHT_LATE_8,
-            JUDGE_RIGHT_LATE_9,
-
-            JUDGE_LEFT_LANDMINE,
-            JUDGE_RIGHT_LANDMINE,
+            OLD_JUDGE_LEFT_EXACT_0,
+            OLD_JUDGE_LEFT_EARLY_0,
+            OLD_JUDGE_LEFT_EARLY_1,
+            OLD_JUDGE_LEFT_EARLY_2,
+            OLD_JUDGE_LEFT_EARLY_3,
+            OLD_JUDGE_LEFT_EARLY_4,
+            OLD_JUDGE_LEFT_EARLY_5,
+            OLD_JUDGE_LEFT_EARLY_6,
+            OLD_JUDGE_LEFT_EARLY_7,
+            OLD_JUDGE_LEFT_EARLY_8,
+            OLD_JUDGE_LEFT_EARLY_9,
+            OLD_JUDGE_LEFT_LATE_0,
+            OLD_JUDGE_LEFT_LATE_1,
+            OLD_JUDGE_LEFT_LATE_2,
+            OLD_JUDGE_LEFT_LATE_3,
+            OLD_JUDGE_LEFT_LATE_4,
+            OLD_JUDGE_LEFT_LATE_5,
+            OLD_JUDGE_LEFT_LATE_6,
+            OLD_JUDGE_LEFT_LATE_7,
+            OLD_JUDGE_LEFT_LATE_8,
+            OLD_JUDGE_LEFT_LATE_9,
+            OLD_JUDGE_RIGHT_EXACT_0,
+            OLD_JUDGE_RIGHT_EARLY_0,
+            OLD_JUDGE_RIGHT_EARLY_1,
+            OLD_JUDGE_RIGHT_EARLY_2,
+            OLD_JUDGE_RIGHT_EARLY_3,
+            OLD_JUDGE_RIGHT_EARLY_4,
+            OLD_JUDGE_RIGHT_EARLY_5,
+            OLD_JUDGE_RIGHT_EARLY_6,
+            OLD_JUDGE_RIGHT_EARLY_7,
+            OLD_JUDGE_RIGHT_EARLY_8,
+            OLD_JUDGE_RIGHT_EARLY_9,
+            OLD_JUDGE_RIGHT_LATE_0,
+            OLD_JUDGE_RIGHT_LATE_1,
+            OLD_JUDGE_RIGHT_LATE_2,
+            OLD_JUDGE_RIGHT_LATE_3,
+            OLD_JUDGE_RIGHT_LATE_4,
+            OLD_JUDGE_RIGHT_LATE_5,
+            OLD_JUDGE_RIGHT_LATE_6,
+            OLD_JUDGE_RIGHT_LATE_7,
+            OLD_JUDGE_RIGHT_LATE_8,
+            OLD_JUDGE_RIGHT_LATE_9,
+            OLD_JUDGE_LEFT_LANDMINE,
+            OLD_JUDGE_RIGHT_LANDMINE,
 
             HISPEED,
             LANECOVER_TOP,
@@ -214,11 +212,6 @@ private:
         ar(lanecoverEnabled);
 
         ar(commands);
-
-        // more parameters goes below
-        if (version >= 3)
-        {
-        }
     }
     void updateChecksum();
 
@@ -231,8 +224,8 @@ public:
     std::string serializeAsXml();
 
     static Path getReplayPath(const HashMD5& chartMD5);
-    Path getReplayPath() const;
-    PlayModifiers getMods() const;
+    [[nodiscard]] Path getReplayPath() const;
+    [[nodiscard]] PlayModifiers getMods() const;
 };
 
 CEREAL_CLASS_VERSION(ReplayChart, 2);

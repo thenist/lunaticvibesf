@@ -637,20 +637,6 @@ ReplayChart::Commands::Type ReplayChart::Commands::leftSideCmdToRightSide(const 
     case CmdType::S1A_PLUS: return CmdType::S2A_PLUS;
     case CmdType::S1A_MINUS: return CmdType::S2A_MINUS;
     case CmdType::S1A_STOP: return CmdType::S2A_STOP;
-    case CmdType::JUDGE_LEFT_EXACT_0: return CmdType::JUDGE_RIGHT_EXACT_0;
-    case CmdType::JUDGE_LEFT_EARLY_0: return CmdType::JUDGE_RIGHT_EARLY_0;
-    case CmdType::JUDGE_LEFT_EARLY_1: return CmdType::JUDGE_RIGHT_EARLY_1;
-    case CmdType::JUDGE_LEFT_EARLY_2: return CmdType::JUDGE_RIGHT_EARLY_2;
-    case CmdType::JUDGE_LEFT_EARLY_3: return CmdType::JUDGE_RIGHT_EARLY_3;
-    case CmdType::JUDGE_LEFT_EARLY_4: return CmdType::JUDGE_RIGHT_EARLY_4;
-    case CmdType::JUDGE_LEFT_EARLY_5: return CmdType::JUDGE_RIGHT_EARLY_5;
-    case CmdType::JUDGE_LEFT_LATE_0: return CmdType::JUDGE_RIGHT_LATE_0;
-    case CmdType::JUDGE_LEFT_LATE_1: return CmdType::JUDGE_RIGHT_LATE_1;
-    case CmdType::JUDGE_LEFT_LATE_2: return CmdType::JUDGE_RIGHT_LATE_2;
-    case CmdType::JUDGE_LEFT_LATE_3: return CmdType::JUDGE_RIGHT_LATE_3;
-    case CmdType::JUDGE_LEFT_LATE_4: return CmdType::JUDGE_RIGHT_LATE_4;
-    case CmdType::JUDGE_LEFT_LATE_5: return CmdType::JUDGE_RIGHT_LATE_5;
-    case CmdType::JUDGE_LEFT_LANDMINE: return CmdType::JUDGE_RIGHT_LANDMINE;
     default: return cmd;
     }
 }
