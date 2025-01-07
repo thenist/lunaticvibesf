@@ -3,10 +3,12 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <string>
 #include <utility>
 
 #include <common/assert.h>
 #include <common/sysutil.h>
+#include <common/types.h>
 #include <config/config_mgr.h>
 #include <game/chart/chart_bms.h>
 #include <game/runtime/state.h>
@@ -457,6 +459,75 @@ const NumberAnimation& GaugeHolderProxy::get_health() const
 
 } // namespace lunaticvibes
 
+static const char* randomTypeStringForShow(PlayModifierRandomType type)
+{
+    switch (type)
+    {
+    case PlayModifierRandomType::NONE: return "NORMAL";
+    case PlayModifierRandomType::MIRROR: return "MIRROR";
+    case PlayModifierRandomType::RANDOM: return "RANDOM";
+    case PlayModifierRandomType::SRAN: return "S-RANDOM";
+    case PlayModifierRandomType::HRAN: return "H-RANDOM";
+    case PlayModifierRandomType::ALLSCR: return "ALL-SCR";
+    case PlayModifierRandomType::RRAN: return "R-RANDOM";
+    case PlayModifierRandomType::DB_SYNCHRONIZE: return "SYNCHRONIZE";
+    case PlayModifierRandomType::DB_SYMMETRY: return "SYMMETRY";
+    }
+    lunaticvibes::assert_failed("playModifierStringForShow");
+}
+
+static std::string makeModsStringForShow(RulesetBMS::PlaySide side, PlayModifiers mods)
+{
+    auto push_part = [](std::stringstream& os, auto part) {
+        if (!os.str().empty()) // woah there, good thing we are calling this .. thrice per play
+            os << ", ";
+        os << part;
+    };
+    std::stringstream os;
+    switch (side)
+    {
+    case RulesetBMS::PlaySide::SINGLE:
+    case RulesetBMS::PlaySide::BATTLE_1P:
+    case RulesetBMS::PlaySide::AUTO:
+        if (mods.randomLeft != PlayModifierRandomType::NONE)
+            os << randomTypeStringForShow(mods.randomLeft);
+        if (mods.assist_mask & PLAY_MOD_ASSIST_AUTOSCR)
+            push_part(os, "AUTO-SCR");
+        break;
+
+    case RulesetBMS::PlaySide::RIVAL:
+    case RulesetBMS::PlaySide::BATTLE_2P:
+    case RulesetBMS::PlaySide::AUTO_2P:
+        if (mods.randomRight != PlayModifierRandomType::NONE)
+            os << randomTypeStringForShow(mods.randomRight);
+        if (mods.assist_mask & PLAY_MOD_ASSIST_AUTOSCR)
+            push_part(os, "AUTO-SCR");
+        break;
+
+    case RulesetBMS::PlaySide::DOUBLE:
+    case RulesetBMS::PlaySide::AUTO_DOUBLE:
+        if (mods.randomLeft != PlayModifierRandomType::NONE && mods.randomRight != PlayModifierRandomType::NONE)
+        {
+            os << (mods.randomLeft == PlayModifierRandomType::NONE ? "-" : randomTypeStringForShow(mods.randomLeft))
+               << "/"
+               << (mods.randomRight == PlayModifierRandomType::NONE ? "-" : randomTypeStringForShow(mods.randomRight));
+        }
+        if (mods.DPFlip)
+            push_part(os, "FLIP");
+        if (mods.assist_mask & PLAY_MOD_ASSIST_AUTOSCR)
+            push_part(os, "AUTO-SCR");
+        break;
+
+    case RulesetBMS::PlaySide::MYBEST:
+    case RulesetBMS::PlaySide::NETWORK: break;
+    }
+
+    std::string out = os.str();
+    if (out.empty())
+        out = "NONE";
+    return out;
+}
+
 RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart,
                        PlayModifiers mods, GameModeKeys keys, JudgeDifficulty difficulty, double health,
                        RulesetBMS::PlaySide side, const int fiveKeyMapIndex,
@@ -720,69 +791,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         break;
     }
 
-    std::stringstream ssMod;
-    std::stringstream ssModShort;
-    switch (side)
-    {
-    case RulesetBMS::PlaySide::SINGLE:
-    case RulesetBMS::PlaySide::BATTLE_1P:
-    case RulesetBMS::PlaySide::AUTO:
-        ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
-                      ? ""
-                      : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)]);
-        if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_1P))
-        {
-            if (!ssMod.str().empty())
-                ssMod << ", ";
-            ssMod << Option::s_assist_type[Option::ASSIST_AUTOSCR];
-        }
-        break;
-
-    case RulesetBMS::PlaySide::RIVAL:
-    case RulesetBMS::PlaySide::BATTLE_2P:
-    case RulesetBMS::PlaySide::AUTO_2P:
-        ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
-                      ? ""
-                      : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
-        if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_2P))
-        {
-            if (!ssMod.str().empty())
-                ssMod << ", ";
-            ssMod << Option::s_assist_type[Option::ASSIST_AUTOSCR];
-        }
-        break;
-
-    case RulesetBMS::PlaySide::DOUBLE:
-    case RulesetBMS::PlaySide::AUTO_DOUBLE:
-        if (!(State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL &&
-              State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL))
-        {
-            ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
-                          ? "-"
-                          : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)])
-                  << "/"
-                  << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
-                          ? "-"
-                          : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
-        }
-        if (State::get(IndexSwitch::PLAY_OPTION_DP_FLIP))
-        {
-            if (!ssMod.str().empty())
-                ssMod << ", ";
-            ssMod << "FLIP";
-        }
-        if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_1P))
-        {
-            if (!ssMod.str().empty())
-                ssMod << ", ";
-            ssMod << Option::s_assist_type[Option::ASSIST_AUTOSCR];
-        }
-        break;
-
-    case RulesetBMS::PlaySide::MYBEST:
-    case RulesetBMS::PlaySide::NETWORK: break;
-    }
-    modifierText = ssMod.str();
+    modifierText = makeModsStringForShow(side, mods);
     if (modifierText.empty())
         modifierText = "NONE";
     modifierTextShort = modifierText;
@@ -2043,6 +2052,25 @@ static unsigned getFastSlow(RulesetBMS::JudgeArea area)
     lunaticvibes::assert_failed("getFastSlow");
 }
 
+static int diffToNextRank(double total_acc, int exScore, int maxScore)
+{
+    if (total_acc >= 100.0 * 8.0 / 9)
+        return exScore - maxScore; // MAX-
+    if (total_acc >= 100.0 * 7.0 / 9)
+        return static_cast<int>(exScore - maxScore * 8.0 / 9); // AAA-
+    if (total_acc >= 100.0 * 6.0 / 9)
+        return static_cast<int>(exScore - maxScore * 7.0 / 9); // AA-
+    if (total_acc >= 100.0 * 5.0 / 9)
+        return static_cast<int>(exScore - maxScore * 6.0 / 9); // A-
+    if (total_acc >= 100.0 * 4.0 / 9)
+        return static_cast<int>(exScore - maxScore * 5.0 / 9); // B-
+    if (total_acc >= 100.0 * 3.0 / 9)
+        return static_cast<int>(exScore - maxScore * 4.0 / 9); // C-
+    if (total_acc >= 100.0 * 2.0 / 9)
+        return static_cast<int>(exScore - maxScore * 3.0 / 9); // D-
+    return static_cast<int>(exScore - maxScore * 2.0 / 9);     // E-
+}
+
 void RulesetBMS::updateGlobals()
 {
     if (_side == PlaySide::SINGLE || _side == PlaySide::DOUBLE || _side == PlaySide::BATTLE_1P ||
@@ -2077,7 +2105,6 @@ void RulesetBMS::updateGlobals()
 
         if (showJudge)
         {
-
             const int fs_of_player = getFastSlow(_lastNoteJudge[PLAYER_SLOT_PLAYER].area);
             State::set(IndexNumber::LR2IR_REPLACE_PLAY_1P_FAST_SLOW, fs_of_player);
             State::set(IndexOption::PLAY_LAST_JUDGE_FASTSLOW_1P, fs_of_player);
@@ -2101,26 +2128,10 @@ void RulesetBMS::updateGlobals()
         State::set(IndexOption::RESULT_RANK_1P, Option::getRankType(_basic.total_acc));
         State::set(IndexOption::PLAY_HEALTH_1P, Option::getHealthType(_basic.health));
 
-        int maxScore = getMaxScore();
-        // if      (dp.total_acc >= 94.44) State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, int(maxScore * 1.000 -
-        // dp.score2));    // MAX-
-        if (_basic.total_acc >= 100.0 * 8.0 / 9)
-            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, exScore - maxScore); // MAX-
-        else if (_basic.total_acc >= 100.0 * 7.0 / 9)
-            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 8.0 / 9)); // AAA-
-        else if (_basic.total_acc >= 100.0 * 6.0 / 9)
-            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 7.0 / 9)); // AA-
-        else if (_basic.total_acc >= 100.0 * 5.0 / 9)
-            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 6.0 / 9)); // A-
-        else if (_basic.total_acc >= 100.0 * 4.0 / 9)
-            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 5.0 / 9)); // B-
-        else if (_basic.total_acc >= 100.0 * 3.0 / 9)
-            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 4.0 / 9)); // C-
-        else if (_basic.total_acc >= 100.0 * 2.0 / 9)
-            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 3.0 / 9)); // D-
-        else
-            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 2.0 / 9)); // E-
-        State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, State::get(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF));
+        const int diff_to_next_rank = diffToNextRank(_basic.total_acc, exScore, getMaxScore());
+        State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, diff_to_next_rank);
+
+        State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, diff_to_next_rank);
 
         State::set(IndexNumber::LR2IR_REPLACE_PLAY_RUNNING_NOTES, notesExpired);
         State::set(IndexNumber::LR2IR_REPLACE_PLAY_REMAIN_NOTES, getNoteCount() - notesExpired);
@@ -2175,25 +2186,8 @@ void RulesetBMS::updateGlobals()
         State::set(IndexOption::RESULT_RANK_2P, Option::getRankType(_basic.total_acc));
         State::set(IndexOption::PLAY_HEALTH_2P, Option::getHealthType(_basic.health));
 
-        int maxScore = getMaxScore();
-        // if      (dp.total_acc >= 94.44) State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, int(maxScore * 1.000 -
-        // dp.score2));    // MAX-
-        if (_basic.total_acc >= 100.0 * 8.0 / 9)
-            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, exScore - maxScore); // MAX-
-        else if (_basic.total_acc >= 100.0 * 7.0 / 9)
-            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 8.0 / 9)); // AAA-
-        else if (_basic.total_acc >= 100.0 * 6.0 / 9)
-            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 7.0 / 9)); // AA-
-        else if (_basic.total_acc >= 100.0 * 5.0 / 9)
-            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 6.0 / 9)); // A-
-        else if (_basic.total_acc >= 100.0 * 4.0 / 9)
-            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 5.0 / 9)); // B-
-        else if (_basic.total_acc >= 100.0 * 3.0 / 9)
-            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 4.0 / 9)); // C-
-        else if (_basic.total_acc >= 100.0 * 2.0 / 9)
-            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 3.0 / 9)); // D-
-        else
-            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 2.0 / 9)); // E-
+        const int diff_to_next_rank = diffToNextRank(_basic.total_acc, exScore, getMaxScore());
+        State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, diff_to_next_rank);
 
         State::set(IndexOption::RESULT_CLEAR_TYPE_2P, calculateLamp());
     }
