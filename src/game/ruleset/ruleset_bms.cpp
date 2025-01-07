@@ -734,7 +734,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         {
             if (!ssMod.str().empty())
                 ssMod << ", ";
-            ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
+            ssMod << Option::s_assist_type[Option::ASSIST_AUTOSCR];
         }
         break;
 
@@ -748,7 +748,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         {
             if (!ssMod.str().empty())
                 ssMod << ", ";
-            ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
+            ssMod << Option::s_assist_type[Option::ASSIST_AUTOSCR];
         }
         break;
 
@@ -775,7 +775,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         {
             if (!ssMod.str().empty())
                 ssMod << ", ";
-            ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
+            ssMod << Option::s_assist_type[Option::ASSIST_AUTOSCR];
         }
         break;
 
