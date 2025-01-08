@@ -682,8 +682,8 @@ bool getDstOpt(int d)
 
     if (std::shared_lock l{_mutex}; d < static_cast<int>(_opIsCached.size()) && _opIsCached[op])
     {
-        l.unlock();
         const bool result = _op[op];
+        l.unlock();
         return (d >= 0) ? result : !result;
     }
 
