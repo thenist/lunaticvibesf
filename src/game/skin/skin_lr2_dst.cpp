@@ -136,12 +136,12 @@ static bool getDstOptAbs(unsigned d)
     case 3: return State::get(IndexOption::SELECT_ENTRY_TYPE) == ENTRY_COURSE;
     case 4: return State::get(IndexOption::SELECT_ENTRY_TYPE) == ENTRY_NEW_COURSE;
     case 5: return any_of({ENTRY_SONG, ENTRY_COURSE}, State::get(IndexOption::SELECT_ENTRY_TYPE));
-    case 10:
+    case 10: // ダブルorダブルバトルならtrue
         return any_of({PLAY_MODE_DOUBLE, PLAY_MODE_DOUBLE_BATTLE, PLAY_MODE_DP_GHOST_BATTLE},
                       State::get(IndexOption::PLAY_MODE));
-    case 11: return State::get(IndexOption::PLAY_MODE) == PLAY_MODE_BATTLE;
-    case 12:
-        return any_of({PLAY_MODE_BATTLE, PLAY_MODE_DOUBLE_BATTLE, PLAY_MODE_DP_GHOST_BATTLE},
+    case 11: return State::get(IndexOption::PLAY_MODE) == PLAY_MODE_BATTLE; // バトルならtrue
+    case 12: // ダブルorバトルorダブルバトルならtrue // 10 || 11
+        return any_of({PLAY_MODE_BATTLE, PLAY_MODE_DOUBLE, PLAY_MODE_DOUBLE_BATTLE, PLAY_MODE_DP_GHOST_BATTLE},
                       State::get(IndexOption::PLAY_MODE));
     case 13:
         return any_of({PLAY_MODE_BATTLE, PLAY_MODE_SP_GHOST_BATTLE, PLAY_MODE_DP_GHOST_BATTLE},
