@@ -15,6 +15,7 @@
 #include <game/arena/arena_host.h>
 #include <game/runtime/i18n.h>
 #include <game/scene/scene_context.h>
+#include <game/skin/skin_lr2_button_callbacks.h>
 #include <game/skin/skin_lr2_debug.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
@@ -1123,6 +1124,9 @@ void SceneSelect::imguiPageDebugMain()
         SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_F_OPEN);
     }
     // TODO: rebuild profile stats button.
+
+    if (ImGui::Button("Enter skin config"))
+        lr2skin::button::enter_skin_config();
 
     ImGui::Checkbox("Enable GAS", &g_enable_gas_for_test);
 
