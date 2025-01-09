@@ -736,6 +736,10 @@ void setEntryInfo(const size_t idx)
     std::map<std::string, int> param;
     std::map<std::string, double> paramf;
     std::map<std::string, std::string> text;
+    struct Params
+    {
+        Option::e_rank_type rank = Option::e_rank_type::RANK_NONE;
+    } param_new;
 
     gPlayContext.courseStageReplayPath.clear();
 
@@ -1060,7 +1064,7 @@ void setEntryInfo(const size_t idx)
                 }
                 param["lamp"] = lamp;
 
-                param["rank"] = Option::getRankType(pScore->rate);
+                param_new.rank = Option::getRankType(pScore->rate);
 
                 param["score"] = pScore->score;
                 param["exscore"] = pScore->exscore;
@@ -1129,7 +1133,7 @@ void setEntryInfo(const size_t idx)
             }
             param["lamp"] = lamp;
 
-            param["rank"] = Option::getRankType(pScore->rate);
+            param_new.rank = Option::getRankType(pScore->rate);
 
             param["score"] = pScore->score;
             param["exscore"] = pScore->exscore;
@@ -1187,7 +1191,7 @@ void setEntryInfo(const size_t idx)
 
         State::set(IndexOption::SELECT_ENTRY_TYPE, param["entry"]);
         State::set(IndexOption::SELECT_ENTRY_LAMP, param["lamp"]);
-        State::set(IndexOption::SELECT_ENTRY_RANK, param["rank"]);
+        State::set(IndexOption::SELECT_ENTRY_RANK, param_new.rank);
 
         State::set(IndexText::PLAY_TITLE, text["title"]);
         State::set(IndexText::PLAY_SUBTITLE, text["subtitle"]);
