@@ -1,9 +1,11 @@
 #include "scene_context.h"
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <mutex>
 #include <random>
+#include <string>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -730,10 +732,26 @@ void setEntryInfo(const size_t idx)
 
     std::map<std::string, int> param;
     std::map<std::string, double> paramf;
-    std::map<std::string, std::string> text;
+    static constexpr int max_course_stages = 9; // 9 sounds reasonable
     struct Params
     {
+        struct Course
+        {
+            std::string subtitle;
+            std::string title;
+        };
+
         Option::e_rank_type rank = Option::e_rank_type::RANK_NONE;
+
+        std::string artist;
+        std::string fulltitle;
+        std::string genre;
+        std::string subartist;
+        std::string subtitle;
+        std::string title;
+        std::string version;
+
+        std::array<Course, max_course_stages> courses;
     } param_new;
 
     gPlayContext.courseStageReplayPath.clear();
@@ -769,13 +787,13 @@ void setEntryInfo(const size_t idx)
             }
         }
 
-        text["title"] = pf->title;
-        text["subtitle"] = pf->title2;
-        text["fulltitle"] = pf->title2.empty() ? pf->title : (pf->title + " " + pf->title2);
-        text["artist"] = pf->artist;
-        text["subartist"] = pf->artist2;
-        text["genre"] = pf->genre;
-        text["version"] = pf->version;
+        param_new.title = pf->title;
+        param_new.subtitle = pf->title2;
+        param_new.fulltitle = pf->title2.empty() ? pf->title : (pf->title + " " + pf->title2);
+        param_new.artist = pf->artist;
+        param_new.subartist = pf->artist2;
+        param_new.genre = pf->genre;
+        param_new.version = pf->version;
 
         param["max"] = pf->totalNotes * 2;
         param["totalnotes"] = pf->totalNotes;
@@ -902,26 +920,26 @@ void setEntryInfo(const size_t idx)
     else if (e[idx].first->type() == eEntryType::COURSE)
     {
         auto ps = std::reinterpret_pointer_cast<EntryCourse>(e[idx].first);
-        text["title"] = ps->_name;
-        text["subtitle"] = ps->_name2;
-        text["fulltitle"] = ps->_name2.empty() ? ps->_name : (ps->_name + " " + ps->_name2);
+        param_new.title = ps->_name;
+        param_new.subtitle = ps->_name2;
+        param_new.fulltitle = ps->_name2.empty() ? ps->_name : (ps->_name + " " + ps->_name2);
 
         switch (ps->courseType)
         {
         case EntryCourse::CourseType::UNDEFINED: break;
         case EntryCourse::CourseType::GRADE:
             param["coursetype"] = Option::COURSE_GRADE;
-            text["genre"] = i18n::s(i18nText::CLASS_TITLE);
+            param_new.genre = i18n::s(i18nText::CLASS_TITLE);
             break;
         }
         param["coursestagecount"] = (int)ps->charts.size();
         if (ps->charts.empty())
         {
-            param["coursenotplayable"s] = 1;
-            param["coursestagechartexist1"s] = 0;
-            param["courselevel1"s] = 0;
-            param["coursedifficulty1"s] = 0;
-            text["coursetitle1"s] = "(EMPTY COURSE)";
+            param["coursenotplayable"] = 1;
+            param["coursestagechartexist1"] = 0;
+            param["courselevel1"] = 0;
+            param["coursedifficulty1"] = 0;
+            param_new.courses.front().title = "(EMPTY COURSE)";
         }
         for (size_t stage = 0; stage < ps->charts.size(); ++stage)
         {
@@ -932,8 +950,8 @@ void setEntryInfo(const size_t idx)
                 param["coursestagechartexist"s + std::to_string(stage + 1)] = 0;
                 param["courselevel"s + std::to_string(stage + 1)] = 0;
                 param["coursedifficulty"s + std::to_string(stage + 1)] = 0;
-                text["coursetitle"s + std::to_string(stage + 1)] = i18n::s(i18nText::CHART_NOT_FOUND);
-                text["coursesubtitle"s + std::to_string(stage + 1)] =
+                param_new.courses.at(stage).title = i18n::s(i18nText::CHART_NOT_FOUND);
+                param_new.courses.at(stage).subtitle =
                     (boost::format(i18n::c(i18nText::CHART_NOT_FOUND_MD5)) % ps->charts[stage].hexdigest()).str();
                 LOG_VERBOSE << "[Select] Course chart not found";
                 continue;
@@ -942,8 +960,8 @@ void setEntryInfo(const size_t idx)
             param["coursestagechartexist"s + std::to_string(stage + 1)] = 1;
             param["courselevel"s + std::to_string(stage + 1)] = pChart->playLevel;
             param["coursedifficulty"s + std::to_string(stage + 1)] = pChart->difficulty;
-            text["coursetitle"s + std::to_string(stage + 1)] = pChart->title;
-            text["coursesubtitle"s + std::to_string(stage + 1)] = pChart->title2;
+            param_new.courses.at(stage).title = pChart->title;
+            param_new.courses.at(stage).subtitle = pChart->title2;
         }
 
         param["havereplay"] = false;
@@ -994,19 +1012,19 @@ void setEntryInfo(const size_t idx)
     else
     {
         auto& p = e[idx].first;
-        text["title"] = p->_name;
-        text["artist"] = p->_name2;
-        text["fulltitle"] = p->_name2.empty() ? p->_name : (p->_name + " " + p->_name2);
+        param_new.title = p->_name;
+        param_new.artist = p->_name2;
+        param_new.fulltitle = p->_name2.empty() ? p->_name : (p->_name + " " + p->_name2);
 
         switch (p->type())
         {
-        case eEntryType::FOLDER: text["genre"] = ""; break;
-        case eEntryType::CUSTOM_FOLDER: text["genre"] = i18n::s(i18nText::CUSTOM_FOLDER_DESCRIPTION); break;
-        case eEntryType::COURSE_FOLDER: text["genre"] = i18n::s(i18nText::COURSE_FOLDER_DESCRIPTION); break;
+        case eEntryType::FOLDER: param_new.genre = ""; break;
+        case eEntryType::CUSTOM_FOLDER: param_new.genre = i18n::s(i18nText::CUSTOM_FOLDER_DESCRIPTION); break;
+        case eEntryType::COURSE_FOLDER: param_new.genre = i18n::s(i18nText::COURSE_FOLDER_DESCRIPTION); break;
 
         case eEntryType::ARENA_FOLDER:
         case eEntryType::ARENA_COMMAND:
-        case eEntryType::ARENA_LOBBY: text["genre"] = i18n::s(i18nText::ARENA_FOLDER_DESCRIPTION); break;
+        case eEntryType::ARENA_LOBBY: param_new.genre = i18n::s(i18nText::ARENA_FOLDER_DESCRIPTION); break;
 
         case eEntryType::UNKNOWN:
         case eEntryType::NEW_SONG_FOLDER:
@@ -1188,13 +1206,13 @@ void setEntryInfo(const size_t idx)
         State::set(IndexOption::SELECT_ENTRY_LAMP, param["lamp"]);
         State::set(IndexOption::SELECT_ENTRY_RANK, param_new.rank);
 
-        State::set(IndexText::PLAY_TITLE, text["title"]);
-        State::set(IndexText::PLAY_SUBTITLE, text["subtitle"]);
-        State::set(IndexText::PLAY_FULLTITLE, text["fulltitle"]);
-        State::set(IndexText::PLAY_ARTIST, text["artist"]);
-        State::set(IndexText::PLAY_SUBARTIST, text["subartist"]);
-        State::set(IndexText::PLAY_GENRE, text["genre"]);
-        State::set(IndexText::PLAY_DIFFICULTY, text["version"]);
+        State::set(IndexText::PLAY_TITLE, param_new.title);
+        State::set(IndexText::PLAY_SUBTITLE, param_new.subtitle);
+        State::set(IndexText::PLAY_FULLTITLE, param_new.fulltitle);
+        State::set(IndexText::PLAY_ARTIST, param_new.artist);
+        State::set(IndexText::PLAY_SUBARTIST, param_new.subartist);
+        State::set(IndexText::PLAY_GENRE, param_new.genre);
+        State::set(IndexText::PLAY_DIFFICULTY, param_new.version);
 
         State::set(IndexNumber::PLAY_BPM, param["bpm"]);
         State::set(IndexNumber::INFO_BPM_MIN, param["minbpm"]);
@@ -1295,16 +1313,16 @@ void setEntryInfo(const size_t idx)
         State::set(IndexOption::COURSE_STAGE3_DIFFICULTY, param["coursedifficulty3"]);
         State::set(IndexOption::COURSE_STAGE4_DIFFICULTY, param["coursedifficulty4"]);
         State::set(IndexOption::COURSE_STAGE5_DIFFICULTY, param["coursedifficulty5"]);
-        State::set(IndexText::COURSE_STAGE1_TITLE, text["coursetitle1"]);
-        State::set(IndexText::COURSE_STAGE2_TITLE, text["coursetitle2"]);
-        State::set(IndexText::COURSE_STAGE3_TITLE, text["coursetitle3"]);
-        State::set(IndexText::COURSE_STAGE4_TITLE, text["coursetitle4"]);
-        State::set(IndexText::COURSE_STAGE5_TITLE, text["coursetitle5"]);
-        State::set(IndexText::COURSE_STAGE1_SUBTITLE, text["coursesubtitle1"]);
-        State::set(IndexText::COURSE_STAGE2_SUBTITLE, text["coursesubtitle2"]);
-        State::set(IndexText::COURSE_STAGE3_SUBTITLE, text["coursesubtitle3"]);
-        State::set(IndexText::COURSE_STAGE4_SUBTITLE, text["coursesubtitle4"]);
-        State::set(IndexText::COURSE_STAGE5_SUBTITLE, text["coursesubtitle5"]);
+        State::set(IndexText::COURSE_STAGE1_TITLE, param_new.courses[0].title);
+        State::set(IndexText::COURSE_STAGE2_TITLE, param_new.courses[1].title);
+        State::set(IndexText::COURSE_STAGE3_TITLE, param_new.courses[2].title);
+        State::set(IndexText::COURSE_STAGE4_TITLE, param_new.courses[3].title);
+        State::set(IndexText::COURSE_STAGE5_TITLE, param_new.courses[4].title);
+        State::set(IndexText::COURSE_STAGE1_SUBTITLE, param_new.courses[0].subtitle);
+        State::set(IndexText::COURSE_STAGE2_SUBTITLE, param_new.courses[1].subtitle);
+        State::set(IndexText::COURSE_STAGE3_SUBTITLE, param_new.courses[2].subtitle);
+        State::set(IndexText::COURSE_STAGE4_SUBTITLE, param_new.courses[3].subtitle);
+        State::set(IndexText::COURSE_STAGE5_SUBTITLE, param_new.courses[4].subtitle);
     }
 
     setPlayModeInfo();
