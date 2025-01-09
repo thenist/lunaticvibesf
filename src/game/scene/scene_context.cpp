@@ -514,28 +514,23 @@ void sortSongList()
         currentEntryHash = gSelectContext.entries.at(gSelectContext.selectedEntryIndex).first->md5;
 
     auto& entries = gSelectContext.entries;
-    std::sort(entries.begin(), entries.end(), [](const Entry& entry1, const Entry& entry2) {
+    r::sort(entries, [](const Entry& entry1, const Entry& entry2) {
         auto& lhs = entry1.first;
         auto& rhs = entry2.first;
         if (lhs->type() != rhs->type())
-        {
             return lhs->type() < rhs->type();
-        }
-        else if (lhs->type() == eEntryType::CUSTOM_FOLDER)
+        if (lhs->type() == eEntryType::CUSTOM_FOLDER)
         {
             {
                 const auto lhs_table = std::reinterpret_pointer_cast<EntryFolderTable>(lhs);
                 const auto rhs_table = std::reinterpret_pointer_cast<EntryFolderTable>(rhs);
-
                 if (lhs_table && rhs_table)
-                {
                     return lhs_table->getIndex() < rhs_table->getIndex();
-                }
             }
 
             return entry1.first->md5 < entry2.first->md5;
         }
-        else
+
         {
             std::shared_ptr<ChartFormatBase> l, r;
             if (lhs->type() == eEntryType::SONG || lhs->type() == eEntryType::RIVAL_SONG)
@@ -1575,7 +1570,7 @@ void createNotification(StringContent text)
     gOverlayContext.notifications.emplace_back(lunaticvibes::Time(), std::move(text));
 }
 
-[[nodiscard]] inline SkinType skinTypeForKeysBattle(unsigned keys)
+[[nodiscard]] static SkinType skinTypeForKeysBattle(unsigned keys)
 {
     switch (keys)
     {
