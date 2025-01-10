@@ -1199,7 +1199,7 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
         _moneyScoreAnim.from = moneyScore;
         moneyScore += 1.0 * maxMoneyScore / getNoteCount();
         _moneyScoreAnim.to = moneyScore;
-        _moneyScoreAnim.start = lunaticvibes::Time{};
+        _moneyScoreAnim.start = t;
         _moneyScoreAnim.end = _moneyScoreAnim.start + MONEY_SCORE_ANIMATION_TIME;
         exScore += 2;
         ++_basic.combo;
@@ -1212,7 +1212,7 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
         _moneyScoreAnim.from = moneyScore;
         moneyScore += 0.5 * maxMoneyScore / getNoteCount();
         _moneyScoreAnim.to = moneyScore;
-        _moneyScoreAnim.start = lunaticvibes::Time{};
+        _moneyScoreAnim.start = t;
         _moneyScoreAnim.end = _moneyScoreAnim.start + MONEY_SCORE_ANIMATION_TIME;
         exScore += 1;
         ++_basic.combo;
@@ -1225,7 +1225,7 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
         _moneyScoreAnim.from = moneyScore;
         moneyScore += 0.25 * maxMoneyScore / getNoteCount();
         _moneyScoreAnim.to = moneyScore;
-        _moneyScoreAnim.start = lunaticvibes::Time{};
+        _moneyScoreAnim.start = t;
         _moneyScoreAnim.end = _moneyScoreAnim.start + MONEY_SCORE_ANIMATION_TIME;
         ++_basic.combo;
         break;
