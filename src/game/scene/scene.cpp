@@ -349,7 +349,7 @@ void SceneBase::updateImgui()
             size_t count = 0;
             for (size_t i = 0; i < 4; ++i)
             {
-                IndexText idx = IndexText(int(IndexText::_OVERLAY_TOPLEFT) + i);
+                auto idx = IndexText(int(IndexText::_OVERLAY_TOPLEFT) + i);
                 if (!State::get(idx).empty())
                 {
                     ImGui::PushID(overlayTextID[count++]);

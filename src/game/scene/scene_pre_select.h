@@ -2,15 +2,16 @@
 #include "scene.h"
 #include "scene_context.h"
 
-class ScenePreSelect : public SceneBase
+#include <common/types.h>
+
+class ScenePreSelect final : public SceneBase
 {
 public:
     ScenePreSelect();
     ~ScenePreSelect() override;
 
 protected:
-    // Looper callbacks
-    enum class SceneState
+    enum class SceneState : uint8_t
     {
         LoadSongs,
         LoadTables,

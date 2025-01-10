@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 
-enum class SceneType
+enum class SceneType : uint8_t
 {
     NOT_INIT,
     PRE_SELECT,

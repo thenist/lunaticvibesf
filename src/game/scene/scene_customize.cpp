@@ -13,8 +13,11 @@
 #include <game/sound/sound_mgr.h>
 #include <game/sound/soundset_lr2.h>
 
+#include <algorithm>
 #include <fstream>
 #include <string_view>
+
+namespace r = std::ranges;
 
 void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType);
 
@@ -131,7 +134,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
 
     auto skinFileList =
         recursiveFindFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/"), ".lr2skin");
-    std::sort(skinFileList.begin(), skinFileList.end());
+    r::sort(skinFileList);
     auto dummySharedSprites = std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>();
     for (auto& p : skinFileList)
     {
@@ -150,7 +153,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
 
     auto soundsetFileList =
         recursiveFindFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/"), ".lr2ss");
-    std::sort(soundsetFileList.begin(), soundsetFileList.end());
+    r::sort(soundsetFileList);
     for (auto& p : soundsetFileList)
     {
         soundsetList.push_back(fs::absolute(p));
@@ -628,8 +631,7 @@ void SceneCustomize::load(SkinType mode)
                 {
                     Option& op = itOp->second;
                     auto selectedEntryName = node.second.as<std::string>();
-                    if (const auto itEntry = std::find(op.entries.begin(), op.entries.end(), selectedEntryName);
-                        itEntry != op.entries.end())
+                    if (const auto itEntry = r::find(op.entries, selectedEntryName); itEntry != op.entries.end())
                     {
                         op.selectedEntry = std::distance(op.entries.begin(), itEntry);
                     }

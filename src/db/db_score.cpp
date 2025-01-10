@@ -1,23 +1,27 @@
 #include "db_score.h"
 
+#include <common/assert.h>
+#include <common/hash.h>
+#include <common/log.h>
+#include <common/types.h>
+#include <db/db_conn.h>
+#include <db/db_lr2_score.h>
+
 #include <algorithm>
 #include <any>
+#include <cstddef>
+#include <cstdio>
 #include <exception>
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <stdint.h>
 
-#include "common/hash.h"
-#include "common/log.h"
-#include "common/types.h"
-#include "db/db_conn.h"
-#include <common/assert.h>
-#include <db/db_lr2_score.h>
-
-bool convert_score_bms(ScoreBMS& out, const std::vector<std::any>& in)
+static bool convert_score_bms(ScoreBMS& out, const std::vector<std::any>& in)
 {
     static constexpr size_t SCORE_BMS_PARAM_COUNT = 21;
     if (in.size() < SCORE_BMS_PARAM_COUNT)
@@ -81,7 +85,7 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
 {
     int ret;
 
-    std::string hashStr = hash.hexdigest();
+    const std::string hashStr = hash.hexdigest();
 
     auto pRecord = getScoreBMS(tableName, hash);
     if (pRecord)
@@ -251,13 +255,13 @@ void ScoreDB::saveChartScoreBmsToHistory(const HashMD5& hash, const ScoreBMS& sc
 {
     const auto lamp = static_cast<int>(score.lamp);
     const auto play_time = score.play_time.norm();
-    int ret = exec("INSERT INTO score_history_bms"
-                   "(md5,notes,score,fast,slow,maxcombo,addtime,exscore,lamp,pgreat,great,good,bad,bpoor,miss,bp,"
-                   "cb,playedtime,replay) "
-                   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                   {hash.hexdigest(), score.notes, score.score, score.fast, score.slow, score.maxcombo, score.addtime,
-                    score.exscore, lamp, score.pgreat, score.great, score.good, score.bad, score.kpoor, score.miss,
-                    score.bp, score.combobreak, play_time, score.replayFileName});
+    const int ret = exec("INSERT INTO score_history_bms"
+                         "(md5,notes,score,fast,slow,maxcombo,addtime,exscore,lamp,pgreat,great,good,bad,bpoor,miss,bp,"
+                         "cb,playedtime,replay) "
+                         "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                         {hash.hexdigest(), score.notes, score.score, score.fast, score.slow, score.maxcombo,
+                          score.addtime, score.exscore, lamp, score.pgreat, score.great, score.good, score.bad,
+                          score.kpoor, score.miss, score.bp, score.combobreak, play_time, score.replayFileName});
     if (ret != SQLITE_OK)
         lunaticvibes::verify_failed(("[ScoreDB] Save score: " + std::string{errmsg()}).c_str());
 }

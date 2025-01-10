@@ -27,6 +27,8 @@
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
 
+namespace r = std::ranges;
+
 static constexpr lunaticvibes::Time USE_FIRST_KEYSOUNDS{-1234};
 
 bool ScenePlay::isPlaymodeDP() const
@@ -797,7 +799,7 @@ bool ScenePlay::createRuleset()
         }
 
         auto rulesetFactoryFunc = [&](int slot) -> std::shared_ptr<RulesetBMS> {
-            enum ObjType
+            enum ObjType : uint8_t
             {
                 EMPTY,
                 BASE,
@@ -2851,10 +2853,7 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
             notes[2] = {note, note->time.hres()};
         }
 
-        const HitableNote* soonest_note =
-            std::min_element(notes.begin(), notes.end(), [](const NotePair& lhs, const NotePair& rhs) {
-                return lhs.second < rhs.second;
-            })->first;
+        const HitableNote* soonest_note = r::min_element(notes, {}, &NotePair::second)->first;
 
         if (soonest_note && (rt == USE_FIRST_KEYSOUNDS || soonest_note->time - rt <= MIN_REMAP_INTERVAL))
         {

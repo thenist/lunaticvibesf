@@ -52,7 +52,7 @@ bool lunaticvibes::in_test_mode()
     return false;
 }
 
-void mainLoop();
+static void mainLoop();
 
 int main(int argc, char* argv[])
 {

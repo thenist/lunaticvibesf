@@ -1,67 +1,87 @@
 #include "db_song.h"
 
-#include <algorithm>
-#include <atomic>
-#include <thread>
-#include <vector>
-
 #include <common/assert.h>
+#include <common/chartformat/chartformat.h>
 #include <common/chartformat/chartformat_types.h>
+#include <common/entry/entry_song.h>
 #include <common/hash.h>
 #include <common/log.h>
 #include <common/sysutil.h>
 #include <common/thread_pool.h>
 #include <common/u8.h>
 #include <common/utils.h>
+#include <db/db_conn.h>
 #include <game/chart/chart_types.h>
 
 #include <re2/re2.h>
+#include <re2/stringpiece.h>
+
+#include <algorithm>
+#include <any>
+#include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <exception>
+#include <filesystem>
+#include <functional>
+#include <future>
+#include <iterator>
+#include <list>
+#include <memory>
+#include <mutex>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
+
+namespace r = std::ranges;
 
 // TODO: NOT NULL everything.
-const char* CREATE_FOLDER_TABLE_STR = "CREATE TABLE IF NOT EXISTS folder( "
-                                      "pathmd5 TEXT PRIMARY KEY UNIQUE NOT NULL, "
-                                      "parent TEXT, "
-                                      "name TEXT, "
-                                      "type INTEGER NOT NULL DEFAULT 0, "
-                                      "path TEXT NOT NULL,"
-                                      "modtime INTEGER"
-                                      ");";
+static const char* CREATE_FOLDER_TABLE_STR = "CREATE TABLE IF NOT EXISTS folder( "
+                                             "pathmd5 TEXT PRIMARY KEY UNIQUE NOT NULL, "
+                                             "parent TEXT, "
+                                             "name TEXT, "
+                                             "type INTEGER NOT NULL DEFAULT 0, "
+                                             "path TEXT NOT NULL,"
+                                             "modtime INTEGER"
+                                             ");";
 
 // TODO: backbmp
 // TODO: NOT NULL everything.
-const char* CREATE_SONG_TABLE_STR = "CREATE TABLE IF NOT EXISTS song("
-                                    "md5 TEXT NOT NULL, "           // 0
-                                    "parent TEXT NOT NULL, "        // 1
-                                    "file TEXT NOT NULL, "          // 2
-                                    "type INTEGER NOT NULL, "       // 3
-                                    "title TEXT NOT NULL, "         // 4
-                                    "title2 TEXT NOT NULL, "        // 5
-                                    "artist TEXT NOT NULL, "        // 6
-                                    "artist2 TEXT NOT NULL, "       // 7
-                                    "genre TEXT NOT NULL, "         // 8
-                                    "version TEXT NOT NULL, "       // 9
-                                    "level REAL NOT NULL, "         // 10
-                                    "bpm REAL NOT NULL, "           // 11
-                                    "minbpm REAL NOT NULL, "        // 12
-                                    "maxbpm REAL NOT NULL, "        // 13
-                                    "length INTEGER NOT NULL, "     // 14
-                                    "totalnotes INTEGER NOT NULL, " // 15
-                                    "stagefile TEXT, "              // 16
-                                    "bannerfile TEXT, "             // 17
-                                    "gamemode INTEGER, "            // 18
-                                    "judgerank INTEGER, "           // 19
-                                    "total INTEGER, "               // 20
-                                    "playlevel INTEGER, "           // 21
-                                    "difficulty INTEGER, "          // 22
-                                    "longnote INTEGER, "            // 23
-                                    "landmine INTEGER, "            // 24
-                                    "metricmod INTEGER, "           // 25
-                                    "stop INTEGER, "                // 26
-                                    "bga INTEGER, "                 // 27
-                                    "random INTEGER, "              // 28
-                                    "addtime INTEGER, "             // 29
-                                    "CONSTRAINT pk_pf PRIMARY KEY (parent,file) "
-                                    ");";
+static const char* CREATE_SONG_TABLE_STR = "CREATE TABLE IF NOT EXISTS song("
+                                           "md5 TEXT NOT NULL, "           // 0
+                                           "parent TEXT NOT NULL, "        // 1
+                                           "file TEXT NOT NULL, "          // 2
+                                           "type INTEGER NOT NULL, "       // 3
+                                           "title TEXT NOT NULL, "         // 4
+                                           "title2 TEXT NOT NULL, "        // 5
+                                           "artist TEXT NOT NULL, "        // 6
+                                           "artist2 TEXT NOT NULL, "       // 7
+                                           "genre TEXT NOT NULL, "         // 8
+                                           "version TEXT NOT NULL, "       // 9
+                                           "level REAL NOT NULL, "         // 10
+                                           "bpm REAL NOT NULL, "           // 11
+                                           "minbpm REAL NOT NULL, "        // 12
+                                           "maxbpm REAL NOT NULL, "        // 13
+                                           "length INTEGER NOT NULL, "     // 14
+                                           "totalnotes INTEGER NOT NULL, " // 15
+                                           "stagefile TEXT, "              // 16
+                                           "bannerfile TEXT, "             // 17
+                                           "gamemode INTEGER, "            // 18
+                                           "judgerank INTEGER, "           // 19
+                                           "total INTEGER, "               // 20
+                                           "playlevel INTEGER, "           // 21
+                                           "difficulty INTEGER, "          // 22
+                                           "longnote INTEGER, "            // 23
+                                           "landmine INTEGER, "            // 24
+                                           "metricmod INTEGER, "           // 25
+                                           "stop INTEGER, "                // 26
+                                           "bga INTEGER, "                 // 27
+                                           "random INTEGER, "              // 28
+                                           "addtime INTEGER, "             // 29
+                                           "CONSTRAINT pk_pf PRIMARY KEY (parent,file) "
+                                           ");";
 static constexpr size_t SONG_PARAM_COUNT = 30;
 struct song_all_params
 {
@@ -133,12 +153,12 @@ struct song_all_params
         addtime = ANY_INT(queryResult[29]);
     }
 };
-bool convert_bms(const std::shared_ptr<ChartFormatBMSMeta>& chart, const std::vector<std::any>& in)
+static bool convert_bms(const std::shared_ptr<ChartFormatBMSMeta>& chart, const std::vector<std::any>& in)
 {
     if (in.size() < 30)
         return false;
 
-    song_all_params params(in);
+    const song_all_params params(in);
     chart->fileHash = HashMD5{params.md5};
     chart->folderHash = HashMD5{params.parent};
     chart->fileName = PathFromUTF8(params.file);
@@ -241,7 +261,7 @@ bool SongDB::asyncAddChartTask(const HashMD5& folder, const Path& path)
             removeChart(path, folder);
         }
 
-        std::shared_ptr<ChartFormatBase> c = ChartFormatBase::createFromFile(path, 2356);
+        const std::shared_ptr<ChartFormatBase> c = ChartFormatBase::createFromFile(path, 2356);
         if (c == nullptr)
         {
             LOG_WARNING << "[SongDB] File error: " << path;
@@ -255,13 +275,8 @@ bool SongDB::asyncAddChartTask(const HashMD5& folder, const Path& path)
             return false;
         }
 
-        {
-            std::unique_lock l(addCurrentPathMutex, std::try_to_lock);
-            if (l.owns_lock())
-            {
-                addCurrentPath = lunaticvibes::s(path.u8string());
-            }
-        }
+        if (const std::unique_lock l(addCurrentPathMutex, std::try_to_lock); l.owns_lock())
+            addCurrentPath = lunaticvibes::s(path.u8string());
 
         switch (c->type())
         {
@@ -322,7 +337,7 @@ bool SongDB::asyncAddChartTask(const HashMD5& folder, const Path& path)
         return false;
     };
 
-    bool ret = closure();
+    const bool ret = closure();
     if (ret)
         addChartSuccess++;
 
@@ -379,7 +394,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const Hash
     if (limit > 0)
         ss << " LIMIT " << limit;
 
-    std::string strSql = ss.str();
+    const std::string strSql = ss.str();
     auto result = query(strSql.c_str(), {tag, tag, tag, tag, tag, tag});
 
     std::vector<std::shared_ptr<ChartFormatBase>> ret;
@@ -476,10 +491,8 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
                 removing.push_front(i);
             }
         }
-        for (size_t i : removing)
-        {
+        for (const size_t i : removing)
             ret.erase(ret.begin() + i);
-        }
     }
 
     LOG_VERBOSE << "[SongDB] Found " << ret.size() << " songs";
@@ -498,7 +511,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const Ha
         ss << "parent=" << folder.hexdigest() << " AND ";
     ss << "addtime>=?";
 
-    std::string strSql = ss.str();
+    const std::string strSql = ss.str();
     auto result = query(strSql.c_str(), {(long long)addTime});
 
     std::vector<std::shared_ptr<ChartFormatBase>> ret;
@@ -580,7 +593,7 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
     resetAddSummary();
 
     std::atomic<bool> inAddFolderSession = true;
-    std::future<void> flush_db_task = std::async(std::launch::async, [&inAddFolderSession, this]() {
+    const std::future<void> flush_db_task = std::async(std::launch::async, [&inAddFolderSession, this]() {
         SetThreadName("flush db task");
         while (inAddFolderSession)
         {
@@ -591,11 +604,12 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
             t.commit();
         }
     });
+    flush_db_task.wait_for(std::chrono::seconds(0));
 
     int count = 0;
     for (const auto& p : paths)
     {
-        int subCount = addSubFolder(p, ROOT_FOLDER_HASH);
+        const int subCount = addSubFolder(p, ROOT_FOLDER_HASH);
         count += subCount;
         LOG_INFO << "[SongDB] " << p << ": added " << subCount << " entries";
     }
@@ -626,10 +640,10 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
     {
         LOG_VERBOSE << "[SongDB] Sub folder already exists (" << path << ")";
 
-        HashMD5 folderMD5{ANY_STR(q[0][0])};
+        const HashMD5 folderMD5{ANY_STR(q[0][0])};
         // std::string folderPath = ANY_STR(q[0][1]);
         auto folderType = (FolderType)ANY_INT(q[0][2]);
-        long long folderModifyTimeDB = ANY_INT(q[0][3]);
+        const long long folderModifyTimeDB = ANY_INT(q[0][3]);
 
         const bool step_in_subfolder = folderType != FolderType::SONG_BMS;
         if (getFileLastWriteTime(path) <= folderModifyTimeDB && !step_in_subfolder)
@@ -641,7 +655,7 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
         return refreshExistingFolder(folderMD5, path, folderType);
     }
 
-    HashMD5 folderHash = md5(lunaticvibes::s(path.u8string()));
+    const HashMD5 folderHash = md5(lunaticvibes::s(path.u8string()));
     return addNewFolder(folderHash, path, parentHash);
 }
 
@@ -690,7 +704,7 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
 
     int ret;
     auto folderName = fs::weakly_canonical(path).filename();
-    long long folderModifyTime = getFileLastWriteTime(path);
+    const long long folderModifyTime = getFileLastWriteTime(path);
     if (!parentHash.empty())
         ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)",
                    {hash.hexdigest(), parentHash.hexdigest(), folderName.u8string(), (int)type, path.u8string(),
@@ -730,7 +744,7 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
         if (_asyncLoadStopRequested)
             break;
 
-        int addedCount = addSubFolder(sub, hash);
+        const int addedCount = addSubFolder(sub, hash);
         if (addedCount > 0)
             count += addedCount;
     }
@@ -764,7 +778,7 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
             if (analyzeChartType(f) != eChartFormat::UNKNOWN)
                 bmsFiles.push_back(fs::absolute(f));
         }
-        std::sort(bmsFiles.begin(), bmsFiles.end());
+        r::sort(bmsFiles);
 
         // get charts from db
         std::vector<Path> existedFiles;
@@ -777,7 +791,7 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
             {
                 existedFiles.push_back(existedList->getChart(i)->absolutePath);
             }
-            std::sort(existedFiles.begin(), existedFiles.end());
+            r::sort(existedFiles);
 
             // delete file-not-found song entries
             if (!existedFiles.empty())
@@ -787,19 +801,19 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
 
                 for (size_t i = 0; i < existedList->getContentsCount(); ++i)
                 {
-                    std::shared_ptr<ChartFormatBase> chart = existedList->getChart(i);
+                    const std::shared_ptr<ChartFormatBase> chart = existedList->getChart(i);
                     if (!fs::exists(chart->absolutePath))
                     {
                         deletedFiles.push_back(chart->fileHash);
                     }
                     else
                     {
-                        long long fstime = getFileLastWriteTime(path);
+                        const long long fstime = getFileLastWriteTime(path);
                         if (auto q = query("SELECT addtime FROM song WHERE md5=? AND parent=?",
                                            {chart->fileHash.hexdigest(), hash.hexdigest()});
                             !q.empty())
                         {
-                            long long dbTime = ANY_INT(q[0][0]);
+                            const long long dbTime = ANY_INT(q[0][0]);
 
                             if (fstime > dbTime && md5file(chart->absolutePath) != chart->fileHash)
                             {
@@ -829,16 +843,14 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
 
                 // remove modified files from existedFiles, and add again below
                 std::vector<Path> existedFilesReal;
-                std::set_difference(existedFiles.begin(), existedFiles.end(), modifiedFiles.begin(),
-                                    modifiedFiles.end(), std::back_inserter(existedFilesReal));
+                r::set_difference(existedFiles, modifiedFiles, std::back_inserter(existedFilesReal));
                 std::swap(existedFiles, existedFilesReal);
             }
         }
 
         // only add new entries
         std::vector<Path> newFiles;
-        std::set_difference(bmsFiles.begin(), bmsFiles.end(), existedFiles.begin(), existedFiles.end(),
-                            std::back_inserter(newFiles));
+        r::set_difference(bmsFiles, existedFiles, std::back_inserter(newFiles));
         for (auto& p : newFiles)
         {
             if (_asyncLoadStopRequested)
@@ -853,8 +865,8 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
         {
             // update modification time
             // saving current time here is OK.
-            long long nowTime = getFileTimeNow();
-            if (int ret = exec("UPDATE folder SET modtime=? WHERE pathmd5=?", {nowTime, hash.hexdigest()});
+            const long long nowTime = getFileTimeNow();
+            if (const int ret = exec("UPDATE folder SET modtime=? WHERE pathmd5=?", {nowTime, hash.hexdigest()});
                 ret != SQLITE_OK)
             {
                 LOG_WARNING << "[SongDB] Update modification time fail: [" << ret << "] " << errmsg() << " (" << path
@@ -880,7 +892,7 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
             {
                 existedFiles.push_back(existedList->getEntry(i)->getPath());
             }
-            std::sort(existedFiles.begin(), existedFiles.end());
+            r::sort(existedFiles);
 
             // delete file-not-found folders
             if (!existedFiles.empty())
@@ -905,14 +917,14 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
         // just add new entries
         int count = 0;
 
-        std::vector<Path> subFolders;
+        const std::vector<Path> subFolders;
         for (auto& f : fs::directory_iterator(path))
         {
             if (_asyncLoadStopRequested)
                 break;
             if (fs::is_directory(f))
             {
-                int addedCount = addSubFolder(f, hash);
+                const int addedCount = addSubFolder(f, hash);
                 if (addedCount > 0)
                     count += addedCount;
             }
@@ -922,8 +934,8 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
         {
             // update modification time
             // saving current time here is OK.
-            long long nowTime = getFileTimeNow();
-            if (int ret = exec("UPDATE folder SET modtime=? WHERE pathmd5=?", {nowTime, hash.hexdigest()});
+            const long long nowTime = getFileTimeNow();
+            if (const int ret = exec("UPDATE folder SET modtime=? WHERE pathmd5=?", {nowTime, hash.hexdigest()});
                 ret != SQLITE_OK)
             {
                 LOG_WARNING << "[SongDB] Update modification time fail: [" << ret << "] " << errmsg() << " (" << path
@@ -956,7 +968,7 @@ HashMD5 SongDB::getFolderParent(const HashMD5& folder) const
     auto result = query("SELECT type,parent FROM folder WHERE path=?", {folder.hexdigest()});
     if (!result.empty())
     {
-        auto leaf = result[0];
+        const auto& leaf = result[0];
         if (ANY_INT(leaf[0]) != FOLDER)
         {
             LOG_WARNING << "[SongDB] Get folder parent type error: excepted " << FOLDER << ", get " << ANY_INT(leaf[0])
@@ -984,7 +996,7 @@ std::pair<bool, Path> SongDB::getFolderPath(const HashMD5& folder) const
         auto result = query("SELECT type,path FROM folder WHERE pathmd5=?", {folder.hexdigest()});
         if (!result.empty())
         {
-            auto leaf = result[0];
+            const auto& leaf = result[0];
             return {true, PathFromUTF8(ANY_STR(leaf[1]))};
         }
     }
@@ -1032,7 +1044,7 @@ std::shared_ptr<EntryFolderRegular> SongDB::browse(const HashMD5& root, bool rec
         for (const auto& index : it->second)
         {
             const auto& c = folderQueryPool[index];
-            HashMD5 md5{ANY_STR(c[0])};
+            const HashMD5 md5{ANY_STR(c[0])};
             // auto parent = ANY_STR(c[1]);
             auto name = ANY_STR(c[2]);
             auto type = (FolderType)ANY_INT(c[3]);

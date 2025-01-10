@@ -1,12 +1,16 @@
 #pragma once
-#include "game/skin/skin_mgr.h"
+
 #include "scene.h"
+
+#include <common/types.h>
+#include <game/skin/skin_mgr.h>
+
 #include <memory>
 
 namespace lunaticvibes
 {
 
-enum class CustomizeState
+enum class CustomizeState : uint8_t
 {
     Start,
     Main,

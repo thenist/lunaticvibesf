@@ -1,6 +1,12 @@
+#include "db_lr2_score.h"
+
 #include <common/assert.h>
 #include <common/log.h>
-#include <db/db_lr2_score.h>
+#include <db/db_conn.h>
+
+#include <any>
+#include <functional>
+#include <vector>
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 

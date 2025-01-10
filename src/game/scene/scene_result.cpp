@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <filesystem>
 
-ScoreBMS::Lamp optionLampToBms(const Option::e_lamp_type lamp)
+static ScoreBMS::Lamp optionLampToBms(const Option::e_lamp_type lamp)
 {
     switch (lamp)
     {

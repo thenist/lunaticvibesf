@@ -1,12 +1,19 @@
-#include <string>
-#include <string_view>
+#include <common/assert.h>
+#include <common/log.h>
+#include <db/db_conn.h>
 
 #include <sqlite3.h>
 
-#include <common/assert.h>
-#include <common/log.h>
-#include <common/u8.h>
-#include <db/db_conn.h>
+#include <any>
+#include <cstddef>
+#include <ctime>
+#include <functional>
+#include <initializer_list>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 void lunaticvibes::SqliteDeleter::operator()(sqlite3* db)
 {
@@ -24,7 +31,7 @@ SQLite::SQLite(const char* path, std::string tag_, SQLite::OpenMode mode) : tag(
     case OpenMode::ReadOnly: flags = SQLITE_OPEN_READONLY; break;
     }
     sqlite3* db = nullptr;
-    int ret = sqlite3_open_v2(path, &db, flags, nullptr);
+    const int ret = sqlite3_open_v2(path, &db, flags, nullptr);
     if (ret != SQLITE_OK)
     {
         LOG_ERROR << "[sqlite3] sql failed to open db at path '" << path << "' (tag '" << tag << "'): [" << ret << "] "
@@ -335,7 +342,7 @@ bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& 
 
 bool SQLite::isReadOnly() const
 {
-    int ret = sqlite3_db_readonly(_db.get(), nullptr);
+    const int ret = sqlite3_db_readonly(_db.get(), nullptr);
     // TODO: remove this check when SQLite can't construct invalid object.
     if (ret == -1)
     {
