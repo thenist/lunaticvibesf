@@ -355,8 +355,7 @@ struct FixedUpdater
 
 void mainLoop()
 {
-    GenericInfoUpdater genericInfo{1};
-    genericInfo.loopStart();
+    FixedUpdater update_global_generic_info{lunaticvibes::Time::now()};
 
     SceneType currentScene = SceneType::NOT_INIT;
 
@@ -433,6 +432,10 @@ void mainLoop()
             }
         }
 
+        // This isn't 100% right as update_global_generic_info() doesn't need to catch up if it fell behind.
+        update_global_generic_info(t, lunaticvibes::global_generic_info_update_rate,
+                                   &lunaticvibes::update_global_generic_info);
+
         // draw
         {
             graphics_clear();
@@ -470,6 +473,4 @@ void mainLoop()
         scene->inputLoopEnd();
         scene.reset();
     }
-
-    genericInfo.loopEnd();
 }

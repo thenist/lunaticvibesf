@@ -1,27 +1,22 @@
 #include "generic_info.h"
 
-#include <common/asynclooper.h>
 #include <common/sysutil.h>
 #include <game/runtime/state.h>
 
-#include <chrono>
 #include <ctime>
 
-GenericInfoUpdater::GenericInfoUpdater(unsigned rate)
-    : AsyncLooper("GenericInfoUpdater", std::bind_front(&GenericInfoUpdater::loop, this), rate)
+void lunaticvibes::update_global_generic_info(const lunaticvibes::Time& t)
 {
-}
-
-void GenericInfoUpdater::loop()
-{
-    State::set(IndexNumber::FPS, gFrameCount[FRAMECOUNT_IDX_FPS] / _rate);
+    constexpr unsigned rate = lunaticvibes::global_generic_info_update_rate;
+    State::set(IndexNumber::FPS, gFrameCount[FRAMECOUNT_IDX_FPS] * rate);
     gFrameCount[FRAMECOUNT_IDX_FPS] = 0;
-    State::set(IndexNumber::INPUT_DETECT_FPS, gFrameCount[FRAMECOUNT_IDX_INPUT] / _rate);
+    State::set(IndexNumber::INPUT_DETECT_FPS, gFrameCount[FRAMECOUNT_IDX_INPUT] * rate);
     gFrameCount[FRAMECOUNT_IDX_INPUT] = 0;
 
-    std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    tm tt;
-    auto d = lunaticvibes::safe_localtime(&t, &tt);
+    constexpr auto millisec_in_sec = 1000;
+    const std::time_t time_t_t = t.norm() / millisec_in_sec;
+    tm d_;
+    auto d = lunaticvibes::safe_localtime(&time_t_t, &d_);
     if (d)
     {
         State::set(IndexNumber::DATE_YEAR, d->tm_year + 1900);

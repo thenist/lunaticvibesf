@@ -1,19 +1,21 @@
 #pragma once
 
-#include <common/asynclooper.h>
+#include <common/beat.h>
+#include <common/types.h>
 
 #include <atomic>
-#include <ctime>
 
 inline std::atomic<unsigned> gFrameCount[2]{0};
-constexpr size_t FRAMECOUNT_IDX_FPS = 0;
-constexpr size_t FRAMECOUNT_IDX_INPUT = 1;
-
-class GenericInfoUpdater : public AsyncLooper
+enum lunaticvibesFrameCountIndex : uint8_t
 {
-public:
-    GenericInfoUpdater(unsigned rate);
-
-private:
-    void loop();
+    FRAMECOUNT_IDX_FPS = 0,
+    FRAMECOUNT_IDX_INPUT = 1,
 };
+
+namespace lunaticvibes
+{
+
+constexpr unsigned global_generic_info_update_rate = 2;
+void update_global_generic_info(const lunaticvibes::Time&);
+
+} // namespace lunaticvibes
