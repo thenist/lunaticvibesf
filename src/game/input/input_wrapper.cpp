@@ -111,7 +111,7 @@ void InputWrapper::loopAsync()
             }
             if (p.any())
             {
-                std::shared_lock l(_inputMutex, std::defer_lock);
+                std::shared_lock l(_inputMutex);
 
                 for (auto& [cbname, callback] : _keyboardCallbackMap)
                     callback(mask, now);
@@ -181,7 +181,7 @@ void InputWrapper::loopAsync()
                 }
                 if (p.any())
                 {
-                    std::shared_lock l(_inputMutex, std::defer_lock);
+                    std::shared_lock l(_inputMutex);
 
                     for (auto& [cbname, callback] : _joystickCallbackMap)
                         callback(mask, device, now);
@@ -213,7 +213,7 @@ void InputWrapper::loopAsync()
                 }
                 if (moved)
                 {
-                    std::shared_lock l(_inputMutex, std::defer_lock);
+                    std::shared_lock l(_inputMutex);
 
                     for (auto& [cbname, callback] : _absaxisCallbackMap)
                         callback(mask, device, now);
@@ -224,8 +224,7 @@ void InputWrapper::loopAsync()
 
     // regular callbacks
     {
-        std::shared_lock l(_inputMutex, std::defer_lock);
-        if (l.try_lock())
+        std::shared_lock l(_inputMutex);
         {
             if (p != 0)
             {

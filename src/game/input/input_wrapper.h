@@ -33,32 +33,34 @@ using InputCallback = std::function<void(InputMask&, const lunaticvibes::Time&, 
 
 } // namespace lunaticvibes
 
-// FUNC:                                          BRDUEHDI><v^543210987654321_
+// NOLINTBEGIN(cert-err58-cpp)
+// FUNC:                                       BRDUEHDI><v^543210987654321_
 inline const InputMask INPUT_MASK_FUNC{"0000000111111111111111111111111111100000000000000000000000000000000"};
-// 1P:                                                                                        sDUEA987654321SS
+// 1P:                                                                                   sDUEA987654321SS
 inline const InputMask INPUT_MASK_1P{"0000000000000000000000000000000000000000000000000001111111111111111"};
-// 2P:                                                                        sDUEA987654321SS
+// 2P:                                                                   sDUEA987654321SS
 inline const InputMask INPUT_MASK_2P{"0000000000000000000000000000000000011111111111111110000000000000000"};
-// Mouse:                                  DU54321
+// Mouse:                                DU54321
 inline const InputMask INPUT_MASK_MOUSE{"1111111000000000000000000000000000000000000000000000000000000000000"};
 
-//                                                 Return >                     2P: 9 7 5 3 1  1P: 9 7 5 3 1
+//                                                Return >                     2P: 9 7 5 3 1  1P: 9 7 5 3 1
 inline const InputMask INPUT_MASK_DECIDE{"0000000010000001000000000000000000000000010101010100000010101010100"};
-//                                                Bksp     <                    2P:  8 6 4 2   1P:  8 6 4 2
+//                                               Bksp     <                    2P:  8 6 4 2   1P:  8 6 4 2
 inline const InputMask INPUT_MASK_CANCEL{"0000000100000000100000000000000000000000001010101000000001010101000"};
-//                                                           ^                  2P:           S1P:           S
+//                                                          ^                  2P:           S1P:           S
 inline const InputMask INPUT_MASK_NAV_UP{"0000000000000000001000000000000000000000000000000001000000000000001"};
-//                                                          v                   2P:          S 1P:          S
+//                                                         v                   2P:          S 1P:          S
 inline const InputMask INPUT_MASK_NAV_DN{"0000000000000000010000000000000000000000000000000010000000000000010"};
 
-//                                                    Return >                     2P:     5      1P:     5
+//                                                   Return >                     2P:     5      1P:     5
 inline const InputMask INPUT_MASK_DECIDE_9K{"0000000010000001000000000000000000000000000001000000000000001000000"};
-//                                                   Bksp     <                    2P:   7   3    1P:   7   3
+//                                                  Bksp     <                    2P:   7   3    1P:   7   3
 inline const InputMask INPUT_MASK_CANCEL_9K{"0000000100000000100000000000000000000000000100010000000000100010000"};
-//                                                              ^                  2P:      4    S1P:      4    S
+//                                                             ^                  2P:      4    S1P:      4    S
 inline const InputMask INPUT_MASK_NAV_UP_9K{"0000000000000000001000000000000000000000000000100001000000000100001"};
-//                                                             v                   2P:    6     S 1P:    6     S
+//                                                            v                   2P:    6     S 1P:    6     S
 inline const InputMask INPUT_MASK_NAV_DN_9K{"0000000000000000010000000000000000000000000010000010000000010000010"};
+// NOLINTEND(cert-err58-cpp)
 
 // InputWrapper
 //  Start a process to check input upon 1000hz polling.
@@ -106,15 +108,7 @@ private:
     void loopAsync();
 
 public:
-    [[nodiscard]] bool isPressed(Input::Pad k) { return (!_prev[k]) && (_curr[k]); }
-
-    [[nodiscard]] bool isReleased(Input::Pad k) { return (_prev[k]) && (!_curr[k]); }
-
-    [[nodiscard]] bool isHolding(Input::Pad k) { return (_prev[k]) && (_curr[k]); }
-
-    [[nodiscard]] InputMask Pressed() const { return ~_prev & _curr; }
     [[nodiscard]] InputMask Holding() const { return _prev & _curr; }
-    [[nodiscard]] InputMask Released() const { return _prev & ~_curr; }
 
     [[nodiscard]] std::pair<int, int> getCursorPos() const { return {_cursor_x, _cursor_y}; }
 

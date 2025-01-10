@@ -2,10 +2,10 @@
 
 #include <utility>
 
-#include "common/beat.h"
-#include "common/chartformat/chartformat.h"
-#include "game/chart/chart.h"
-#include "game/input/input_wrapper.h"
+#include <common/beat.h>
+#include <common/chartformat/chartformat.h>
+#include <game/chart/chart.h>
+#include <game/input/input_wrapper.h>
 
 enum class RulesetType
 {
