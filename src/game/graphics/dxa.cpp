@@ -48,13 +48,13 @@ using DARC_HEAD_VER5 = struct tagDARC_HEAD_VER5
     u16 Version;          // バージョン
     u32 HeadSize;         // ヘッダ情報の DARC_HEAD_VER5 を抜いた全サイズ
     u32 DataStartAddress; // 最初のファイルのデータが格納されているデータアドレス(ファイルの先頭アドレスをアドレス０とする)
-    u32 FileNameTableStartAddress; // ファイル名テーブルの先頭アドレス(ファイルの先頭アドレスをアドレス０とする)
-    u32 FileTableStartAddress; // ファイルテーブルの先頭アドレス(メンバ変数 FileNameTableStartAddress
-                               // のアドレスを０とする)
+    u32 FileNameTableStartAddress;  // ファイル名テーブルの先頭アドレス(ファイルの先頭アドレスをアドレス０とする)
+    u32 FileTableStartAddress;      // ファイルテーブルの先頭アドレス(メンバ変数 FileNameTableStartAddress
+                                    // のアドレスを０とする)
     u32 DirectoryTableStartAddress; // ディレクトリテーブルの先頭アドレス(メンバ変数 FileNameTableStartAddress
                                     // のアドレスを０とする) アドレス０から配置されている DARC_DIRECTORY_VER5
                                     // 構造体がルートディレクトリ
-    u32 CodePage; // ファイル名に使用しているコードページ番号
+    u32 CodePage;                   // ファイル名に使用しているコードページ番号
 };
 
 // アーカイブデータの最初のヘッダ(Ver 0x0003まで)
@@ -64,9 +64,9 @@ using DARC_HEAD_VER3 = struct tagDARC_HEAD_VER3
     u16 Version;          // バージョン
     u32 HeadSize;         // ヘッダ情報の DARC_HEAD_VER5 を抜いた全サイズ
     u32 DataStartAddress; // 最初のファイルのデータが格納されているデータアドレス(ファイルの先頭アドレスをアドレス０とする)
-    u32 FileNameTableStartAddress; // ファイル名テーブルの先頭アドレス(ファイルの先頭アドレスをアドレス０とする)
-    u32 FileTableStartAddress; // ファイルテーブルの先頭アドレス(メンバ変数 FileNameTableStartAddress
-                               // のアドレスを０とする)
+    u32 FileNameTableStartAddress;  // ファイル名テーブルの先頭アドレス(ファイルの先頭アドレスをアドレス０とする)
+    u32 FileTableStartAddress;      // ファイルテーブルの先頭アドレス(メンバ変数 FileNameTableStartAddress
+                                    // のアドレスを０とする)
     u32 DirectoryTableStartAddress; // ディレクトリテーブルの先頭アドレス(メンバ変数 FileNameTableStartAddress
                                     // のアドレスを０とする) アドレス０から配置されている DARC_DIRECTORY_VER5
                                     // 構造体がルートディレクトリ
@@ -107,7 +107,7 @@ using DARC_FILEHEAD_VER5 = struct tagDARC_FILEHEAD_VER5
                              //			ファイルの場合：DARC_HEAD_VER5構造体 のメンバ変数 DataStartAddress
     // が示すアドレスをアドレス０とする 			ディレクトリの場合：DARC_HEAD_VER5構造体 のメンバ変数
     // DirectoryTableStartAddress のが示すアドレスをアドレス０とする
-    u32 DataSize; // ファイルのデータサイズ
+    u32 DataSize;           // ファイルのデータサイズ
     u32 CompressedDataSize; // 圧縮後のデータのサイズ( 0xffffffff:圧縮されていない ) ( Ver0x0002 で追加された )
 };
 
@@ -118,9 +118,9 @@ using DARC_DIRECTORY_VER5 = struct tagDARC_DIRECTORY_VER5
                           // FileTableStartAddress が示すアドレスをアドレス０とする)
     u32 ParentDirectoryAddress; // 親ディレクトリの DARC_DIRECTORY_VER5 が格納されているアドレス( DARC_HEAD_VER5構造体
                                 // のメンバ変数 DirectoryTableStartAddress が示すアドレスをアドレス０とする)
-    u32 FileHeadNum; // ディレクトリ内のファイルの数
-    u32 FileHeadAddress; // ディレクトリ内のファイルのヘッダ列が格納されているアドレス( DARC_HEAD_VER5構造体
-                         // のメンバ変数 FileTableStartAddress が示すアドレスをアドレス０とする)
+    u32 FileHeadNum;            // ディレクトリ内のファイルの数
+    u32 FileHeadAddress;        // ディレクトリ内のファイルのヘッダ列が格納されているアドレス( DARC_HEAD_VER5構造体
+                                // のメンバ変数 FileTableStartAddress が示すアドレスをアドレス０とする)
 };
 
 #pragma pack(pop)

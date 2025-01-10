@@ -534,7 +534,7 @@ static bool getDstOptAbs(unsigned d)
     case 621: return false; // ランキング表示中
     case 622: return true;  // ゴーストバトルではない
     case 623: return false; // ゴーストバトル発動中(決定演出～リザルトの間のみ)
-    case 624: return true; // 自分と相手のスコアを比較する状況ではない (現状では、ランキング表示中とライバルフォルダ)
+    case 624: return true;  // 自分と相手のスコアを比較する状況ではない (現状では、ランキング表示中とライバルフォルダ)
     case 625:
         return false; // 自分と相手のスコアを比較するべき状況である
 
