@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <functional>
 #include <future>
+#include <mutex>
 #include <string_view>
 #include <utility>
 
@@ -20,6 +21,9 @@
 #include <game/runtime/i18n.h>
 #include <game/scene/scene_context.h>
 #include <git_version.h>
+
+// TODO: translations.
+#define _(String) String
 
 ScenePreSelect::ScenePreSelect() : SceneBase(nullptr, SkinType::PRE_SELECT, 240)
 {
@@ -51,7 +55,10 @@ ScenePreSelect::ScenePreSelect() : SceneBase(nullptr, SkinType::PRE_SELECT, 240)
         gSelectContext.entries.clear();
         gSelectContext.backtrace.clear();
 
-        textHint = i18n::s(i18nText::INITIALIZING);
+        {
+            std::unique_lock l{_textHintMutex};
+            textHint = i18n::s(i18nText::INITIALIZING);
+        }
     }
 
     LOG_INFO << "[List] ------------------------------------------------------------";
@@ -100,7 +107,10 @@ void ScenePreSelect::updateLoadSongs()
 
         // load files
         loadSongEnd = std::async(std::launch::async, [this]() {
-            textHint = i18n::s(i18nText::CHECKING_FOLDERS);
+            {
+                std::unique_lock l{_textHintMutex};
+                textHint = i18n::s(i18nText::CHECKING_FOLDERS);
+            }
 
             // get folders from config
             const std::vector<Path> pathList = ConfigMgr::General()->getFoldersPath();
@@ -196,7 +206,9 @@ void ScenePreSelect::updateLoadSongs()
 
     if (g_pSongDB->addChartTaskFinishCount != prevChartLoaded)
     {
-        std::shared_lock l(g_pSongDB->addCurrentPathMutex);
+        std::shared_lock l{g_pSongDB->addCurrentPathMutex, std::defer_lock};
+        std::unique_lock l2{_textHintMutex, std::defer_lock};
+        std::lock(l, l2);
 
         prevChartLoaded = g_pSongDB->addChartTaskFinishCount;
         textHint = (boost::format(i18n::c(i18nText::LOADING_CHARTS)) % g_pSongDB->addChartTaskFinishCount %
@@ -245,7 +257,10 @@ void ScenePreSelect::updateLoadTables()
         LOG_INFO << "[List] Start loading tables...";
 
         loadTableEnd = std::async(std::launch::async, [this]() {
-            textHint = i18n::s(i18nText::CHECKING_TABLES);
+            {
+                std::unique_lock l{_textHintMutex};
+                textHint = i18n::s(i18nText::CHECKING_TABLES);
+            }
 
             // initialize table list
             auto tableList = ConfigMgr::General()->getTablesUrl();
@@ -255,7 +270,10 @@ void ScenePreSelect::updateLoadTables()
                 if (gAppIsExiting)
                     break;
                 LOG_INFO << "[List] Add table " << tableUrl;
-                textHint2 = tableUrl;
+                {
+                    std::unique_lock l{_textHintMutex};
+                    textHint2 = tableUrl;
+                }
 
                 gSelectContext.tables.emplace_back();
                 DifficultyTableBMS& t = gSelectContext.tables.back();
@@ -287,8 +305,11 @@ void ScenePreSelect::updateLoadTables()
                     return tbl;
                 };
 
-                textHint = (boost::format(i18n::c(i18nText::LOADING_TABLE)) % t.getUrl()).str();
-                textHint2 = "";
+                {
+                    std::unique_lock l{_textHintMutex};
+                    textHint = (boost::format(i18n::c(i18nText::LOADING_TABLE)) % t.getUrl()).str();
+                    textHint2 = "";
+                }
 
                 if (t.loadFromFile())
                 {
@@ -299,7 +320,10 @@ void ScenePreSelect::updateLoadTables()
                 else
                 {
                     LOG_INFO << "[List] Local file not found. Downloading... " << t.getFolderPath();
-                    textHint2 = i18n::s(i18nText::DOWNLOADING_TABLE);
+                    {
+                        std::unique_lock l{_textHintMutex};
+                        textHint2 = "";
+                    }
 
                     t.updateFromUrl([&](DifficultyTable::UpdateResult result) {
                         if (result == DifficultyTable::UpdateResult::OK)
@@ -335,7 +359,10 @@ void ScenePreSelect::updateLoadCourses()
         LOG_INFO << "[List] Start loading courses...";
 
         loadCourseEnd = std::async(std::launch::async, [this]() {
-            textHint = i18n::s(i18nText::LOADING_COURSES);
+            {
+                std::unique_lock l{_textHintMutex};
+                textHint = i18n::s(i18nText::LOADING_COURSES);
+            }
 
             std::map<EntryCourse::CourseType, std::vector<std::shared_ptr<EntryCourse>>> courses;
 
@@ -353,7 +380,11 @@ void ScenePreSelect::updateLoadCourses()
 
                 const Path& coursePath = courseFile.path();
                 LOG_INFO << "[List] Loading course file: " << coursePath;
-                textHint2 = lunaticvibes::u8str(coursePath);
+
+                {
+                    std::unique_lock l{_textHintMutex};
+                    textHint2 = lunaticvibes::u8str(coursePath);
+                }
 
                 CourseLr2crs lr2crs(coursePath);
                 for (auto& c : lr2crs.courses)
@@ -414,9 +445,11 @@ void ScenePreSelect::updateUpdateScoreCache()
         LOG_INFO << "[List] Start updating score cache...";
 
         updateScoreCacheEnd = std::async(std::launch::async, [this]() {
-            // TODO: i18n
-            textHint = "Updating score cache...";
-            textHint2.clear();
+            {
+                std::unique_lock l{_textHintMutex};
+                textHint = _("Updating score cache...");
+                textHint2.clear();
+            }
             if (g_pScoreDB->isBmsPbCacheEmpty())
                 g_pScoreDB->rebuildBmsPbCache();
         });
@@ -452,6 +485,7 @@ void ScenePreSelect::loadFinished()
         }
         if (gNextScene == SceneType::PRE_SELECT)
         {
+            std::unique_lock l{_textHintMutex};
             textHint = (boost::format("%s %s %s (%s)") % PROJECT_NAME % PROJECT_VERSION
 #ifndef NDEBUG
                         % "Debug"
@@ -495,6 +529,7 @@ void ScenePreSelect::updateImgui()
                          ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
                          ImGuiWindowFlags_NoCollapse))
     {
+        std::unique_lock l{_textHintMutex};
         ImGui::TextUnformatted(textHint.c_str());
         ImGui::TextUnformatted(textHint2.c_str());
 

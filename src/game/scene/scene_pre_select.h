@@ -1,8 +1,11 @@
 #pragma once
+
 #include "scene.h"
 #include "scene_context.h"
 
 #include <common/types.h>
+
+#include <mutex>
 
 class ScenePreSelect final : public SceneBase
 {
@@ -42,6 +45,8 @@ protected:
     std::future<void> loadCourseEnd;
     std::future<void> updateScoreCacheEnd;
     int prevChartLoaded = 0;
+
+    std::mutex _textHintMutex;
     std::string textHint;
     std::string textHint2;
 

@@ -11,7 +11,6 @@
 
 #include "scene.h"
 #include "scene_context.h"
-#include "scene_pre_select.h"
 
 enum class eSelectState
 {
@@ -24,6 +23,7 @@ enum class eSelectState
 class ChartFormatBase;
 class EntryFolderRegular;
 class SceneCustomize;
+class ScenePreSelect;
 
 class SceneSelect final : public SceneBase
 {
