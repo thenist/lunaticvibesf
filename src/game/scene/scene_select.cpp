@@ -1990,7 +1990,9 @@ static std::shared_ptr<ChartFormatBase> getChart(EntryBase& entry)
         return reinterpret_cast<EntryFolderSong&>(entry).getCurrentChart();
     if (entry.type() == eEntryType::CHART || entry.type() == eEntryType::RIVAL_CHART)
         return reinterpret_cast<EntryChart&>(entry)._file;
-    lunaticvibes::assert_failed("getChart");
+    // E.g. for re-roll if we get RANDOM_CHART itself first.
+    LOG_VERBOSE << "[Select] No chart for entry " << static_cast<int>(entry.type());
+    return nullptr;
 };
 
 // NOTE: don't forget to lock mutex for 'entries'.
