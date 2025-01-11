@@ -23,6 +23,7 @@ public:
 private:
     std::shared_mutex _inputMutex;
     AsyncLooper _looper;
+    lunaticvibes::Time _prevUpdateEnd;
 
 protected:
     std::array<std::pair<long long, bool>, Input::KEY_COUNT> _inputBuffer{{{0, false}}};

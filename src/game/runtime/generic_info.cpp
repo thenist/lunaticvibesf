@@ -1,17 +1,26 @@
 #include "generic_info.h"
 
+#include <common/assert.h>
 #include <common/sysutil.h>
 #include <game/runtime/state.h>
 
+#include <atomic>
 #include <ctime>
 
-void lunaticvibes::update_global_generic_info(const lunaticvibes::Time& t)
+static constexpr auto NS_IN_MS = 1'000'000LL;
+static std::atomic<unsigned long long> s_frametimes[2]{0};
+
+void lunaticvibes::g_feed_frametime(FrameTimeType type, const lunaticvibes::Time& t)
 {
-    constexpr unsigned rate = lunaticvibes::global_generic_info_update_rate;
-    State::set(IndexNumber::FPS, gFrameCount[FRAMECOUNT_IDX_FPS] * rate);
-    gFrameCount[FRAMECOUNT_IDX_FPS] = 0;
-    State::set(IndexNumber::INPUT_DETECT_FPS, gFrameCount[FRAMECOUNT_IDX_INPUT] * rate);
-    gFrameCount[FRAMECOUNT_IDX_INPUT] = 0;
+    auto idx = static_cast<int>(type);
+    constexpr auto smoothing = 0.9f;
+    s_frametimes[idx] = (s_frametimes[idx] * smoothing) + (t.hres() * (1.f - smoothing));
+}
+
+void lunaticvibes::g_update_generic_info(const lunaticvibes::Time& t)
+{
+    State::set(IndexNumber::FPS, NS_IN_MS * 1000 / s_frametimes[static_cast<int>(FrameTimeType::Fps)]);
+    State::set(IndexNumber::INPUT_DETECT_FPS, NS_IN_MS * 1000 / s_frametimes[static_cast<int>(FrameTimeType::Input)]);
 
     constexpr auto millisec_in_sec = 1000;
     const std::time_t time_t_t = t.norm() / millisec_in_sec;

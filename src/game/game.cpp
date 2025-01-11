@@ -432,9 +432,8 @@ void mainLoop()
             }
         }
 
-        // This isn't 100% right as update_global_generic_info() doesn't need to catch up if it fell behind.
-        update_global_generic_info(t, lunaticvibes::global_generic_info_update_rate,
-                                   &lunaticvibes::update_global_generic_info);
+        // Don't really care about catching up, just want to call this once a second.
+        update_global_generic_info(t, 1, &lunaticvibes::g_update_generic_info);
 
         // draw
         {
@@ -464,7 +463,7 @@ void mainLoop()
             }
             graphics_flush();
         }
-        ++gFrameCount[FRAMECOUNT_IDX_FPS];
+        lunaticvibes::g_feed_frametime(lunaticvibes::FrameTimeType::Fps, lunaticvibes::Time::now() - t);
     }
     if (scene)
     {

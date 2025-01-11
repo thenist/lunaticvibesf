@@ -5,6 +5,7 @@
 #include <utility>
 
 #include <common/assert.h>
+#include <common/beat.h>
 #include <common/log.h>
 #include <common/sysutil.h>
 #include <common/utils.h>
@@ -22,11 +23,9 @@ InputWrapper::~InputWrapper()
 
 void InputWrapper::loopAsync()
 {
-    gFrameCount[FRAMECOUNT_IDX_INPUT]++;
-
+    const auto now = lunaticvibes::Time::now();
     _prev = _curr;
     _curr = InputMgr::detect();
-    lunaticvibes::Time now;
 
     // detect key / button
     InputMask p{0}, h{0}, r{0};
@@ -250,6 +249,11 @@ void InputWrapper::loopAsync()
                 }
         }
     }
+
+    // Also count sleeping which is done outside of this function.
+    auto update_end = lunaticvibes::Time::now();
+    lunaticvibes::g_feed_frametime(lunaticvibes::FrameTimeType::Input, update_end - _prevUpdateEnd);
+    _prevUpdateEnd = update_end;
 }
 
 double InputWrapper::getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index)
