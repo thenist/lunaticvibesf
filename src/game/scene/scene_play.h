@@ -1,9 +1,9 @@
 #pragma once
 
-#include "common/types.h"
 #include <common/chartformat/chartformat.h>
+#include <common/types.h>
 #include <game/chart/chart.h>
-#include <game/input/input_wrapper.h>
+#include <game/input/input_callback.h>
 #include <game/scene/scene.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_mgr.h>
@@ -15,7 +15,7 @@
 class ScenePlay final : public SceneBase
 {
 public:
-    enum class ePlayState
+    enum class ePlayState : uint8_t
     {
         PREPARE,
         LOADING,

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <utility>
-
 #include <common/beat.h>
 #include <common/chartformat/chartformat.h>
+#include <common/types.h>
 #include <game/chart/chart.h>
-#include <game/input/input_wrapper.h>
+#include <game/input/input_callback.h>
 
-enum class RulesetType
+#include <utility>
+
+enum class RulesetType : uint8_t
 {
     SOUND_ONLY,
     BMS,
