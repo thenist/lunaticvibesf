@@ -326,9 +326,9 @@ int main(int argc, char* argv[])
 // Fix your time step.
 struct FixedUpdater
 {
-    explicit FixedUpdater(const lunaticvibes::Time& t) { reset(t); }
+    constexpr explicit FixedUpdater(const lunaticvibes::Time& t) : _acc(0), _last_update_time(0) { reset(t); }
 
-    void operator()(const lunaticvibes::Time& t, unsigned rate, auto cb)
+    constexpr void operator()(const lunaticvibes::Time& t, unsigned rate, auto cb)
     {
         _acc += t - _last_update_time;
 
@@ -343,7 +343,7 @@ struct FixedUpdater
         _last_update_time = t;
     }
 
-    void reset(const lunaticvibes::Time& t)
+    constexpr void reset(const lunaticvibes::Time& t)
     {
         _acc = 0;
         _last_update_time = t;
