@@ -15,6 +15,7 @@
 #include <common/entry/entry_random_song.h>
 #include <common/entry/entry_song.h>
 #include <common/entry/entry_types.h>
+#include <common/keymap.h>
 #include <common/str_utils.h>
 #include <common/thread_pool.h>
 #include <common/utils.h>
@@ -1290,9 +1291,6 @@ void SceneSelect::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
     auto input = _inputAvailable & m;
     if (input.any())
     {
-        if (input[Input::F5])
-            lr2skin::button::open_ir_page();
-
         if (input[Pad::K15])
             isHoldingK15 = true;
         if (input[Pad::K16])
@@ -1453,6 +1451,9 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
         imguiShow = !imguiShow;
         pSkin->setHandleMouseEvents(!imguiShow);
     }
+
+    if (input[Input::Pad::F5])
+        lr2skin::button::open_ir_page();
 
     if (input[Input::Pad::F8])
     {
