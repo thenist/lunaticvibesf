@@ -1995,6 +1995,27 @@ static std::shared_ptr<ChartFormatBase> getChart(EntryBase& entry)
     return nullptr;
 };
 
+static bool matchesFilter(const std::shared_ptr<EntryBase>& entry, const std::shared_ptr<ScoreBase>& score,
+                          const lunaticvibes::EntryRandomChart::Filter filter)
+{
+    switch (filter)
+    {
+        using Filter = lunaticvibes::EntryRandomChart::Filter;
+    case Filter::Any: return true;
+    case Filter::Failed:
+        if (score == nullptr || score->clearcount > 0)
+            return false;
+        // TODO: remove this, it should be redundant, but clearcount and playcount values in scores seem to be
+        // broken.
+        if (const auto scoreBms = std::dynamic_pointer_cast<ScoreBMS>(score);
+            scoreBms && scoreBms->lamp != ScoreBMS::Lamp::FAILED)
+            return false;
+        return true;
+    case Filter::Unplayed: return score == nullptr;
+    }
+    lunaticvibes::assert_failed("matchesFilter");
+}
+
 // NOTE: don't forget to lock mutex for 'entries'.
 static std::pair<std::shared_ptr<ChartFormatBase>, size_t> selectRandom(
     const EntryList& entries, const lunaticvibes::EntryRandomChart::Filter filter)
@@ -2006,26 +2027,8 @@ static std::pair<std::shared_ptr<ChartFormatBase>, size_t> selectRandom(
     {
         const size_t idx = distribution(rd);
         auto [entry, score] = entries[idx];
-        switch (filter)
-        {
-            using Filter = lunaticvibes::EntryRandomChart::Filter;
-        case Filter::Any: break;
-        case Filter::Failed:
-            if (score == nullptr || score->clearcount > 0)
-                continue;
-            {
-                // TODO: remove this, it should be redundant, but clearcount and playcount values in scores seem to be
-                // broken.
-                const auto scoreBms = std::dynamic_pointer_cast<ScoreBMS>(score);
-                if (scoreBms && scoreBms->lamp != ScoreBMS::Lamp::FAILED)
-                    continue;
-            }
-            break;
-        case Filter::Unplayed:
-            if (score != nullptr)
-                continue;
-            break;
-        }
+        if (!matchesFilter(entry, score, filter))
+            continue;
         if (auto chart = getChart(*entry))
             return {chart, idx};
     }
