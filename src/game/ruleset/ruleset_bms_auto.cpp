@@ -1,9 +1,11 @@
 #include "ruleset_bms_auto.h"
 
-#include "game/chart/chart_types.h"
-#include "game/scene/scene.h"
-#include "game/scene/scene_context.h"
 #include <common/assert.h>
+#include <game/chart/chart_types.h>
+#include <game/scene/scene.h>
+#include <game/scene/scene_context.h>
+
+namespace r = std::ranges;
 
 RulesetBMSAuto::RulesetBMSAuto(const std::shared_ptr<ChartFormatBase>& format,
                                const std::shared_ptr<ChartObjectBase>& chart, const PlayModifiers mods,
@@ -38,7 +40,7 @@ void RulesetBMSAuto::setTargetRate(double rate)
     if (rate == 1.0)
     {
         noteJudges.resize(count);
-        std::fill(noteJudges.begin(), noteJudges.end(), JudgeArea::EXACT_PERFECT);
+        r::fill(noteJudges, JudgeArea::EXACT_PERFECT);
         totalJudgeCount[JudgeArea::EXACT_PERFECT] = count;
         totalJudgeCount[JudgeArea::EARLY_GREAT] = 0;
         totalJudgeCount[JudgeArea::EARLY_GOOD] = 0;
@@ -119,14 +121,16 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
     auto updateSection = [&](Input::Pad begin, Input::Pad end, int side) {
         for (size_t k = begin; k <= static_cast<size_t>(end); ++k)
         {
-            bool scratch = false;
-            switch (k)
-            {
-            case Input::S1L:
-            case Input::S1R:
-            case Input::S2L:
-            case Input::S2R: scratch = true; break;
-            }
+            const bool scratch = [](size_t k) {
+                switch (k)
+                {
+                case Input::S1L:
+                case Input::S1R:
+                case Input::S2L:
+                case Input::S2R: return true;
+                default: return false;
+                }
+            }(k);
 
             NoteLaneIndex idx;
 

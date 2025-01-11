@@ -1,5 +1,6 @@
 #include "skin_lr2.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <execution>
 #include <fstream>
@@ -34,6 +35,8 @@
 
 using uint8_t = std::uint8_t;
 
+namespace r = std::ranges;
+
 [[nodiscard]] static MotionKeyFrameParams::accelType parseAccelType(const int value)
 {
     using accelType = MotionKeyFrameParams::accelType;
@@ -52,7 +55,7 @@ using uint8_t = std::uint8_t;
 namespace lr2skin
 {
 
-size_t convertLine(const Tokens& tokens, int* pData, size_t start, size_t count)
+static size_t convertLine(const Tokens& tokens, int* pData, size_t start, size_t count)
 {
     size_t end = start + count;
 
@@ -462,7 +465,7 @@ struct dst
     }
 };
 
-BlendMode convertBlend(int blend)
+static BlendMode convertBlend(int blend)
 {
     switch (blend)
     {
@@ -579,7 +582,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     return linecsv;
 }
 
-[[nodiscard]] Tokens csvLineTokenizeSimple(const std::string& raw)
+[[nodiscard]] static Tokens csvLineTokenizeSimple(const std::string& raw)
 {
     StringContentView linecsv = csvLineNormalize(raw);
     if (linecsv.empty())
@@ -591,7 +594,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     return res;
 }
 
-[[nodiscard]] Tokens csvLineTokenizeRegex(const std::string& raw)
+[[nodiscard]] static Tokens csvLineTokenizeRegex(const std::string& raw)
 {
     Tokens res;
     res.reserve(32);
@@ -609,7 +612,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     return res;
 }
 
-[[nodiscard]] Point getCenterPoint(const int& wi, const int& hi, int numpadCenter)
+[[nodiscard]] static Point getCenterPoint(const int& wi, const int& hi, int numpadCenter)
 {
     auto w = (double)wi;
     auto h = (double)hi;
@@ -863,7 +866,7 @@ int SkinLR2::LR2FONT()
             auto tokens = csvLineTokenize(rawUTF8);
             if (tokens.empty())
                 continue;
-            auto key = tokens[0];
+            const auto& key = tokens[0];
 
             if (matchToken(key, "#S"))
             {
@@ -1937,7 +1940,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO2()
     return ParseRet::OK;
 }
 
-chart::NoteLaneIndex NoteIdxToLane(SkinType gamemode, int idx, unsigned scratchSide1P, unsigned scratchSide2P)
+static chart::NoteLaneIndex NoteIdxToLane(SkinType gamemode, int idx, unsigned scratchSide1P, unsigned scratchSide2P)
 {
     LVF_DEBUG_ASSERT(idx < 20);
 
@@ -3385,7 +3388,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
         auto& def(parseParamBuf[2]);
 
         auto ls = findFiles(pathf);
-        std::sort(ls.begin(), ls.end());
+        r::sort(ls);
         size_t defVal = 0;
         for (size_t param = 0; param < ls.size(); ++param)
         {
@@ -3863,8 +3866,7 @@ bool SkinLR2::loadCSV(Path p)
                     {
                         if (itDst.first == itOp.dst_op)
                         {
-                            if (const auto itEntry = std::find(itOp.label.begin(), itOp.label.end(), itDst.second);
-                                itEntry != itOp.label.end())
+                            if (const auto itEntry = r::find(itOp.label, itDst.second); itEntry != itOp.label.end())
                             {
                                 itOp.value = std::distance(itOp.label.begin(), itEntry);
                             }
@@ -3874,8 +3876,7 @@ bool SkinLR2::loadCSV(Path p)
                     {
                         if (itOp.title == itFile.first && itOp.dst_op == 0)
                         {
-                            if (const auto itEntry = std::find(itOp.label.begin(), itOp.label.end(), itFile.second);
-                                itEntry != itOp.label.end())
+                            if (const auto itEntry = r::find(itOp.label, itFile.second); itEntry != itOp.label.end())
                             {
                                 itOp.value = std::distance(itOp.label.begin(), itEntry);
                             }
@@ -4396,7 +4397,7 @@ void SkinLR2::update()
         const int ttAngle1P = State::get(IndexNumber::_ANGLE_TT_1P);
         const int ttAngle2P = State::get(IndexNumber::_ANGLE_TT_2P);
         auto updateSprite = [ttAngle1P, ttAngle2P](element& e) {
-            e.ps->setHideExternal(std::any_of(e.dstOpt.begin(), e.dstOpt.end(), std::not_fn(&getDstOpt)));
+            e.ps->setHideExternal(r::any_of(e.dstOpt, std::not_fn(&getDstOpt)));
 
             switch (e.op4)
             {

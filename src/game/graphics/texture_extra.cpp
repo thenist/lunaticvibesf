@@ -10,6 +10,8 @@
 #include <game/chart/chart_bms.h>
 #include <game/scene/scene_context.h>
 
+namespace r = std::ranges;
+
 extern "C"
 {
 #include "libavformat/avformat.h"
@@ -214,16 +216,9 @@ bool TextureBmsBga::setSlot(size_t idx, const lunaticvibes::Time& time, bool bas
 
 void TextureBmsBga::sortSlot()
 {
-    auto less = [](const std::pair<lunaticvibes::Time, size_t>& l, const std::pair<lunaticvibes::Time, size_t>& r) {
-        if (l.first < r.first)
-            return true;
-        if (l.first == r.first && l.second < r.second)
-            return true;
-        return false;
-    };
-    std::sort(baseSlot.begin(), baseSlot.end(), less);
-    std::sort(layerSlot.begin(), layerSlot.end(), less);
-    std::sort(poorSlot.begin(), poorSlot.end(), less);
+    r::sort(baseSlot);
+    r::sort(layerSlot);
+    r::sort(poorSlot);
     baseIt = baseSlot.begin();
     layerIt = layerSlot.begin();
     poorIt = poorSlot.begin();
@@ -317,7 +312,7 @@ void TextureBmsBga::update(const lunaticvibes::Time& t, bool poor)
 // 1. position: horizontally centered, vertically top
 // 2. w < 256 / h < 256: do not scale up
 // 3. w > 256 / h > 256: stretch down to 256, ignore aspect
-void lr2ScaleBgaRect(const Rect& srcRect, RectF& dstRect)
+static void lr2ScaleBgaRect(const Rect& srcRect, RectF& dstRect)
 {
     if (srcRect.w < 256)
     {

@@ -45,6 +45,8 @@
 // TODO: translations.
 #define _(String) String
 
+namespace r = std::ranges;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <class... Ts> struct overloaded : Ts...
@@ -52,11 +54,9 @@ template <class... Ts> struct overloaded : Ts...
     using Ts::operator()...;
 };
 
-void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType);
-
 #pragma region save config
 
-void config_sys()
+static void config_sys()
 {
     using namespace cfg;
 
@@ -69,7 +69,7 @@ void config_sys()
     }
 }
 
-void config_player()
+static void config_player()
 {
     using namespace cfg;
 
@@ -242,7 +242,7 @@ void config_player()
     ConfigMgr::set('P', P_SCORE_GRAPH, State::get(IndexSwitch::SYSTEM_SCOREGRAPH));
 }
 
-void config_vol()
+static void config_vol()
 {
     using namespace cfg;
 
@@ -251,7 +251,7 @@ void config_vol()
     ConfigMgr::set('P', P_VOL_BGM, State::get(IndexSlider::VOLUME_BGM));
 }
 
-void config_eq()
+static void config_eq()
 {
     using namespace cfg;
 
@@ -265,7 +265,7 @@ void config_eq()
     ConfigMgr::set('P', P_EQ6, State::get(IndexNumber::EQ6));
 }
 
-void config_freq()
+static void config_freq()
 {
     using namespace cfg;
 
@@ -280,7 +280,7 @@ void config_freq()
     ConfigMgr::set('P', P_FREQ_VAL, State::get(IndexNumber::PITCH));
 }
 
-void config_fx()
+static void config_fx()
 {
     using namespace cfg;
 
@@ -2640,9 +2640,7 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
 
         std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
 
-        auto canAddRandomSongEntries = [](const EntryList& entries) {
-            return std::any_of(entries.begin(), entries.end(), isChartEntry);
-        };
+        auto canAddRandomSongEntries = [](const EntryList& entries) { return r::any_of(entries, isChartEntry); };
         auto addRandomSongEntries = [this](EntryList& entries) {
             using namespace lunaticvibes;
             if (_show_random_any)
@@ -2690,13 +2688,13 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
             }
 
             loadSongList();
-            if (std::none_of(gSelectContext.entries.begin(), gSelectContext.entries.end(), isChartEntry))
+            if (r::none_of(gSelectContext.entries, isChartEntry))
             {
                 State::set(IndexOption::SELECT_FILTER_DIFF, Option::DIFF_ANY);
                 gSelectContext.filterDifficulty = State::get(IndexOption::SELECT_FILTER_DIFF);
                 loadSongList();
             }
-            if (std::none_of(gSelectContext.entries.begin(), gSelectContext.entries.end(), isChartEntry))
+            if (r::none_of(gSelectContext.entries, isChartEntry))
             {
                 State::set(IndexOption::SELECT_FILTER_KEYS, Option::FILTER_KEYS_ALL);
                 switch (State::get(IndexOption::SELECT_FILTER_KEYS))
@@ -2984,7 +2982,7 @@ std::optional<DeleteScoreResult> try_delete_score(const std::string_view query, 
 
 // LR2 behavior:
 // MD5 digest or an empty text box if no chart is highlighted.
-std::optional<HashResult> try_get_hash(const std::string_view query, const SelectContextParams& select_context)
+static std::optional<HashResult> try_get_hash(const std::string_view query, const SelectContextParams& select_context)
 {
     if (query != "/hash")
     {
@@ -3013,7 +3011,7 @@ std::optional<HashResult> try_get_hash(const std::string_view query, const Selec
     return out;
 }
 
-std::optional<PathResult> try_get_path(const std::string_view query, const SelectContextParams& select_context)
+static std::optional<PathResult> try_get_path(const std::string_view query, const SelectContextParams& select_context)
 {
     if (query != "/path")
     {
@@ -3136,7 +3134,7 @@ void SceneSelect::searchSong(const std::string& text)
 }
 
 // returns empty Path on error.
-Path getChartPath(const std::shared_ptr<EntryBase>& entry)
+static Path getChartPath(const std::shared_ptr<EntryBase>& entry)
 {
     if (entry == nullptr)
         return {};
@@ -3145,14 +3143,12 @@ Path getChartPath(const std::shared_ptr<EntryBase>& entry)
 
     if (type == eEntryType::SONG || type == eEntryType::RIVAL_SONG)
     {
-        auto chart = std::reinterpret_pointer_cast<EntryFolderSong>(entry)->getCurrentChart();
-        if (chart)
+        if (auto chart = std::reinterpret_pointer_cast<EntryFolderSong>(entry)->getCurrentChart(); chart)
             return chart->absolutePath;
     }
     else if (type == eEntryType::CHART || type == eEntryType::RIVAL_CHART)
     {
-        auto chart = std::reinterpret_pointer_cast<EntryChart>(entry)->_file;
-        if (chart)
+        if (auto chart = std::reinterpret_pointer_cast<EntryChart>(entry)->_file; chart)
             return chart->absolutePath;
     }
 
@@ -3161,7 +3157,7 @@ Path getChartPath(const std::shared_ptr<EntryBase>& entry)
 
 static constexpr int STANDALONE_PREVIEW_SAMPLE_INDEX = 0;
 
-bool tryLoadDedicatedPreview(ChartFormatBMS& bms)
+static bool tryLoadDedicatedPreview(ChartFormatBMS& bms)
 {
     if (!bms.dedicatedPreview.empty())
     {

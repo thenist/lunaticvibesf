@@ -19,8 +19,6 @@
 
 namespace r = std::ranges;
 
-void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType);
-
 static void loadPreviewChartIfNeeded(SkinType mode)
 {
     auto previewChartKeyForMode = [](SkinType mode) -> const char* {

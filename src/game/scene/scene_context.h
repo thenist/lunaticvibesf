@@ -157,6 +157,7 @@ struct PlayContextParams
 std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge = true);
 void clearContextPlayForRetry();
 void clearContextPlay();
+void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType);
 
 void pushGraphPoints();
 
