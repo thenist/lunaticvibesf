@@ -442,15 +442,13 @@ void mainLoop()
             doMainThreadTask();
 
             if (scene)
-                update_scene(t, scene->getRate(),
-                             std::bind_front(std::mem_fn(&SceneBase::update_fixed), std::ref(*scene)));
+                update_scene(t, scene->getRate(), std::bind_front(&SceneBase::update_fixed, std::ref(*scene)));
             else
                 update_scene.reset(t);
 
             if (sceneCustomize)
-                update_scene_customize(
-                    t, sceneCustomize->getRate(),
-                    std::bind_front(std::mem_fn(&SceneBase::update_fixed), std::ref(*sceneCustomize)));
+                update_scene_customize(t, sceneCustomize->getRate(),
+                                       std::bind_front(&SceneBase::update_fixed, std::ref(*sceneCustomize)));
             else
                 update_scene_customize.reset(t);
 
