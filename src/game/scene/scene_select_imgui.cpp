@@ -1181,10 +1181,10 @@ Current programmer:
 
 Contributors:
     MatVeiQaaa
-    Vad1mCSO2
+    BKVad1m
 
 Testers:
-    Vad1mCSO2
+    BKVad1m
     lyko
 
 Original cast:（敬称略）
