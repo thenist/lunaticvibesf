@@ -26,16 +26,16 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
     auto devName = ConfigMgr::get('A', cfg::A_DEVNAME, "");
     if (!devName.empty())
     {
-        for (size_t i = 0; i < devList.size(); ++i)
+        for (auto& i : devList)
         {
-            if (devList[i].second == devName)
+            if (i.second == devName)
             {
-                if (devList[i].first < 0)
+                if (i.first < 0)
                 {
-                    driver = findDriver(devList[i].second, devList[i].first);
+                    driver = findDriver(i.second, i.first);
                     if (driver >= 0)
                     {
-                        switch (devList[i].first)
+                        switch (i.first) // FIXME: switch on a wrong value?
                         {
                         case DriverIDUnknownASIO: outputType = FMOD_OUTPUTTYPE_ASIO; break;
                         }
@@ -43,7 +43,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
                 }
                 else
                 {
-                    driver = devList[i].first;
+                    driver = i.first;
                 }
                 break;
             }
@@ -104,7 +104,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
         __try
         {
 #endif
-            initRet = fmodSystem->init(512, FMOD_INIT_NORMAL, 0); // Initialize FMOD; same as above about SEH
+            initRet = fmodSystem->init(512, FMOD_INIT_NORMAL, nullptr); // Initialize FMOD; same as above about SEH
 #ifdef _WIN32
         }
         __except (EXCEPTION_INVALID_HANDLE)
@@ -122,7 +122,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
         fmodSystem->setOutput(FMOD_OUTPUTTYPE_AUTODETECT);
         fmodSystem->setDriver(0);
 
-        initRet = fmodSystem->init(512, FMOD_INIT_NORMAL, 0); // Initialize FMOD.
+        initRet = fmodSystem->init(512, FMOD_INIT_NORMAL, nullptr); // Initialize FMOD.
         if (initRet != FMOD_OK)
         {
             LOG_ERROR << "[FMOD] FMOD System Initialize Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
@@ -164,7 +164,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
         char name[256];
         int systemRate;
         int speakerLanes;
-        fmodSystem->getDriverInfo(driverId, name, 255, 0, &systemRate, 0, &speakerLanes);
+        fmodSystem->getDriverInfo(driverId, name, 255, nullptr, &systemRate, nullptr, &speakerLanes);
         LOG_INFO << "[FMOD] Device Name: " << name;
         LOG_INFO << "[FMOD] Device Sample Rate: " << systemRate;
         LOG_INFO << "[FMOD] Device Channels: " << speakerLanes;
@@ -326,7 +326,7 @@ SoundDriverFMOD::~SoundDriverFMOD()
     LOG_DEBUG << "FMOD System released.";
 }
 
-std::vector<std::string> getDeviceListASIO()
+static std::vector<std::string> getDeviceListASIO()
 {
     std::vector<std::string> devList;
 
@@ -401,12 +401,10 @@ std::vector<std::pair<int, std::string>> SoundDriverFMOD::getDeviceList()
             }
         }
 
-#ifdef _WIN32
         for (auto& devName : getDeviceListASIO())
         {
-            res.push_back(std::make_pair(DriverIDUnknownASIO, devName));
+            res.emplace_back(DriverIDUnknownASIO, devName);
         }
-#endif
 
         f->release();
         return res;
@@ -540,7 +538,7 @@ int SoundDriverFMOD::setDevice(size_t index)
         LOG_WARNING << "[FMOD] Set DSP buffer size failed: " << FMOD_ErrorString((FMOD_RESULT)res);
     }
 
-    if (FMOD_RESULT res = pSystem->init(512, FMOD_INIT_NORMAL, 0); res != FMOD_OK)
+    if (FMOD_RESULT res = pSystem->init(512, FMOD_INIT_NORMAL, nullptr); res != FMOD_OK)
     {
         LOG_ERROR << "FMOD System Initialize Failed: " << FMOD_ErrorString((FMOD_RESULT)res);
         return 1;
@@ -551,14 +549,14 @@ int SoundDriverFMOD::setDevice(size_t index)
     {
         if (!s.path.empty())
         {
-            pSystem->createSound(s.path.c_str(), s.flags, 0, &s.objptr);
+            pSystem->createSound(s.path.c_str(), s.flags, nullptr, &s.objptr);
         }
     }
     for (auto& s : noteSamples)
     {
         if (!s.path.empty())
         {
-            pSystem->createSound(s.path.c_str(), s.flags, 0, &s.objptr);
+            pSystem->createSound(s.path.c_str(), s.flags, nullptr, &s.objptr);
         }
     }
 
@@ -596,7 +594,7 @@ int SoundDriverFMOD::setDevice(size_t index)
         char name[256];
         int systemRate;
         int speakerLanes;
-        fmodSystem->getDriverInfo(driverId, name, 255, 0, &systemRate, 0, &speakerLanes);
+        fmodSystem->getDriverInfo(driverId, name, 255, nullptr, &systemRate, nullptr, &speakerLanes);
         LOG_INFO << "[FMOD] Device Name: " << name;
         LOG_INFO << "[FMOD] Device Sample Rate: " << systemRate;
         LOG_INFO << "[FMOD] Device Channels: " << speakerLanes;
@@ -667,7 +665,7 @@ int SoundDriverFMOD::loadNoteSample(const Path& spath, size_t index)
     if (fs::exists(spath) && fs::is_regular_file(spath))
     {
         path = lunaticvibes::s(spath.u8string());
-        r = fmodSystem->createSound(path.c_str(), flags, 0, &noteSamples[index].objptr);
+        r = fmodSystem->createSound(path.c_str(), flags, nullptr, &noteSamples[index].objptr);
     }
 
     if (r == FMOD_ERR_FILE_NOTFOUND)
@@ -680,7 +678,7 @@ int SoundDriverFMOD::loadNoteSample(const Path& spath, size_t index)
             if (fs::exists(filePath) && fs::is_regular_file(filePath))
             {
                 path = lunaticvibes::s(filePath.u8string());
-                r = fmodSystem->createSound(path.c_str(), flags, 0, &noteSamples[index].objptr);
+                r = fmodSystem->createSound(path.c_str(), flags, nullptr, &noteSamples[index].objptr);
                 if (r == FMOD_OK)
                     break;
             }
@@ -706,7 +704,7 @@ void SoundDriverFMOD::playNoteSample(SoundChannelType ch, size_t count, size_t i
     {
         FMOD_RESULT r = FMOD_OK;
         if (noteSamples[index[i]].objptr != nullptr)
-            r = fmodSystem->playSound(noteSamples[index[i]].objptr, &*channelGroup[ch], false, 0);
+            r = fmodSystem->playSound(noteSamples[index[i]].objptr, &*channelGroup[ch], false, nullptr);
         if (r != FMOD_OK)
         {
             LOG_WARNING << "[FMOD] Playing Sample Error: " << r << ", " << FMOD_ErrorString(r);
@@ -764,7 +762,7 @@ int SoundDriverFMOD::loadSysSample(const Path& spath, size_t index, bool isStrea
     if (fs::exists(spath) && fs::is_regular_file(spath))
     {
         path = lunaticvibes::s(spath.u8string());
-        r = fmodSystem->createSound(path.c_str(), flags, 0, &sysSamples[index].objptr);
+        r = fmodSystem->createSound(path.c_str(), flags, nullptr, &sysSamples[index].objptr);
     }
 
     if (r == FMOD_ERR_FILE_NOTFOUND)
@@ -777,7 +775,7 @@ int SoundDriverFMOD::loadSysSample(const Path& spath, size_t index, bool isStrea
             if (fs::exists(filePath) && fs::is_regular_file(filePath))
             {
                 path = lunaticvibes::s(filePath.u8string());
-                r = fmodSystem->createSound(path.c_str(), flags, 0, &sysSamples[index].objptr);
+                r = fmodSystem->createSound(path.c_str(), flags, nullptr, &sysSamples[index].objptr);
                 if (r == FMOD_OK)
                     break;
             }
@@ -801,7 +799,7 @@ void SoundDriverFMOD::playSysSample(SoundChannelType ch, size_t index)
 {
     FMOD_RESULT r = FMOD_OK;
     if (sysSamples[index].objptr != nullptr)
-        r = fmodSystem->playSound(sysSamples[index].objptr, &*channelGroup[ch], false, 0);
+        r = fmodSystem->playSound(sysSamples[index].objptr, &*channelGroup[ch], false, nullptr);
     if (r != FMOD_OK)
     {
         LOG_WARNING << "[FMOD] Playing Sample Error: " << r << ", " << FMOD_ErrorString(r);
