@@ -231,36 +231,35 @@ int main(int argc, char* argv[])
             return 1;
         }
         gPlayContext.mode = lunaticvibes::skinTypeForKeys(bms->gamemode);
-        gChartContext = ChartContextParams{
-            bmsFile,
-            md5file(bmsFile),
-            bms,
-            nullptr,
 
-            false,
-            HashMD5{},
-            false,
-            HashMD5{},
-            false,
+        gChartContext.path = bmsFile;
+        gChartContext.hash = md5file(bmsFile);
+        gChartContext.chart = bms;
+        gChartContext.chartMybest = nullptr;
 
-            false,
+        gChartContext.isSampleLoaded = false;
+        gChartContext.sampleLoadedHash = HashMD5{};
+        gChartContext.isBgaLoaded = false;
+        gChartContext.bgaLoadedHash = HashMD5{};
+        gChartContext.started = false;
 
-            bms->title,
-            bms->title2,
-            bms->artist,
-            bms->artist2,
-            bms->genre,
-            bms->version,
+        gChartContext.isDoubleBattle = false;
 
-            bms->levelEstimated,
-            bms->minBPM,
-            bms->startBPM,
-            bms->maxBPM,
+        gChartContext.title = bms->title;
+        gChartContext.title2 = bms->title2;
+        gChartContext.artist = bms->artist;
+        gChartContext.artist2 = bms->artist2;
+        gChartContext.genre = bms->genre;
+        gChartContext.version = bms->version;
+        gChartContext.level = bms->levelEstimated;
 
-            {},
-            {},
-            {},
-        };
+        gChartContext.minBPM = bms->minBPM;
+        gChartContext.startBPM = bms->startBPM;
+        gChartContext.maxBPM = bms->maxBPM;
+
+        gChartContext.texBackbmp.setPath("");
+        gChartContext.texBanner.setPath("");
+        gChartContext.texStagefile.setPath("");
     }
     else
     {
