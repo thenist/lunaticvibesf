@@ -153,49 +153,49 @@ struct song_all_params
         addtime = ANY_INT(queryResult[29]);
     }
 };
-static bool convert_bms(const std::shared_ptr<ChartFormatBMSMeta>& chart, const std::vector<std::any>& in)
+static bool convert_bms(ChartFormatBMSMeta& chart, const std::vector<std::any>& in)
 {
     if (in.size() < 30)
         return false;
 
     const song_all_params params(in);
-    chart->fileHash = HashMD5{params.md5};
-    chart->folderHash = HashMD5{params.parent};
-    chart->fileName = PathFromUTF8(params.file);
+    chart.fileHash = HashMD5{params.md5};
+    chart.folderHash = HashMD5{params.parent};
+    chart.fileName = PathFromUTF8(params.file);
     //                        params.type       ;
-    chart->title = params.title;
-    chart->title2 = params.title2;
-    chart->artist = params.artist;
-    chart->artist2 = params.artist2;
-    chart->genre = params.genre;
-    chart->version = params.version;
-    chart->levelEstimated = params.level;
-    chart->startBPM = params.bpm;
-    chart->minBPM = params.minbpm;
-    chart->maxBPM = params.maxbpm;
-    chart->totalLength = params.length;
-    chart->totalNotes = params.totalnotes;
-    chart->stagefile = params.stagefile;
-    chart->banner = params.bannerfile;
-    chart->gamemode = params.gamemode;
-    chart->raw_rank = params.judgerank;
-    chart->rank = lunaticvibes::parser_bms::parse_rank(params.judgerank);
-    chart->total = params.total;
-    chart->playLevel = params.playlevel;
-    chart->difficulty = params.difficulty;
-    chart->haveLN = params.longnote;
-    chart->haveMine = params.landmine;
-    chart->haveMetricMod = params.metricmod;
-    chart->haveStop = params.stop;
-    chart->haveBPMChange = params.maxbpm != params.minbpm;
-    chart->haveBGA = params.bga;
-    chart->haveRandom = params.random;
-    chart->addTime = params.addtime;
+    chart.title = params.title;
+    chart.title2 = params.title2;
+    chart.artist = params.artist;
+    chart.artist2 = params.artist2;
+    chart.genre = params.genre;
+    chart.version = params.version;
+    chart.levelEstimated = params.level;
+    chart.startBPM = params.bpm;
+    chart.minBPM = params.minbpm;
+    chart.maxBPM = params.maxbpm;
+    chart.totalLength = params.length;
+    chart.totalNotes = params.totalnotes;
+    chart.stagefile = params.stagefile;
+    chart.banner = params.bannerfile;
+    chart.gamemode = params.gamemode;
+    chart.raw_rank = params.judgerank;
+    chart.rank = lunaticvibes::parser_bms::parse_rank(params.judgerank);
+    chart.total = params.total;
+    chart.playLevel = params.playlevel;
+    chart.difficulty = params.difficulty;
+    chart.haveLN = params.longnote;
+    chart.haveMine = params.landmine;
+    chart.haveMetricMod = params.metricmod;
+    chart.haveStop = params.stop;
+    chart.haveBPMChange = params.maxbpm != params.minbpm;
+    chart.haveBGA = params.bga;
+    chart.haveRandom = params.random;
+    chart.addTime = params.addtime;
 
-    if (chart->totalNotes > 0)
+    if (chart.totalNotes > 0)
     {
-        chart->haveNote = true;
-        chart->notes_total = chart->totalNotes;
+        chart.haveNote = true;
+        chart.notes_total = chart.totalNotes;
     }
 
     return true;
@@ -404,7 +404,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const Hash
         {
         case eChartFormat::BMS: {
             auto p = std::make_shared<ChartFormatBMSMeta>();
-            if (convert_bms(p, r))
+            if (convert_bms(*p, r))
             {
                 if (p->fileName.is_absolute())
                 {
@@ -449,7 +449,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
             {
             case eChartFormat::BMS: {
                 auto p = std::make_shared<ChartFormatBMSMeta>();
-                if (convert_bms(p, r))
+                if (convert_bms(*p, r))
                 {
                     if (p->fileName.is_absolute())
                     {
@@ -521,7 +521,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const Ha
         {
         case eChartFormat::BMS: {
             auto p = std::make_shared<ChartFormatBMSMeta>();
-            if (convert_bms(p, r))
+            if (convert_bms(*p, r))
             {
                 if (p->fileName.is_absolute())
                 {
@@ -1116,7 +1116,7 @@ std::shared_ptr<EntryFolderSong> SongDB::browseSong(const HashMD5& root)
                 {
                 case eChartFormat::BMS: {
                     auto p = std::make_shared<ChartFormatBMSMeta>();
-                    if (convert_bms(p, c))
+                    if (convert_bms(*p, c))
                     {
                         if (p->fileName.is_absolute())
                             p->absolutePath = p->fileName;
