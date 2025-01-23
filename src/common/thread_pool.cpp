@@ -5,17 +5,16 @@
 
 using size_t = std::size_t;
 
+static size_t wanted_thread_count()
+{
+    if (const auto threads = std::thread::hardware_concurrency(); threads >= 4)
+        return threads - 2;
+    return 1;
+}
+
 std::pair<boost::asio::thread_pool&, std::mutex&> lunaticvibes::get_thread_pool()
 {
-    static size_t thread_count = 0;
-    if (thread_count == 0)
-    {
-        if (const auto threads = std::thread::hardware_concurrency(); threads >= 4)
-            thread_count = threads - 2;
-        else
-            thread_count = 1;
-    }
-    static boost::asio::thread_pool thread_pool{thread_count};
+    static boost::asio::thread_pool thread_pool{wanted_thread_count()};
     static std::mutex m;
     return {thread_pool, m};
 }
