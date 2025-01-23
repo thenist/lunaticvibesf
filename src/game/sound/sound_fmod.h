@@ -26,14 +26,14 @@ protected:
     float sysVolume = 1.0;
     float noteVolume = 1.0;
 
-    float sysVolumeGradientBegin = 1.0;
-    float sysVolumeGradientEnd = 1.0;
-    lunaticvibes::Time sysVolumeGradientBeginTime;
-    int sysVolumeGradientLength = 0;
-    float noteVolumeGradientBegin = 1.0;
-    float noteVolumeGradientEnd = 1.0;
-    lunaticvibes::Time noteVolumeGradientBeginTime;
-    int noteVolumeGradientLength = 0;
+    std::atomic<float> sysVolumeGradientBegin = 1.0;
+    std::atomic<float> sysVolumeGradientEnd = 1.0;
+    std::atomic<long long> sysVolumeGradientBeginTime;
+    std::atomic<int> sysVolumeGradientLength = 0;
+    std::atomic<float> noteVolumeGradientBegin = 1.0;
+    std::atomic<float> noteVolumeGradientEnd = 1.0;
+    std::atomic<long long> noteVolumeGradientBeginTime;
+    std::atomic<int> noteVolumeGradientLength = 0;
 
     std::map<SoundChannelType, FMOD::DSP*> DSPMaster[3];
     std::map<SoundChannelType, FMOD::DSP*> DSPKey[3];
