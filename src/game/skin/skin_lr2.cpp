@@ -4582,8 +4582,7 @@ void SkinLR2::update()
 
     // update songlist bar
     // NOTE: barSprites have been already updated by SkinBase::update.
-    std::shared_lock u(gSelectContext._mutex, std::try_to_lock);
-    if (u.owns_lock())
+    std::shared_lock u(gSelectContext._mutex);
     {
         // update songlist position
         if (hasBarMotionInterpOrigin && gSelectContext.scrollDirection != 0 && !gSelectContext.entries.empty())
