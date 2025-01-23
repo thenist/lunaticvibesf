@@ -37,5 +37,6 @@ Checks: |
   -misc-non-private-member-variables-in-classes,
   -misc-unused-parameters, #?
   -misc-use-anonymous-namespace,
+  -performance-enum-size, # Inapplicable if enum is used as an enumeration instead of #DEFINE.
 ---
 
