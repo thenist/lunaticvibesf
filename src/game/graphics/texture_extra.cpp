@@ -1,14 +1,21 @@
 #include "texture_extra.h"
 
 #include <algorithm>
+#include <future>
+#include <memory>
+#include <mutex>
+#include <utility>
 
 #include <common/log.h>
 #include <common/sysutil.h>
+#include <common/thread_pool.h>
 #include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
 #include <game/chart/chart_bms.h>
 #include <game/scene/scene_context.h>
+
+#include <boost/asio.hpp>
 
 namespace r = std::ranges;
 
@@ -496,35 +503,39 @@ void TextureBmsBga::setVideoSpeed()
 // TODO: remove this and use Texture directly.
 TextureDynamic::TextureDynamic() : Texture(nullptr, 0, 0) {}
 
+static std::future<Image> asyncLoadImage(Path path)
+{
+    auto [pool, mutex] = lunaticvibes::get_thread_pool();
+    std::unique_lock l{mutex};
+    // NOTE: std::async always spawns threads which seems to cause lots of lag.
+    // For future improvement: right now it's possible to queue up some amount of these calls, which will all be
+    // executed even if their result is discarded.
+    return boost::asio::post(pool, boost::asio::use_future([path = std::move(path)]() { return Image{path}; }));
+}
+
 void TextureDynamic::setPath(const Path& path)
 {
     loaded = false;
-
     if (path.empty())
-    {
         return;
-    }
+    _loadImage = asyncLoadImage(path);
+}
 
-    // TODO: use LRU cache instead? Right now this as good as leaks memory.
-    static std::map<Path, Texture> dynTexCache;
-    if (dynTexCache.find(path) == dynTexCache.end())
-    {
-        Image tmp(path);
-        if (!tmp.loaded)
-        {
-            dynTexCache.emplace(std::piecewise_construct, std::forward_as_tuple(path),
-                                std::forward_as_tuple(nullptr, 0, 0));
-            loaded = false;
-            return;
-        }
-        dynTexCache.emplace(path, tmp);
-    }
+void TextureDynamic::applyImageIfNeeded()
+{
+    if (!_loadImage.valid() || _loadImage.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+        return;
 
-    _dynTexture = &dynTexCache.at(path);
+    Image image = _loadImage.get();
+    _dynTexture = std::make_unique<Texture>(image);
     if (_dynTexture->isLoaded())
     {
-        loaded = true;
         textureRect = _dynTexture->getRect();
+        loaded = true;
+    }
+    else
+    {
+        loaded = false;
     }
 }
 

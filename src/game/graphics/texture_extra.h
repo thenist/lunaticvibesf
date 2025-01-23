@@ -120,17 +120,19 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class TextureDynamic : public Texture
+class TextureDynamic final : public Texture
 {
 protected:
-    Texture* _dynTexture = nullptr;
+    std::future<Image> _loadImage;
+    std::unique_ptr<Texture> _dynTexture;
 
 public:
     TextureDynamic();
     ~TextureDynamic() override = default;
 
 public:
-    void setPath(const Path& path);
+    void setPath(const Path& path); // Asynchronously load the image from disk.
+    void applyImageIfNeeded();      // Synchronously upload the image to GPU.
 
     void draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter,
               const double angleInDegrees) const override;

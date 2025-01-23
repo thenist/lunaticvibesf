@@ -678,6 +678,10 @@ void SceneSelect::enterEntry(const eEntryType type, const lunaticvibes::Time t)
 
 void SceneSelect::update()
 {
+    gChartContext.texBackbmp.applyImageIfNeeded();
+    gChartContext.texBanner.applyImageIfNeeded();
+    gChartContext.texStagefile.applyImageIfNeeded();
+
     SceneBase::update();
     if (_virtualSceneCustomize)
         _virtualSceneCustomize->update();
