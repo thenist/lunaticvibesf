@@ -8,6 +8,7 @@
 #include <game/graphics/texture_extra.h>
 #include <game/replay/replay_chart.h>
 #include <game/ruleset/ruleset.h>
+#include <game/runtime/index/option.h>
 #include <game/scene/scene.h>
 
 #include <array>
@@ -207,9 +208,15 @@ using ReadmeOpenRequest = std::variant<std::monostate, HelpFileOpenRequest, Char
 
 struct SelectContextParams
 {
+    struct SelectedEntry
+    {
+        Option::e_rank_type rank = Option::e_rank_type::RANK_NONE;
+    };
+
     std::shared_mutex _mutex;
     std::list<SongListProperties> backtrace;
     EntryList entries;
+    SelectedEntry selectedEntryInfo;
     size_t selectedEntryIndex = 0;   // current selected entry index
     size_t highlightBarIndex = 0;    // highlighted bar index
     bool draggingListSlider = false; // is dragging slider

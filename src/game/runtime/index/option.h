@@ -22,7 +22,6 @@ enum class IndexOption : unsigned
     SELECT_ENTRY_TYPE,
     SELECT_DIFFICULTY,
     SELECT_ENTRY_LAMP,
-    SELECT_ENTRY_RANK,
     SELECT_FILTER_DIFF,
     SELECT_FILTER_KEYS,
     SELECT_SORT,
@@ -109,15 +108,6 @@ enum class IndexOption : unsigned
 
 namespace Option
 {
-const unsigned NO = 0;
-const unsigned YES = 1;
-const unsigned OFF = 0;
-const unsigned ON = 1;
-
-enum e_ruleset_type
-{
-    CLASSIC = 0,
-};
 
 enum e_entry_type
 {

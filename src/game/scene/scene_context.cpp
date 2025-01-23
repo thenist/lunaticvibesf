@@ -1204,7 +1204,7 @@ void setEntryInfo(const size_t idx)
 
         State::set(IndexOption::SELECT_ENTRY_TYPE, param["entry"]);
         State::set(IndexOption::SELECT_ENTRY_LAMP, param["lamp"]);
-        State::set(IndexOption::SELECT_ENTRY_RANK, param_new.rank);
+        gSelectContext.selectedEntryInfo.rank = param_new.rank;
 
         State::set(IndexText::PLAY_TITLE, param_new.title);
         State::set(IndexText::PLAY_SUBTITLE, param_new.subtitle);

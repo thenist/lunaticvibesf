@@ -219,18 +219,18 @@ static bool getDstOptAbs(unsigned d)
     case 103: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_NORMAL;
     case 104: return any_of({LAMP_EXHARD, LAMP_HARD}, State::get(IndexOption::SELECT_ENTRY_LAMP));
     case 105: return any_of({LAMP_FULLCOMBO, LAMP_MAX, LAMP_PERFECT}, State::get(IndexOption::SELECT_ENTRY_LAMP));
-    case 106: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_EXHARD;            // lunaticvibes
-    case 107: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_PERFECT;           // lunaticvibes
-    case 108: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_MAX;               // lunaticvibes
-    case 109: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_ASSIST;            // lunaticvibes
-    case 110: return any_of({RANK_0, RANK_1}, State::get(IndexOption::SELECT_ENTRY_RANK)); // AAA/MAX
-    case 111: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_2;
-    case 112: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_3;
-    case 113: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_4;
-    case 114: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_5;
-    case 115: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_6;
-    case 116: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_7;
-    case 117: return State::get(IndexOption::SELECT_ENTRY_RANK) == RANK_8;
+    case 106: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_EXHARD;       // lunaticvibes
+    case 107: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_PERFECT;      // lunaticvibes
+    case 108: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_MAX;          // lunaticvibes
+    case 109: return State::get(IndexOption::SELECT_ENTRY_LAMP) == LAMP_ASSIST;       // lunaticvibes
+    case 110: return any_of({RANK_0, RANK_1}, gSelectContext.selectedEntryInfo.rank); // AAA/MAX
+    case 111: return gSelectContext.selectedEntryInfo.rank == RANK_2;
+    case 112: return gSelectContext.selectedEntryInfo.rank == RANK_3;
+    case 113: return gSelectContext.selectedEntryInfo.rank == RANK_4;
+    case 114: return gSelectContext.selectedEntryInfo.rank == RANK_5;
+    case 115: return gSelectContext.selectedEntryInfo.rank == RANK_6;
+    case 116: return gSelectContext.selectedEntryInfo.rank == RANK_7;
+    case 117: return gSelectContext.selectedEntryInfo.rank == RANK_8;
     // 118 GROOVE //クリア済みオプションフラグ(ゲージ)
     // 119 SURVIVAL
     // 120 SUDDEN DEATH
