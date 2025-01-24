@@ -678,24 +678,21 @@ static bool getDstOptAbs(unsigned d)
 
 bool getDstOpt(int d)
 {
+    const bool invert_result = d < 0;
     auto op = (dst_option)std::abs(d);
 
-    if (std::shared_lock l{_mutex}; d < static_cast<int>(_opIsCached.size()) && _opIsCached[op])
-    {
-        const bool result = _op[op];
-        l.unlock();
-        return (d >= 0) ? result : !result;
-    }
+    if (d < static_cast<int>(_opIsCached.size()))
+        if (std::shared_lock l{_mutex}; _opIsCached[op])
+            return invert_result ? !_op[op] : _op[op];
 
     const bool result = getDstOptAbs(op);
-    std::unique_lock l{_mutex};
     if (op < static_cast<int>(_op.size()))
     {
+        std::unique_lock l{_mutex};
         _op[op] = result;
         _opIsCached[op] = true;
     }
-    l.unlock();
-    return (d >= 0) ? result : !result;
+    return invert_result ? !result : result;
 }
 
 void setCustomDstOpt(unsigned base, size_t offset, bool val)
