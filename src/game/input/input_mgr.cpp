@@ -4,6 +4,7 @@
 #include <common/types.h>
 #include <config/config_mgr.h>
 #include <game/graphics/graphics.h>
+#include <shared_mutex>
 
 #ifdef RENDER_SDL2
 #include <game/graphics/SDL2/input.h>
@@ -206,8 +207,11 @@ std::bitset<KEY_COUNT> InputMgr::detect()
 bool InputMgr::getMousePos(int& x, int& y)
 {
 #ifdef RENDER_SDL2
-    x = sdl::state::g_mouse_x;
-    y = sdl::state::g_mouse_y;
+    {
+        std::shared_lock l{sdl::state::g_input_mutex};
+        x = sdl::state::g_mouse_x;
+        y = sdl::state::g_mouse_y;
+    }
     bool ret = true;
 #else
 #error "No mouse pos getting implementation"

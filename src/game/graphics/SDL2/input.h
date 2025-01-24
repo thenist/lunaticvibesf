@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstdint>
+#include <shared_mutex>
 
 #include <SDL.h>
 
@@ -13,6 +14,7 @@ namespace sdl::state
 
 inline constexpr size_t SDL_MOUSE_BUTTON_COUNT = 256;
 
+inline std::shared_mutex g_input_mutex;
 // `true` for keys currently being pressed down.
 inline bool g_keyboard_scancodes[SDL_NUM_SCANCODES];
 // `true` for buttons currently being pressed down.

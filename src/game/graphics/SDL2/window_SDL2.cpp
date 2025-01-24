@@ -1,3 +1,4 @@
+#include <mutex>
 #ifdef RENDER_SDL2
 
 #include <climits>
@@ -483,27 +484,47 @@ bool lunaticvibes::event_handle()
                 funEditing(e.edit);
             break;
 
-        case SDL_KEYDOWN:
+        case SDL_KEYDOWN: {
+            std::unique_lock l{sdl::state::g_input_mutex};
             sdl::state::g_keyboard_scancodes[e.key.keysym.scancode] = true;
-
             if (isEditing)
                 funKeyDown(e.key);
             break;
+        }
 
-        case SDL_KEYUP: sdl::state::g_keyboard_scancodes[e.key.keysym.scancode] = false; break;
+        case SDL_KEYUP: {
+            std::unique_lock l{sdl::state::g_input_mutex};
+            sdl::state::g_keyboard_scancodes[e.key.keysym.scancode] = false;
+            break;
+        }
 
-        case SDL_MOUSEMOTION:
+        case SDL_MOUSEMOTION: {
+            std::unique_lock l{sdl::state::g_input_mutex};
             sdl::state::g_mouse_x = e.motion.x;
             sdl::state::g_mouse_y = e.motion.y;
             break;
+        }
 
-        case SDL_MOUSEBUTTONDOWN: sdl::state::g_mouse_buttons[e.button.button] = true; break;
+        case SDL_MOUSEBUTTONDOWN: {
+            std::unique_lock l{sdl::state::g_input_mutex};
+            sdl::state::g_mouse_buttons[e.button.button] = true;
+            break;
+        }
 
-        case SDL_MOUSEBUTTONUP: sdl::state::g_mouse_buttons[e.button.button] = false; break;
+        case SDL_MOUSEBUTTONUP: {
+            std::unique_lock l{sdl::state::g_input_mutex};
+            sdl::state::g_mouse_buttons[e.button.button] = false;
+            break;
+        }
 
-        case SDL_MOUSEWHEEL: sdl::state::g_mouse_wheel_delta = i16_from_i32(e.wheel.y); break;
+        case SDL_MOUSEWHEEL: {
+            std::unique_lock l{sdl::state::g_input_mutex};
+            sdl::state::g_mouse_wheel_delta = i16_from_i32(e.wheel.y);
+            break;
+        }
 
         case SDL_CONTROLLERAXISMOTION: {
+            std::unique_lock l{sdl::state::g_input_mutex};
             LVF_DEBUG_ASSERT(e.caxis.which < static_cast<int>(sdl::state::g_con_axes.size()));
             auto& axes = sdl::state::g_con_axes[e.caxis.which];
             if (e.caxis.axis >= axes.size())
@@ -516,6 +537,7 @@ bool lunaticvibes::event_handle()
         }
 
         case SDL_CONTROLLERBUTTONDOWN: {
+            std::unique_lock l{sdl::state::g_input_mutex};
             LVF_DEBUG_ASSERT(e.cbutton.which < static_cast<int>(sdl::state::g_con_buttons.size()));
             auto& buttons = sdl::state::g_con_buttons[e.cbutton.which];
             if (e.cbutton.button >= buttons.size())
@@ -528,6 +550,7 @@ bool lunaticvibes::event_handle()
         }
 
         case SDL_CONTROLLERBUTTONUP: {
+            std::unique_lock l{sdl::state::g_input_mutex};
             LVF_DEBUG_ASSERT(e.cbutton.which < static_cast<int>(sdl::state::g_con_buttons.size()));
             auto& buttons = sdl::state::g_con_buttons[e.cbutton.which];
             if (e.cbutton.button >= buttons.size())

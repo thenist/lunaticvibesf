@@ -9,6 +9,8 @@
 
 #include <algorithm>
 #include <array>
+#include <mutex>
+#include <shared_mutex>
 
 #include <SDL.h>
 
@@ -109,6 +111,7 @@ void pollInput()
 
 bool isKeyPressed(Input::Keyboard key)
 {
+    std::shared_lock l{sdl::state::g_input_mutex};
     return sdl::state::g_keyboard_scancodes[sdl_key_from_common_scancode(key)];
 }
 
@@ -117,6 +120,7 @@ bool isButtonPressed(Input::Joystick c, double deadzone)
     switch (c.type)
     {
     case Input::Joystick::Type::BUTTON: {
+        std::shared_lock l{sdl::state::g_input_mutex};
         LVF_DEBUG_ASSERT(c.device < sdl::state::g_con_buttons.size());
         const auto& buttons = sdl::state::g_con_buttons[c.device];
         if (buttons.size() < c.index)
@@ -141,7 +145,9 @@ double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index)
     const auto& axes = sdl::state::g_con_axes[device];
     if (axes.size() < index)
         return -1.;
+    std::shared_lock l{sdl::state::g_input_mutex};
     const auto axis = static_cast<int16_t>(axes[index]);
+    l.unlock();
     if (axis == 0 || axis == std::numeric_limits<decltype(axis)>::min())
         return -1.;
     switch (type)
@@ -168,11 +174,13 @@ bool isMouseButtonPressed(int idx)
     default: break;
     }
 
+    std::shared_lock l{sdl::state::g_input_mutex};
     return sdl::state::g_mouse_buttons[idx];
 }
 
 short getLastMouseWheelState()
 {
+    std::unique_lock l{sdl::state::g_input_mutex};
     auto state = sdl::state::g_mouse_wheel_delta;
     sdl::state::g_mouse_wheel_delta = 0;
     return state;
