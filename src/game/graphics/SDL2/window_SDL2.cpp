@@ -1,8 +1,8 @@
-#include <mutex>
 #ifdef RENDER_SDL2
 
 #include <climits>
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <utility>
 
