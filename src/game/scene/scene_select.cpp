@@ -507,7 +507,10 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     }
 
     // do not play preview right after scene is loaded
-    previewState = PREVIEW_FINISH;
+    {
+        std::unique_lock l(previewMutex);
+        previewState = PREVIEW_FINISH;
+    }
 
     if (gArenaData.isOnline())
         State::set(IndexTimer::ARENA_SHOW_LOBBY, lunaticvibes::Time().norm());
@@ -3198,7 +3201,12 @@ void SceneSelect::updatePreview()
         return;
     }
 
-    switch (previewState)
+    const auto state = [this]() {
+        std::shared_lock l(previewMutex);
+        return previewState;
+    }();
+
+    switch (state)
     {
     case PREVIEW_START_CHART_LOADING: {
         Path previewChartPath;
