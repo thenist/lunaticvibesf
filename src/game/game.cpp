@@ -434,6 +434,11 @@ void mainLoop()
         // Don't really care about catching up, just want to call this once a second.
         update_global_generic_info(t, 1, &lunaticvibes::g_update_generic_info);
 
+        if (scene)
+            scene->processInput();
+        if (sceneCustomize)
+            sceneCustomize->processInput();
+
         // draw
         {
             graphics_clear();

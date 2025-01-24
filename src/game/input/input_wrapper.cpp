@@ -24,13 +24,17 @@ InputWrapper::~InputWrapper()
 void InputWrapper::loopAsync()
 {
     const auto now = lunaticvibes::Time::now();
-    _prev = _curr;
-    _curr = InputMgr::detect();
+    auto curr = InputMgr::detect();
+
+    {
+        std::unique_lock l(_inputMutex);
+        _prev = _curr;
+        _curr = curr;
+    }
 
     // detect key / button
     InputMask p{0}, h{0}, r{0};
     lunaticvibes::InputMaskTimes pTimes{};
-    auto curr = _curr;
     if (!_background && !IsWindowForeground())
     {
         curr.reset();
@@ -74,18 +78,29 @@ void InputWrapper::loopAsync()
     scratchAxisPrev[0] = scratchAxisCurr[0];
     scratchAxisPrev[1] = scratchAxisCurr[1];
     InputMgr::getScratchPos(scratchAxisCurr[0], scratchAxisCurr[1]);
-    double aDelta[2] = {0., 0.};
     if (scratchAxisSet)
     {
-        aDelta[0] = normalizeLinearGrowth(scratchAxisPrev[0], scratchAxisCurr[0]) * InputMgr::getDeadzone(Input::S1A);
-        aDelta[1] = normalizeLinearGrowth(scratchAxisPrev[1], scratchAxisCurr[1]) * InputMgr::getDeadzone(Input::S2A);
+        double d1 = normalizeLinearGrowth(scratchAxisPrev[0], scratchAxisCurr[0]) * InputMgr::getDeadzone(Input::S1A);
+        double d2 = normalizeLinearGrowth(scratchAxisPrev[1], scratchAxisCurr[1]) * InputMgr::getDeadzone(Input::S2A);
+        if (d1 != 0. || d2 != 0.)
+        {
+            std::unique_lock l(_inputMutex);
+            _scratch_events.emplace(now, d1, d2);
+        }
     }
     scratchAxisSet = true;
 
     // mouse pos
-    InputMgr::getMousePos(_cursor_x, _cursor_y);
+    {
+        int x, y;
+        InputMgr::getMousePos(x, y);
+        std::unique_lock l(_inputMutex);
+        _cursor_x = x;
+        _cursor_y = y;
+    }
 
     // key config callbacks
+    // FIXME: make this thread-safe. Accumulate input and invoke callbacks in processInput().
     if (_background || IsWindowForeground())
     {
         if (!_keyboardCallbackMap.empty())
@@ -221,39 +236,71 @@ void InputWrapper::loopAsync()
         }
     }
 
-    // regular callbacks
+    if (p.any())
     {
-        std::shared_lock l(_inputMutex);
-        {
-            if (p != 0)
-            {
-                for (auto& [cbname, callback] : _pCallbackMap)
-                    callback(p, now);
-                for (auto& [cbname, callback] : _pCallbackMapNew)
-                    callback(p, now, pTimes);
-            }
-            if (h != 0)
-                for (auto& [cbname, callback] : _hCallbackMap)
-                    callback(h, now);
-            if (r != 0)
-                for (auto& [cbname, callback] : _rCallbackMap)
-                    callback(r, now);
-
-            if (aDelta[0] != 0.0 || aDelta[1] != 0.0)
-                for (auto& [cbname, callback] : _aCallbackMap)
-                {
-                    if (mergeInput)
-                        callback(aDelta[0] + aDelta[1], 0.0, now);
-                    else
-                        callback(aDelta[0], aDelta[1], now);
-                }
-        }
+        std::unique_lock l(_inputMutex);
+        _input_press_events.emplace(pTimes, now, p);
+    }
+    if (h.any())
+    {
+        std::unique_lock l(_inputMutex);
+        _input_hold_events.emplace(now, h);
+    }
+    if (r.any())
+    {
+        std::unique_lock l(_inputMutex);
+        _input_release_events.emplace(now, r);
     }
 
     // Also count sleeping which is done outside of this function.
     auto update_end = lunaticvibes::Time::now();
     lunaticvibes::g_feed_frametime(lunaticvibes::FrameTimeType::Input, update_end - _prevUpdateEnd);
     _prevUpdateEnd = update_end;
+}
+
+void InputWrapper::processInput()
+{
+    // FIXME: C++ Core Guidelines CP.22
+    std::unique_lock l(_inputMutex);
+
+    while (!_input_press_events.empty())
+    {
+        auto& event = _input_press_events.front();
+        for (auto& [cbname, callback] : _pCallbackMap)
+            callback(event.mask, event.t);
+        for (auto& [cbname, callback] : _pCallbackMapNew)
+            callback(event.mask, event.t, event.times);
+        _input_press_events.pop();
+    }
+
+    while (!_input_hold_events.empty())
+    {
+        auto& event = _input_hold_events.front();
+        for (auto& [cbname, callback] : _hCallbackMap)
+            callback(event.mask, event.t);
+        _input_hold_events.pop();
+    }
+
+    while (!_input_release_events.empty())
+    {
+        auto& event = _input_release_events.front();
+        for (auto& [cbname, callback] : _rCallbackMap)
+            callback(event.mask, event.t);
+        _input_release_events.pop();
+    }
+
+    while (!_scratch_events.empty())
+    {
+        auto& event = _scratch_events.front();
+        for (auto& [cbname, callback] : _aCallbackMap)
+        {
+            if (mergeInput)
+                callback(event.delta1 + event.delta2, 0.0, event.t);
+            else
+                callback(event.delta1, event.delta2, event.t);
+        }
+        _scratch_events.pop();
+    }
 }
 
 double InputWrapper::getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index)

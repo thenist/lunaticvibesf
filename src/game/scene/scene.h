@@ -86,6 +86,7 @@ public:
     virtual ~SceneBase();
     void inputLoopStart() { _input.loopStart(); }
     void inputLoopEnd() { _input.loopEnd(); }
+    void processInput() { _input.processInput(); };
     void disableMouseInput() { pSkin->setHandleMouseEvents(false); }
     [[nodiscard]] unsigned getRate() const { return _rate; };
 

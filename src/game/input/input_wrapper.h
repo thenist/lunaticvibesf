@@ -21,7 +21,34 @@ public:
     unsigned release_delay_ms = 5;
 
 private:
-    std::shared_mutex _inputMutex;
+    struct InputPressEvent
+    {
+        lunaticvibes::InputMaskTimes times;
+        lunaticvibes::Time t;
+        InputMask mask;
+    };
+    struct InputHoldEvent
+    {
+        lunaticvibes::Time t;
+        InputMask mask;
+    };
+    struct InputReleaseEvent
+    {
+        lunaticvibes::Time t;
+        InputMask mask;
+    };
+    struct ScratchEvent
+    {
+        lunaticvibes::Time t;
+        double delta1;
+        double delta2;
+    };
+    std::queue<InputHoldEvent> _input_hold_events;
+    std::queue<InputPressEvent> _input_press_events;
+    std::queue<InputReleaseEvent> _input_release_events;
+    std::queue<ScratchEvent> _scratch_events;
+
+    mutable std::shared_mutex _inputMutex;
     AsyncLooper _looper;
     lunaticvibes::Time _prevUpdateEnd;
 
@@ -57,9 +84,23 @@ private:
     void loopAsync();
 
 public:
-    [[nodiscard]] InputMask Holding() const { return _prev & _curr; }
+    // Invoke callbacks for detected input.
+    // Locks '_inputMutex'.
+    void processInput();
 
-    [[nodiscard]] std::pair<int, int> getCursorPos() const { return {_cursor_x, _cursor_y}; }
+    [[nodiscard]] InputMask Holding() const
+    {
+        // FIXME: this will probably recursively lock if this function is called from a callback in processInput.
+        // std::shared_lock l(_inputMutex);
+        return _prev & _curr;
+    }
+
+    [[nodiscard]] std::pair<int, int> getCursorPos() const
+    {
+        // FIXME: this will probably recursively lock if this function is called from a callback in processInput.
+        // std::shared_lock l(_inputMutex);
+        return {_cursor_x, _cursor_y};
+    }
 
     [[nodiscard]] double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index);
 
