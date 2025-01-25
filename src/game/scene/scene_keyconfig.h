@@ -49,5 +49,6 @@ public:
 
 private:
     bool exiting = false;
+    bool _handleInput = false;
     std::shared_mutex _mutex;
 };

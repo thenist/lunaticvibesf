@@ -108,6 +108,12 @@ SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr)
     updateInfo(ConfigMgr::Input(gKeyconfigContext.keys)->getBindings(gKeyconfigContext.selecting.first),
                gKeyconfigContext.selecting.second);
 
+    _input.register_p("SCENE_PRESS", std::bind_front(&SceneKeyConfig::inputGamePress, this));
+    _input.register_a("SCENE_AXIS", std::bind_front(&SceneKeyConfig::inputGameAxis, this));
+    _input.register_kb("SCENE_KEYPRESS", std::bind_front(&SceneKeyConfig::inputGamePressKeyboard, this));
+    _input.register_joy("SCENE_JOYPRESS", std::bind_front(&SceneKeyConfig::inputGamePressJoystick, this));
+    _input.register_aa("SCENE_ABSOLUTEAXIS", std::bind_front(&SceneKeyConfig::inputGameAbsoluteAxis, this));
+
     LOG_DEBUG << "[KeyConfig] Start";
 }
 
@@ -158,11 +164,7 @@ void SceneKeyConfig::updateStart(const lunaticvibes::Time& t)
     if (rt.norm() > pSkin->info.timeIntro)
     {
         _state = SceneKeyConfigState::MAIN;
-        _input.register_p("SCENE_PRESS", std::bind_front(&SceneKeyConfig::inputGamePress, this));
-        _input.register_a("SCENE_AXIS", std::bind_front(&SceneKeyConfig::inputGameAxis, this));
-        _input.register_kb("SCENE_KEYPRESS", std::bind_front(&SceneKeyConfig::inputGamePressKeyboard, this));
-        _input.register_joy("SCENE_JOYPRESS", std::bind_front(&SceneKeyConfig::inputGamePressJoystick, this));
-        _input.register_aa("SCENE_ABSOLUTEAXIS", std::bind_front(&SceneKeyConfig::inputGameAbsoluteAxis, this));
+        _handleInput = true;
         LOG_DEBUG << "[KeyConfig] State changed to Main";
     }
 }
@@ -173,11 +175,7 @@ void SceneKeyConfig::updateMain(const lunaticvibes::Time& t)
     {
         State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
         _state = SceneKeyConfigState::FADEOUT;
-        _input.unregister_p("SCENE_PRESS");
-        _input.unregister_a("SCENE_AXIS");
-        _input.unregister_kb("SCENE_KEYPRESS");
-        _input.unregister_joy("SCENE_JOYPRESS");
-        _input.unregister_aa("SCENE_ABSOLUTEAXIS");
+        _handleInput = false;
         LOG_DEBUG << "[KeyConfig] State changed to Fadeout";
     }
 }
@@ -198,6 +196,9 @@ void SceneKeyConfig::updateFadeout(const lunaticvibes::Time& t)
 // CALLBACK
 void SceneKeyConfig::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
+    if (!_handleInput)
+        return;
+
     if (m[Input::Pad::ESC])
         exiting = true;
     if (m[Input::Pad::M2])
@@ -217,7 +218,8 @@ void SceneKeyConfig::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 
 void SceneKeyConfig::inputGameAxis(double S1, double S2, const lunaticvibes::Time& t)
 {
-    using namespace Input;
+    if (!_handleInput)
+        return;
 
     // turntable spin
     playerTurntableAngleAdd[PLAYER_SLOT_PLAYER] += S1 * 2.0 * 360;
@@ -226,6 +228,9 @@ void SceneKeyConfig::inputGameAxis(double S1, double S2, const lunaticvibes::Tim
 
 void SceneKeyConfig::inputGamePressKeyboard(KeyboardMask& mask, const lunaticvibes::Time& t)
 {
+    if (!_handleInput)
+        return;
+
     // update bindings
     const auto [pad, slot] = gKeyconfigContext.selecting;
     const GameModeKeys keys = gKeyconfigContext.keys;
@@ -300,6 +305,9 @@ void SceneKeyConfig::inputGamePressKeyboard(KeyboardMask& mask, const lunaticvib
 
 void SceneKeyConfig::inputGamePressJoystick(JoystickMask& mask, size_t device, const lunaticvibes::Time& t)
 {
+    if (!_handleInput)
+        return;
+
     // update bindings
     const auto [pad, slot] = gKeyconfigContext.selecting;
     if (pad == Input::Pad::S1A || pad == Input::Pad::S2A)
@@ -414,6 +422,9 @@ void SceneKeyConfig::inputGamePressJoystick(JoystickMask& mask, size_t device, c
 
 void SceneKeyConfig::inputGameAbsoluteAxis(JoystickAxis& axis, size_t device, const lunaticvibes::Time&)
 {
+    if (!_handleInput)
+        return;
+
     auto [pad, slot] = gKeyconfigContext.selecting;
     if (pad != Input::Pad::S1A && pad != Input::Pad::S2A)
         return;
