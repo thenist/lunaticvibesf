@@ -65,7 +65,8 @@ public:
 public:
     int initializeFolders(const std::vector<Path>& paths);
     int addSubFolder(Path path, const HashMD5& parent = ROOT_FOLDER_HASH);
-    void waitLoadingFinish();
+    void waitLoadingFinish() const;
+    [[nodiscard]] bool didLoadingFinish() const { return _asyncLoadJobs == _asyncLoadJobsDone; };
     int removeFolder(const HashMD5& hash, bool removeSong = false);
 
 protected:

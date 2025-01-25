@@ -673,10 +673,10 @@ int SongDB::removeFolder(const HashMD5& hash, bool removeSong)
     return 0;
 }
 
-void SongDB::waitLoadingFinish()
+void SongDB::waitLoadingFinish() const
 {
     LOG_DEBUG << "[SongDB] Waiting for all loading threads...";
-    while (_asyncLoadJobs != _asyncLoadJobsDone)
+    while (!didLoadingFinish())
         std::this_thread::yield();
     LOG_DEBUG << "[SongDB] All loading threads finished, continue";
 }

@@ -701,8 +701,97 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
 {
     if (_virtualSceneCustomize)
         _virtualSceneCustomize->update_fixed(t);
-    if (_virtualSceneLoadSongs)
-        _virtualSceneLoadSongs->update_fixed(t);
+    if (refreshingSongList)
+    {
+        if (_virtualSceneLoadSongs)
+        {
+            _virtualSceneLoadSongs->update_fixed(t);
+            if (_virtualSceneLoadSongs->isLoadingFinished())
+            {
+                _virtualSceneLoadSongs.reset();
+                {
+                    std::unique_lock u(gSelectContext._mutex);
+                    loadSongList();
+                    sortSongList();
+
+                    gSelectContext.selectedEntryIndex = 0;
+                    setBarInfo();
+                    setEntryInfo();
+                    setDynamicTextures();
+
+                    resetJukeboxText();
+                }
+
+                State::set(IndexTimer::LIST_MOVE, lunaticvibes::Time().norm());
+                SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_F_OPEN);
+
+                refreshingSongList = false;
+            }
+        }
+        // TODO: this shit is blocking somewhere.
+        else if (auto song_db = g_pSongDB; song_db->didLoadingFinish())
+        {
+            LOG_INFO << "[List] Building chart hash cache...";
+            g_pSongDB->prepareCache();
+            LOG_INFO << "[List] Building chart hash cache finished.";
+
+            int added = g_pSongDB->addChartSuccess - g_pSongDB->addChartModified;
+            int updated = g_pSongDB->addChartModified;
+            int deleted = g_pSongDB->addChartDeleted;
+            if (added || updated || deleted)
+            {
+                createNotification((boost::format(i18n::c(i18nText::REFRESH_FOLDER_DETAIL)) %
+                                    "<current folder path a b c d>" % added % updated % deleted)
+                                       .str());
+            }
+            State::set(IndexText::_OVERLAY_TOPLEFT, "");
+            State::set(IndexText::_OVERLAY_TOPLEFT2, "");
+
+            // re-browse
+            if (!isInVersionList)
+                selectDownTimestamp = -1;
+
+            // simplified navigateBack(t)
+            {
+                std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
+
+                gSelectContext.selectedEntryIndex = 0;
+                gSelectContext.backtrace.pop_front();
+                auto& parent = gSelectContext.backtrace.front();
+                gSelectContext.entries = parent.displayEntries;
+                gSelectContext.selectedEntryIndex = parent.index;
+
+                if (parent.ignoreFilters)
+                {
+                    // change display only
+                    State::set(IndexOption::SELECT_FILTER_DIFF, Option::DIFF_ANY);
+                    State::set(IndexOption::SELECT_FILTER_KEYS, Option::FILTER_KEYS_ALL);
+                }
+                else
+                {
+                    // restore prev
+                    State::set(IndexOption::SELECT_FILTER_DIFF, gSelectContext.filterDifficulty);
+                    int keys = 0;
+                    switch (gSelectContext.filterKeys)
+                    {
+                    case 1: keys = Option::FILTER_KEYS_SINGLE; break;
+                    case 7: keys = Option::FILTER_KEYS_7; break;
+                    case 5: keys = Option::FILTER_KEYS_5; break;
+                    case 2: keys = Option::FILTER_KEYS_DOUBLE; break;
+                    case 14: keys = Option::FILTER_KEYS_14; break;
+                    case 10: keys = Option::FILTER_KEYS_10; break;
+                    case 9: keys = Option::FILTER_KEYS_9; break;
+                    }
+                    State::set(IndexOption::SELECT_FILTER_KEYS, keys);
+                }
+            }
+
+            // reset infos, play sound
+            navigateEnter(lunaticvibes::Time());
+
+            refreshingSongList = false;
+        }
+    }
     if (gNextScene != SceneType::SELECT)
         return;
 
@@ -1484,66 +1573,9 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
 
                 g_pSongDB->resetAddSummary();
                 g_pSongDB->addSubFolder(path, gSelectContext.backtrace.front().parent);
-                g_pSongDB->waitLoadingFinish();
 
-                LOG_INFO << "[List] Building chart hash cache...";
-                g_pSongDB->prepareCache();
-                LOG_INFO << "[List] Building chart hash cache finished.";
-
-                int added = g_pSongDB->addChartSuccess - g_pSongDB->addChartModified;
-                int updated = g_pSongDB->addChartModified;
-                int deleted = g_pSongDB->addChartDeleted;
-                if (added || updated || deleted)
-                {
-                    createNotification((boost::format(i18n::c(i18nText::REFRESH_FOLDER_DETAIL)) %
-                                        lunaticvibes::s(path.u8string()) % added % updated % deleted)
-                                           .str());
-                }
-                State::set(IndexText::_OVERLAY_TOPLEFT, "");
-                State::set(IndexText::_OVERLAY_TOPLEFT2, "");
+                // Now check for didLoadingFinish in updating..
             }
-
-            // re-browse
-            if (!isInVersionList)
-                selectDownTimestamp = -1;
-
-            // simplified navigateBack(t)
-            {
-                std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
-
-                gSelectContext.selectedEntryIndex = 0;
-                gSelectContext.backtrace.pop_front();
-                auto& parent = gSelectContext.backtrace.front();
-                gSelectContext.entries = parent.displayEntries;
-                gSelectContext.selectedEntryIndex = parent.index;
-
-                if (parent.ignoreFilters)
-                {
-                    // change display only
-                    State::set(IndexOption::SELECT_FILTER_DIFF, Option::DIFF_ANY);
-                    State::set(IndexOption::SELECT_FILTER_KEYS, Option::FILTER_KEYS_ALL);
-                }
-                else
-                {
-                    // restore prev
-                    State::set(IndexOption::SELECT_FILTER_DIFF, gSelectContext.filterDifficulty);
-                    int keys = 0;
-                    switch (gSelectContext.filterKeys)
-                    {
-                    case 1: keys = Option::FILTER_KEYS_SINGLE; break;
-                    case 7: keys = Option::FILTER_KEYS_7; break;
-                    case 5: keys = Option::FILTER_KEYS_5; break;
-                    case 2: keys = Option::FILTER_KEYS_DOUBLE; break;
-                    case 14: keys = Option::FILTER_KEYS_14; break;
-                    case 10: keys = Option::FILTER_KEYS_10; break;
-                    case 9: keys = Option::FILTER_KEYS_9; break;
-                    }
-                    State::set(IndexOption::SELECT_FILTER_KEYS, keys);
-                }
-            }
-
-            // reset infos, play sound
-            navigateEnter(lunaticvibes::Time());
         }
         else
         {
@@ -1555,36 +1587,10 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
                 selectDownTimestamp = -1;
 
             // Make a virtual preload scene to rebuild song list. This is very tricky...
-            LVF_DEBUG_ASSERT(_virtualSceneLoadSongs == nullptr);
-            if (_virtualSceneLoadSongs == nullptr)
-            {
-                _virtualSceneLoadSongs = std::make_shared<ScenePreSelect>();
-                while (!_virtualSceneLoadSongs->isLoadingFinished())
-                {
-                    using namespace std::chrono_literals;
-                    std::this_thread::sleep_for(33ms);
-                }
-                _virtualSceneLoadSongs.reset();
-            }
-
-            {
-                std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
-                loadSongList();
-                sortSongList();
-
-                gSelectContext.selectedEntryIndex = 0;
-                setBarInfo();
-                setEntryInfo();
-                setDynamicTextures();
-
-                resetJukeboxText();
-            }
-
-            State::set(IndexTimer::LIST_MOVE, lunaticvibes::Time().norm());
-            SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_F_OPEN);
+            LVF_ASSERT(_virtualSceneLoadSongs == nullptr);
+            _virtualSceneLoadSongs = std::make_shared<ScenePreSelect>();
         }
 
-        refreshingSongList = false;
         return;
     }
 
