@@ -46,6 +46,8 @@ protected:
 
     SkinType selectedMode;
 
+    bool _handleInput = false;
+
 protected:
     void updateStart(const lunaticvibes::Time& t);
     void updateMain(const lunaticvibes::Time& t);

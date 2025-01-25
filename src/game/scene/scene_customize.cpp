@@ -159,6 +159,8 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
 
     SoundMgr::setSysVolume(1.0);
 
+    _input.register_p("SCENE_PRESS_CUSTOMIZE", std::bind_front(&SceneCustomize::inputGamePress, this));
+
     LOG_DEBUG << "[Customize] Start";
 
     State::set(IndexTimer::_SCENE_CUSTOMIZE_START, lunaticvibes::Time().norm());
@@ -215,9 +217,7 @@ void SceneCustomize::updateStart(const lunaticvibes::Time& t)
         _state = lunaticvibes::CustomizeState::Main;
 
         if (gInCustomize)
-        {
-            _input.register_p("SCENE_PRESS_CUSTOMIZE", std::bind_front(&SceneCustomize::inputGamePress, this));
-        }
+            _handleInput = true;
 
         LOG_DEBUG << "[Customize] State changed to Main";
     }
@@ -457,7 +457,7 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
         State::set(IndexTimer::_SCENE_CUSTOMIZE_FADEOUT, t.norm());
         SoundMgr::setSysVolume(0.0, 1000);
         _state = lunaticvibes::CustomizeState::Fadeout;
-        _input.unregister_p("SCENE_PRESS_CUSTOMIZE");
+        _handleInput = false;
         LOG_DEBUG << "[Customize] State changed to Fadeout";
     }
 }
@@ -712,6 +712,9 @@ void SceneCustomize::updateTexts() const
 // CALLBACK
 void SceneCustomize::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
+    if (!_handleInput)
+        return;
+
     if (m[Input::Pad::ESC])
         exiting = true;
     if (m[Input::Pad::M2])
