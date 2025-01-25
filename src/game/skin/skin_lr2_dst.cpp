@@ -654,6 +654,108 @@ static bool getDstOptAbs(unsigned d)
     case 801: return State::get(IndexSwitch::P1_LOCK_SPEED);        // lunaticvibes
     case 810: return State::get(IndexSwitch::P2_LANECOVER_ENABLED); // lunaticvibes
     case 811: return State::get(IndexSwitch::P2_LOCK_SPEED);        // lunaticvibes
+    case 900:                                                       // Skin custom op
+    case 901:
+    case 902:
+    case 903:
+    case 904:
+    case 905:
+    case 906:
+    case 907:
+    case 908:
+    case 909:
+    case 910:
+    case 911:
+    case 912:
+    case 913:
+    case 914:
+    case 915:
+    case 916:
+    case 917:
+    case 918:
+    case 919:
+    case 920:
+    case 921:
+    case 922:
+    case 923:
+    case 924:
+    case 925:
+    case 926:
+    case 927:
+    case 928:
+    case 929:
+    case 930:
+    case 931:
+    case 932:
+    case 933:
+    case 934:
+    case 935:
+    case 936:
+    case 937:
+    case 938:
+    case 939:
+    case 940:
+    case 941:
+    case 942:
+    case 943:
+    case 944:
+    case 945:
+    case 946:
+    case 947:
+    case 948:
+    case 949:
+    case 950:
+    case 951:
+    case 952:
+    case 953:
+    case 954:
+    case 955:
+    case 956:
+    case 957:
+    case 958:
+    case 959:
+    case 960:
+    case 961:
+    case 962:
+    case 963:
+    case 964:
+    case 965:
+    case 966:
+    case 967:
+    case 968:
+    case 969:
+    case 970:
+    case 971:
+    case 972:
+    case 973:
+    case 974:
+    case 975:
+    case 976:
+    case 977:
+    case 978:
+    case 979:
+    case 980:
+    case 981:
+    case 982:
+    case 983:
+    case 984:
+    case 985:
+    case 986:
+    case 987:
+    case 988:
+    case 989:
+    case 990:
+    case 991:
+    case 992:
+    case 993:
+    case 994:
+    case 995:
+    case 996:
+    case 997:
+    case 998: {
+        std::shared_lock l(_mutex);
+        return _customOp[d - 900];
+    }
     case 999: return false;
     case 1000: return gArenaData.isOnline(); // lunaticvibes
     case 1001:
@@ -666,13 +768,7 @@ static bool getDstOptAbs(unsigned d)
     case 1008: return gArenaData.isOnline() && gArenaData.getPlayerCount() > d - 1000; // lunaticvibes
     case 1400: return gArenaData.isOnline() && gArenaData.isSelfReady();
     case 9999: return true; // Is lunaticvibes.
-    default:
-        if (d >= 900 && d <= 999)
-        {
-            std::shared_lock l(_mutex);
-            return _customOp[d - 900];
-        }
-        return false;
+    default: return false;
     }
 }
 
