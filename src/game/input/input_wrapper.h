@@ -7,7 +7,7 @@
 
 #include <array>
 #include <map>
-#include <shared_mutex>
+#include <mutex>
 #include <utility>
 
 // InputWrapper
@@ -21,6 +21,7 @@ public:
     static constexpr unsigned release_delay_ms = 5;
 
 private:
+    // Input queue, separately shared
     struct InputPressEvent
     {
         lunaticvibes::InputMaskTimes times;
@@ -43,35 +44,42 @@ private:
         double delta1;
         double delta2;
     };
+    std::mutex _inputQueueMutex;
     std::queue<InputHoldEvent> _input_hold_events;
     std::queue<InputPressEvent> _input_press_events;
     std::queue<InputReleaseEvent> _input_release_events;
     std::queue<ScratchEvent> _scratch_events;
+    // These will be drained from the queue to be processed without holding the mutex.
+    std::vector<InputHoldEvent> _drained_input_hold_events;
+    std::vector<InputPressEvent> _drained_input_press_events;
+    std::vector<InputReleaseEvent> _drained_input_release_events;
+    std::vector<ScratchEvent> _drained_scratch_events;
 
-    mutable std::shared_mutex _inputMutex;
+    // Const data
+    bool _background;
+
+    // Async thread data
     AsyncLooper _looper;
     lunaticvibes::Time _prevUpdateEnd;
-
-protected:
     std::array<std::pair<long long, bool>, Input::KEY_COUNT> _inputBuffer{{{0, false}}};
     std::array<long long, Input::KEY_COUNT> _releaseBuffer{-1};
-    int _cursor_x = 0, _cursor_y = 0;
-    bool _background = false;
-
     InputMask _prev = 0;
     InputMask _curr = 0;
-
-    bool scratchAxisSet = false;
     double scratchAxisPrev[2] = {0.};
     double scratchAxisCurr[2] = {0.};
+    bool scratchAxisSet = false;
 
+    // Shared data
+    mutable std::mutex _inputMutex;
+    InputMask _holding = 0;
+    int _cursor_x = 0;
+    int _cursor_y = 0;
     bool mergeInput = false;
 
 public:
     InputWrapper(unsigned rate = 1000, bool background = false);
     ~InputWrapper();
 
-public:
     void loopEnd() { _looper.loopEnd(); }
     void loopStart() { _looper.loopStart(); }
 
@@ -90,15 +98,13 @@ public:
 
     [[nodiscard]] InputMask Holding() const
     {
-        // FIXME: this will probably recursively lock if this function is called from a callback in processInput.
-        // std::shared_lock l(_inputMutex);
-        return _prev & _curr;
+        std::lock_guard l(_inputMutex);
+        return _holding;
     }
 
     [[nodiscard]] std::pair<int, int> getCursorPos() const
     {
-        // FIXME: this will probably recursively lock if this function is called from a callback in processInput.
-        // std::shared_lock l(_inputMutex);
+        std::lock_guard l(_inputMutex);
         return {_cursor_x, _cursor_y};
     }
 

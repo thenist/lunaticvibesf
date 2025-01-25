@@ -12,7 +12,7 @@
 #include <game/runtime/generic_info.h>
 
 InputWrapper::InputWrapper(unsigned rate, bool background)
-    : _looper{"InputLoop", std::bind_front(&InputWrapper::loopAsync, this), rate}, _background(background)
+    : _background(background), _looper{"InputLoop", std::bind_front(&InputWrapper::loopAsync, this), rate}
 {
 }
 
@@ -84,7 +84,7 @@ void InputWrapper::loopAsync()
         double d2 = normalizeLinearGrowth(scratchAxisPrev[1], scratchAxisCurr[1]) * InputMgr::getDeadzone(Input::S2A);
         if (d1 != 0. || d2 != 0.)
         {
-            std::unique_lock l(_inputMutex);
+            std::unique_lock l(_inputQueueMutex);
             _scratch_events.emplace(now, d1, d2);
         }
     }
@@ -232,17 +232,17 @@ void InputWrapper::loopAsync()
 
     if (p.any())
     {
-        std::unique_lock l(_inputMutex);
+        std::unique_lock l(_inputQueueMutex);
         _input_press_events.emplace(pTimes, now, p);
     }
     if (h.any())
     {
-        std::unique_lock l(_inputMutex);
+        std::unique_lock l(_inputQueueMutex);
         _input_hold_events.emplace(now, h);
     }
     if (r.any())
     {
-        std::unique_lock l(_inputMutex);
+        std::unique_lock l(_inputQueueMutex);
         _input_release_events.emplace(now, r);
     }
 
@@ -254,38 +254,41 @@ void InputWrapper::loopAsync()
 
 void InputWrapper::processInput()
 {
-    // FIXME: C++ Core Guidelines CP.22
-    std::unique_lock l(_inputMutex);
-
-    while (!_input_press_events.empty())
     {
-        auto& event = _input_press_events.front();
+        std::unique_lock l(_inputQueueMutex);
+        auto drain = []<typename T>(std::queue<T>& q, std::vector<T>& v) {
+            while (!q.empty())
+            {
+                v.push_back(std::move(q.front()));
+                q.pop();
+            }
+        };
+        drain(_input_press_events, _drained_input_press_events);
+        drain(_input_hold_events, _drained_input_hold_events);
+        drain(_input_release_events, _drained_input_release_events);
+        drain(_scratch_events, _drained_scratch_events);
+    }
+
+    for (auto& event : _drained_input_press_events)
+    {
         for (auto& [cbname, callback] : _pCallbackMap)
             callback(event.mask, event.t);
         for (auto& [cbname, callback] : _pCallbackMapNew)
             callback(event.mask, event.t, event.times);
-        _input_press_events.pop();
     }
+    _drained_input_press_events.clear();
 
-    while (!_input_hold_events.empty())
-    {
-        auto& event = _input_hold_events.front();
+    for (auto& event : _drained_input_hold_events)
         for (auto& [cbname, callback] : _hCallbackMap)
             callback(event.mask, event.t);
-        _input_hold_events.pop();
-    }
+    _drained_input_hold_events.clear();
 
-    while (!_input_release_events.empty())
-    {
-        auto& event = _input_release_events.front();
+    for (auto& event : _drained_input_release_events)
         for (auto& [cbname, callback] : _rCallbackMap)
             callback(event.mask, event.t);
-        _input_release_events.pop();
-    }
+    _drained_input_release_events.clear();
 
-    while (!_scratch_events.empty())
-    {
-        auto& event = _scratch_events.front();
+    for (auto& event : _drained_scratch_events)
         for (auto& [cbname, callback] : _aCallbackMap)
         {
             if (mergeInput)
@@ -293,8 +296,7 @@ void InputWrapper::processInput()
             else
                 callback(event.delta1, event.delta2, event.t);
         }
-        _scratch_events.pop();
-    }
+    _drained_scratch_events.clear();
 }
 
 double InputWrapper::getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index)
