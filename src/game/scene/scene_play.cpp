@@ -2274,7 +2274,7 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
                     SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_PLAYSTOP);
                     LOG_DEBUG << "[Play] State changed to PLAY_FAILED";
                 }
-                _input.unregister_p("SCENE_PRESS");
+                _handleInput = false;
             }
         }
 
@@ -3010,6 +3010,8 @@ void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t, const 
             judgeInput(PLAYER_SLOT_TARGET);
     }
 
+    if (!_handleInput)
+        return;
     auto input = _inputAvailable & m;
 
     // individual keys
@@ -3323,6 +3325,8 @@ void ScenePlay::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
             judgeInput(PLAYER_SLOT_TARGET);
     }
 
+    if (!_handleInput)
+        return;
     auto input = _inputAvailable & m;
 
     // delay start
@@ -3383,6 +3387,8 @@ void ScenePlay::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
             judgeInput(PLAYER_SLOT_TARGET);
     }
 
+    if (!_handleInput)
+        return;
     auto input = _inputAvailable & m;
 
     if (!gPlayContext.isAuto && !gPlayContext.isReplay)
@@ -3487,6 +3493,9 @@ void ScenePlay::inputGameAxis(double S1, double S2, const lunaticvibes::Time& t)
         if (!gPlayContext.isAuto)
             judgeInput(PLAYER_SLOT_TARGET);
     }
+
+    if (!_handleInput)
+        return;
 
     // turntable spin
     playerState[PLAYER_SLOT_PLAYER].turntableAngleAdd += S1 * 2.0 * 360;

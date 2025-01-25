@@ -36,6 +36,7 @@ private:
     ePlayState state;
     InputMask _inputAvailable;
     std::vector<size_t> keySampleIndex;
+    bool _handleInput = true;
     bool _handleJudgeInput = false;
 
 protected:
