@@ -103,6 +103,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
     // implicit parameters
     bool hasDifficulty = false;
+    bool only_check_note_existence = false;
 
     for (StringContent lineBuf, lineBuf_; std::getline(bmsFile, lineBuf_);)
     {
@@ -242,10 +243,14 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                         ifValue = std::stack<int>();
                     }
                 }
-                else if (ifValue.empty() || ifValue.top() != randomValue.top())
+                else if (ifValue.empty())
                 {
-                    // skip orphan blocks and mismatch IF value blocks
+                    // skip orphan blocks IF value blocks
                     continue;
+                }
+                else if (ifValue.top() != randomValue.top())
+                {
+                    only_check_note_existence = true;
                 }
             }
 
@@ -418,41 +423,44 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
                     if (x_ == 0) // 0x: basic info
                     {
-                        switch (_y)
+                        if (!only_check_note_existence)
                         {
-                        case 1: // 01: BGM
-                            seqToLane36(chBGM[bgmLayersCount[bar]][bar], value);
-                            ++bgmLayersCount[bar];
-                            break;
-                        case 2: // 02: Bar Length
-                            metres[bar] = toDouble(value);
-                            haveMetricMod = true;
-                            break;
-                        case 3: // 03: BPM change
-                            seqToLane16(chBPMChange[bar], value);
-                            haveBPMChange = true;
-                            break;
-                        case 4: // 04: BGA Base
-                            seqToLane36(chBGABase[bar], value);
-                            haveBGA = true;
-                            break;
-                        case 6: // 06: BGA Poor
-                            seqToLane36(chBGAPoor[bar], value);
-                            haveBGA = true;
-                            break;
-                        case 7: // 07: BGA Layer
-                            seqToLane36(chBGALayer[bar], value);
-                            haveBGA = true;
-                            break;
-                        case 8: // 08: ExBPM
-                            seqToLane36(chExBPMChange[bar], value);
-                            haveBPMChange = true;
-                            break;
-                        case 9: // 09: Stop
-                            seqToLane36(chStop[bar], value);
-                            haveStop = true;
-                            break;
-                        default: LOG_DEBUG << "[BMS] Unhandled x=0 (basic info) << y=" << _y; break;
+                            switch (_y)
+                            {
+                            case 1: // 01: BGM
+                                seqToLane36(chBGM[bgmLayersCount[bar]][bar], value);
+                                ++bgmLayersCount[bar];
+                                break;
+                            case 2: // 02: Bar Length
+                                metres[bar] = toDouble(value);
+                                haveMetricMod = true;
+                                break;
+                            case 3: // 03: BPM change
+                                seqToLane16(chBPMChange[bar], value);
+                                haveBPMChange = true;
+                                break;
+                            case 4: // 04: BGA Base
+                                seqToLane36(chBGABase[bar], value);
+                                haveBGA = true;
+                                break;
+                            case 6: // 06: BGA Poor
+                                seqToLane36(chBGAPoor[bar], value);
+                                haveBGA = true;
+                                break;
+                            case 7: // 07: BGA Layer
+                                seqToLane36(chBGALayer[bar], value);
+                                haveBGA = true;
+                                break;
+                            case 8: // 08: ExBPM
+                                seqToLane36(chExBPMChange[bar], value);
+                                haveBPMChange = true;
+                                break;
+                            case 9: // 09: Stop
+                                seqToLane36(chStop[bar], value);
+                                haveStop = true;
+                                break;
+                            default: LOG_DEBUG << "[BMS] Unhandled x=0 (basic info) << y=" << _y; break;
+                            }
                         }
                     }
                     else // not 0x
@@ -467,69 +475,72 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                         unsigned chIdx = idx + (side == 1 ? 10 : 0);
                         if (side >= 0)
                         {
-                            switch (x_)
+                            if (!only_check_note_existence)
                             {
-                            case 1: // 1x: 1P visible
-                            case 2: // 2x: 2P visible
-                                seqToLane36(chNotesRegular[chIdx][bar], value);
-                                haveNote = true;
-                                if (side == 1)
-                                    haveAny_2 = true;
-                                break;
-                            case 3: // 3x: 1P invisible
-                            case 4: // 4x: 2P invisible
-                                seqToLane36(chNotesInvisible[chIdx][bar], value);
-                                haveInvisible = true;
-                                if (side == 1)
-                                    haveAny_2 = true;
-                                break;
-                            case 5: // 5x: 1P LN
-                            case 6: // 6x: 2P LN
-                                haveLNchannels = true;
-                                if (!lnobjSet.empty())
+                                switch (x_)
                                 {
-                                    // Note: there is so many possibilities of conflicting LN definition. Add all LN
-                                    // channel notes as regular notes
-                                    channel noteLane;
-                                    seqToLane36(noteLane, value, channel::NoteParseValue::LN);
-                                    unsigned scale =
-                                        chNotesRegular[chIdx][bar].relax(noteLane.resolution) / noteLane.resolution;
-                                    for (auto& note : noteLane.notes)
-                                    {
-                                        note.segment *= scale;
-                                        bool noteInserted = false;
-                                        channel& chTarget = chNotesRegular[chIdx][bar];
-                                        for (auto it = chTarget.notes.begin(); it != chTarget.notes.end(); ++it)
-                                        {
-                                            if (it->segment > note.segment ||
-                                                (it->segment == note.segment && it->value > note.value))
-                                            {
-                                                chTarget.notes.insert(it, note);
-                                                noteInserted = true;
-                                                break;
-                                            }
-                                        }
-                                        if (!noteInserted)
-                                        {
-                                            chTarget.notes.push_back(note);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // #LNTYPE 1
-                                    seqToLane36(chNotesLN[chIdx][bar], value, channel::NoteParseValue::LN);
-                                    haveLN = true;
+                                case 1: // 1x: 1P visible
+                                case 2: // 2x: 2P visible
+                                    seqToLane36(chNotesRegular[chIdx][bar], value);
+                                    haveNote = true;
                                     if (side == 1)
                                         haveAny_2 = true;
+                                    break;
+                                case 3: // 3x: 1P invisible
+                                case 4: // 4x: 2P invisible
+                                    seqToLane36(chNotesInvisible[chIdx][bar], value);
+                                    haveInvisible = true;
+                                    if (side == 1)
+                                        haveAny_2 = true;
+                                    break;
+                                case 5: // 5x: 1P LN
+                                case 6: // 6x: 2P LN
+                                    haveLNchannels = true;
+                                    if (!lnobjSet.empty())
+                                    {
+                                        // Note: there is so many possibilities of conflicting LN definition. Add all LN
+                                        // channel notes as regular notes
+                                        channel noteLane;
+                                        seqToLane36(noteLane, value, channel::NoteParseValue::LN);
+                                        unsigned scale =
+                                            chNotesRegular[chIdx][bar].relax(noteLane.resolution) / noteLane.resolution;
+                                        for (auto& note : noteLane.notes)
+                                        {
+                                            note.segment *= scale;
+                                            bool noteInserted = false;
+                                            channel& chTarget = chNotesRegular[chIdx][bar];
+                                            for (auto it = chTarget.notes.begin(); it != chTarget.notes.end(); ++it)
+                                            {
+                                                if (it->segment > note.segment ||
+                                                    (it->segment == note.segment && it->value > note.value))
+                                                {
+                                                    chTarget.notes.insert(it, note);
+                                                    noteInserted = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!noteInserted)
+                                            {
+                                                chTarget.notes.push_back(note);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // #LNTYPE 1
+                                        seqToLane36(chNotesLN[chIdx][bar], value, channel::NoteParseValue::LN);
+                                        haveLN = true;
+                                        if (side == 1)
+                                            haveAny_2 = true;
+                                    }
+                                    break;
+                                case 0xD: // Dx: 1P mine
+                                case 0xE: // Ex: 2P mine
+                                    seqToLane36(chMines[chIdx][bar], value);
+                                    haveMine = true;
+                                    break;
+                                default: LOG_VERBOSE << "[BMS] Unhandled x=" << x_ << "; y=" << _y; break;
                                 }
-                                break;
-                            case 0xD: // Dx: 1P mine
-                            case 0xE: // Ex: 2P mine
-                                seqToLane36(chMines[chIdx][bar], value);
-                                haveMine = true;
-                                break;
-                            default: LOG_VERBOSE << "[BMS] Unhandled x=" << x_ << "; y=" << _y; break;
                             }
 
                             switch (idx)

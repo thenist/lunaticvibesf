@@ -6,6 +6,7 @@
 #include <common/utils.h>
 
 #include <optional>
+#include <random>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -113,6 +114,16 @@ TEST(tBMS, MetaNoFile)
 
     EXPECT_FALSE(bms.checkHasReadme());
     EXPECT_TRUE(bms.getReadmeFiles().empty());
+}
+
+TEST(tBMS, RandomKeyCount)
+{
+    std::shared_ptr<ChartFormatBMS> bms = nullptr;
+    // Intentionally random seed. Who knows if default '0' would always trigger what was the #IF bug.
+    const auto seed = std::random_device{}();
+    ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/random_5k_7k.bme", seed));
+    ASSERT_EQ(bms->isLoaded(), true);
+    EXPECT_EQ(bms->gamemode, 7);
 }
 
 TEST(tBMS, RankInvalidParsedCorrectly)
