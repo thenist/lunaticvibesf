@@ -19,7 +19,7 @@
 // 111: white dot
 
 #IMAGE,LR2files\Mouse\*.tga
-#IMAGE,LR2files\..\gamedata\resources\keyconfig\keyconfig.png
+#IMAGE,gamedata\resources\keyconfig\keyconfig.png
 
 
 //////////////////////////////////////////////////////////////////////////
