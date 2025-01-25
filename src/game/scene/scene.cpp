@@ -116,11 +116,6 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
 SceneBase::~SceneBase()
 {
     LVF_ASSERT(!_input.isRunning());
-    _input.unregister_r("SKIN_MOUSE_RELEASE");
-    _input.unregister_h("SKIN_MOUSE_DRAG");
-    _input.unregister_p("SKIN_MOUSE_CLICK");
-    _input.unregister_p("GLOBALFUNC");
-    _input.unregister_p("DEBUG_TOGGLE");
 }
 
 void SceneBase::update()
