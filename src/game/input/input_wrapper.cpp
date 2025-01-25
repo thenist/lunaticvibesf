@@ -329,18 +329,6 @@ bool InputWrapper::_register(unsigned type, const std::string& key, INPUTCALLBAC
     }
 }
 
-bool InputWrapper::_unregister(unsigned type, const std::string& key)
-{
-    std::unique_lock _lock(_inputMutex);
-    switch (type)
-    {
-    case 0: _pCallbackMap.erase(key); return true;
-    case 1: _hCallbackMap.erase(key); return true;
-    case 2: _rCallbackMap.erase(key); return true;
-    default: lunaticvibes::assert_failed("InputWrapper::_register");
-    }
-}
-
 bool InputWrapper::register_p_new(const std::string& key, lunaticvibes::InputCallback f)
 {
     std::unique_lock _lock(_inputMutex);
@@ -357,24 +345,11 @@ bool InputWrapper::register_a(const std::string& key, AXISPLUSCALLBACK f)
     return true;
 }
 
-bool InputWrapper::unregister_a(const std::string& key)
-{
-    std::unique_lock _lock(_inputMutex);
-    _aCallbackMap.erase(key);
-    return true;
-}
-
 bool InputWrapper::register_kb(const std::string& key, KEYBOARDCALLBACK f)
 {
     std::unique_lock _lock(_inputMutex);
     LVF_ASSERT(!_keyboardCallbackMap.contains(key));
     _keyboardCallbackMap[key] = std::move(f);
-    return true;
-}
-bool InputWrapper::unregister_kb(const std::string& key)
-{
-    std::unique_lock _lock(_inputMutex);
-    _keyboardCallbackMap.erase(key);
     return true;
 }
 
@@ -385,23 +360,11 @@ bool InputWrapper::register_joy(const std::string& key, JOYSTICKCALLBACK f)
     _joystickCallbackMap[key] = std::move(f);
     return true;
 }
-bool InputWrapper::unregister_joy(const std::string& key)
-{
-    std::unique_lock _lock(_inputMutex);
-    _joystickCallbackMap.erase(key);
-    return true;
-}
 
 bool InputWrapper::register_aa(const std::string& key, ABSAXISCALLBACK f)
 {
     std::unique_lock _lock(_inputMutex);
     LVF_ASSERT(!_absaxisCallbackMap.contains(key));
     _absaxisCallbackMap[key] = std::move(f);
-    return true;
-}
-bool InputWrapper::unregister_aa(const std::string& key)
-{
-    std::unique_lock _lock(_inputMutex);
-    _absaxisCallbackMap.erase(key);
     return true;
 }

@@ -118,18 +118,13 @@ private:
 private:
     // Callback registering
     bool _register(unsigned type, const std::string& key, INPUTCALLBACK);
-    bool _unregister(unsigned type, const std::string& key);
 
 public:
     bool register_p(const std::string& key, INPUTCALLBACK f) { return _register(0, key, std::move(f)); }
     bool register_p_new(const std::string& key, lunaticvibes::InputCallback f);
     bool register_h(const std::string& key, INPUTCALLBACK f) { return _register(1, key, std::move(f)); }
     bool register_r(const std::string& key, INPUTCALLBACK f) { return _register(2, key, std::move(f)); }
-    bool unregister_p(const std::string& key) { return _unregister(0, key); }
-    bool unregister_h(const std::string& key) { return _unregister(1, key); }
-    bool unregister_r(const std::string& key) { return _unregister(2, key); }
     bool register_a(const std::string& key, AXISPLUSCALLBACK f);
-    bool unregister_a(const std::string& key);
 
     // Should only used for keyconfig
 protected:
@@ -141,7 +136,6 @@ private:
 
 public:
     bool register_kb(const std::string& key, KEYBOARDCALLBACK f);
-    bool unregister_kb(const std::string& key);
 
 protected:
     std::array<JoystickMask, InputMgr::MAX_JOYSTICK_COUNT> _joyprev{};
@@ -152,7 +146,6 @@ private:
 
 public:
     bool register_joy(const std::string& key, JOYSTICKCALLBACK f);
-    bool unregister_joy(const std::string& key);
 
 protected:
     std::array<JoystickAxis, InputMgr::MAX_JOYSTICK_COUNT> _joyaxisprev{};
@@ -163,5 +156,4 @@ private:
 
 public:
     bool register_aa(const std::string& key, ABSAXISCALLBACK f);
-    bool unregister_aa(const std::string& key);
 };
