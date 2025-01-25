@@ -127,33 +127,19 @@ public:
     bool register_a(const std::string& key, AXISPLUSCALLBACK f);
 
     // Should only used for keyconfig
-protected:
-    KeyboardMask _kbprev = 0;
-    KeyboardMask _kbcurr = 0;
-
 private:
+    KeyboardMask _kbcurr = 0;
+    KeyboardMask _kbprev = 0;
+    std::array<JoystickAxis, InputMgr::MAX_JOYSTICK_COUNT> _joyaxiscurr{};
+    std::array<JoystickAxis, InputMgr::MAX_JOYSTICK_COUNT> _joyaxisprev{};
+    std::array<JoystickMask, InputMgr::MAX_JOYSTICK_COUNT> _joycurr{};
+    std::array<JoystickMask, InputMgr::MAX_JOYSTICK_COUNT> _joyprev{};
+    std::map<const std::string, ABSAXISCALLBACK> _absaxisCallbackMap;
+    std::map<const std::string, JOYSTICKCALLBACK> _joystickCallbackMap;
     std::map<const std::string, KEYBOARDCALLBACK> _keyboardCallbackMap;
 
 public:
     bool register_kb(const std::string& key, KEYBOARDCALLBACK f);
-
-protected:
-    std::array<JoystickMask, InputMgr::MAX_JOYSTICK_COUNT> _joyprev{};
-    std::array<JoystickMask, InputMgr::MAX_JOYSTICK_COUNT> _joycurr{};
-
-private:
-    std::map<const std::string, JOYSTICKCALLBACK> _joystickCallbackMap;
-
-public:
     bool register_joy(const std::string& key, JOYSTICKCALLBACK f);
-
-protected:
-    std::array<JoystickAxis, InputMgr::MAX_JOYSTICK_COUNT> _joyaxisprev{};
-    std::array<JoystickAxis, InputMgr::MAX_JOYSTICK_COUNT> _joyaxiscurr{};
-
-private:
-    std::map<const std::string, ABSAXISCALLBACK> _absaxisCallbackMap;
-
-public:
     bool register_aa(const std::string& key, ABSAXISCALLBACK f);
 };
