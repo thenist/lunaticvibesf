@@ -3,6 +3,7 @@
 #include <climits>
 #include <cstdint>
 #include <mutex>
+#include <ranges>
 #include <string>
 #include <utility>
 
@@ -27,6 +28,8 @@
 #include <game/graphics/SDL2/window_SDL2.h>
 #include <game/graphics/graphics.h>
 #include <game/graphics/video.h>
+
+namespace v = std::views;
 
 static SDL_Rect canvasRect;
 static SDL_Rect windowRect;
@@ -423,9 +426,9 @@ void graphics_set_maxfps(int fps)
 
 static bool isEditing = false;
 static std::string textBuf, textBufSuffix;
-void funEditing(const SDL_TextEditingEvent& e);
-void funInput(const SDL_TextInputEvent& e);
-void funKeyDown(const SDL_KeyboardEvent& e);
+static void funEditing(const SDL_TextEditingEvent& e);
+static void funInput(const SDL_TextInputEvent& e);
+static void funKeyDown(const SDL_KeyboardEvent& e);
 
 static std::int16_t i16_from_i32(std::int32_t value)
 {
@@ -644,6 +647,33 @@ void funInput(const SDL_TextInputEvent& e)
     funUpdateText(textBuf);
 }
 
+// \param c First byte of UTF-8 character (which may be up to 4 bytes)
+static int get_utf8_char_size(char c)
+{
+    if ((c & 0x80) == 0)
+        return 1;
+    if ((c & 0xE0) == 0xC0)
+        return 2;
+    if ((c & 0xF0) == 0xE0)
+        return 3;
+    if ((c & 0xF8) == 0xF0)
+        return 4;
+    return -1;
+}
+
+static void remove_last_utf8_char(std::string& str)
+{
+    if (str.empty())
+        return;
+    const auto s_size = static_cast<int>(str.size());
+    for (const int size :
+         str | v::reverse | v::transform(get_utf8_char_size) | v::filter([](int size) { return size > 0; }))
+    {
+        str.resize(s_size < size ? 0 : s_size - size);
+        break;
+    }
+}
+
 void funKeyDown(const SDL_KeyboardEvent& e)
 {
     if (e.keysym.mod & (KMOD_LCTRL | KMOD_RCTRL))
@@ -670,9 +700,7 @@ void funKeyDown(const SDL_KeyboardEvent& e)
         case SDLK_BACKSPACE:
             if (textBufSuffix.empty() && !textBuf.empty())
             {
-                std::u32string textTmp = utf8_to_utf32(textBuf);
-                textTmp.erase(textTmp.length() - 1, 1);
-                textBuf = utf32_to_utf8(textTmp);
+                remove_last_utf8_char(textBuf);
                 funUpdateText(textBuf + textBufSuffix);
             }
             break;

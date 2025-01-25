@@ -30,5 +30,3 @@ void utf8_to_utf32(const std::string& str, std::u32string& out);
     lunaticvibes::utf8_to_utf32(str, buf);
     return buf;
 }
-
-[[nodiscard]] std::string utf32_to_utf8(const std::u32string& str);

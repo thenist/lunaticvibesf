@@ -401,28 +401,3 @@ void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)
 
     out.resize(to_next - &out[0]);
 }
-
-std::string utf32_to_utf8(const std::u32string& str)
-{
-    static const auto locale = std::locale("");
-    static const auto& facet_u32_u8 = std::use_facet<std::codecvt<char32_t, char, std::mbstate_t>>(locale);
-    std::string u8Text(str.size() * 4, '\0');
-
-    std::mbstate_t s;
-    const char32_t* from_next = &str[0];
-    char* to_next = &u8Text[0];
-
-    std::codecvt_base::result res;
-    do
-    {
-        res = facet_u32_u8.out(s, from_next, &str[str.size()], from_next, to_next, &u8Text[u8Text.size()], to_next);
-
-        // skip unconvertiable chars (which is impossible though)
-        if (res == std::codecvt_base::error)
-            from_next++;
-
-    } while (res == std::codecvt_base::error);
-
-    u8Text.resize(to_next - &u8Text[0]);
-    return u8Text;
-}
