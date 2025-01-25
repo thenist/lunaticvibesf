@@ -49,7 +49,4 @@ public:
 
     std::vector<std::string> getLevelList() const;
     std::vector<std::shared_ptr<EntryBase>> getEntryList(const std::string& level);
-
-private:
-    [[nodiscard]] bool compareByLevelOrder(const std::string&, const std::string&) const;
 };
