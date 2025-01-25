@@ -34,6 +34,7 @@ public:
 private:
     eSelectState state;
     InputMask _inputAvailable;
+    bool _handleInput = false;
 
     int _config_list_scroll_time_initial;
     // navigate input

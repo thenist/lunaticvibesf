@@ -526,6 +526,11 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     lunaticvibes::assign(_preview_chart_5k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_5K, ""));
     lunaticvibes::assign(_preview_chart_7k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_7K, ""));
     lunaticvibes::assign(_preview_chart_9k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_9K, ""));
+
+    _input.register_p("SCENE_PRESS", std::bind_front(&SceneSelect::inputGamePress, this));
+    _input.register_h("SCENE_HOLD", std::bind_front(&SceneSelect::inputGameHold, this));
+    _input.register_r("SCENE_RELEASE", std::bind_front(&SceneSelect::inputGameRelease, this));
+    _input.register_a("SCENE_AXIS", std::bind_front(&SceneSelect::inputGameAxisSelect, this));
 }
 
 SceneSelect::~SceneSelect()
@@ -988,10 +993,7 @@ void SceneSelect::updatePrepare(const lunaticvibes::Time& t)
     {
         state = eSelectState::SELECT;
 
-        _input.register_p("SCENE_PRESS", std::bind_front(&SceneSelect::inputGamePress, this));
-        _input.register_h("SCENE_HOLD", std::bind_front(&SceneSelect::inputGameHold, this));
-        _input.register_r("SCENE_RELEASE", std::bind_front(&SceneSelect::inputGameRelease, this));
-        _input.register_a("SCENE_AXIS", std::bind_front(&SceneSelect::inputGameAxisSelect, this));
+        _handleInput = true;
 
         State::set(IndexTimer::LIST_MOVE, t.norm());
         State::set(IndexTimer::LIST_MOVE_STOP, t.norm());
