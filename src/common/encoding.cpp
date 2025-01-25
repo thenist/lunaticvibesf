@@ -211,66 +211,52 @@ std::string to_utf8(const std::string& input, eFileEncoding fromEncoding)
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& out)
+static int to_win_codepage(eFileEncoding enc)
 {
-    int cp = CP_UTF8;
-    switch (fromEncoding)
+    switch (enc)
     {
-    case eFileEncoding::SHIFT_JIS: cp = 932; break;
-    case eFileEncoding::EUC_KR: cp = 949; break;
-    case eFileEncoding::LATIN1: cp = CP_ACP; break;
-    default: cp = CP_UTF8; break;
+    case eFileEncoding::SHIFT_JIS: return 932;
+    case eFileEncoding::EUC_KR: return 949;
+    case eFileEncoding::LATIN1: return CP_ACP;
+    case eFileEncoding::UTF8: return CP_UTF8;
     }
-    if (cp == CP_UTF8)
+    lunaticvibes::assert_failed("to_win_codepage");
+};
+
+static void convert(const std::string& input, eFileEncoding fromEncoding, eFileEncoding toEncoding, std::string& out)
+{
+    const int from = to_win_codepage(fromEncoding);
+    const int to = to_win_codepage(toEncoding);
+    if (from == to)
     {
         out = input;
         return;
     }
 
-    DWORD dwNum;
+    DWORD wide_buf_size = MultiByteToWideChar(from, 0, input.c_str(), -1, nullptr, 0);
+    wchar_t* wstr = new wchar_t[wide_buf_size];
+    MultiByteToWideChar(from, 0, input.c_str(), -1, wstr, wide_buf_size);
 
-    dwNum = MultiByteToWideChar(cp, 0, input.c_str(), -1, nullptr, 0);
-    wchar_t* wstr = new wchar_t[dwNum];
-    MultiByteToWideChar(cp, 0, input.c_str(), -1, wstr, dwNum);
+    DWORD narrow_buf_size = WideCharToMultiByte(to, 0, wstr, -1, 0, 0, 0, FALSE);
+    char* lstr = new char[narrow_buf_size];
+    WideCharToMultiByte(to, 0, wstr, -1, lstr, narrow_buf_size, 0, FALSE);
 
-    dwNum = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, 0, 0, 0, FALSE);
-    char* ustr = new char[dwNum];
-    WideCharToMultiByte(CP_UTF8, 0, wstr, -1, ustr, dwNum, 0, FALSE);
-
-    out = ustr;
+    out = lstr;
 
     delete[] wstr;
-    delete[] ustr;
+    delete[] lstr;
+}
+
+void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& out)
+{
+    convert(input, fromEncoding, eFileEncoding::UTF8, out);
 }
 
 std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
 {
-    int cp = CP_UTF8;
-    switch (toEncoding)
-    {
-    case eFileEncoding::SHIFT_JIS: cp = 932; break;
-    case eFileEncoding::EUC_KR: cp = 949; break;
-    case eFileEncoding::LATIN1: cp = CP_ACP; break;
-    default: cp = CP_UTF8; break;
-    }
-    if (cp == CP_UTF8)
-        return input;
-
-    DWORD dwNum;
-
-    dwNum = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, nullptr, 0);
-    wchar_t* wstr = new wchar_t[dwNum];
-    MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, wstr, dwNum);
-
-    dwNum = WideCharToMultiByte(cp, 0, wstr, -1, 0, 0, 0, FALSE);
-    char* lstr = new char[dwNum];
-    WideCharToMultiByte(cp, 0, wstr, -1, lstr, dwNum, 0, FALSE);
-
-    std::string ret(lstr);
-
-    delete[] wstr;
-    delete[] lstr;
-    return ret;
+    std::string out;
+    convert(input, eFileEncoding::UTF8, toEncoding, out);
+    return out;
 }
 
 #else
