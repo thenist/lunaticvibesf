@@ -233,15 +233,16 @@ static void convert(const std::string& input, eFileEncoding fromEncoding, eFileE
         return;
     }
 
-    DWORD wide_buf_size = MultiByteToWideChar(from, 0, input.c_str(), -1, nullptr, 0);
+    DWORD wide_buf_size = MultiByteToWideChar(from, 0, input.c_str(), static_cast<int>(input.size()), nullptr, 0);
     wchar_t* wstr = new wchar_t[wide_buf_size];
-    MultiByteToWideChar(from, 0, input.c_str(), -1, wstr, wide_buf_size);
+    MultiByteToWideChar(from, 0, input.c_str(), static_cast<int>(input.size()), wstr, wide_buf_size);
 
-    DWORD narrow_buf_size = WideCharToMultiByte(to, 0, wstr, -1, 0, 0, 0, FALSE);
+    DWORD narrow_buf_size = WideCharToMultiByte(to, 0, wstr, wide_buf_size, 0, 0, 0, FALSE);
     char* lstr = new char[narrow_buf_size];
-    WideCharToMultiByte(to, 0, wstr, -1, lstr, narrow_buf_size, 0, FALSE);
+    WideCharToMultiByte(to, 0, wstr, narrow_buf_size, lstr, narrow_buf_size, 0, FALSE);
 
-    out = lstr;
+    // NOTE: narrow_buf_size doesn't include null-terminator as we are passing size to WideCharToMultiByte explicitly.
+    out.assign(lstr, narrow_buf_size);
 
     delete[] wstr;
     delete[] lstr;
