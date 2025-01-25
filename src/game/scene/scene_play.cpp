@@ -1354,17 +1354,14 @@ void ScenePlay::setInputJudgeCallback()
 
 void ScenePlay::removeInputJudgeCallback()
 {
-    for (size_t i = 0; i < gPlayContext.ruleset.size(); ++i)
-    {
-        _input.unregister_p("JUDGE_PRESS_1");
-        _input.unregister_h("JUDGE_HOLD_1");
-        _input.unregister_r("JUDGE_RELEASE_1");
-        _input.unregister_a("JUDGE_AXIS_1");
-        _input.unregister_p("JUDGE_PRESS_2");
-        _input.unregister_h("JUDGE_HOLD_2");
-        _input.unregister_r("JUDGE_RELEASE_2");
-        _input.unregister_a("JUDGE_AXIS_2");
-    }
+    _input.unregister_p("JUDGE_PRESS_1");
+    _input.unregister_h("JUDGE_HOLD_1");
+    _input.unregister_r("JUDGE_RELEASE_1");
+    _input.unregister_a("JUDGE_AXIS_1");
+    _input.unregister_p("JUDGE_PRESS_2");
+    _input.unregister_h("JUDGE_HOLD_2");
+    _input.unregister_r("JUDGE_RELEASE_2");
+    _input.unregister_a("JUDGE_AXIS_2");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2322,10 +2319,7 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
                     SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_PLAYSTOP);
                     LOG_DEBUG << "[Play] State changed to PLAY_FAILED";
                 }
-                for (size_t i = 0; i < gPlayContext.ruleset.size(); ++i)
-                {
-                    _input.unregister_p("SCENE_PRESS");
-                }
+                _input.unregister_p("SCENE_PRESS");
             }
         }
 
