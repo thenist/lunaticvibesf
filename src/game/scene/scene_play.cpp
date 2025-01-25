@@ -5,6 +5,8 @@
 #include <functional>
 #include <future>
 #include <random>
+#include <sstream>
+#include <string>
 
 #include <common/assert.h>
 #include <common/chartformat/chartformat_bms.h>
@@ -1317,53 +1319,6 @@ void ScenePlay::loadChart()
         bgaFuture.get();
 }
 
-void ScenePlay::setInputJudgeCallback()
-{
-    if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr)
-    {
-        _input.register_p_new("JUDGE_PRESS_1",
-                              std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
-        _input.register_h("JUDGE_HOLD_1",
-                          std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
-        _input.register_r("JUDGE_RELEASE_1",
-                          std::bind_front(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
-        _input.register_a("JUDGE_AXIS_1",
-                          std::bind_front(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
-    }
-    else
-    {
-        LOG_ERROR << "[Play] Ruleset of 1P not initialized!";
-    }
-
-    if (gPlayContext.ruleset[PLAYER_SLOT_TARGET] != nullptr)
-    {
-        _input.register_p_new("JUDGE_PRESS_2",
-                              std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
-        _input.register_h("JUDGE_HOLD_2",
-                          std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
-        _input.register_r("JUDGE_RELEASE_2",
-                          std::bind_front(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
-        _input.register_a("JUDGE_AXIS_2",
-                          std::bind_front(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
-    }
-    else if (!gPlayContext.isAuto)
-    {
-        LOG_ERROR << "[Play] Ruleset of 2P not initialized!";
-    }
-}
-
-void ScenePlay::removeInputJudgeCallback()
-{
-    _input.unregister_p("JUDGE_PRESS_1");
-    _input.unregister_h("JUDGE_HOLD_1");
-    _input.unregister_r("JUDGE_RELEASE_1");
-    _input.unregister_a("JUDGE_AXIS_1");
-    _input.unregister_p("JUDGE_PRESS_2");
-    _input.unregister_h("JUDGE_HOLD_2");
-    _input.unregister_r("JUDGE_RELEASE_2");
-    _input.unregister_a("JUDGE_AXIS_2");
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 void ScenePlay::update_fixed(const lunaticvibes::Time& t)
@@ -1999,7 +1954,7 @@ void ScenePlay::updateLoadEnd(const lunaticvibes::Time& t)
         changeKeySampleMapping(USE_FIRST_KEYSOUNDS);
         State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_PLAYING);
         State::set(IndexTimer::PLAY_START, t.norm());
-        setInputJudgeCallback();
+        _handleJudgeInput = true;
         gChartContext.started = true;
         {
             std::unique_lock l{gPlayContext._mutex};
@@ -2427,7 +2382,7 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
         if (_loadChartFuture.valid())
             _loadChartFuture.wait();
 
-        removeInputJudgeCallback();
+        _handleJudgeInput = false;
 
         bool cleared = false;
         if (gPlayContext.isBattle)
@@ -3044,6 +2999,17 @@ void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t, const 
 {
     using namespace Input;
 
+    auto judgeInput = [&](int slot) {
+        LVF_ASSERT(gPlayContext.ruleset[slot] != nullptr);
+        gPlayContext.ruleset[slot]->updatePress(m, t, tt);
+    };
+    if (_handleJudgeInput)
+    {
+        judgeInput(PLAYER_SLOT_PLAYER);
+        if (!gPlayContext.isAuto)
+            judgeInput(PLAYER_SLOT_TARGET);
+    }
+
     auto input = _inputAvailable & m;
 
     // individual keys
@@ -3346,6 +3312,17 @@ void ScenePlay::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
 {
     using namespace Input;
 
+    auto judgeInput = [&](int slot) {
+        LVF_ASSERT(gPlayContext.ruleset[slot] != nullptr);
+        gPlayContext.ruleset[slot]->updateHold(m, t);
+    };
+    if (_handleJudgeInput)
+    {
+        judgeInput(PLAYER_SLOT_PLAYER);
+        if (!gPlayContext.isAuto)
+            judgeInput(PLAYER_SLOT_TARGET);
+    }
+
     auto input = _inputAvailable & m;
 
     // delay start
@@ -3394,6 +3371,18 @@ void ScenePlay::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
 void ScenePlay::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 {
     using namespace Input;
+
+    auto judgeInput = [&](int slot) {
+        LVF_ASSERT(gPlayContext.ruleset[slot] != nullptr);
+        gPlayContext.ruleset[slot]->updateRelease(m, t);
+    };
+    if (_handleJudgeInput)
+    {
+        judgeInput(PLAYER_SLOT_PLAYER);
+        if (!gPlayContext.isAuto)
+            judgeInput(PLAYER_SLOT_TARGET);
+    }
+
     auto input = _inputAvailable & m;
 
     if (!gPlayContext.isAuto && !gPlayContext.isReplay)
@@ -3487,6 +3476,17 @@ void ScenePlay::inputGameReleaseTimer(InputMask& input, const lunaticvibes::Time
 void ScenePlay::inputGameAxis(double S1, double S2, const lunaticvibes::Time& t)
 {
     using namespace Input;
+
+    auto judgeInput = [&](int slot) {
+        LVF_ASSERT(gPlayContext.ruleset[slot] != nullptr);
+        gPlayContext.ruleset[slot]->updateAxis(S1, S2, t);
+    };
+    if (_handleJudgeInput)
+    {
+        judgeInput(PLAYER_SLOT_PLAYER);
+        if (!gPlayContext.isAuto)
+            judgeInput(PLAYER_SLOT_TARGET);
+    }
 
     // turntable spin
     playerState[PLAYER_SLOT_PLAYER].turntableAngleAdd += S1 * 2.0 * 360;

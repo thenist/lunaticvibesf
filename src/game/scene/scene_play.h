@@ -36,6 +36,7 @@ private:
     ePlayState state;
     InputMask _inputAvailable;
     std::vector<size_t> keySampleIndex;
+    bool _handleJudgeInput = false;
 
 protected:
     [[nodiscard]] bool isPlaymodeDP() const;
@@ -130,9 +131,6 @@ private:
 protected:
     // common
     void loadChart();
-
-    void setInputJudgeCallback();
-    void removeInputJudgeCallback();
 
 protected:
     void update_fixed(const lunaticvibes::Time& t) override;
