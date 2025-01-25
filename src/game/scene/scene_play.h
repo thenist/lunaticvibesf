@@ -161,7 +161,7 @@ protected:
 
 protected:
     // Register to InputWrapper: judge / keysound
-    void inputGamePress(InputMask&, const lunaticvibes::Time&);
+    void inputGamePress(InputMask&, const lunaticvibes::Time&, const lunaticvibes::InputMaskTimes&);
     void inputGameHold(InputMask&, const lunaticvibes::Time&);
     void inputGameRelease(InputMask&, const lunaticvibes::Time&);
     void inputGamePressTimer(InputMask&, const lunaticvibes::Time&);

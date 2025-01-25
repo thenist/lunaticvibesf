@@ -609,7 +609,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
-    _input.register_p("SCENE_PRESS", std::bind_front(&ScenePlay::inputGamePress, this));
+    _input.register_p_new("SCENE_PRESS", std::bind_front(&ScenePlay::inputGamePress, this));
     _input.register_h("SCENE_HOLD", std::bind_front(&ScenePlay::inputGameHold, this));
     _input.register_r("SCENE_RELEASE", std::bind_front(&ScenePlay::inputGameRelease, this));
     _input.register_a("SCENE_AXIS", std::bind_front(&ScenePlay::inputGameAxis, this));
@@ -3040,7 +3040,7 @@ void ScenePlay::toggleLanecover(int slot, bool state)
 
 ////////////////////////////////////////////////////////////////////////////////
 // CALLBACK
-void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
+void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t, const lunaticvibes::InputMaskTimes& tt)
 {
     using namespace Input;
 
