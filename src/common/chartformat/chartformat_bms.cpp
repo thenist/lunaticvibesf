@@ -1,5 +1,14 @@
 #include "chartformat_bms.h"
-#include "common/log.h"
+
+#include <common/assert.h>
+#include <common/encoding.h>
+#include <common/log.h>
+#include <common/u8.h>
+#include <common/utils.h>
+
+#include <boost/algorithm/string.hpp>
+#include <re2/re2.h>
+
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -9,18 +18,6 @@
 #include <random>
 #include <set>
 #include <utility>
-
-#include "common/encoding.h"
-#include "common/utils.h"
-#include <common/assert.h>
-#include <common/u8.h>
-
-#include "re2/re2.h"
-#include <boost/algorithm/string.hpp>
-
-class noteLineException : public std::exception
-{
-};
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
 
@@ -415,7 +412,6 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                     lastBarIdx = bar;
                 }
 
-                try
                 {
                     const auto x_ = static_cast<int>(base36(key[3]));
                     const auto _y = static_cast<int>(base36(key[4]));
@@ -560,16 +556,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                         }
                     }
                 }
-                catch (noteLineException& e)
-                {
-                    LOG_WARNING << "[BMS] Line error. " << absolutePath << "@" << srcLine;
-                }
             }
-        }
-        catch (const noteLineException&)
-        {
-            errorCode = err::NOTE_LINE_ERROR;
-            throw;
         }
         catch (const std::invalid_argument&)
         {
