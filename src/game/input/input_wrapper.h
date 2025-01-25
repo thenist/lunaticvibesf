@@ -18,7 +18,7 @@
 class InputWrapper
 {
 public:
-    unsigned release_delay_ms = 5;
+    static constexpr unsigned release_delay_ms = 5;
 
 private:
     struct InputPressEvent
