@@ -144,7 +144,6 @@ private:
 public:
     Image(const std::filesystem::path& path);
     Image(const char* filePath);
-    Image(const char* format, void* bmp, size_t size);
     void setTransparentColorRGB(Color c);
     [[nodiscard]] bool hasAlphaLayer() const { return _haveAlphaLayer; }
 

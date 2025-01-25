@@ -132,14 +132,7 @@ static void close_rwops(SDL_RWops* s)
 }
 
 Image::Image(const char* filePath)
-    :
-
-      Image(filePath, std::shared_ptr<SDL_RWops>(SDL_RWFromFile(filePath, "rb"), close_rwops))
-{
-}
-
-Image::Image(const char* format, void* data, size_t size)
-    : Image(format, std::shared_ptr<SDL_RWops>(SDL_RWFromMem(data, size), close_rwops))
+    : Image(filePath, std::shared_ptr<SDL_RWops>(SDL_RWFromFile(filePath, "rb"), close_rwops))
 {
 }
 
@@ -158,21 +151,13 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _
     LVF_DEBUG_ASSERT(_pRWop);
     const std::string_view pathView{path};
     if (isTGA(pathView))
-    {
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_LoadTGA_RW(_pRWop.get()), SDL_FreeSurface);
-    }
     else if (isPNG(pathView))
-    {
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_LoadPNG_RW(_pRWop.get()), SDL_FreeSurface);
-    }
     else if (isGIF(pathView))
-    {
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_LoadGIF_RW(_pRWop.get()), SDL_FreeSurface);
-    }
     else
-    {
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_Load_RW(_pRWop.get(), SDL_LOAD_NOAUTOFREE), SDL_FreeSurface);
-    }
 
     if (!_pSurface)
     {
