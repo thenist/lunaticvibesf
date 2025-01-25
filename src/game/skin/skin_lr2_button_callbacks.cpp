@@ -1,10 +1,12 @@
 #include "skin_lr2_button_callbacks.h"
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
@@ -20,12 +22,15 @@
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
 
+namespace r = std::ranges;
+
 namespace lr2skin::button
 {
 
 #pragma region helpers
 
-std::tuple<IndexOption, IndexSwitch, IndexNumber, IndexNumber, IndexSlider, IndexSlider, IndexOption, SampleChannel>
+static std::tuple<IndexOption, IndexSwitch, IndexNumber, IndexNumber, IndexSlider, IndexSlider, IndexOption,
+                  SampleChannel>
 disp_fx(int idx)
 {
     IndexOption op;
@@ -77,7 +82,7 @@ disp_fx(int idx)
     return {op, sw, num_p1, num_p2, sli_p1, sli_p2, target, ch};
 }
 
-void update_fx(int type, int index, SampleChannel ch, float p1, float p2)
+static void update_fx(int type, int index, SampleChannel ch, float p1, float p2)
 {
     switch (type)
     {
@@ -93,7 +98,7 @@ void update_fx(int type, int index, SampleChannel ch, float p1, float p2)
     }
 }
 
-void update_pitch()
+static void update_pitch()
 {
     int p = static_cast<int>(std::round((State::get(IndexSlider::PITCH) - 0.5) * 2 * 12));
     static const double tick = std::pow(2, 1.0 / 12);
@@ -118,14 +123,7 @@ void update_pitch()
     }
 }
 
-void number_change(IndexNumber type, int plus)
-{
-    State::set(type, State::get(type) + plus);
-
-    SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
-}
-
-void number_change_clamp(IndexNumber type, int min, int max, int plus)
+static void number_change_clamp(IndexNumber type, int min, int max, int plus)
 {
     int val = std::clamp(State::get(type) + plus, min, max);
     State::set(type, val);
@@ -138,7 +136,7 @@ void number_change_clamp(IndexNumber type, int min, int max, int plus)
 #pragma region button type callbacks
 
 // 1 - 9
-void panel_switch(int idx, int plus)
+static void panel_switch(int idx, int plus)
 {
     if (idx < 1 || idx > 9)
         return;
@@ -261,7 +259,7 @@ void select_keys_filter(int iterateCount, int plus)
             setEntryInfo();
         }
 
-        if (std::none_of(gSelectContext.entries.begin(), gSelectContext.entries.end(), isChartEntry))
+        if (r::none_of(gSelectContext.entries, isChartEntry))
             return select_keys_filter(iterateCount + 1, plus);
 
         if (true)
@@ -292,7 +290,7 @@ void select_keys_filter(int iterateCount, int plus)
 }
 
 // 12
-void select_sort_type(int plus)
+static void select_sort_type(int plus)
 {
     State::set(IndexOption::SELECT_SORT, (State::get(IndexOption::SELECT_SORT) + 5 + plus) % 5);
 
@@ -332,19 +330,19 @@ void enter_skin_config()
 }
 
 // 16
-void autoplay()
+static void autoplay()
 {
     gSelectContext.isGoingToAutoPlay = true;
 }
 
 // 19
-void replay()
+static void replay()
 {
     gSelectContext.isGoingToReplay = true;
 }
 
 // 20, 21, 22
-void fx_type(int idx, int plus)
+static void fx_type(int idx, int plus)
 {
     if (idx < 0 || idx > 2)
         return;
@@ -383,7 +381,7 @@ void fx_type(int idx, int plus)
 }
 
 // 23, 24, 25
-void fx_switch(int idx, int plus)
+static void fx_switch(int idx, int plus)
 {
     if (idx < 0 || idx > 2)
         return;
@@ -406,7 +404,7 @@ void fx_switch(int idx, int plus)
 }
 
 // 26, 27, 28
-void fx_target(int idx, int plus)
+static void fx_target(int idx, int plus)
 {
     if (idx < 0 || idx > 2)
         return;
@@ -436,7 +434,7 @@ void fx_target(int idx, int plus)
 }
 
 // 29
-void eq_switch(int plus)
+static void eq_switch(int plus)
 {
     if (State::get(IndexSwitch::SOUND_EQ))
     {
@@ -462,7 +460,7 @@ void eq_switch(int plus)
 }
 
 // 31
-void vol_switch(int plus)
+static void vol_switch(int plus)
 {
     if (State::get(IndexSwitch::SOUND_VOLUME))
     {
@@ -507,7 +505,7 @@ void pitch_switch(int plus)
 }
 
 // 33
-void pitch_type(int plus)
+static void pitch_type(int plus)
 {
     // FREQUENCY/PITCH/SPEED
     unsigned val = (State::get(IndexOption::SOUND_PITCH_TYPE) + 3 + plus) % 3;
@@ -682,7 +680,7 @@ void autoscr(int player, int plus)
 }
 
 // 46
-void shutter(int plus)
+static void shutter(int plus)
 {
     bool val = State::get(IndexSwitch::P1_LANECOVER_ENABLED);
     int type = Option::LANE_OFF;
@@ -838,7 +836,7 @@ void battle(int plus)
     case 9: {
         static const std::vector<Option::e_battle_type> modesSP = {Option::BATTLE_OFF, Option::BATTLE_LOCAL,
                                                                    Option::BATTLE_GHOST};
-        auto it = std::find(modesSP.begin(), modesSP.end(), State::get(IndexOption::PLAY_BATTLE_TYPE));
+        auto it = r::find(modesSP, State::get(IndexOption::PLAY_BATTLE_TYPE));
         if (it != modesSP.end())
         {
             size_t idx = std::distance(modesSP.begin(), it);
@@ -854,7 +852,7 @@ void battle(int plus)
     case 14: {
         static const std::vector<Option::e_battle_type> modesDP = {Option::BATTLE_OFF, Option::BATTLE_DB,
                                                                    Option::BATTLE_GHOST};
-        auto it = std::find(modesDP.begin(), modesDP.end(), State::get(IndexOption::PLAY_BATTLE_TYPE));
+        auto it = r::find(modesDP, State::get(IndexOption::PLAY_BATTLE_TYPE));
         if (it != modesDP.end())
         {
             size_t idx = std::distance(modesDP.begin(), it);
@@ -939,7 +937,7 @@ void lock_speed_value(int player, int plus)
 }
 
 // 70
-void score_graph(int plus)
+static void score_graph(int plus)
 {
     if (State::get(IndexSwitch::SYSTEM_SCOREGRAPH))
     {
@@ -958,7 +956,7 @@ void score_graph(int plus)
 }
 
 // 71
-void ghost_type(int plus)
+static void ghost_type(int plus)
 {
     unsigned val = (State::get(IndexOption::PLAY_GHOST_TYPE_1P) + 4 + plus) % 4;
 
@@ -970,7 +968,7 @@ void ghost_type(int plus)
 }
 
 // 72
-void bga(int plus)
+static void bga(int plus)
 {
     unsigned val = (State::get(IndexOption::PLAY_BGA_TYPE) + 3 + plus) % 3;
 
@@ -984,7 +982,7 @@ void bga(int plus)
 }
 
 // 73
-void bga_size(int plus)
+static void bga_size(int plus)
 {
     unsigned val = (State::get(IndexOption::PLAY_BGA_SIZE) + 2 + plus) % 2;
 
@@ -998,7 +996,7 @@ void bga_size(int plus)
 }
 
 // 75
-void judge_auto_adjust(int plus)
+static void judge_auto_adjust(int plus)
 {
     unsigned val = (State::get(IndexOption::PLAY_AUTOADJUST) + 2 + plus) % 2;
 
@@ -1011,7 +1009,7 @@ void judge_auto_adjust(int plus)
 }
 
 // 76
-void default_target_rate(int plus)
+static void default_target_rate(int plus)
 {
     number_change_clamp(IndexNumber::DEFAULT_TARGET_RATE, 0, 100, plus);
 
@@ -1041,13 +1039,13 @@ void target_type(int plus)
 }
 
 // 80
-void window_mode(int plus)
+static void window_mode(int plus)
 {
     // This button is disabled.
 }
 
 // 82
-void vsync(int plus)
+static void vsync(int plus)
 {
 #ifdef _WIN32
     unsigned val = (State::get(IndexOption::SYS_VSYNC) + 2 + plus) % 2;
@@ -1064,20 +1062,20 @@ void vsync(int plus)
 }
 
 // 83
-void save_replay_type(int plus)
+static void save_replay_type(int plus)
 {
     // TODO
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 }
 
 // 90
-void favorite_ignore(int plus)
+static void favorite_ignore(int plus)
 {
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 }
 
 // 91 - 96
-void difficulty(int diff_, int plus)
+static void difficulty(int diff_, int plus)
 {
     auto diff = static_cast<unsigned>(diff_);
 
@@ -1319,8 +1317,8 @@ void key_config_slot(const int slot)
             case 7: return IndexSwitch::KEY_CONFIG_SLOT7;
             case 8: return IndexSwitch::KEY_CONFIG_SLOT8;
             case 9: return IndexSwitch::KEY_CONFIG_SLOT9;
+            default: lunaticvibes::assert_failed("getSwitch");
             }
-            lunaticvibes::assert_failed("getSwitch");
         };
         State::set(getSwitch(old), false);
         State::set(getSwitch(slot), true);
@@ -1489,7 +1487,8 @@ std::function<void(int)> getButtonCallback(int type)
         };
     };
 
-    // NOLINTBEGIN(modernize-avoid-bind) - lambads here are ugly. Maybe later.
+    auto noarg = [](auto cb) { return [cb = std::move(cb)](int /*ignored*/) { return cb(); }; };
+
     using namespace lr2skin::button;
     switch (type)
     {
@@ -1570,12 +1569,12 @@ std::function<void(int)> getButtonCallback(int type)
     case 106:
     case 107:
     case 108:
-    case 109: return std::bind(key_config_pad, Input::Pad(unsigned(Input::Pad::K11) + type - 101), false);
-    case 110: return std::bind(key_config_pad, Input::Pad::S1L, false);
-    case 111: return std::bind(key_config_pad, Input::Pad::S1R, false);
-    case 112: return std::bind(key_config_pad, Input::Pad::K1START, false);
-    case 113: return std::bind(key_config_pad, Input::Pad::K1SELECT, false);
-    case 116: return std::bind(key_config_pad, Input::Pad::S1A, false);
+    case 109: return noarg(std::bind_front(key_config_pad, Input::Pad(unsigned(Input::Pad::K11) + type - 101), false));
+    case 110: return noarg(std::bind_front(key_config_pad, Input::Pad::S1L, false));
+    case 111: return noarg(std::bind_front(key_config_pad, Input::Pad::S1R, false));
+    case 112: return noarg(std::bind_front(key_config_pad, Input::Pad::K1START, false));
+    case 113: return noarg(std::bind_front(key_config_pad, Input::Pad::K1SELECT, false));
+    case 116: return noarg(std::bind_front(key_config_pad, Input::Pad::S1A, false));
     case 121:
     case 122:
     case 123:
@@ -1584,12 +1583,12 @@ std::function<void(int)> getButtonCallback(int type)
     case 126:
     case 127:
     case 128:
-    case 129: return std::bind(key_config_pad, Input::Pad(unsigned(Input::Pad::K21) + type - 121), false);
-    case 130: return std::bind(key_config_pad, Input::Pad::S2L, false);
-    case 131: return std::bind(key_config_pad, Input::Pad::S2R, false);
-    case 132: return std::bind(key_config_pad, Input::Pad::K2START, false);
-    case 133: return std::bind(key_config_pad, Input::Pad::K2SELECT, false);
-    case 136: return std::bind(key_config_pad, Input::Pad::S2A, false);
+    case 129: return noarg(std::bind_front(key_config_pad, Input::Pad(unsigned(Input::Pad::K21) + type - 121), false));
+    case 130: return noarg(std::bind_front(key_config_pad, Input::Pad::S2L, false));
+    case 131: return noarg(std::bind_front(key_config_pad, Input::Pad::S2R, false));
+    case 132: return noarg(std::bind_front(key_config_pad, Input::Pad::K2START, false));
+    case 133: return noarg(std::bind_front(key_config_pad, Input::Pad::K2SELECT, false));
+    case 136: return noarg(std::bind_front(key_config_pad, Input::Pad::S2A, false));
     case 140: return createUnsupportedCb("鍵盤変更ボタン(7鍵用)");
     case 141: return createUnsupportedCb("鍵盤変更ボタン(9鍵用)");
     case 142: return createUnsupportedCb("鍵盤変更ボタン(5鍵用)");
@@ -1603,7 +1602,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 156:
     case 157:
     case 158:
-    case 159: return std::bind(key_config_slot, type - 150);
+    case 159: return noarg(std::bind_front(key_config_slot, type - 150));
     case 170:
     case 171:
     case 172:
@@ -1619,7 +1618,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 182:
     case 183:
     case 184:
-    case 185: return std::bind(skinselect_mode, type - 170);
+    case 185: return noarg(std::bind_front(skinselect_mode, type - 170));
     case 190: return std::bind_front(skinselect_skin);
     case 200:
     case 201:
@@ -1630,7 +1629,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 206:
     case 207:
     case 208:
-    case 209: return std::bind(requestOpenHelpFile, type - 200);
+    case 209: return noarg(std::bind_front(requestOpenHelpFile, type - 200));
     case 210: return [](auto) { lr2skin::button::open_ir_page(); };
     case 220:
     case 221:
@@ -1670,9 +1669,8 @@ std::function<void(int)> getButtonCallback(int type)
     case 267: return createUnsupportedCb("(empty)");
     case 268: return createUnsupportedCb("全体コースオプション　デフォルトつなぎタイプの変更");
     case 269: return createUnsupportedCb("全体コースオプション　デフォルトゲージの変更");
+    default: return createUnsupportedCb("(undocumented)");
     }
-    return createUnsupportedCb("(undocumented)");
-    // NOLINTEND(modernize-avoid-bind)
 }
 
 } // namespace lr2skin::button

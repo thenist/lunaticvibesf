@@ -116,7 +116,7 @@ Image::Image(const std::filesystem::path& path) : Image(lunaticvibes::cs(path.u8
 // SDL_SetError_REAL
 // SDL_RWFromFile_REAL
 // SDL_RWFromFile
-void ensure_tls_cleanup()
+static void ensure_tls_cleanup()
 {
     static thread_local struct TlsCleanup
     {
@@ -124,7 +124,7 @@ void ensure_tls_cleanup()
     } tls_cleanup;
 }
 
-void close_rwops(SDL_RWops* s)
+static void close_rwops(SDL_RWops* s)
 {
     if (s)
         s->close(s);

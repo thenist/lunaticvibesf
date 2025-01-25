@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -32,6 +33,8 @@
 #include <common/sysutil.h>
 #include <common/types.h>
 #include <common/u8.h>
+
+namespace r = std::ranges;
 
 std::vector<Path> findFiles(Path p, bool recursive)
 {
@@ -108,8 +111,7 @@ try
     if (parent.root_directory() != dir.root_directory())
         return false;
 
-    auto pair = std::mismatch(dir.begin(), dir.end(), parent.begin(), parent.end());
-    return pair.second == parent.end();
+    return r::mismatch(dir, parent).in2 == parent.end();
 }
 catch (const std::filesystem::filesystem_error& e)
 {
@@ -135,8 +137,7 @@ double toDouble(std::string_view str, double defVal) noexcept
 
 bool lunaticvibes::iequals(std::string_view lhs, std::string_view rhs) noexcept
 {
-    return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(),
-                      [](unsigned char l, unsigned char r) { return std::tolower(l) == std::tolower(r); });
+    return r::equal(lhs, rhs, [](unsigned char l, unsigned char r) { return std::tolower(l) == std::tolower(r); });
 }
 
 #ifdef _WIN32
@@ -204,17 +205,17 @@ HashMD5 md5file(const Path& filePath)
 static HashMD5 format_hash(std::span<unsigned char> digest)
 {
     std::string ret;
-    for (size_t i = 0; i < digest.size(); ++i)
+    for (unsigned char i : digest)
     {
-        unsigned char high = digest[i] >> 4 & 0xF;
-        unsigned char low = digest[i] & 0xF;
+        unsigned char high = i >> 4 & 0xF;
+        unsigned char low = i & 0xF;
         ret += static_cast<char>(high <= 9 ? ('0' + high) : ('A' - 10 + high));
         ret += static_cast<char>(low <= 9 ? ('0' + low) : ('A' - 10 + low));
     }
     return HashMD5{ret};
 }
 
-template <typename DigestUpdater> HashMD5 md5_impl(DigestUpdater updater)
+template <typename DigestUpdater> static HashMD5 md5_impl(DigestUpdater updater)
 {
     struct MdCtxDeleter
     {
@@ -306,7 +307,7 @@ using DirPtr = std::unique_ptr<DIR, DirDeleter>;
 
 Path lunaticvibes::resolve_windows_path(std::string input)
 {
-    std::replace(input.begin(), input.end(), '\\', '/');
+    r::replace(input, '\\', '/');
 
     if (input == "/" || input == "." || input.empty())
         return PathFromUTF8(input);
@@ -322,7 +323,7 @@ Path lunaticvibes::resolve_windows_path(std::string input)
     std::string out;
     out.reserve(input.length() + CURRENT_PATH_RELATIVE_PREFIX.length());
 
-    thread_local std::vector<std::string> segments;
+    static thread_local std::vector<std::string> segments;
     boost::split(segments, input, boost::is_any_of("/"));
 
     size_t segments_traversed = 0;
@@ -447,7 +448,7 @@ Path PathFromUTF8(std::string_view s)
 {
     // Casting char to char8_t should be UB (unlike the other way around), but
     // `_GLIBCXX20_DEPRECATED_SUGGEST("path((const char8_t*)&*source)")`.
-    return fs::path(std::u8string_view{reinterpret_cast<const char8_t*>(s.data()), s.size()});
+    return {std::u8string_view{reinterpret_cast<const char8_t*>(s.data()), s.size()}};
 }
 
 void preciseSleep(long long sleep_ns)
@@ -527,6 +528,6 @@ static unsigned char limit_to_ascii(int c)
 void lunaticvibes::trim_in_place(std::string& s)
 {
     static auto not_space = [](int c) { return !std::isspace(limit_to_ascii(c)); };
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), not_space));
-    s.erase(std::find_if(s.rbegin(), s.rend(), not_space).base(), s.end());
+    s.erase(s.begin(), r::find_if(s, not_space));
+    s.erase(r::find_if(r::reverse_view{s}, not_space).base(), s.end());
 }

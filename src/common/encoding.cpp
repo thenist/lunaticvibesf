@@ -153,7 +153,6 @@ eFileEncoding getFileEncoding(std::istream& is)
     is.clear();
     is.seekg(0);
 
-    std::string buf;
     eFileEncoding enc = eFileEncoding::LATIN1;
     for (std::string buf; std::getline(is, buf);)
     {
@@ -311,7 +310,7 @@ using IcdPtr = std::unique_ptr<std::remove_pointer_t<iconv_t>, IcdDeleter>;
 
 static void convert(std::string_view input, eFileEncoding from, eFileEncoding to, std::string& out)
 {
-    thread_local std::map<std::pair<eFileEncoding, eFileEncoding>, IcdPtr> icds;
+    static thread_local std::map<std::pair<eFileEncoding, eFileEncoding>, IcdPtr> icds;
 
     auto icd_it = icds.find({from, to});
     if (icd_it == icds.end())
