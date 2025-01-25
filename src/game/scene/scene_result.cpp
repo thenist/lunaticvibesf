@@ -212,7 +212,6 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 
     _input.register_p("SCENE_PRESS", std::bind_front(&SceneResult::inputGamePress, this));
     _input.register_h("SCENE_HOLD", std::bind_front(&SceneResult::inputGameHold, this));
-    _input.register_r("SCENE_RELEASE", std::bind_front(&SceneResult::inputGameRelease, this));
 
     lunaticvibes::Time t;
     State::set(IndexTimer::RESULT_GRAPH_START, t.norm());
@@ -636,11 +635,4 @@ void SceneResult::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
         _retryRequested =
             (_inputAvailable & m & INPUT_MASK_DECIDE).any() && (_inputAvailable & m & INPUT_MASK_CANCEL).any();
     }
-}
-
-// CALLBACK
-void SceneResult::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
-{
-    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro)
-        return;
 }
