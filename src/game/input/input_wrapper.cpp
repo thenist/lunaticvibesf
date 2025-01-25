@@ -125,8 +125,6 @@ void InputWrapper::loopAsync()
             }
             if (p.any())
             {
-                std::shared_lock l(_inputMutex);
-
                 for (auto& [cbname, callback] : _keyboardCallbackMap)
                     callback(mask, now);
             }
@@ -195,8 +193,6 @@ void InputWrapper::loopAsync()
                 }
                 if (p.any())
                 {
-                    std::shared_lock l(_inputMutex);
-
                     for (auto& [cbname, callback] : _joystickCallbackMap)
                         callback(mask, device, now);
                 }
@@ -227,8 +223,6 @@ void InputWrapper::loopAsync()
                 }
                 if (moved)
                 {
-                    std::shared_lock l(_inputMutex);
-
                     for (auto& [cbname, callback] : _absaxisCallbackMap)
                         callback(mask, device, now);
                 }
@@ -310,7 +304,7 @@ double InputWrapper::getJoystickAxis(size_t device, Input::Joystick::Type type, 
 
 bool InputWrapper::_register(unsigned type, const std::string& key, INPUTCALLBACK f)
 {
-    std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(!_looper.isRunning());
     switch (type)
     {
     case 0:
@@ -331,7 +325,7 @@ bool InputWrapper::_register(unsigned type, const std::string& key, INPUTCALLBAC
 
 bool InputWrapper::register_p_new(const std::string& key, lunaticvibes::InputCallback f)
 {
-    std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(!_looper.isRunning());
     LVF_ASSERT(!_pCallbackMapNew.contains(key));
     _pCallbackMapNew[key] = std::move(f);
     return true;
@@ -339,7 +333,7 @@ bool InputWrapper::register_p_new(const std::string& key, lunaticvibes::InputCal
 
 bool InputWrapper::register_a(const std::string& key, AXISPLUSCALLBACK f)
 {
-    std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(!_looper.isRunning());
     LVF_ASSERT(!_aCallbackMap.contains(key));
     _aCallbackMap[key] = std::move(f);
     return true;
@@ -347,7 +341,7 @@ bool InputWrapper::register_a(const std::string& key, AXISPLUSCALLBACK f)
 
 bool InputWrapper::register_kb(const std::string& key, KEYBOARDCALLBACK f)
 {
-    std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(!_looper.isRunning());
     LVF_ASSERT(!_keyboardCallbackMap.contains(key));
     _keyboardCallbackMap[key] = std::move(f);
     return true;
@@ -355,7 +349,7 @@ bool InputWrapper::register_kb(const std::string& key, KEYBOARDCALLBACK f)
 
 bool InputWrapper::register_joy(const std::string& key, JOYSTICKCALLBACK f)
 {
-    std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(!_looper.isRunning());
     LVF_ASSERT(!_joystickCallbackMap.contains(key));
     _joystickCallbackMap[key] = std::move(f);
     return true;
@@ -363,7 +357,7 @@ bool InputWrapper::register_joy(const std::string& key, JOYSTICKCALLBACK f)
 
 bool InputWrapper::register_aa(const std::string& key, ABSAXISCALLBACK f)
 {
-    std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(!_looper.isRunning());
     LVF_ASSERT(!_absaxisCallbackMap.contains(key));
     _absaxisCallbackMap[key] = std::move(f);
     return true;

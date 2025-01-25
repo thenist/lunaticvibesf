@@ -108,18 +108,16 @@ public:
     void setMergeInput() { mergeInput = true; }
 
 private:
-    // Callback function maps
     std::map<const std::string, lunaticvibes::InputCallback> _pCallbackMapNew;
     std::map<const std::string, INPUTCALLBACK> _pCallbackMap;
     std::map<const std::string, INPUTCALLBACK> _hCallbackMap;
     std::map<const std::string, INPUTCALLBACK> _rCallbackMap;
     std::map<const std::string, AXISPLUSCALLBACK> _aCallbackMap;
 
-private:
-    // Callback registering
     bool _register(unsigned type, const std::string& key, INPUTCALLBACK);
 
 public:
+    // These must only be called before input loop starts.
     bool register_p(const std::string& key, INPUTCALLBACK f) { return _register(0, key, std::move(f)); }
     bool register_p_new(const std::string& key, lunaticvibes::InputCallback f);
     bool register_h(const std::string& key, INPUTCALLBACK f) { return _register(1, key, std::move(f)); }
@@ -139,6 +137,7 @@ private:
     std::map<const std::string, KEYBOARDCALLBACK> _keyboardCallbackMap;
 
 public:
+    // These must only be called before input loop starts.
     bool register_kb(const std::string& key, KEYBOARDCALLBACK f);
     bool register_joy(const std::string& key, JOYSTICKCALLBACK f);
     bool register_aa(const std::string& key, ABSAXISCALLBACK f);
