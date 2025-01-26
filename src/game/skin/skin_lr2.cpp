@@ -581,7 +581,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     return linecsv;
 }
 
-[[nodiscard]] static Tokens csvLineTokenizeSimple(const std::string& raw)
+[[nodiscard]] static Tokens csvLineTokenizeSimple(const std::string_view raw)
 {
     StringContentView linecsv = csvLineNormalize(raw);
     if (linecsv.empty())
@@ -593,7 +593,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     return res;
 }
 
-[[nodiscard]] static Tokens csvLineTokenizeRegex(const std::string& raw)
+[[nodiscard]] static Tokens csvLineTokenizeRegex(const std::string_view raw)
 {
     StringContentView linecsv = csvLineNormalize(raw);
     if (linecsv.empty())
@@ -672,20 +672,15 @@ Path SkinLR2::getCustomizePath(StringContentView input)
 
 Tokens SkinLR2::csvLineTokenize(const std::string& raw)
 {
+    const auto view = std::string_view{raw}.substr(0, raw.find("//"));
+
     Tokens res;
     res.reserve(32);
-    if (size_t commentIdx = raw.find("//"); commentIdx != raw.npos)
-    {
-        res = csvLineTokenize(raw.substr(0, commentIdx));
-    }
-    else if (raw.find('\\') == raw.npos)
-    {
-        res = csvLineTokenizeSimple(raw);
-    }
+
+    if (view.contains('\\'))
+        res = csvLineTokenizeRegex(view);
     else
-    {
-        res = csvLineTokenizeRegex(raw);
-    }
+        res = csvLineTokenizeSimple(view);
 
     // #ELSE
     if (res.size() == 1 && lunaticvibes::iequals(res[0], "#ELSE"))
