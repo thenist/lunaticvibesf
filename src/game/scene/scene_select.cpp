@@ -1059,6 +1059,8 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
             createNotification("Loading skin options...");
 
             pSkin->setHandleMouseEvents(false);
+            // FIXME: use loadMode=2. SceneCustomize passes _skinMgr to SceneBase which creates customize skin with
+            // loadMode=0.
             _virtualSceneCustomize = std::make_shared<SceneCustomize>(_skinMgr);
             _virtualSceneCustomize->setIsVirtual(true);
             pSkin->setHandleMouseEvents(true);

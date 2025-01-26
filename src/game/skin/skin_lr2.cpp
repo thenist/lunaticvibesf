@@ -21,6 +21,7 @@
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
 #include <config/config_mgr.h>
@@ -4010,15 +4011,10 @@ void SkinLR2::postLoad()
     }
 
     // set barcenter
-    if (barCenter < barSprites.size())
+    if (loadMode == 0 && info.mode == SkinType::MUSIC_SELECT && barCenter < barSprites.size())
     {
-        barSprites[barCenter]->drawFlash = true;
-
-        if (loadMode == 0)
-        {
-            gSelectContext.highlightBarIndex = barCenter;
-            gSelectContext.cursorClick = barCenter;
-        }
+        gSelectContext.highlightBarIndex = barCenter;
+        gSelectContext.cursorClick = barCenter;
     }
 
     for (auto& s : _sprites)
