@@ -8,6 +8,7 @@
 #include <iterator>
 #include <optional>
 #include <random>
+#include <ranges>
 #include <set>
 #include <span>
 #include <sstream>
@@ -36,6 +37,7 @@
 using uint8_t = std::uint8_t;
 
 namespace r = std::ranges;
+namespace v = std::views;
 
 [[nodiscard]] static MotionKeyFrameParams::accelType parseAccelType(const int value)
 {
@@ -76,15 +78,10 @@ static int optToInt(std::string_view opt)
     return toInt(opt);
 }
 
-// offset_tokens MUST be as big as data.
 static void convertOpsToInt(const std::span<const StringContent> offset_tokens, std::initializer_list<int*> data)
 {
-    size_t i = 0;
-    for (auto* p : data)
-    {
-        *p = optToInt(offset_tokens[i]);
-        i++;
-    }
+    for (auto [p, t] : v::zip(data, offset_tokens))
+        *p = optToInt(t);
 }
 
 static bool flipSideFlag = false;
