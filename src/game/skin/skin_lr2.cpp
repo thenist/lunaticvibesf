@@ -85,9 +85,10 @@ static void convertOpsToInt(const std::span<const StringContent> offset_tokens, 
         *p = optToInt(t);
 }
 
-static bool flipSideFlag = false;
-static bool flipResultFlag = false; // Set in play skin
-static bool flipSide = false;
+// These need to be persisted between skins wadafak.
+static bool s_flipSideFlag = false;
+static bool s_flipResultFlag = false; // Set in play skin
+static bool s_flipSide = false;
 
 static int flipTimer(int timer)
 {
@@ -148,7 +149,7 @@ struct s_basic
             div_y = 1;
         }
 
-        if (flipSide)
+        if (s_flipSide)
             timer = flipTimer(timer);
     }
 };
@@ -179,7 +180,7 @@ struct s_number : s_basic
     {
         convertLine(tokens, (int*)this, &num - &_null, 3);
 
-        if (flipSide)
+        if (s_flipSide)
         {
             if (100 <= num && num <= 119)
                 num += 20;
@@ -223,7 +224,7 @@ struct s_slider : s_basic
     {
         convertLine(tokens, (int*)this, &muki - &_null, 4);
 
-        if (flipSide)
+        if (s_flipSide)
         {
             switch (type)
             {
@@ -246,7 +247,7 @@ struct s_bargraph : s_basic
     {
         convertLine(tokens, (int*)this, &type - &_null, 2);
 
-        if (flipSide)
+        if (s_flipSide)
         {
             if (10 <= type && type <= 11)
                 type += 4;
@@ -298,7 +299,7 @@ struct s_text
         int count = sizeof(s_text) / sizeof(int);
         convertLine(tokens, (int*)this, 0, count);
 
-        if (flipSide)
+        if (s_flipSide)
         {
             switch (st)
             {
@@ -374,8 +375,8 @@ struct s_groovegauge : s_basic
 
         switch (_null)
         {
-        case 0: _null = lr2skin::flipSide ? 1 : 0; break;
-        case 1: _null = lr2skin::flipSide ? 0 : 1; break;
+        case 0: _null = lr2skin::s_flipSide ? 1 : 0; break;
+        case 1: _null = lr2skin::s_flipSide ? 0 : 1; break;
         }
     }
 };
@@ -458,7 +459,7 @@ struct dst
         convertLine(tokens, (int*)this, 0, MEMBERS);
         convertOpsToInt(std::span{tokens}.subspan(MEMBERS - std::size(op)), {&op[0], &op[1], &op[2], &op[3]});
 
-        if (flipSide)
+        if (s_flipSide)
             timer = flipTimer(timer);
     }
 };
@@ -1108,14 +1109,14 @@ int SkinLR2::others()
     }
     if (matchToken(parseKeyBuf, "#FLIPRESULT"))
     {
-        lr2skin::flipResultFlag = true;
+        lr2skin::s_flipResultFlag = true;
 
         switch (info.mode)
         {
         case SkinType::RESULT:
         case SkinType::COURSE_RESULT:
-            lr2skin::flipSide = (lr2skin::flipSideFlag || lr2skin::flipResultFlag) && !disableFlipResult;
-            State::set(IndexSwitch::FLIP_RESULT, lr2skin::flipSide);
+            lr2skin::s_flipSide = (lr2skin::s_flipSideFlag || lr2skin::s_flipResultFlag) && !disableFlipResult;
+            State::set(IndexSwitch::FLIP_RESULT, lr2skin::s_flipSide);
             break;
         default: break;
         }
@@ -1130,8 +1131,8 @@ int SkinLR2::others()
         {
         case SkinType::RESULT:
         case SkinType::COURSE_RESULT:
-            lr2skin::flipSide = (lr2skin::flipSideFlag || lr2skin::flipResultFlag) && !disableFlipResult;
-            State::set(IndexSwitch::FLIP_RESULT, lr2skin::flipSide);
+            lr2skin::s_flipSide = (lr2skin::s_flipSideFlag || lr2skin::s_flipResultFlag) && !disableFlipResult;
+            State::set(IndexSwitch::FLIP_RESULT, lr2skin::s_flipSide);
             break;
         default: break;
         }
@@ -3791,18 +3792,18 @@ bool SkinLR2::loadCSV(Path p)
     case SkinType::PLAY9:
     case SkinType::PLAY9_2:
     case SkinType::PLAY10:
-    case SkinType::PLAY14: lr2skin::flipSide = false; break;
+    case SkinType::PLAY14: lr2skin::s_flipSide = false; break;
     case SkinType::RESULT:
     case SkinType::COURSE_RESULT:
-        lr2skin::flipSide = (lr2skin::flipSideFlag || lr2skin::flipResultFlag) && !disableFlipResult;
+        lr2skin::s_flipSide = (lr2skin::s_flipSideFlag || lr2skin::s_flipResultFlag) && !disableFlipResult;
         break;
     default:
-        lr2skin::flipSide = false;
-        lr2skin::flipSideFlag = false;
-        lr2skin::flipResultFlag = false;
+        lr2skin::s_flipSide = false;
+        lr2skin::s_flipSideFlag = false;
+        lr2skin::s_flipResultFlag = false;
         break;
     }
-    State::set(IndexSwitch::FLIP_RESULT, lr2skin::flipSide);
+    State::set(IndexSwitch::FLIP_RESULT, lr2skin::s_flipSide);
 
     if (loadMode < 2)
     {
