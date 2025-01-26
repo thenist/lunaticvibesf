@@ -595,19 +595,16 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
 
 [[nodiscard]] static Tokens csvLineTokenizeRegex(const std::string& raw)
 {
-    Tokens res;
-    res.reserve(32);
     StringContentView linecsv = csvLineNormalize(raw);
     if (linecsv.empty())
         return {};
 
     auto lineBuf = re2::StringPiece(linecsv.data(), linecsv.length());
     static const LazyRE2 re{R"(((?:(?:\\,)|[^,])*?)(?:,|$))"};
-    std::string token;
-    while (!lineBuf.empty() && RE2::Consume(&lineBuf, *re, &token))
-    {
+    Tokens res;
+    res.reserve(32);
+    for (std::string token; !lineBuf.empty() && RE2::Consume(&lineBuf, *re, &token);)
         res.push_back(token);
-    }
     return res;
 }
 
