@@ -1,5 +1,6 @@
 #ifdef RENDER_SDL2
 
+#include <algorithm>
 #include <climits>
 #include <cstdint>
 #include <mutex>
@@ -430,24 +431,12 @@ static void funEditing(const SDL_TextEditingEvent& e);
 static void funInput(const SDL_TextInputEvent& e);
 static void funKeyDown(const SDL_KeyboardEvent& e);
 
-static std::int16_t i16_from_i32(std::int32_t value)
-{
-    if (value > SHRT_MAX)
-    {
-        return SHRT_MAX;
-    }
-    else if (value < SHRT_MIN)
-    {
-        return SHRT_MIN;
-    }
-    else
-    {
-        return static_cast<std::int16_t>(value);
-    }
-}
-
 bool lunaticvibes::event_handle()
 {
+    auto i16_from_i32 = [](std::int32_t value) {
+        return static_cast<std::int16_t>(std::clamp(value, SHRT_MIN, SHRT_MAX));
+    };
+
     bool quit = false;
     SDL_Event e;
     while (SDL_PollEvent(&e))
