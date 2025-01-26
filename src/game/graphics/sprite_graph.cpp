@@ -97,8 +97,10 @@ void SpriteLine::updateRects()
     switch (_ltype)
     {
     case LineType::GAUGE_F: {
-        const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
         std::shared_lock l(gPlayContext._mutex);
+        if (gPlayContext.ruleset[_player]->failWhenNoHealth())
+            break;
+        const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
         const auto& p = gPlayContext.graphGauge[_player];
         pushRects(
             p, static_cast<uint8_t>(100), [h](int val1, int val2) { return val1 <= h || val2 <= h; },
@@ -106,8 +108,8 @@ void SpriteLine::updateRects()
         break;
     }
     case LineType::GAUGE_C: {
-        const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
         std::shared_lock l(gPlayContext._mutex);
+        const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
         const auto& p = gPlayContext.graphGauge[_player];
         pushRects(
             p, static_cast<uint8_t>(100), [h](int val1, int val2) { return val1 >= h || val2 >= h; },
