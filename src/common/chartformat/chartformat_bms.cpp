@@ -6,7 +6,6 @@
 #include <common/u8.h>
 #include <common/utils.h>
 
-#include <boost/algorithm/string.hpp>
 #include <re2/re2.h>
 
 #include <exception>

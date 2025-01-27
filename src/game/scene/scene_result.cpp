@@ -16,9 +16,6 @@
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
 
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-
 #include <algorithm>
 #include <filesystem>
 

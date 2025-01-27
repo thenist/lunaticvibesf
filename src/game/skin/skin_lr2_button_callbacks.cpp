@@ -8,7 +8,6 @@
 #include <string_view>
 #include <utility>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include <common/assert.h>

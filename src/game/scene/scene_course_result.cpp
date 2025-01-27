@@ -11,8 +11,6 @@
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
 
-#include <boost/algorithm/string.hpp>
-
 SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::COURSE_RESULT, 1000), _inputAvailable(INPUT_MASK_FUNC)
 {
