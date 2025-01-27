@@ -280,7 +280,7 @@ private:
 
     [[nodiscard]] Path getCustomizePath(StringContentView input);
 
-    [[nodiscard]] Tokens csvLineTokenize(const std::string& raw);
+    static void csvLineTokenize(int line, const std::string& raw, Tokens& out);
 
     int HELPFILE();
     int IMAGE();

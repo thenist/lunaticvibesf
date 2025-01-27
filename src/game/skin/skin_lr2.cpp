@@ -31,6 +31,7 @@
 #include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/scene/scene_customize.h>
+#include <game/skin/skin.h>
 #include <game/skin/skin_lr2_button_callbacks.h>
 #include <game/skin/skin_lr2_converters.h>
 #include <game/skin/skin_lr2_slider_callbacks.h>
@@ -581,31 +582,26 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     return linecsv;
 }
 
-[[nodiscard]] static Tokens csvLineTokenizeSimple(const std::string_view raw)
+static void csvLineTokenizeSimple(const std::string_view raw, Tokens& res)
 {
+    res.clear();
     StringContentView linecsv = csvLineNormalize(raw);
     if (linecsv.empty())
-        return {};
-
-    Tokens res;
-    res.reserve(32);
+        return;
     boost::split(res, linecsv, boost::is_any_of(","));
-    return res;
 }
 
-[[nodiscard]] static Tokens csvLineTokenizeRegex(const std::string_view raw)
+static void csvLineTokenizeRegex(const std::string_view raw, Tokens& res)
 {
+    res.clear();
     StringContentView linecsv = csvLineNormalize(raw);
     if (linecsv.empty())
-        return {};
+        return;
 
     auto lineBuf = re2::StringPiece(linecsv.data(), linecsv.length());
     static const LazyRE2 re{R"(((?:(?:\\,)|[^,])*?)(?:,|$))"};
-    Tokens res;
-    res.reserve(32);
     for (std::string token; !lineBuf.empty() && RE2::Consume(&lineBuf, *re, &token);)
         res.push_back(token);
-    return res;
 }
 
 [[nodiscard]] static Point getCenterPoint(const int& wi, const int& hi, int numpadCenter)
@@ -670,22 +666,19 @@ Path SkinLR2::getCustomizePath(StringContentView input)
     return path;
 }
 
-Tokens SkinLR2::csvLineTokenize(const std::string& raw)
+void SkinLR2::csvLineTokenize(int line, const std::string& raw, Tokens& res)
 {
     const auto view = std::string_view{raw}.substr(0, raw.find("//"));
 
-    Tokens res;
-    res.reserve(32);
-
     if (view.contains('\\'))
-        res = csvLineTokenizeRegex(view);
+        csvLineTokenizeRegex(view, res);
     else
-        res = csvLineTokenizeSimple(view);
+        csvLineTokenizeSimple(view, res);
 
     // #ELSE
     if (res.size() == 1 && lunaticvibes::iequals(res[0], "#ELSE"))
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Ignored #ELSE without trailing comma";
+        LOG_DEBUG << "[Skin] " << line << ": Ignored #ELSE without trailing comma";
         res.clear();
     }
 
@@ -693,12 +686,10 @@ Tokens SkinLR2::csvLineTokenize(const std::string& raw)
     if (!res.empty() && (lunaticvibes::iequals(res[0], "#IF") || lunaticvibes::iequals(res[0], "#ELSEIF")) &&
         res.back().length() == 1)
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber
+        LOG_DEBUG << "[Skin] " << line
                   << ": Ignored last parameter with 1 character long. Don't forget the trailing comma!";
         res.pop_back();
     }
-
-    return res;
 }
 
 int SkinLR2::HELPFILE()
@@ -850,11 +841,12 @@ int SkinLR2::LR2FONT()
 
         auto pf = std::make_shared<LR2Font>();
 
+        Tokens tokens;
         for (std::string rawUTF8, raw_; std::getline(lr2font, raw_);)
         {
             lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
-            auto tokens = csvLineTokenize(rawUTF8);
+            csvLineTokenize(csvLineNumber, rawUTF8, tokens);
             if (tokens.empty())
                 continue;
             const auto& key = tokens[0];
@@ -3502,6 +3494,8 @@ void SkinLR2::IF(const Tokens& t, std::istream& lr2skin, eFileEncoding enc, bool
         skipOnly = false;
     }
 
+    Tokens tokens;
+
     if (skipOnly)
     {
         // only look for #ENDIF, skip the whole sub #IF block
@@ -3511,7 +3505,7 @@ void SkinLR2::IF(const Tokens& t, std::istream& lr2skin, eFileEncoding enc, bool
 
             lunaticvibes::to_utf8(raw_, enc, rawUTF8);
 
-            auto tokens = csvLineTokenize(rawUTF8);
+            csvLineTokenize(csvLineNumber, rawUTF8, tokens);
             if (tokens.empty())
                 continue;
 
@@ -3567,7 +3561,7 @@ void SkinLR2::IF(const Tokens& t, std::istream& lr2skin, eFileEncoding enc, bool
 
             lunaticvibes::to_utf8(raw_, enc, rawUTF8);
 
-            auto tokens = csvLineTokenize(rawUTF8);
+            csvLineTokenize(csvLineNumber, rawUTF8, tokens);
             if (tokens.empty())
                 continue;
 
@@ -3619,7 +3613,7 @@ void SkinLR2::IF(const Tokens& t, std::istream& lr2skin, eFileEncoding enc, bool
         for (std::string raw; std::getline(lr2skin, raw);)
         {
             ++csvLineNumber;
-            auto tokens = csvLineTokenize(raw);
+            csvLineTokenize(csvLineNumber, raw, tokens);
             if (tokens.empty())
                 continue;
 
@@ -3755,6 +3749,8 @@ bool SkinLR2::loadCSV(Path p)
 
     LOG_INFO << "[Skin] File (" << getFileEncodingName(encoding) << "): " << p;
 
+    Tokens tokens;
+
     bool haveEndOfHeader = false;
     for (std::string rawUTF8, raw_; std::getline(csvFile, raw_);)
     {
@@ -3762,7 +3758,7 @@ bool SkinLR2::loadCSV(Path p)
 
         lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
-        auto tokens = csvLineTokenize(rawUTF8);
+        csvLineTokenize(csvLineNumber, rawUTF8, tokens);
         if (tokens.empty())
             continue;
 
@@ -3900,7 +3896,7 @@ bool SkinLR2::loadCSV(Path p)
 
             lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
-            auto tokens = csvLineTokenize(rawUTF8);
+            csvLineTokenize(csvLineNumber, rawUTF8, tokens);
             if (tokens.empty())
                 continue;
 
