@@ -152,7 +152,7 @@ int graphics_init()
 
         SDL_ShowCursor(SDL_DISABLE);
 
-        LOG_INFO << "[SDL2] SDL2 init finished.";
+        LOG_INFO << "[SDL2] SDL2 init finished";
     }
 
     // SDL_Image
@@ -163,7 +163,7 @@ int graphics_init()
         if (flags != IMG_Init(flags))
         {
             // error handling
-            LOG_FATAL << "[SDL2] SDL2_Image init failed. " << IMG_GetError();
+            LOG_FATAL << "[SDL2] SDL2_Image init failed: " << IMG_GetError();
             return 1;
         }
         LOG_INFO << "[SDL2] SDL2_Image init finished. Version " << SDL_IMAGE_MAJOR_VERSION << '.'
@@ -176,7 +176,7 @@ int graphics_init()
         if (-1 == TTF_Init())
         {
             // error handling
-            LOG_FATAL << "[SDL2] SDL2_TTF init failed. " << TTF_GetError();
+            LOG_FATAL << "[SDL2] SDL2_TTF init failed: " << TTF_GetError();
             return 2;
         }
         LOG_INFO << "[SDL2] SDL2_TTF init finished. Version " << SDL_TTF_MAJOR_VERSION << '.' << SDL_TTF_MINOR_VERSION
@@ -187,14 +187,14 @@ int graphics_init()
     video_init();
 
     // imgui
-    LOG_INFO << "Initializing ImGui for SDL renderer...";
+    LOG_INFO << "[SDL2] Initializing ImGui for SDL renderer...";
     if (!ImGui_ImplSDL2_InitForSDLRenderer(gFrameWindow, gFrameRenderer) ||
         !ImGui_ImplSDLRenderer2_Init(gFrameRenderer))
     {
-        LOG_FATAL << "ImGui init failed.";
+        LOG_FATAL << "[SDL2] ImGui init failed";
         return 3;
     }
-    LOG_INFO << "ImGui init finished.";
+    LOG_INFO << "[SDL2] ImGui init finished";
 
     // Draw a black frame to prevent flashbang
     graphics_clear();
@@ -273,11 +273,11 @@ void graphics_flush()
 
 int graphics_free()
 {
-    LOG_INFO << "Shutting down ImGui module...";
+    LOG_INFO << "[SDL2] Shutting down ImGui module...";
     ImGui_ImplSDLRenderer2_Shutdown();
     ImGui_ImplSDL2_Shutdown();
 
-    LOG_INFO << "Releasing SDL resources...";
+    LOG_INFO << "[SDL2] Releasing SDL resources...";
     SDL_DestroyTexture(gInternalRenderTarget);
     gInternalRenderTarget = nullptr;
     SDL_DestroyRenderer(gFrameRenderer);
@@ -292,7 +292,7 @@ int graphics_free()
     LOG_INFO << "[SDL2] De-initializing SDL2...";
     SDL_Quit();
 
-    LOG_INFO << "Graphics shutdown complete.";
+    LOG_INFO << "[SDL2] Graphics shutdown complete.";
 
     return 0;
 }
@@ -340,7 +340,7 @@ std::vector<std::tuple<int, int, int>> graphics_get_resolution_list()
 
 void graphics_change_window_mode(int mode)
 {
-    LOG_WARNING << "Setting window mode to " << mode;
+    LOG_INFO << "[SDL2] Setting window mode to " << mode;
     switch (mode)
     {
     case 0:
@@ -362,7 +362,7 @@ void graphics_change_window_mode(int mode)
 
 void graphics_resize_window(int x, int y)
 {
-    LOG_WARNING << "Resizing window mode to " << x << 'x' << y;
+    LOG_INFO << "[SDL2] Resizing window mode to " << x << 'x' << y;
     lunaticvibes::graphics::save_new_window_size(x, y);
     SDL_SetWindowSize(gFrameWindow, windowRect.w, windowRect.h);
     SDL_SetWindowPosition(gFrameWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
@@ -370,7 +370,7 @@ void graphics_resize_window(int x, int y)
 
 void lunaticvibes::graphics::save_new_window_size(int width, int height)
 {
-    LOG_DEBUG << "saving new window size " << width << 'x' << height;
+    LOG_DEBUG << "[SDL2] Saving new window size " << width << 'x' << height;
     windowRect.w = width;
     windowRect.h = height;
     canvasScaleX = (double)width / canvasRect.w;
@@ -381,14 +381,14 @@ void lunaticvibes::graphics::save_new_window_size(int width, int height)
 
 void graphics_change_vsync(int mode)
 {
-    LOG_WARNING << "Setting vsync mode to " << mode;
+    LOG_INFO << "[SDL2] Setting vsync mode to " << mode;
     SDL_RenderSetVSync(gFrameRenderer, mode);
 }
 
 static int superSampleLevel = 1;
 void graphics_set_supersample_level(int level)
 {
-    LOG_WARNING << "Setting supersample level to " << level;
+    LOG_INFO << "[SDL2] Setting supersample level to " << level;
     // assert(canvasRect.w * level <= 3840);
     superSampleLevel = level;
 }
@@ -399,7 +399,7 @@ int graphics_get_supersample_level()
 
 void graphics_resize_canvas(int x, int y)
 {
-    LOG_WARNING << "Resizing canvas to " << x << 'x' << y;
+    LOG_INFO << "[SDL2] Resizing canvas to " << x << 'x' << y;
     canvasRect.w = x;
     canvasRect.h = y;
     canvasScaleX = (double)windowRect.w / x;
@@ -416,7 +416,7 @@ double graphics_get_canvas_scale_y()
 
 void graphics_set_maxfps(int fps)
 {
-    LOG_WARNING << "Setting max fps to " << fps;
+    LOG_INFO << "[SDL2] Setting max fps to " << fps;
     maxFPS = fps;
     if (maxFPS != 0)
     {
@@ -447,7 +447,7 @@ bool lunaticvibes::event_handle()
         switch (e.type)
         {
         case SDL_QUIT:
-            LOG_WARNING << "[Event] SDL_QUIT";
+            LOG_INFO << "[SDL2] Got SDL_QUIT";
             quit = true;
             break;
 
@@ -702,6 +702,6 @@ void funKeyDown(const SDL_KeyboardEvent& e)
 
 void lunaticvibes::graphics::queue_screenshot(Path png)
 {
-    LOG_INFO << "Screenshot: " << png;
+    LOG_INFO << "[SDL2] Screenshot: " << png;
     screenshotPath = std::move(png);
 }
