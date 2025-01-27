@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 enum class SpriteTypes
@@ -346,6 +347,7 @@ protected:
 
 protected:
     std::string _text;
+    std::string _textBuf;
 
 private:
     Rect textureRect;
@@ -379,7 +381,7 @@ public:
     virtual void updateTextRect();
 
 private:
-    void updateTextTexture(std::string&& text, const Color& c);
+    void updateTextTexture(std::string_view text, const Color& c);
 
 public:
     bool update(const lunaticvibes::Time& t) override;

@@ -74,6 +74,11 @@ std::string State::get(IndexText ind)
     return inst().gTexts.get(ind);
 }
 
+void State::get(IndexText ind, std::string& out)
+{
+    inst().gTexts.get(ind, out);
+}
+
 bool State::set(IndexTimer ind, long long val)
 {
     return inst().gTimers.set(ind, val);

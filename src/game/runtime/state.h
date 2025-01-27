@@ -42,15 +42,25 @@ protected:
         mutable std::shared_mutex _mutex;
 
     public:
-        Value get(Key n) const
+        void get(Key n, Value& out) const
         {
             auto idx = (size_t)n;
             if (idx < _size)
             {
                 std::shared_lock l{_mutex};
-                return _data.data()[idx];
+                out = _data.data()[idx];
             }
-            return {};
+            else
+            {
+                out = {};
+            }
+        }
+
+        Value get(Key n) const
+        {
+            Value out;
+            get(n, out);
+            return out;
         }
 
         bool set(Key n, const Value& value)
@@ -116,6 +126,7 @@ public:
 
     static bool set(IndexText ind, std::string_view val);
     static std::string get(IndexText ind);
+    static void get(IndexText ind, std::string& out);
 
     static bool set(IndexTimer ind, long long val);
     static long long get(IndexTimer ind);

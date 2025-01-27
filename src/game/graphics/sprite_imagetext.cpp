@@ -25,7 +25,8 @@ void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_
     _text = text;
     _firstLine = first_line;
 
-    std::u32string u32Text = utf8_to_utf32(text);
+    lunaticvibes::utf8_to_utf32(text, _textU32Buf);
+    std::u32string& u32Text = _textU32Buf;
 
     float draw_x = 0;
     float draw_y = 0;
@@ -154,7 +155,8 @@ bool SpriteImageText::update(const lunaticvibes::Time& t)
         unsigned first_line = 0;
         if (_lvf_use_readme_line)
             first_line = gSelectContext.readme_line;
-        updateTextTexture(State::get(textInd), first_line);
+        State::get(textInd, _textBuf);
+        updateTextTexture(_textBuf, first_line);
         updateTextRect();
     }
     return _draw;

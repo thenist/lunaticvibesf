@@ -28,6 +28,8 @@ protected:
 private:
     std::vector<std::pair<char32_t, RectF>> _drawListOrig;
     std::vector<std::pair<char32_t, RectF>> _drawList;
+    std::string _textBuf;
+    std::u32string _textU32Buf;
     Rect _drawRect;
 
 public:

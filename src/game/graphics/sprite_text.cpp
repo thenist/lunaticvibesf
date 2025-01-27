@@ -3,6 +3,8 @@
 #include <common/assert.h>
 #include <common/sysutil.h>
 
+#include <string_view>
+
 SpriteText::SpriteText(const SpriteTextBuilder& builder) : SpriteBase(builder)
 {
     _type = SpriteTypes::TEXT;
@@ -31,11 +33,12 @@ void SpriteText::updateText()
     if (!_draw)
         return;
 
-    updateTextTexture(State::get(textInd), _current.color);
+    State::get(textInd, _textBuf);
+    updateTextTexture(_textBuf, _current.color);
     updateTextRect();
 }
 
-void SpriteText::updateTextTexture(std::string&& text, const Color& c)
+void SpriteText::updateTextTexture(std::string_view text, const Color& c)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
 
@@ -55,7 +58,7 @@ void SpriteText::updateTextTexture(std::string&& text, const Color& c)
     _text = text;
     textColor = c;
 
-    pTexture = pFont->TextUTF8(text.c_str(), c);
+    pTexture = pFont->TextUTF8(_text.c_str(), c);
     if (pTexture)
     {
         textureRect = pTexture->getRect();
