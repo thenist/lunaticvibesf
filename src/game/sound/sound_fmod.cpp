@@ -1,24 +1,52 @@
 #include "sound_fmod.h"
-#include "common/u8.h"
-
-#include <cstdlib>
-#include <functional>
 
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/types.h>
+#include <common/u8.h>
 #include <common/utils.h>
 #include <config/config_mgr.h>
-#include <fmod_errors.h>
 #include <game/sound/sound_fmod_callback.h>
+
+#include <fmod_errors.h>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 
+#include <cstdlib>
+#include <functional>
+#include <string_view>
+
+static FMOD_RESULT log_fmod_message(FMOD_DEBUG_FLAGS flags, const char* file, int line, const char* func,
+                                    const char* message_)
+{
+    auto display_message = [message_]() {
+        std::string_view s{message_};
+        return s.substr(0, s.find('\n')); // FMOD messages have a trailing newline.
+    };
+    if (flags & FMOD_DEBUG_LEVEL_LOG)
+    {
+        LOG_VERBOSE << "[FMOD] " << func << ": " << display_message();
+    }
+    else if (flags & FMOD_DEBUG_LEVEL_WARNING)
+    {
+        LOG_WARNING << "[FMOD] " << func << ": " << display_message();
+    }
+    else if (flags & FMOD_DEBUG_LEVEL_ERROR)
+    {
+        LOG_ERROR << "[FMOD] " << func << ": " << display_message();
+    }
+    return FMOD_OK;
+}
+
 SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMOD::update, this))
 {
+    // NOTE: this is GLOBAL, not instance-specific.
+    FMOD_Debug_Initialize(FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG,
+                          FMOD_DEBUG_MODE_CALLBACK, log_fmod_message, "");
+
     // load device
     int driver = -1;
     FMOD_OUTPUTTYPE outputType = FMOD_OUTPUTTYPE_AUTODETECT;
