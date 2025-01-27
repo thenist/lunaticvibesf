@@ -13,7 +13,6 @@
 #include <shared_mutex>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <utility>
 
 // Global state value manager
@@ -66,7 +65,7 @@ protected:
             return false;
         }
 
-        template <typename = typename std::enable_if<std::is_same_v<Value, std::string>>>
+        // PERF: avoid forcing copies for strings.
         bool set(Key n, std::string_view value)
         {
             auto idx = (size_t)n;
