@@ -195,8 +195,8 @@ const char* getFileEncodingName(eFileEncoding enc)
     case eFileEncoding::LATIN1: return "Latin 1";
     case eFileEncoding::SHIFT_JIS: return "Shift JIS";
     case eFileEncoding::UTF8: return "UTF-8";
-    default: return "Unknown";
     }
+    lunaticvibes::assert_failed("getFileEncodingName");
 }
 
 std::string to_utf8(const std::string& input, eFileEncoding fromEncoding)
@@ -278,7 +278,7 @@ static const char* get_iconv_encoding_name(eFileEncoding encoding)
     case eFileEncoding::EUC_KR: return "CP949";
     case eFileEncoding::UTF8: return "UTF-8";
     }
-    lunaticvibes::assert_failed("Incorrect eFileEncoding");
+    lunaticvibes::assert_failed("get_iconv_encoding_name");
 }
 
 struct IcdDeleter
