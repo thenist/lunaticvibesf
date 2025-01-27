@@ -70,18 +70,6 @@ int main(int argc, char* argv[])
 
     LOG_INFO << "Starting Lunatic Vibes F " << PROJECT_VERSION << " (" << GIT_REVISION << ")";
 
-    // init curl
-    LOG_INFO << "Initializing libcurl...";
-    if (CURLcode ret = curl_global_init(CURL_GLOBAL_DEFAULT); ret != CURLE_OK)
-    {
-        const std::string msg =
-            std::format("libcurl init error: {}", static_cast<std::underlying_type_t<decltype(ret)>>(ret));
-        LOG_FATAL << msg;
-        tinyfd_messageBox("Fatal error", msg.c_str(), "ok", "error", 0);
-        return 1;
-    }
-    LOG_INFO << "libcurl version: " << curl_version();
-
     // load configs
     ConfigMgr::init();
     ConfigMgr::load();
@@ -96,6 +84,18 @@ int main(int argc, char* argv[])
         tinyfd_messageBox("Fatal error", msg.c_str(), "ok", "error", 0);
         return 1;
     }
+
+    // init curl
+    LOG_INFO << "Initializing libcurl...";
+    if (CURLcode ret = curl_global_init(CURL_GLOBAL_DEFAULT); ret != CURLE_OK)
+    {
+        const std::string msg =
+            std::format("libcurl init error: {}", static_cast<std::underlying_type_t<decltype(ret)>>(ret));
+        LOG_FATAL << msg;
+        tinyfd_messageBox("Fatal error", msg.c_str(), "ok", "error", 0);
+        return 1;
+    }
+    LOG_INFO << "libcurl version: " << curl_version();
 
     // init imgui
     LOG_INFO << "Initializing ImGui...";
