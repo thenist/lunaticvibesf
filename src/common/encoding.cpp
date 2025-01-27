@@ -343,9 +343,11 @@ static iconv_t get_icd(eFileEncoding from, eFileEncoding to)
 template <class T>
 static void convert(std::string_view input, eFileEncoding from, eFileEncoding to, std::basic_string<T>& out)
 {
-    if (from == to || input.empty())
+    // if (from == to) // handled by callers, it's messy with templates
+
+    if (input.empty())
     {
-        out.assign(reinterpret_cast<const T*>(input.data()), input.size());
+        out.clear();
         return;
     }
 
@@ -386,13 +388,20 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
 
 void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& buf)
 {
-    convert(input, fromEncoding, eFileEncoding::UTF8, buf);
+    auto toEncoding = eFileEncoding::UTF8;
+    if (fromEncoding == toEncoding)
+        buf.assign(input);
+    else
+        convert(input, fromEncoding, toEncoding, buf);
 }
 
 std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
 {
+    auto fromEncoding = eFileEncoding::UTF8;
+    if (fromEncoding == toEncoding)
+        return input;
     std::string buf;
-    convert(input, eFileEncoding::UTF8, toEncoding, buf);
+    convert(input, fromEncoding, toEncoding, buf);
     return buf;
 }
 
