@@ -1,6 +1,5 @@
 #include <fstream>
 
-#include <boost/algorithm/string/trim.hpp>
 #include <gmock/gmock.h>
 
 #include <common/encoding.h>
@@ -20,6 +19,5 @@ TEST(Encoding, CanOpenUtf8FilePath)
     std::ifstream ifs(u8"encoding/クールネーム.txt"_p);
     ASSERT_FALSE(ifs.fail());
     std::string contents{std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>()};
-    boost::trim(contents);
-    EXPECT_STREQ(contents.c_str(), "it's so cool");
+    EXPECT_EQ(lunaticvibes::trim(contents), "it's so cool");
 }
