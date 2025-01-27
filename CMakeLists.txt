@@ -47,5 +47,10 @@ if(${BUILD_TEST})
     add_subdirectory(test)
 endif()
 
+option(LVF_BUILD_BENCHMARK NO)
+if(${LVF_BUILD_BENCHMARK})
+    add_subdirectory(benchmark)
+endif()
+
 set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 include(CPack)

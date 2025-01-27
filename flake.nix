@@ -58,6 +58,7 @@
           cereal_1_3_2
           curl
           ffmpeg
+          gbenchmark
           gtest
 
           openssl
