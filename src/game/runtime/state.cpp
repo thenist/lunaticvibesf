@@ -2,7 +2,11 @@
 
 #include "common/types.h"
 
-State State::_inst;
+State& State::inst()
+{
+    static State state;
+    return state;
+};
 
 State::State()
 {
@@ -22,67 +26,67 @@ State::State()
 
 bool State::set(IndexNumber ind, int val)
 {
-    return _inst.gNumbers.set(ind, val);
+    return inst().gNumbers.set(ind, val);
 }
 
 int State::get(IndexNumber ind)
 {
-    return _inst.gNumbers.get(ind);
+    return inst().gNumbers.get(ind);
 }
 
 bool State::set(IndexOption ind, unsigned val)
 {
-    return _inst.gOptions.set(ind, val);
+    return inst().gOptions.set(ind, val);
 }
 
 unsigned State::get(IndexOption ind)
 {
-    return _inst.gOptions.get(ind);
+    return inst().gOptions.get(ind);
 }
 
 bool State::set(IndexSlider ind, Ratio val)
 {
-    return _inst.gSliders.set(ind, val);
+    return inst().gSliders.set(ind, val);
 }
 
 double State::get(IndexSlider ind)
 {
-    return _inst.gSliders.get(ind);
+    return inst().gSliders.get(ind);
 }
 
 bool State::set(IndexSwitch ind, bool val)
 {
-    return _inst.gSwitches.set(ind, val);
+    return inst().gSwitches.set(ind, val);
 }
 
 bool State::get(IndexSwitch ind)
 {
-    return _inst.gSwitches.get(ind);
+    return inst().gSwitches.get(ind);
 }
 
 bool State::set(IndexText ind, std::string_view val)
 {
-    return _inst.gTexts.set(ind, val);
+    return inst().gTexts.set(ind, val);
 }
 
 std::string State::get(IndexText ind)
 {
-    return _inst.gTexts.get(ind);
+    return inst().gTexts.get(ind);
 }
 
 bool State::set(IndexTimer ind, long long val)
 {
-    return _inst.gTimers.set(ind, val);
+    return inst().gTimers.set(ind, val);
 }
 
 long long State::get(IndexTimer ind)
 {
-    return _inst.gTimers.get(ind);
+    return inst().gTimers.get(ind);
 }
 
 void State::resetTimer()
 {
     long long customizeTimer = get(IndexTimer::_SCENE_CUSTOMIZE_START);
-    _inst.gTimers.reset();
+    inst().gTimers.reset();
     set(IndexTimer::_SCENE_CUSTOMIZE_START, customizeTimer);
 }

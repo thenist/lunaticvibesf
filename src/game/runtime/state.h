@@ -19,7 +19,7 @@
 class State
 {
 private:
-    static State _inst;
+    static State& inst();
 
 protected:
     template <class Key, class Value, size_t _size> class StateContainer
