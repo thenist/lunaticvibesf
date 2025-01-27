@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.29.2)
 # Maybe related: https://gitlab.kitware.com/cmake/cmake/-/issues/20289
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
-project(LunaticVibesF VERSION 0.25.3 LANGUAGES CXX)
+project(LunaticVibesF VERSION 0.25.4 LANGUAGES CXX)
 set(PROJECT_TITLE "Lunatic Vibes F")
 
 configure_file(
