@@ -16,6 +16,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 
+namespace r = std::ranges;
+
 SoundSetLR2::SoundSetLR2() : SoundSetLR2(std::mt19937{std::random_device{}()})
 {
     _type = eSoundSetType::LR2;
@@ -170,7 +172,7 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
         for (auto& p : findFiles(pathf))
             c.label.push_back(lunaticvibes::u8str(p.filename()));
 
-        std::sort(c.label.begin(), c.label.end());
+        r::sort(c.label);
         c.label.emplace_back("RANDOM");
         customizeRandom.push_back(
             c.label.size() < 2 ? 0 : std::uniform_int_distribution<size_t>{0, c.label.size() - 2}(_gen));
@@ -265,7 +267,7 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string_view rawpat
             else
             {
                 // Sort for determinism in tests.
-                std::sort(ls.begin(), ls.end());
+                r::sort(ls);
                 const size_t ranidx = std::uniform_int_distribution<size_t>{0, ls.size() - 1}(_gen);
                 const Path& soundPath = ls[ranidx];
                 soundFilePath[key] = soundPath;
@@ -407,8 +409,7 @@ bool SoundSetLR2::setCustomFileOptionForBodyParsing(const std::string_view title
     {
         if (customFile.title == title)
         {
-            if (const auto entry = std::find(customFile.label.begin(), customFile.label.end(), value);
-                entry != customFile.label.end())
+            if (const auto entry = r::find(customFile.label, value); entry != customFile.label.end())
             {
                 customFile.value = std::distance(customFile.label.begin(), entry);
                 return true;
