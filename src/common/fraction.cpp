@@ -1,12 +1,11 @@
 #include "fraction.h"
-#include <utility>
 
 #include <cstdlib>
 #include <numeric>
 
 #pragma warning(disable : 4244)
 
-bool trim(long long& _numerator, long long& _denominator)
+static bool trim(long long& _numerator, long long& _denominator)
 {
     if (_numerator == 0)
     {
@@ -47,7 +46,7 @@ fraction::fraction(long long numerator, long long denominator, bool t)
 fraction fraction::operator+(const fraction& rhs) const
 {
     long long g = std::lcm(_denominator, rhs._denominator);
-    return fraction(_numerator * (g / _denominator) + rhs._numerator * (g / rhs._denominator), g);
+    return {_numerator * (g / _denominator) + rhs._numerator * (g / rhs._denominator), g};
 }
 
 fraction& fraction::operator+=(const fraction& rhs)
@@ -61,7 +60,7 @@ fraction& fraction::operator+=(const fraction& rhs)
 fraction fraction::operator-(const fraction& rhs) const
 {
     long long g = std::lcm(_denominator, rhs._denominator);
-    return fraction(_numerator * (g / _denominator) - rhs._numerator * (g / rhs._denominator), g);
+    return {_numerator * (g / _denominator) - rhs._numerator * (g / rhs._denominator), g};
 }
 
 fraction& fraction::operator-=(const fraction& rhs)
@@ -74,7 +73,7 @@ fraction& fraction::operator-=(const fraction& rhs)
 
 fraction fraction::operator*(const fraction& rhs) const
 {
-    return fraction(_numerator * rhs._numerator, _denominator * rhs._denominator);
+    return {_numerator * rhs._numerator, _denominator * rhs._denominator};
 }
 
 fraction& fraction::operator*=(const fraction& rhs)
@@ -99,16 +98,14 @@ fraction d2fr(double d)
 {
     long long nr = d * 1e15;
     if (nr == 0)
-    {
-        return fraction(0, 1);
-    }
+        return {0, 1};
 
     long long dr = 1e15;
     trim(nr, dr);
-    while (std::abs(nr) & 0xffffffff00000000ll || std::abs(dr) & 0xffffffff00000000ll)
+    while (std::abs(nr) & 0xffffffff00000000LL || std::abs(dr) & 0xffffffff00000000LL)
     {
         nr >>= 1;
         dr >>= 1;
     }
-    return fraction(nr, dr);
+    return {nr, dr};
 }
