@@ -76,8 +76,8 @@ int main(int argc, char* argv[])
     ConfigMgr::selectProfile(ConfigMgr::get('E', cfg::E_PROFILE, cfg::PROFILE_DEFAULT));
     lunaticvibes::SetLogLevel(static_cast<lunaticvibes::LogLevel>(ConfigMgr::get('E', cfg::E_LOG_LEVEL, 1)));
 
-    Path lr2path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/");
-    if (!fs::is_directory(lr2path))
+    if (Path lr2path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/");
+        !fs::is_directory(lr2path))
     {
         const std::string msg = std::format("LR2files directory not found! {}", lunaticvibes::s(lr2path.u8string()));
         LOG_FATAL << msg;
