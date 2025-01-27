@@ -1994,7 +1994,7 @@ void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Tim
     if (input[Input::Pad::MWHEELDOWN])
     {
         const auto helpfile = State::get(IndexText::LVF_INTERNAL_README);
-        const auto max_lines = static_cast<unsigned>(std::count(helpfile.begin(), helpfile.end(), '\n'));
+        const auto max_lines = static_cast<unsigned>(r::count(helpfile, '\n'));
         if (gSelectContext.readme_line <= max_lines)
             gSelectContext.readme_line = std::min(gSelectContext.readme_line + lines_per_scroll, max_lines);
         return;
@@ -3312,8 +3312,7 @@ void SceneSelect::updatePreview()
                     SoundMgr::freeNoteSamples();
                     auto chartDir = bms->getDirectory();
 
-                    const int wavTotal =
-                        std::count_if(bms->wavFiles.begin(), bms->wavFiles.end(), std::not_fn(&std::string::empty));
+                    const int wavTotal = r::count_if(bms->wavFiles, std::not_fn(&std::string::empty));
                     if (wavTotal == 0)
                     {
                         LOG_DEBUG << "[Select] Chart has no samples for direct preview -> PREVIEW_FINISH";
