@@ -12,7 +12,6 @@
     "boost-format",
     "boost-nowide",
     "boost-property-tree",
-    "boost-tokenizer",
     "cereal",
     "curl",
     "ffmpeg",

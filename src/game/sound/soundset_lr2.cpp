@@ -7,14 +7,14 @@
 #include <string_view>
 #include <utility>
 
-#include "common/encoding.h"
-#include "common/u8.h"
-#include "common/utils.h"
-#include "config/config_mgr.h"
-#include "game/scene/scene_customize.h"
+#include <common/encoding.h>
+#include <common/str_utils.h>
+#include <common/u8.h>
+#include <common/utils.h>
+#include <config/config_mgr.h>
+#include <game/scene/scene_customize.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/tokenizer.hpp>
 
 namespace r = std::ranges;
 
@@ -64,16 +64,8 @@ void SoundSetLR2::loadCSV(Path p)
     for (std::string raw; std::getline(csvFile, raw);)
     {
         ++csvLineNumber;
-
-        // convert codepage
         std::string rawUTF8 = to_utf8(raw, encoding);
-
-        static const boost::char_separator<char> sep(",");
-        boost::tokenizer<boost::char_separator<char>> tokens(rawUTF8, sep);
-        if (tokens.begin() == tokens.end())
-            continue;
-        tokenBuf.assign(tokens.begin(), tokens.end());
-
+        lunaticvibes::split(rawUTF8, ',', tokenBuf);
         parseHeader(tokenBuf);
     }
 
@@ -106,16 +98,8 @@ void SoundSetLR2::loadCSV(Path p)
     for (std::string raw; std::getline(csvFile, raw);)
     {
         ++csvLineNumber;
-
-        // convert codepage
         std::string rawUTF8 = lunaticvibes::trim(to_utf8(raw, encoding));
-
-        static boost::char_separator<char> sep(",");
-        boost::tokenizer<boost::char_separator<char>> tokens(rawUTF8, sep);
-        if (tokens.begin() == tokens.end())
-            continue;
-        tokenBuf.assign(tokens.begin(), tokens.end());
-
+        lunaticvibes::split(rawUTF8, ',', tokenBuf);
         parseBody(tokenBuf);
     }
 
