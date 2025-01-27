@@ -7,12 +7,12 @@
 #include <random>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
 #include <common/assert.h>
 #include <common/chartformat/chartformat_bms.h>
 #include <common/entry/entry_types.h>
+#include <common/str_utils.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
 #include <db/db_song.h>
@@ -969,7 +969,7 @@ void setEntryInfo(const size_t idx)
         if (score && !score->replayFileName.empty())
         {
             std::vector<std::string> replayFileNames;
-            boost::split(replayFileNames, score->replayFileName, boost::is_any_of("|"), boost::token_compress_off);
+            lunaticvibes::split(score->replayFileName, '|', replayFileNames);
             if (replayFileNames.size() <= ps->charts.size())
             {
                 bool loadFailed = false;

@@ -15,7 +15,6 @@
 #include <thread>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
 #include <re2/re2.h>
 
 #ifdef _WIN32
@@ -30,6 +29,7 @@
 #include <common/assert.h>
 #include <common/hash.h>
 #include <common/log.h>
+#include <common/str_utils.h>
 #include <common/sysutil.h>
 #include <common/types.h>
 #include <common/u8.h>
@@ -324,7 +324,7 @@ Path lunaticvibes::resolve_windows_path(std::string input)
     out.reserve(input.length() + CURRENT_PATH_RELATIVE_PREFIX.length());
 
     static thread_local std::vector<std::string> segments;
-    boost::split(segments, input, boost::is_any_of("/"));
+    lunaticvibes::split(input, '/', segments);
 
     size_t segments_traversed = 0;
     for (const auto& segment : segments)
@@ -343,9 +343,7 @@ Path lunaticvibes::resolve_windows_path(std::string input)
         if (!prefix.empty())
         {
             if (!out.empty() && out.back() != '/')
-            {
                 out += '/';
-            }
             out += prefix;
             segments_traversed += 1;
             continue;

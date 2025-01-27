@@ -15,12 +15,11 @@
 #include <string>
 #include <string_view>
 
-#include <boost/algorithm/string/classification.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <re2/re2.h>
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/str_utils.h>
 #include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
@@ -588,7 +587,7 @@ static void csvLineTokenizeSimple(const std::string_view raw, Tokens& res)
     StringContentView linecsv = csvLineNormalize(raw);
     if (linecsv.empty())
         return;
-    boost::split(res, linecsv, boost::is_any_of(","));
+    lunaticvibes::split(linecsv, ',', res);
 }
 
 static void csvLineTokenizeRegex(const std::string_view raw, Tokens& res)
