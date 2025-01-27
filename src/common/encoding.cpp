@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <istream>
-#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -264,6 +263,7 @@ std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
 
 #include <cerrno>
 #include <cstring>
+#include <map>
 #include <memory>
 #include <type_traits>
 
@@ -295,27 +295,28 @@ struct IcdDeleter
 };
 using IcdPtr = std::unique_ptr<std::remove_pointer_t<iconv_t>, IcdDeleter>;
 
-static void convert(std::string_view input, eFileEncoding from, eFileEncoding to, std::string& out)
+static iconv_t get_icd(eFileEncoding from, eFileEncoding to)
 {
     static thread_local std::map<std::pair<eFileEncoding, eFileEncoding>, IcdPtr> icds;
-
     auto icd_it = icds.find({from, to});
     if (icd_it == icds.end())
     {
         const auto* source_encoding_name = get_iconv_encoding_name(from);
         const auto* target_encoding_name = get_iconv_encoding_name(to);
-        auto icd = IcdPtr(iconv_open(target_encoding_name, source_encoding_name));
-        if (reinterpret_cast<size_t>(icd.get()) == static_cast<size_t>(-1))
-        {
-            const int error = errno;
-            LOG_ERROR << "iconv_open() error: " << safe_strerror(error) << " (" << error << ")";
-            out = "(conversion descriptor opening error)";
-            return;
-        }
-        icd_it = icds.insert_or_assign({from, to}, std::move(icd)).first;
-        LVF_DEBUG_ASSERT(icd_it != icds.end());
+        icd_it =
+            icds.insert_or_assign({from, to}, IcdPtr(iconv_open(target_encoding_name, source_encoding_name))).first;
+        LVF_ASSERT(icd_it != icds.end());
+        // > The following error can occur, among others:
+        // > EINVAL The conversion from fromcode to tocode is not supported by the implementation.
+        // Don't bother with such implementations.
+        LVF_ASSERT(reinterpret_cast<size_t>(icd_it->second.get()) != static_cast<size_t>(-1));
     }
-    auto icd = icd_it->second.get();
+    return icd_it->second.get();
+}
+
+static void convert(std::string_view input, eFileEncoding from, eFileEncoding to, std::string& out)
+{
+    auto* icd = get_icd(from, to);
 
     // PERF: this buffer is MASSIVE. Don't initialize it or memset will dominate runtime.
     char out_buf[1024L * 32L];
