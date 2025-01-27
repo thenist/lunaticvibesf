@@ -14,35 +14,27 @@
 #include <common/u8.h>
 #include <common/utils.h>
 
-std::stringstream readIntoUtf8StringStream(const Path& filePath)
+static std::stringstream readFileIntoStringStream(const Path& filePath)
 {
-    // .lr2crs is a standard xml file. A file may contain multiple courses.
-
-    // load file
     std::ifstream ifs(filePath);
     if (ifs.fail())
     {
         LOG_WARNING << "[lr2crs] " << filePath << " File ERROR";
         return {};
     }
-
     std::stringstream ss;
     ss << ifs.rdbuf();
-    ss.sync();
     ifs.close();
+    return ss;
+}
 
-    // convert codepage
+static std::stringstream readIntoUtf8StringStream(const Path& filePath)
+{
+    auto ss = readFileIntoStringStream(filePath);
     auto encoding = getFileEncoding(ss);
     std::stringstream ssUTF8;
     for (std::string lineBuf; std::getline(ss, lineBuf);)
-    {
-        // convert codepage
-        lineBuf = lunaticvibes::trim(to_utf8(lineBuf, encoding));
-        ssUTF8 << lineBuf;
-    }
-    ssUTF8.sync();
-    ss.clear();
-
+        ssUTF8 << lunaticvibes::trim(to_utf8(lineBuf, encoding));
     return ssUTF8;
 }
 
@@ -54,6 +46,7 @@ CourseLr2crs::CourseLr2crs(const Path& filePath)
 
 CourseLr2crs::CourseLr2crs(std::string_view source, long long addTime, std::stringstream ssUTF8) : addTime(addTime)
 {
+    // .lr2crs is a standard xml file. A file may contain multiple courses.
     // parse as XML
     try
     {
@@ -79,9 +72,7 @@ CourseLr2crs::CourseLr2crs(std::string_view source, long long addTime, std::stri
                     const std::string& hash = value.data();
                     c.hashTop = hash.substr(0, 32);
                     for (size_t count = 1; count < hash.size() / 32; ++count)
-                    {
                         c.chartHash.emplace_back(hash.substr(count * 32, 32));
-                    }
                 }
                 else
                 {
