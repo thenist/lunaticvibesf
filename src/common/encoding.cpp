@@ -180,7 +180,7 @@ eFileEncoding getFileEncoding(std::istream& is)
 
     if (enc == eFileEncoding::EUC_KR)
     {
-        LOG_WARNING << "beep, boop, detected EUC-KR encoding (rare occurrence)";
+        LOG_WARNING << "[Encoding] Beep, boop, detected EUC-KR encoding (rare occurrence)";
     }
 
     return enc;
@@ -289,7 +289,7 @@ struct IcdDeleter
         if (ret == -1)
         {
             const int error = errno;
-            LOG_ERROR << "iconv_close() error: " << safe_strerror(error) << " (" << error << ")";
+            LOG_ERROR << "[Encoding] iconv_close() error: " << safe_strerror(error) << " (" << error << ")";
         }
     }
 };
@@ -332,7 +332,7 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
     if (iconv_ret == static_cast<size_t>(-1))
     {
         const int error = errno;
-        LOG_ERROR << "iconv() error: " << safe_strerror(error) << " (" << error << ")";
+        LOG_ERROR << "[Encoding] iconv() error: " << safe_strerror(error) << " (" << error << ")";
         out = "(conversion error)";
         return;
     }
@@ -346,7 +346,7 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
     if (iconv_ret == static_cast<size_t>(-1))
     {
         const int error = errno;
-        LOG_ERROR << "iconv() error: " << safe_strerror(error) << " (" << error << ")";
+        LOG_ERROR << "[Encoding] iconv() error: " << safe_strerror(error) << " (" << error << ")";
         out = "(conversion error)";
         return;
     }
