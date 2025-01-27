@@ -7,9 +7,9 @@
 #include <string_view>
 #include <utility>
 
-#include "common/assert.h"
-#include "common/log.h"
-#include "common/sysutil.h"
+#include <common/assert.h>
+#include <common/log.h>
+#include <common/sysutil.h>
 
 static bool is_ascii(const std::string_view str)
 {
@@ -235,18 +235,15 @@ static void convert(const std::string& input, eFileEncoding fromEncoding, eFileE
     }
 
     DWORD wide_buf_size = MultiByteToWideChar(from, 0, input.c_str(), static_cast<int>(input.size()), nullptr, 0);
-    wchar_t* wstr = new wchar_t[wide_buf_size];
-    MultiByteToWideChar(from, 0, input.c_str(), static_cast<int>(input.size()), wstr, wide_buf_size);
+    auto wstr = std::make_unique_for_overwrite<wchar_t[]>(wide_buf_size);
+    MultiByteToWideChar(from, 0, input.c_str(), static_cast<int>(input.size()), wstr.get(), wide_buf_size);
 
-    DWORD narrow_buf_size = WideCharToMultiByte(to, 0, wstr, wide_buf_size, 0, 0, 0, FALSE);
-    char* lstr = new char[narrow_buf_size];
-    WideCharToMultiByte(to, 0, wstr, narrow_buf_size, lstr, narrow_buf_size, 0, FALSE);
+    DWORD narrow_buf_size = WideCharToMultiByte(to, 0, wstr.get(), wide_buf_size, 0, 0, 0, FALSE);
+    auto lstr = std::make_unique_for_overwrite<char[]>(narrow_buf_size);
+    WideCharToMultiByte(to, 0, wstr.get(), narrow_buf_size, lstr.get(), narrow_buf_size, 0, FALSE);
 
     // NOTE: narrow_buf_size doesn't include null-terminator as we are passing size to WideCharToMultiByte explicitly.
-    out.assign(lstr, narrow_buf_size);
-
-    delete[] wstr;
-    delete[] lstr;
+    out.assign(lstr.get(), narrow_buf_size);
 }
 
 void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& out)
@@ -292,7 +289,6 @@ void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)
 #include <cerrno>
 #include <cstring>
 #include <map>
-#include <memory>
 #include <type_traits>
 
 #include <iconv.h>
