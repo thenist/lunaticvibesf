@@ -226,13 +226,14 @@ static int to_win_codepage(eFileEncoding enc)
 
 static void convert(const std::string& input, eFileEncoding fromEncoding, eFileEncoding toEncoding, std::string& out)
 {
-    const int from = to_win_codepage(fromEncoding);
-    const int to = to_win_codepage(toEncoding);
-    if (from == to)
+    if (fromEncoding == toEncoding || input.empty())
     {
         out = input;
         return;
     }
+
+    const int from = to_win_codepage(fromEncoding);
+    const int to = to_win_codepage(toEncoding);
 
     DWORD wide_buf_size = MultiByteToWideChar(from, 0, input.c_str(), static_cast<int>(input.size()), nullptr, 0);
     auto wstr = std::make_unique_for_overwrite<wchar_t[]>(wide_buf_size);
@@ -342,6 +343,12 @@ static iconv_t get_icd(eFileEncoding from, eFileEncoding to)
 template <class T>
 static void convert(std::string_view input, eFileEncoding from, eFileEncoding to, std::basic_string<T>& out)
 {
+    if (from == to || input.empty())
+    {
+        out.assign(reinterpret_cast<const T*>(input.data()), input.size());
+        return;
+    }
+
     auto* icd = get_icd(from, to);
 
     // PERF: this buffer is MASSIVE. Don't initialize it or memset will dominate runtime.
