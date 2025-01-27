@@ -356,6 +356,7 @@ void graphics_change_window_mode(int mode)
         SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
         SDL_SetWindowBordered(gFrameWindow, SDL_FALSE);
         break;
+    default: lunaticvibes::assert_failed("graphics_change_window_mode");
     }
 }
 
