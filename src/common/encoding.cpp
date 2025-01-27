@@ -194,6 +194,7 @@ const char* getFileEncodingName(eFileEncoding enc)
     case eFileEncoding::LATIN1: return "Latin 1";
     case eFileEncoding::SHIFT_JIS: return "Shift JIS";
     case eFileEncoding::UTF8: return "UTF-8";
+    case eFileEncoding::UTF32: return "UTF-32";
     }
     lunaticvibes::assert_failed("getFileEncodingName");
 }
@@ -218,6 +219,7 @@ static int to_win_codepage(eFileEncoding enc)
     case eFileEncoding::EUC_KR: return 949;
     case eFileEncoding::LATIN1: return CP_ACP;
     case eFileEncoding::UTF8: return CP_UTF8;
+    case eFileEncoding::UTF32: break; // Shouldn't be used.
     }
     lunaticvibes::assert_failed("to_win_codepage");
 };
@@ -259,8 +261,34 @@ std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
     return out;
 }
 
+void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)
+{
+    // FIXME: std::use_facet is already deprecated and removed in C++26, and is not supported well in Wine.
+    static const auto locale = std::locale("");
+    static const auto& facet_u32_u8 = std::use_facet<std::codecvt<char32_t, char, std::mbstate_t>>(locale);
+    out.resize(str.size() * facet_u32_u8.max_length(), '\0');
+
+    std::mbstate_t s;
+    const char* from_next = &str[0];
+    char32_t* to_next = &out[0];
+
+    std::codecvt_base::result res;
+    do
+    {
+        res = facet_u32_u8.in(s, from_next, &str[str.size()], from_next, to_next, &out[out.size()], to_next);
+
+        // skip unconvertiable chars (which is impossible though)
+        if (res == std::codecvt_base::error)
+            from_next++;
+
+    } while (res == std::codecvt_base::error);
+
+    out.resize(to_next - &out[0]);
+}
+
 #else
 
+#include <array>
 #include <cerrno>
 #include <cstring>
 #include <map>
@@ -277,6 +305,7 @@ static const char* get_iconv_encoding_name(eFileEncoding encoding)
     case eFileEncoding::SHIFT_JIS: return "CP932";
     case eFileEncoding::EUC_KR: return "CP949";
     case eFileEncoding::UTF8: return "UTF-8";
+    case eFileEncoding::UTF32: return "UCS-4BE";
     }
     lunaticvibes::assert_failed("get_iconv_encoding_name");
 }
@@ -314,17 +343,17 @@ static iconv_t get_icd(eFileEncoding from, eFileEncoding to)
     return icd_it->second.get();
 }
 
-static void convert(std::string_view input, eFileEncoding from, eFileEncoding to, std::string& out)
+template <class T>
+static void convert(std::string_view input, eFileEncoding from, eFileEncoding to, std::basic_string<T>& out)
 {
     auto* icd = get_icd(from, to);
 
     // PERF: this buffer is MASSIVE. Don't initialize it or memset will dominate runtime.
-    char out_buf[1024L * 32L];
+    std::array<T, 1024L * 32L / sizeof(T)> out_buf;
 
-    // BRUH-cast.
-    char* buf_ptr = const_cast<char*>(input.data());
+    auto* buf_ptr = const_cast<char*>(input.data()); // SAFETY: iconv *shouldn't* modify the buffer. *shouldn't*.
     size_t buf_len = input.length();
-    char* out_ptr = static_cast<char*>(out_buf);
+    auto* out_ptr = reinterpret_cast<char*>(out_buf.data()); // SAFETY: using 'char' to read bytes is always safe.
     size_t out_len = sizeof(out_buf);
     const size_t initial_out_len = out_len;
 
@@ -333,12 +362,13 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
     {
         const int error = errno;
         LOG_ERROR << "[Encoding] iconv() error: " << safe_strerror(error) << " (" << error << ")";
-        out = "(conversion error)";
+        out.clear();
         return;
     }
     const size_t bytes_written = initial_out_len - out_len;
 
-    out = std::string_view{static_cast<char*>(out_buf), bytes_written};
+    LVF_DEBUG_ASSERT(bytes_written % sizeof(T) == 0);
+    out.assign(out_buf.data(), bytes_written / sizeof(T));
 
     // "In each series of calls to iconv(), the last should be one with inbuf or *inbuf equal to NULL, in order to flush
     // out any partially converted input".
@@ -347,8 +377,7 @@ static void convert(std::string_view input, eFileEncoding from, eFileEncoding to
     {
         const int error = errno;
         LOG_ERROR << "[Encoding] iconv() error: " << safe_strerror(error) << " (" << error << ")";
-        out = "(conversion error)";
-        return;
+        out.clear();
     }
 }
 
@@ -364,28 +393,9 @@ std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
     return buf;
 }
 
-#endif // _WIN32
-
 void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)
 {
-    static const auto locale = std::locale("");
-    static const auto& facet_u32_u8 = std::use_facet<std::codecvt<char32_t, char, std::mbstate_t>>(locale);
-    out.resize(str.size() * facet_u32_u8.max_length(), '\0');
-
-    std::mbstate_t s;
-    const char* from_next = &str[0];
-    char32_t* to_next = &out[0];
-
-    std::codecvt_base::result res;
-    do
-    {
-        res = facet_u32_u8.in(s, from_next, &str[str.size()], from_next, to_next, &out[out.size()], to_next);
-
-        // skip unconvertiable chars (which is impossible though)
-        if (res == std::codecvt_base::error)
-            from_next++;
-
-    } while (res == std::codecvt_base::error);
-
-    out.resize(to_next - &out[0]);
+    convert(str, eFileEncoding::UTF8, eFileEncoding::UTF32, out);
 }
+
+#endif // _WIN32

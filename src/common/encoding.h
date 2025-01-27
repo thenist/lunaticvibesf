@@ -10,6 +10,7 @@ enum class eFileEncoding : uint8_t
     SHIFT_JIS,
     EUC_KR,
     UTF8,
+    UTF32,
 };
 [[nodiscard]] eFileEncoding getFileEncoding(const Path& path);
 [[nodiscard]] eFileEncoding getFileEncoding(std::istream& is);
