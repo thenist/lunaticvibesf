@@ -10,6 +10,7 @@
 #include <game/skin/skin.h>
 
 #include <array>
+#include <atomic>
 #include <bitset>
 #include <cstdint>
 #include <map>
@@ -52,6 +53,9 @@ namespace lunaticvibes
 
 struct SkinLr2SharedData
 {
+    std::atomic<bool> flipSideFlag = false;
+    std::atomic<bool> flipResultFlag = false; // Set in play skin
+    std::atomic<bool> flipSide = false;
     std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX> sprites;
 };
 

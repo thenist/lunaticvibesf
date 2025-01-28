@@ -85,11 +85,6 @@ static void convertOpsToInt(const std::span<const StringContent> offset_tokens, 
         *p = optToInt(t);
 }
 
-// These need to be persisted between skins wadafak.
-static bool s_flipSideFlag = false;
-static bool s_flipResultFlag = false; // Set in play skin
-static bool s_flipSide = false;
-
 static int flipTimer(int timer)
 {
     switch (timer)
@@ -129,7 +124,7 @@ struct s_basic
     int div_y = 0;
     int cycle = 0;
     int timer = 0;
-    s_basic(const Tokens& tokens, size_t csvLineNumber = 0)
+    s_basic(const Tokens& tokens, bool flipSide, size_t csvLineNumber)
     {
         convertLine(tokens, (int*)this, 0, static_cast<int>(MEMBERS));
 
@@ -149,7 +144,7 @@ struct s_basic
             div_y = 1;
         }
 
-        if (s_flipSide)
+        if (flipSide)
             timer = flipTimer(timer);
     }
 };
@@ -160,7 +155,7 @@ struct s_image : s_basic
     int op1 = 0;
     int op2 = 0;
     int op3 = 0;
-    s_image(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_image(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         if (tokens.size() < MEMBERS)
         {
@@ -176,11 +171,11 @@ struct s_number : s_basic
     int num = 0;
     int align = 0;
     int keta = 0;
-    s_number(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_number(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         convertLine(tokens, (int*)this, &num - &_null, 3);
 
-        if (s_flipSide)
+        if (flipSide)
         {
             if (100 <= num && num <= 119)
                 num += 20;
@@ -220,11 +215,11 @@ struct s_slider : s_basic
     int range = 0;
     int type = 0;
     int disable = 0;
-    s_slider(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_slider(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         convertLine(tokens, (int*)this, &muki - &_null, 4);
 
-        if (s_flipSide)
+        if (flipSide)
         {
             switch (type)
             {
@@ -243,11 +238,11 @@ struct s_bargraph : s_basic
 {
     int type = 0;
     int muki = 0;
-    s_bargraph(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_bargraph(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         convertLine(tokens, (int*)this, &type - &_null, 2);
 
-        if (s_flipSide)
+        if (flipSide)
         {
             if (10 <= type && type <= 11)
                 type += 4;
@@ -267,7 +262,7 @@ struct s_button : s_basic
     int click = 0;
     int panel = 0;
     int plusonly = 0;
-    s_button(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_button(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         convertLine(tokens, (int*)this, &type - &_null, 4);
     }
@@ -280,7 +275,7 @@ struct s_onmouse : s_basic
     int y2 = 0;
     int w2 = 0;
     int h2 = 0;
-    s_onmouse(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_onmouse(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         convertLine(tokens, (int*)this, &panel - &_null, 5);
     }
@@ -294,12 +289,12 @@ struct s_text
     int align = 0;
     int edit = 0;
     int panel = 0;
-    s_text(const Tokens& tokens)
+    s_text(const Tokens& tokens, bool flip_side)
     {
         int count = sizeof(s_text) / sizeof(int);
         convertLine(tokens, (int*)this, 0, count);
 
-        if (s_flipSide)
+        if (flip_side)
         {
             switch (st)
             {
@@ -338,7 +333,7 @@ using s_note = s_basic;
 struct s_nowjudge : s_basic
 {
     int noshift = 0;
-    s_nowjudge(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_nowjudge(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         size_t offset = sizeof(s_basic) / sizeof(int);
         size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
@@ -353,7 +348,7 @@ struct s_nowcombo : s_basic
     int _null2 = 0;
     int align = 0;
     int keta = 0;
-    s_nowcombo(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_nowcombo(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         size_t offset = sizeof(s_basic) / sizeof(int);
         size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
@@ -367,7 +362,7 @@ struct s_groovegauge : s_basic
 {
     int add_x = 0;
     int add_y = 0;
-    s_groovegauge(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_groovegauge(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         size_t offset = sizeof(s_basic) / sizeof(int);
         size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
@@ -375,8 +370,8 @@ struct s_groovegauge : s_basic
 
         switch (_null)
         {
-        case 0: _null = lr2skin::s_flipSide ? 1 : 0; break;
-        case 1: _null = lr2skin::s_flipSide ? 0 : 1; break;
+        case 0: _null = flipSide ? 1 : 0; break;
+        case 1: _null = flipSide ? 0 : 1; break;
         }
     }
 };
@@ -419,7 +414,7 @@ struct s_gaugechart : s_basic
     int field_h = 0;
     int start = 0;
     int end = 0;
-    s_gaugechart(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    s_gaugechart(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
         size_t offset = sizeof(s_basic) / sizeof(int);
         size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
@@ -449,7 +444,7 @@ struct dst
     int loop = -1;  // 15
     int timer = -1; // 16
     int op[4]{DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE};
-    dst(const Tokens& tokens)
+    dst(const Tokens& tokens, bool flipSide)
     {
         if (tokens.size() < MEMBERS)
         {
@@ -459,7 +454,7 @@ struct dst
         convertLine(tokens, (int*)this, 0, MEMBERS);
         convertOpsToInt(std::span{tokens}.subspan(MEMBERS - std::size(op)), {&op[0], &op[1], &op[2], &op[3]});
 
-        if (s_flipSide)
+        if (flipSide)
             timer = flipTimer(timer);
     }
 };
@@ -1092,14 +1087,14 @@ int SkinLR2::others()
     }
     if (matchToken(parseKeyBuf, "#FLIPRESULT"))
     {
-        lr2skin::s_flipResultFlag = true;
+        _sharedData->flipResultFlag = true;
 
         switch (info.mode)
         {
         case SkinType::RESULT:
         case SkinType::COURSE_RESULT:
-            lr2skin::s_flipSide = (lr2skin::s_flipSideFlag || lr2skin::s_flipResultFlag) && !disableFlipResult;
-            State::set(IndexSwitch::FLIP_RESULT, lr2skin::s_flipSide);
+            _sharedData->flipSide = (_sharedData->flipSideFlag || _sharedData->flipResultFlag) && !disableFlipResult;
+            State::set(IndexSwitch::FLIP_RESULT, _sharedData->flipSide);
             break;
         default: break;
         }
@@ -1114,8 +1109,8 @@ int SkinLR2::others()
         {
         case SkinType::RESULT:
         case SkinType::COURSE_RESULT:
-            lr2skin::s_flipSide = (lr2skin::s_flipSideFlag || lr2skin::s_flipResultFlag) && !disableFlipResult;
-            State::set(IndexSwitch::FLIP_RESULT, lr2skin::s_flipSide);
+            _sharedData->flipSide = (_sharedData->flipSideFlag || _sharedData->flipResultFlag) && !disableFlipResult;
+            State::set(IndexSwitch::FLIP_RESULT, _sharedData->flipSide);
             break;
         default: break;
         }
@@ -1299,7 +1294,7 @@ bool SkinLR2::SRC()
 
 ParseRet SkinLR2::SRC_IMAGE()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     if (videoBuf && videoBuf->haveVideo)
     {
@@ -1325,7 +1320,7 @@ ParseRet SkinLR2::SRC_IMAGE()
 
 ParseRet SkinLR2::SRC_NUMBER()
 {
-    lr2skin::s_number d(parseParamBuf, csvLineNumber);
+    lr2skin::s_number d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     IndexNumber iNum = lr2skin::num(d.num);
 
@@ -1390,7 +1385,7 @@ ParseRet SkinLR2::SRC_NUMBER()
 
 ParseRet SkinLR2::SRC_SLIDER()
 {
-    lr2skin::s_slider d(parseParamBuf, csvLineNumber);
+    lr2skin::s_slider d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     SpriteSlider::SpriteSliderBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1419,7 +1414,7 @@ ParseRet SkinLR2::SRC_SLIDER()
 
 ParseRet SkinLR2::SRC_BARGRAPH()
 {
-    lr2skin::s_bargraph d(parseParamBuf, csvLineNumber);
+    lr2skin::s_bargraph d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     SpriteBargraph::SpriteBargraphBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1439,7 +1434,7 @@ ParseRet SkinLR2::SRC_BARGRAPH()
 
 ParseRet SkinLR2::SRC_BUTTON()
 {
-    lr2skin::s_button d(parseParamBuf, csvLineNumber);
+    lr2skin::s_button d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     std::shared_ptr<SpriteOption> s;
 
@@ -1530,7 +1525,7 @@ ParseRet SkinLR2::SRC_BUTTON()
 
 ParseRet SkinLR2::SRC_ONMOUSE()
 {
-    lr2skin::s_onmouse d(parseParamBuf, csvLineNumber);
+    lr2skin::s_onmouse d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     SpriteOnMouse::SpriteOnMouseBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1550,7 +1545,7 @@ ParseRet SkinLR2::SRC_ONMOUSE()
 
 ParseRet SkinLR2::SRC_MOUSECURSOR()
 {
-    lr2skin::s_mousecursor d(parseParamBuf, csvLineNumber);
+    lr2skin::s_mousecursor d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     SpriteCursor::SpriteCursorBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1605,7 +1600,7 @@ ParseRet SkinLR2::SRC_TEXT()
     if (loadMode >= 1)
         return ParseRet::OK;
 
-    lr2skin::s_text d(parseParamBuf);
+    lr2skin::s_text d(parseParamBuf, _sharedData->flipSide);
 
     SpriteImageText::SpriteImageTextBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1646,7 +1641,7 @@ ParseRet SkinLR2::SRC_TEXT()
 
 ParseRet SkinLR2::SRC_GAUGECHART(unsigned playerSlot)
 {
-    lr2skin::s_gaugechart d(parseParamBuf, csvLineNumber);
+    lr2skin::s_gaugechart d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     SpriteLine::SpriteLineBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1671,7 +1666,7 @@ ParseRet SkinLR2::SRC_GAUGECHART(unsigned playerSlot)
 
 ParseRet SkinLR2::SRC_SCORECHART()
 {
-    lr2skin::s_gaugechart d(parseParamBuf, csvLineNumber);
+    lr2skin::s_gaugechart d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     SpriteLine::SpriteLineBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1710,7 +1705,7 @@ ParseRet SkinLR2::SRC_SCORECHART()
 
 ParseRet SkinLR2::SRC_JUDGELINE()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
     if (flipSide)
     {
         d._null = (d._null == 0) ? 1 : 0;
@@ -1753,7 +1748,7 @@ ParseRet SkinLR2::SRC_NOWJUDGE(size_t idx)
         return ParseRet::PARAM_INVALID;
     }
 
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     SpriteAnimated::SpriteAnimatedBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1777,7 +1772,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO(size_t idx)
         return ParseRet::PARAM_INVALID;
     }
 
-    lr2skin::s_number d(parseParamBuf, csvLineNumber);
+    lr2skin::s_number d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     IndexNumber iNum = lr2skin::num(d.num);
 
@@ -1812,7 +1807,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO(size_t idx)
 
 ParseRet SkinLR2::SRC_GROOVEGAUGE()
 {
-    lr2skin::s_groovegauge d(parseParamBuf, csvLineNumber);
+    lr2skin::s_groovegauge d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     if (d.div_y * d.div_x < 4)
     {
@@ -1846,7 +1841,7 @@ ParseRet SkinLR2::SRC_GROOVEGAUGE()
 
 ParseRet SkinLR2::SRC_NOWJUDGE1()
 {
-    lr2skin::s_nowjudge d(parseParamBuf, csvLineNumber);
+    lr2skin::s_nowjudge d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     bufJudge1PSlot = d._null;
     if (bufJudge1PSlot >= 0 && bufJudge1PSlot < 6)
@@ -1863,7 +1858,7 @@ ParseRet SkinLR2::SRC_NOWJUDGE1()
 
 ParseRet SkinLR2::SRC_NOWJUDGE2()
 {
-    lr2skin::s_nowjudge d(parseParamBuf, csvLineNumber);
+    lr2skin::s_nowjudge d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     bufJudge2PSlot = d._null;
     if (bufJudge2PSlot >= 0 && bufJudge2PSlot < 6)
@@ -1880,7 +1875,7 @@ ParseRet SkinLR2::SRC_NOWJUDGE2()
 
 ParseRet SkinLR2::SRC_NOWCOMBO1()
 {
-    lr2skin::s_nowcombo d(parseParamBuf, csvLineNumber);
+    lr2skin::s_nowcombo d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     bufJudge1PSlot = d._null;
     // modify necessary info for SRC_NOWCOMBO(idx)
@@ -1902,7 +1897,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO1()
 
 ParseRet SkinLR2::SRC_NOWCOMBO2()
 {
-    lr2skin::s_nowcombo d(parseParamBuf, csvLineNumber);
+    lr2skin::s_nowcombo d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     bufJudge2PSlot = d._null;
     // modify necessary info for SRC_NOWCOMBO(idx)
@@ -2007,7 +2002,7 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     using namespace chart;
 
     // load raw into data struct
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
     if (flipSide)
     {
         if (type == DefType::LINE)
@@ -2230,7 +2225,7 @@ ParseRet SkinLR2::SRC_BGA()
 
 ParseRet SkinLR2::SRC_BAR_BODY()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     BarType type;
     switch (d._null & 0xFFFFFFFF)
@@ -2275,7 +2270,7 @@ ParseRet SkinLR2::SRC_BAR_BODY()
 
 ParseRet SkinLR2::SRC_BAR_FLASH()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     SpriteAnimated::SpriteAnimatedBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -2297,7 +2292,7 @@ ParseRet SkinLR2::SRC_BAR_FLASH()
 
 ParseRet SkinLR2::SRC_BAR_LEVEL()
 {
-    lr2skin::s_number d(parseParamBuf, csvLineNumber);
+    lr2skin::s_number d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     auto type = BarLevelType(d._null & 0xFFFFFFFF);
 
@@ -2334,7 +2329,7 @@ ParseRet SkinLR2::SRC_BAR_LEVEL()
 
 ParseRet SkinLR2::SRC_BAR_LAMP()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     auto type = BarLampType(d._null & 0xFFFFFFFF);
 
@@ -2358,7 +2353,7 @@ ParseRet SkinLR2::SRC_BAR_LAMP()
 
 ParseRet SkinLR2::SRC_BAR_TITLE()
 {
-    lr2skin::s_text d(parseParamBuf);
+    lr2skin::s_text d(parseParamBuf, _sharedData->flipSide);
     auto type = BarTitleType(d._null & 0xFFFFFFFF);
 
     SpriteImageText::SpriteImageTextBuilder builder;
@@ -2391,7 +2386,7 @@ ParseRet SkinLR2::SRC_BAR_TITLE()
 
 ParseRet SkinLR2::SRC_BAR_RANK()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     auto type = BarRankType(d._null & 0xFFFFFFFF);
 
@@ -2415,7 +2410,7 @@ ParseRet SkinLR2::SRC_BAR_RANK()
 
 ParseRet SkinLR2::SRC_BAR_RIVAL()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     auto type = BarRivalType(d._null & 0xFFFFFFFF);
 
@@ -2439,7 +2434,7 @@ ParseRet SkinLR2::SRC_BAR_RIVAL()
 
 ParseRet SkinLR2::SRC_BAR_RIVAL_MYLAMP()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     auto type = BarLampType(d._null & 0xFFFFFFFF);
 
@@ -2463,7 +2458,7 @@ ParseRet SkinLR2::SRC_BAR_RIVAL_MYLAMP()
 
 ParseRet SkinLR2::SRC_BAR_RIVAL_RIVALLAMP()
 {
-    lr2skin::s_basic d(parseParamBuf, csvLineNumber);
+    lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
 
     auto type = BarLampType(d._null & 0xFFFFFFFF);
 
@@ -2540,7 +2535,7 @@ bool SkinLR2::DST()
         [[fallthrough]];
     default: {
         // load raw into data struct
-        lr2skin::dst d(parseParamBuf);
+        lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
         auto e = _sprites.back();
         if (e == nullptr)
@@ -2745,7 +2740,7 @@ ParseRet SkinLR2::DST_NOTE()
     using namespace chart;
 
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
     if (flipSide)
     {
         if (0 <= d._null && d._null <= 9)
@@ -2814,7 +2809,7 @@ ParseRet SkinLR2::DST_NOTE()
 ParseRet SkinLR2::DST_LINE()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     auto e = _sprites.back();
     if (e == nullptr)
@@ -2883,7 +2878,7 @@ ParseRet SkinLR2::DST_BAR_BODY()
     bool bodyOn = parseKeyBuf == "#DST_BAR_BODY_ON";
 
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -2936,7 +2931,7 @@ ParseRet SkinLR2::DST_BAR_BODY()
 ParseRet SkinLR2::DST_BAR_FLASH()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -2971,7 +2966,7 @@ ParseRet SkinLR2::DST_BAR_FLASH()
 ParseRet SkinLR2::DST_BAR_LEVEL()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -3015,7 +3010,7 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
 ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -3058,7 +3053,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
 ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -3102,7 +3097,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
 ParseRet SkinLR2::DST_BAR_LAMP()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -3146,7 +3141,7 @@ ParseRet SkinLR2::DST_BAR_LAMP()
 ParseRet SkinLR2::DST_BAR_TITLE()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -3189,7 +3184,7 @@ ParseRet SkinLR2::DST_BAR_TITLE()
 ParseRet SkinLR2::DST_BAR_RANK()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -3233,7 +3228,7 @@ ParseRet SkinLR2::DST_BAR_RANK()
 ParseRet SkinLR2::DST_BAR_RIVAL()
 {
     // load raw into data struct
-    lr2skin::dst d(parseParamBuf);
+    lr2skin::dst d(parseParamBuf, _sharedData->flipSide);
 
     // timers are ignored for bars
     d.timer = 0;
@@ -3778,18 +3773,18 @@ bool SkinLR2::loadCSV(Path p)
     case SkinType::PLAY9:
     case SkinType::PLAY9_2:
     case SkinType::PLAY10:
-    case SkinType::PLAY14: lr2skin::s_flipSide = false; break;
+    case SkinType::PLAY14: _sharedData->flipSide = false; break;
     case SkinType::RESULT:
     case SkinType::COURSE_RESULT:
-        lr2skin::s_flipSide = (lr2skin::s_flipSideFlag || lr2skin::s_flipResultFlag) && !disableFlipResult;
+        _sharedData->flipSide = (_sharedData->flipSideFlag || _sharedData->flipResultFlag) && !disableFlipResult;
         break;
     default:
-        lr2skin::s_flipSide = false;
-        lr2skin::s_flipSideFlag = false;
-        lr2skin::s_flipResultFlag = false;
+        _sharedData->flipSide = false;
+        _sharedData->flipSideFlag = false;
+        _sharedData->flipResultFlag = false;
         break;
     }
-    State::set(IndexSwitch::FLIP_RESULT, lr2skin::s_flipSide);
+    State::set(IndexSwitch::FLIP_RESULT, _sharedData->flipSide);
 
     if (loadMode < 2)
     {
