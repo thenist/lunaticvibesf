@@ -26,6 +26,7 @@
 #include <game/arena/arena_data.h>
 #include <game/arena/arena_host.h>
 #include <game/chart/chart_bms.h>
+#include <game/ruleset/ruleset_bms.h>
 #include <game/ruleset/ruleset_bms_auto.h>
 #include <game/runtime/i18n.h>
 #include <game/runtime/index/number.h>
@@ -2245,68 +2246,19 @@ void SceneSelect::decide()
     if (!gPlayContext.isReplay)
     {
         // gauge
-        auto convertGaugeType = [](int nType) -> PlayModifierGaugeType {
-            if (gPlayContext.isCourse)
-            {
-                if (State::get(IndexOption::COURSE_TYPE) == Option::COURSE_GRADE)
-                {
-                    switch (nType)
-                    {
-                    case 1:
-                    case 4:
-                    case 5:
-                    case 6: return PlayModifierGaugeType::GRADE_HARD;
-                    case 2: return PlayModifierGaugeType::GRADE_DEATH;
-                    case 0:
-                    default: return PlayModifierGaugeType::GRADE_NORMAL;
-                    };
-                }
-            }
-
-            switch (nType)
-            {
-            case 1: return PlayModifierGaugeType::HARD;
-            case 2: return PlayModifierGaugeType::DEATH;
-            case 3:
-                return PlayModifierGaugeType::EASY;
-                // TODO
-                // case 4: return PlayModifierGaugeType::PATTACK;
-                // case 5: return PlayModifierGaugeType::GATTACK;
-            case 4:
-            case 5: return PlayModifierGaugeType::HARD;
-            case 6: return PlayModifierGaugeType::EXHARD;
-            case 7: return PlayModifierGaugeType::ASSISTEASY;
-            case 0:
-            default: return PlayModifierGaugeType::NORMAL;
-            };
-        };
-        gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge = convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_1P));
+        gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge =
+            lunaticvibes::convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_1P));
 
         // random
-        auto convertRandomType = [](int nType) -> PlayModifierRandomType {
-            switch (nType)
-            {
-            case 1: return PlayModifierRandomType::MIRROR;
-            case 2: return PlayModifierRandomType::RANDOM;
-            case 3: return PlayModifierRandomType::SRAN;
-            case 4: return PlayModifierRandomType::HRAN;
-            case 5: return PlayModifierRandomType::ALLSCR;
-            case 6: return PlayModifierRandomType::RRAN;
-            case 7: return PlayModifierRandomType::DB_SYNCHRONIZE;
-            case 8: return PlayModifierRandomType::DB_SYMMETRY;
-            case 0:
-            default: return PlayModifierRandomType::NONE;
-            };
-        };
         gPlayContext.mods[PLAYER_SLOT_PLAYER].randomLeft =
-            convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_1P));
+            lunaticvibes::convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_1P));
 
         if (gPlayContext.mode == SkinType::PLAY10 || gPlayContext.mode == SkinType::PLAY14)
         {
             gPlayContext.mods[PLAYER_SLOT_PLAYER].randomRight =
-                convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_2P));
+                lunaticvibes::convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_2P));
             gPlayContext.mods[PLAYER_SLOT_TARGET].randomRight =
-                convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_2P));
+                lunaticvibes::convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_2P));
             gPlayContext.mods[PLAYER_SLOT_PLAYER].DPFlip = State::get(IndexSwitch::PLAY_OPTION_DP_FLIP);
             gPlayContext.mods[PLAYER_SLOT_TARGET].DPFlip = State::get(IndexSwitch::PLAY_OPTION_DP_FLIP);
         }
@@ -2322,21 +2274,10 @@ void SceneSelect::decide()
             (PlayModifierLaneEffectType)State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_2P);
 
         // HS fix
-        auto convertHSType = [](int nType) -> PlayModifierHispeedFixType {
-            switch (nType)
-            {
-            case 1: return PlayModifierHispeedFixType::MAXBPM;
-            case 2: return PlayModifierHispeedFixType::MINBPM;
-            case 3: return PlayModifierHispeedFixType::AVERAGE;
-            case 4: return PlayModifierHispeedFixType::CONSTANT;
-            case 5: return PlayModifierHispeedFixType::INITIAL;
-            case 6: return PlayModifierHispeedFixType::MAIN;
-            case 0:
-            default: return PlayModifierHispeedFixType::NONE;
-            };
-        };
-        gPlayContext.mods[PLAYER_SLOT_PLAYER].hispeedFix = convertHSType(State::get(IndexOption::PLAY_HSFIX_TYPE));
-        gPlayContext.mods[PLAYER_SLOT_TARGET].hispeedFix = convertHSType(State::get(IndexOption::PLAY_HSFIX_TYPE));
+        gPlayContext.mods[PLAYER_SLOT_PLAYER].hispeedFix =
+            lunaticvibes::convertHSType(State::get(IndexOption::PLAY_HSFIX_TYPE));
+        gPlayContext.mods[PLAYER_SLOT_TARGET].hispeedFix =
+            lunaticvibes::convertHSType(State::get(IndexOption::PLAY_HSFIX_TYPE));
 
         if (gPlayContext.isBattle)
         {
@@ -2424,9 +2365,9 @@ void SceneSelect::decide()
             {
                 // notes are loaded in 2P area, we should check randomRight instead of randomLeft
                 gPlayContext.mods[PLAYER_SLOT_TARGET].gauge =
-                    convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_2P));
+                    lunaticvibes::convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_2P));
                 gPlayContext.mods[PLAYER_SLOT_TARGET].randomRight =
-                    convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_2P));
+                    lunaticvibes::convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_2P));
                 gPlayContext.mods[PLAYER_SLOT_TARGET].assist_mask |=
                     State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_2P) ? PLAY_MOD_ASSIST_AUTOSCR : 0;
             }
@@ -2434,9 +2375,10 @@ void SceneSelect::decide()
         else
         {
             // copy 1P setting for target
-            gPlayContext.mods[PLAYER_SLOT_TARGET].gauge = convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_1P));
+            gPlayContext.mods[PLAYER_SLOT_TARGET].gauge =
+                lunaticvibes::convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_1P));
             gPlayContext.mods[PLAYER_SLOT_TARGET].randomLeft =
-                convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_1P));
+                lunaticvibes::convertRandomType(State::get(IndexOption::PLAY_RANDOM_TYPE_1P));
             gPlayContext.mods[PLAYER_SLOT_TARGET].assist_mask = 0; // rival do not use assist options
 
             State::set(IndexOption::PLAY_GAUGE_TYPE_2P, State::get(IndexOption::PLAY_GAUGE_TYPE_1P));

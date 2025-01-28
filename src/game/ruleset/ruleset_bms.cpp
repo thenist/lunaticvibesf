@@ -328,6 +328,43 @@ static lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, int
     lunaticvibes::assert_failed("getGauge");
 }
 
+PlayModifierGaugeType lunaticvibes::convertGaugeType(int nType)
+{
+    if (gPlayContext.isCourse)
+    {
+        if (State::get(IndexOption::COURSE_TYPE) == Option::COURSE_GRADE)
+        {
+            switch (nType)
+            {
+            case 1:
+            case 4:
+            case 5:
+            case 6: return PlayModifierGaugeType::GRADE_HARD;
+            case 2: return PlayModifierGaugeType::GRADE_DEATH;
+            case 0:
+            default: return PlayModifierGaugeType::GRADE_NORMAL;
+            };
+        }
+    }
+
+    switch (nType)
+    {
+    case 1: return PlayModifierGaugeType::HARD;
+    case 2: return PlayModifierGaugeType::DEATH;
+    case 3:
+        return PlayModifierGaugeType::EASY;
+        // TODO
+        // case 4: return PlayModifierGaugeType::PATTACK;
+        // case 5: return PlayModifierGaugeType::GATTACK;
+    case 4:
+    case 5: return PlayModifierGaugeType::HARD;
+    case 6: return PlayModifierGaugeType::EXHARD;
+    case 7: return PlayModifierGaugeType::ASSISTEASY;
+    case 0:
+    default: return PlayModifierGaugeType::NORMAL;
+    };
+};
+
 static int getTotal(const std::shared_ptr<ChartFormatBase>& format)
 {
     switch (format->type())

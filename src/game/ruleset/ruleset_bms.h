@@ -17,6 +17,38 @@ class RulesetBMS;
 namespace lunaticvibes
 {
 
+PlayModifierGaugeType convertGaugeType(int nType);
+constexpr inline PlayModifierRandomType convertRandomType(int nType)
+{
+    switch (nType)
+    {
+    case 1: return PlayModifierRandomType::MIRROR;
+    case 2: return PlayModifierRandomType::RANDOM;
+    case 3: return PlayModifierRandomType::SRAN;
+    case 4: return PlayModifierRandomType::HRAN;
+    case 5: return PlayModifierRandomType::ALLSCR;
+    case 6: return PlayModifierRandomType::RRAN;
+    case 7: return PlayModifierRandomType::DB_SYNCHRONIZE;
+    case 8: return PlayModifierRandomType::DB_SYMMETRY;
+    case 0:
+    default: return PlayModifierRandomType::NONE;
+    };
+};
+constexpr inline PlayModifierHispeedFixType convertHSType(int nType)
+{
+    switch (nType)
+    {
+    case 1: return PlayModifierHispeedFixType::MAXBPM;
+    case 2: return PlayModifierHispeedFixType::MINBPM;
+    case 3: return PlayModifierHispeedFixType::AVERAGE;
+    case 4: return PlayModifierHispeedFixType::CONSTANT;
+    case 5: return PlayModifierHispeedFixType::INITIAL;
+    case 6: return PlayModifierHispeedFixType::MAIN;
+    case 0:
+    default: return PlayModifierHispeedFixType::NONE;
+    };
+};
+
 // Judge area definitions.
 // e.g. EARLY_PERFECT: Perfect early half part
 enum class BmsJudgeArea
