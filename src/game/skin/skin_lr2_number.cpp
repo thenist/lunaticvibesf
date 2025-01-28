@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <memory>
+#include <utility>
 
 static std::shared_ptr<ChartFormatBase> get_current_select_chart(SelectContextParams& ctx)
 {
@@ -36,32 +37,32 @@ static std::shared_ptr<ChartFormatBase> get_chart_for_display(SelectContextParam
 
 int lunaticvibes::get_number(IndexNumber ind)
 {
-    switch (ind)
+    switch (std::to_underlying(ind))
     {
-    case IndexNumber::PLAY_1P_SCORE:
+    case 100:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
             return static_cast<int>(std::round(ruleset->getMoneyScoreAnimation().animate({})));
         return 0;
-    case IndexNumber::PLAY_2P_SCORE:
+    case 107:
+        if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
+            return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
+        break; // might still also be in State::get
+    case 120:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
             return static_cast<int>(std::round(ruleset->getMoneyScoreAnimation().animate({})));
         return 0;
-    case IndexNumber::PLAY_1P_GROOVEGAUGE:
-        if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
-            return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
-        break; // might still also be in State::get
-    case IndexNumber::PLAY_1P_GROOVEGAUGE_AFTER_DOT:
-        if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
-            return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100'00) % 100;
-        break; // might still also be in State::get
-    case IndexNumber::PLAY_2P_GROOVEGAUGE:
+    case 127:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
             return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
         break; // might still also be in State::get
-    case IndexNumber::INFO_BMS_TOTAL:
+    case 301:
         if (auto chart = get_chart_for_display(gSelectContext, gChartContext); chart != nullptr)
             return getEffectiveChartTotal(*chart, convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_1P)));
         return 0;
+    case 407:
+        if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
+            return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100'00) % 100;
+        break; // might still also be in State::get
     default: break;
     }
     return State::get(ind);
