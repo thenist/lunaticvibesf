@@ -35,6 +35,24 @@ static std::shared_ptr<ChartFormatBase> get_chart_for_display(SelectContextParam
     return chart;
 }
 
+static std::shared_ptr<ChartObjectBase> get_chart_obj_for_display(PlayContextParams& play_ctx)
+{
+    std::shared_lock l(play_ctx._mutex);
+    return play_ctx.chartObj[PLAYER_SLOT_PLAYER];
+}
+
+// \return Seconds
+static unsigned get_current_chart_length(SelectContextParams& select_ctx, ChartContextParams& chart_ctx,
+                                         PlayContextParams& play_ctx)
+{
+    // ChartFormatBase doesn't always have populated totalLength.
+    if (auto obj = get_chart_obj_for_display(play_ctx); obj != nullptr)
+        return obj->getTotalLength().norm() / 1000;
+    if (auto chart = get_chart_for_display(select_ctx, chart_ctx); chart != nullptr)
+        return chart->totalLength;
+    return 0;
+}
+
 int lunaticvibes::get_number(IndexNumber ind)
 {
     switch (std::to_underlying(ind))
@@ -63,6 +81,8 @@ int lunaticvibes::get_number(IndexNumber ind)
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
             return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100'00) % 100;
         break; // might still also be in State::get
+    case 1163: return get_current_chart_length(gSelectContext, gChartContext, gPlayContext) / 60; // beatoraja
+    case 1164: return get_current_chart_length(gSelectContext, gChartContext, gPlayContext) % 60; // beatoraja
     default: break;
     }
     return State::get(ind);
