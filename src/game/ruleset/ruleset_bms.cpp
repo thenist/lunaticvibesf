@@ -18,7 +18,7 @@
 
 using namespace chart;
 
-void setJudgeInternalTimer1P(RulesetBMS::JudgeType judge, long long t)
+static void setJudgeInternalTimer1P(RulesetBMS::JudgeType judge, long long t)
 {
     State::set(IndexTimer::_JUDGE_1P_0, TIMER_NEVER);
     State::set(IndexTimer::_JUDGE_1P_1, TIMER_NEVER);
@@ -38,7 +38,7 @@ void setJudgeInternalTimer1P(RulesetBMS::JudgeType judge, long long t)
     }
 }
 
-void setJudgeInternalTimer2P(RulesetBMS::JudgeType judge, long long t)
+static void setJudgeInternalTimer2P(RulesetBMS::JudgeType judge, long long t)
 {
     State::set(IndexTimer::_JUDGE_2P_0, TIMER_NEVER);
     State::set(IndexTimer::_JUDGE_2P_1, TIMER_NEVER);
@@ -821,7 +821,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     }
 }
 
-static bool isCourseGrade(RulesetBMS::GaugeType gauge)
+[[nodiscard]] static constexpr bool isCourseGrade(RulesetBMS::GaugeType gauge)
 {
     switch (gauge)
     {

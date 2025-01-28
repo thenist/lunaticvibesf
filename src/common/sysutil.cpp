@@ -1,6 +1,7 @@
 #include "sysutil.h"
 
 #include <atomic>
+#include <functional>
 #include <queue>
 #include <shared_mutex>
 
@@ -9,9 +10,9 @@
 
 #include <tinyfiledialogs.h>
 
-std::shared_mutex mainThreadTaskQueueMutex;
-std::queue<std::function<void()>> mainThreadTaskQueue;
-bool handleMainThreadTask = true;
+static std::shared_mutex mainThreadTaskQueueMutex;
+static std::queue<std::move_only_function<void()>> mainThreadTaskQueue;
+static bool handleMainThreadTask = true;
 
 static std::atomic<bool> s_foreground = true;
 bool IsWindowForeground()
@@ -30,13 +31,10 @@ void pushMainThreadTask(std::function<void()> f)
         // LOG_DEBUG << "Warning: Calling pushMainThreadTask at main thread";
         f();
     }
-    else
+    else if (handleMainThreadTask)
     {
-        if (handleMainThreadTask)
-        {
-            std::unique_lock l(mainThreadTaskQueueMutex);
-            mainThreadTaskQueue.push(std::move(f));
-        }
+        std::unique_lock l(mainThreadTaskQueueMutex);
+        mainThreadTaskQueue.emplace(std::move(f));
     }
 }
 
@@ -179,7 +177,7 @@ time_t lunaticvibes::localtime_utc_offset()
 
 void panic(const char* title, const char* msg)
 {
-    fprintf(stderr, "PANIC! [%s] %s\n", title, msg);
+    (void)fprintf(stderr, "PANIC! [%s] %s\n", title, msg);
     if (!lunaticvibes::in_test_mode())
         tinyfd_messageBox(title, msg, "ok", "error", 0);
     abort();
