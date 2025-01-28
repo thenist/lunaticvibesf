@@ -9,7 +9,6 @@
 #include <filesystem>
 #include <iomanip>
 #include <string>
-#include <thread>
 
 #include <boost/format.hpp>
 
@@ -21,21 +20,9 @@
 #include <common/log.h>
 #include <common/utils.h>
 
-static std::thread::id s_main_thread{};
-
-void SetThreadAsMainThread()
-{
-    s_main_thread = std::this_thread::get_id();
-}
-
 int64_t GetCurrentThreadID()
 {
     return static_cast<int64_t>(gettid());
-}
-
-bool IsMainThread()
-{
-    return s_main_thread == std::this_thread::get_id();
 }
 
 [[nodiscard]] static std::string ellipsize(const std::string_view s, const size_t len)

@@ -60,6 +60,16 @@ bool CanHandleMainThreadTask()
     return handleMainThreadTask;
 }
 
+static int64_t s_main_thread{};
+void SetThreadAsMainThread()
+{
+    s_main_thread = GetCurrentThreadID();
+}
+bool IsMainThread()
+{
+    return s_main_thread == GetCurrentThreadID();
+}
+
 long long getFileTimeNow()
 {
     return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch())

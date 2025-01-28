@@ -45,21 +45,9 @@ void SetThreadNameWin32(DWORD dwThreadID, const char* threadName)
 #pragma warning(pop)
 }
 
-static DWORD dwMainThreadId = 0;
-
-void SetThreadAsMainThread()
-{
-    dwMainThreadId = GetCurrentThreadId();
-}
-
 int64_t GetCurrentThreadID()
 {
     return GetCurrentThreadId();
-}
-
-bool IsMainThread()
-{
-    return GetCurrentThreadId() == dwMainThreadId;
 }
 
 void SetThreadName(const char* name)
