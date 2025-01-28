@@ -133,10 +133,10 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     auto skinFileList =
         recursiveFindFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/"), ".lr2skin");
     r::sort(skinFileList);
-    auto dummySharedSprites = std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>();
+    auto dummySharedData = std::make_shared<lunaticvibes::SkinLr2SharedData>();
     for (auto& p : skinFileList)
     {
-        SkinLR2 s(dummySharedSprites, p, 2);
+        SkinLR2 s(dummySharedData, p, 2);
         LOG_DEBUG << "[Customize] Adding skin: mode='" << s.info.mode << "' p='" << p << "'";
         skinList[s.info.mode].push_back(fs::absolute(p));
 

@@ -47,12 +47,21 @@ enum class ParseRet
 
 using namespace LR2SkinDef;
 
+namespace lunaticvibes
+{
+
+struct SkinLr2SharedData
+{
+    std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX> sprites;
+};
+
+} // namespace lunaticvibes
+
 class SkinLR2 : public SkinBase
 {
 public:
     SkinLR2() = delete;
-    SkinLR2(std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>> sharedSprites, Path p,
-            int loadMode = 0);
+    SkinLR2(std::shared_ptr<lunaticvibes::SkinLr2SharedData> data, Path p, int loadMode = 0);
     ~SkinLR2() override;
 
 public:
@@ -138,7 +147,7 @@ protected:
     static constexpr size_t BAR_ENTRY_SPRITE_COUNT = 32;
     std::bitset<BAR_ENTRY_SPRITE_COUNT> barSpriteAvailable{false};
     std::array<std::shared_ptr<SpriteBarEntry>, BAR_ENTRY_SPRITE_COUNT> barSprites;
-    std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>> _sharedSprites{};
+    std::shared_ptr<lunaticvibes::SkinLr2SharedData> _sharedData{};
     unsigned barCenter = 0;
     unsigned barClickableFrom = 0;
     unsigned barClickableTo = 0;

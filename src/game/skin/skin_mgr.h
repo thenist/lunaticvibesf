@@ -1,5 +1,8 @@
 #pragma once
 #include "skin.h"
+
+#include <game/skin/skin_lr2.h>
+
 #include <array>
 #include <memory>
 
@@ -20,5 +23,5 @@ public:
 
 protected:
     std::array<std::shared_ptr<SkinBase>, static_cast<size_t>(SkinType::MODE_COUNT)> _skins{};
-    std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>> _sharedSprites{};
+    std::shared_ptr<lunaticvibes::SkinLr2SharedData> _sharedData{};
 };
