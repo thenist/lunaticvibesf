@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <re2/re2.h>
 
@@ -2984,8 +2985,7 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
         auto e = bar->getSpriteLevel(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_LEVEL " << std::to_string(size_t(type))
-                      << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_LEVEL " << std::to_underlying(type) << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3028,8 +3028,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
         auto e = bar->getSpriteRivalLampSelf(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_MY_LAMP " << std::to_string(size_t(type))
-                      << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_MY_LAMP " << std::to_underlying(type) << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3071,7 +3070,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
         auto e = bar->getSpriteRivalLampRival(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RIVAL_LAMP " << std::to_string(size_t(type))
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RIVAL_LAMP " << std::to_underlying(type)
                       << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
@@ -3115,8 +3114,7 @@ ParseRet SkinLR2::DST_BAR_LAMP()
         auto e = bar->getSpriteLamp(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_LAMP " << std::to_string(size_t(type))
-                      << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_LAMP " << std::to_underlying(type) << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3202,8 +3200,7 @@ ParseRet SkinLR2::DST_BAR_RANK()
         auto e = bar->getSpriteRank(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RANK " << std::to_string(size_t(type))
-                      << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RANK " << std::to_underlying(type) << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3246,8 +3243,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
         auto e = bar->getSpriteRivalWinLose(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RIVAL " << std::to_string(size_t(type))
-                      << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RIVAL " << std::to_underlying(type) << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
