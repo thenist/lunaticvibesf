@@ -2351,17 +2351,11 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
     {
         const auto rt = t - start_time;
         if (gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr)
-        {
             gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->update(rt);
-        }
         if (gPlayContext.chartObj[PLAYER_SLOT_TARGET] != nullptr)
-        {
             gPlayContext.chartObj[PLAYER_SLOT_TARGET]->update(rt);
-        }
         if (gPlayContext.chartObj[PLAYER_SLOT_MYBEST] != nullptr)
-        {
             gPlayContext.chartObj[PLAYER_SLOT_MYBEST]->update(rt);
-        }
 
         State::set(IndexTimer::MUSIC_BEAT,
                    static_cast<int>(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) %
@@ -2571,10 +2565,11 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
             }
         }
 
+        if (gNextScene == SceneType::SELECT)
+            clearContextPlay();
+
         if (gNextScene == SceneType::SELECT && gQuitOnFinish)
-        {
             gNextScene = SceneType::EXIT_TRANS;
-        }
 
         // protect
         if (gPlayContext.ruleset[PLAYER_SLOT_MYBEST] && !gPlayContext.ruleset[PLAYER_SLOT_MYBEST]->isFailed() &&
@@ -2600,17 +2595,11 @@ void ScenePlay::updateFailed(const lunaticvibes::Time& t)
     auto ft = t - State::get(IndexTimer::FAIL_BEGIN);
 
     if (gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr)
-    {
         gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->update(rt);
-    }
     if (gPlayContext.chartObj[PLAYER_SLOT_TARGET] != nullptr)
-    {
         gPlayContext.chartObj[PLAYER_SLOT_TARGET]->update(rt);
-    }
     if (gPlayContext.chartObj[PLAYER_SLOT_MYBEST] != nullptr)
-    {
         gPlayContext.chartObj[PLAYER_SLOT_MYBEST]->update(rt);
-    }
 
     if (gChartContext.started)
     {
