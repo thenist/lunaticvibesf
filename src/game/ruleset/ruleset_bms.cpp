@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -135,26 +136,8 @@ static double calculateHardNegativeHpDiffMultiplier(unsigned total, unsigned not
     return std::max(by_total, by_notes);
 }
 
-static unsigned getDefaultTotal(RulesetBMS::GaugeType gauge)
-{
-    switch (gauge)
-    {
-        using enum RulesetBMS::GaugeType;
-    case HARD:
-    case EXHARD:
-    case DEATH:
-    case GRADE:
-    case EXGRADE: return 300;
-    case P_ATK: // ?
-    case G_ATK: // ?
-    case GROOVE:
-    case EASY:
-    case ASSIST: return 160;
-    }
-    lunaticvibes::assert_failed("getDefaultTotal");
-}
-
-static lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, int total, unsigned note_count)
+static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, unsigned total,
+                                                           unsigned note_count)
 {
     // Older reference: https://github.com/aeventyr/LR2GAS_pub
     // Health gain later updated from LR2 disassembly project.
@@ -162,10 +145,6 @@ static lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, int
     //
     // ASSISTEASY and EXHARD match lr2oraja.
     // https://github.com/wcko87/lr2oraja/blob/4e9df9a5394561a1c24fe48d52c1c6539de559f3/src/bms/player/beatoraja/play/GaugeProperty.java
-
-    // NOTE: LR2 handles #TOTAL 0 as if total was not set.
-    if (total <= 0)
-        total = getDefaultTotal(type);
 
     switch (type)
     {
@@ -365,15 +344,46 @@ PlayModifierGaugeType lunaticvibes::convertGaugeType(int nType)
     };
 };
 
-static int getTotal(const std::shared_ptr<ChartFormatBase>& format)
+unsigned lunaticvibes::getEffectiveChartTotal(ChartFormatBase& format, PlayModifierGaugeType gauge)
 {
-    switch (format->type())
-    {
-    case eChartFormat::BMS: return std::reinterpret_pointer_cast<ChartFormatBMSMeta>(format)->total;
-    case eChartFormat::UNKNOWN:
-    case eChartFormat::BMSON: return -1;
-    }
-    lunaticvibes::assert_failed("getTotal");
+    // https://github.com/chown2/lunaticvibesf/issues/214
+    auto chart_total = [](ChartFormatBase& format) -> std::optional<int> {
+        // TODO: make .type() const, make this function take a const ref.
+        switch (format.type())
+        {
+        case eChartFormat::UNKNOWN: return {};
+        case eChartFormat::BMS:
+            if (int total = dynamic_cast<const ChartFormatBMSMeta&>(format).total; total != -1)
+                return total;
+            return {};
+        case eChartFormat::BMSON: return {};
+        }
+        lunaticvibes::assert_failed("chart_total");
+    };
+
+    auto lr2_default_total = [](RulesetBMS::GaugeType gauge) -> unsigned {
+        using enum RulesetBMS::GaugeType;
+        switch (gauge)
+        {
+        case HARD:
+        case EXHARD:
+        case DEATH:
+        case GRADE:
+        case EXGRADE: return 300;
+        case P_ATK: // ?
+        case G_ATK: // ?
+        case GROOVE:
+        case EASY:
+        case ASSIST: return 160;
+        }
+        lunaticvibes::assert_failed("lr2_default_total");
+    };
+
+    int total = chart_total(format).value_or(0);
+    // NOTE: LR2 handles #TOTAL 0 as if total was not set.
+    if (total <= 0)
+        total = lr2_default_total(get_gauge(gauge));
+    return total;
 }
 
 namespace lunaticvibes
@@ -880,9 +890,11 @@ extern bool g_enable_gas_for_test;
 
 void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 {
-    const int total = _format != nullptr ? getTotal(_format) : 0;
-    auto bms_gauge = get_gauge(gauge);
+    const auto bms_gauge = get_gauge(gauge);
     LOG_VERBOSE << "[RulesetBMS] initGaugeParams " << bms_gauge;
+
+    LVF_ASSERT(_format != nullptr);
+    const unsigned total = lunaticvibes::getEffectiveChartTotal(*_format, gauge);
 
     // FIXME: adjust result graph per gauge.
     if (g_enable_gas_for_test)

@@ -2,6 +2,7 @@
 
 #include "ruleset.h"
 
+#include <common/chartformat/chartformat.h>
 #include <common/chartformat/chartformat_bms.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_number_animation.h>
@@ -48,6 +49,7 @@ constexpr inline PlayModifierHispeedFixType convertHSType(int nType)
     default: return PlayModifierHispeedFixType::NONE;
     };
 };
+unsigned getEffectiveChartTotal(ChartFormatBase& format, PlayModifierGaugeType gauge);
 
 // Judge area definitions.
 // e.g. EARLY_PERFECT: Perfect early half part
