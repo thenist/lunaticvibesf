@@ -185,9 +185,9 @@ private:
     // Private enum, LVF internal.
     enum class DefType
     {
-        UNDEF,
+        UNDEF = 0,
 
-        IMAGE = 1,
+        IMAGE,
         NUMBER,
         SLIDER,
         BARGRAPH,
