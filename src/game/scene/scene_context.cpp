@@ -845,8 +845,6 @@ void setEntryInfo(const size_t idx)
             param["totalnotesscrln"] = bms->notes_scratch_ln;
             param["totalnotesmine"] = bms->notes_mine;
 
-            param["total"] = bms->total;
-
             param["havebga"] = bms->haveBGA;
             param["bpmchange"] = bms->haveBPMChange;
             param["haveln"] = bms->haveLN;
@@ -1235,8 +1233,6 @@ void setEntryInfo(const size_t idx)
         State::set(IndexNumber::INFO_TOTALNOTE_SCRATCH, param["totalnotesscr"]);
         State::set(IndexNumber::INFO_TOTALNOTE_BSS, param["totalnotesscrln"]);
         State::set(IndexNumber::INFO_TOTALNOTE_MINE, param["totalnotesmine"]);
-
-        State::set(IndexNumber::INFO_BMS_TOTAL, param["total"]);
 
         State::set(IndexSwitch::CHART_HAVE_BGA, param["havebga"]);
         State::set(IndexSwitch::CHART_HAVE_BPMCHANGE, param["bpmchange"]);
