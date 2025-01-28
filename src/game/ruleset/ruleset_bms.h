@@ -109,7 +109,7 @@ public:
     [[nodiscard]] const NumberAnimation& get_health() const;
 
 private:
-    // deducing this pls
+    // [[nodiscard]] decltype(auto) current_gauge(this auto&& self) // TODO(GCC14): use this.
     [[nodiscard]] GaugeHolder& current_gauge()
     {
         for (auto& gauge : _gauges)
