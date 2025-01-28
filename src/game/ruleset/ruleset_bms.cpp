@@ -452,16 +452,16 @@ void GaugeHolder::process(double diff)
     if (_gauge.reduce_below_30_hp_damage && _health.to < 0.32 && diff < 0.0)
         diff *= 0.6;
 
-    // TODO: verify the animation. Try with hard gauge something where one miss makes you lose like 90% HP.
     _health.from = _health.to;
     const double new_hp_tmp = _health.to + diff;
     const auto new_hp = std::max(_gauge.min_health, std::min(1.0, new_hp_tmp));
     if (_health.from != new_hp)
     {
+        // Formula matches LR2.
         auto get_lr2_hp_animation_time = [](double from, double to) {
-            return std::abs(static_cast<int>(from - to)) * 10;
+            constexpr double WE_USE_DOUBLES = 100.;
+            return static_cast<long long>(std::abs(from - to) * 10. * WE_USE_DOUBLES);
         };
-        _health.from = _health.animate(lunaticvibes::Time::now());
         _health.to = new_hp;
         _health.start = lunaticvibes::Time::now();
         _health.end = _health.start + get_lr2_hp_animation_time(_health.from, _health.to);
