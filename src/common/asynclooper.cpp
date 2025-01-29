@@ -49,9 +49,6 @@ void AsyncLooper::setRate(unsigned rate_per_sec)
 
 void AsyncLooper::run()
 {
-#ifndef NDEBUG
-    _runThreadID = GetCurrentThreadID();
-#endif
     if (_running && !_inLoopBody)
     {
         _inLoopBody = true;

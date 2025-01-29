@@ -5,12 +5,9 @@
 #include <future>
 #include <string>
 
-#include <stdint.h>
-
 #include "common/types.h"
 
 void SetThreadAsMainThread();
-int64_t GetCurrentThreadID();
 bool IsMainThread();
 void SetThreadName(const char* name);
 [[noreturn]] void panic(const char* title, const char* msg);

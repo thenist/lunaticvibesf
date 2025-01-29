@@ -20,11 +20,6 @@
 #include <common/log.h>
 #include <common/utils.h>
 
-int64_t GetCurrentThreadID()
-{
-    return static_cast<int64_t>(gettid());
-}
-
 [[nodiscard]] static std::string ellipsize(const std::string_view s, const size_t len)
 {
     std::string out;

@@ -45,11 +45,6 @@ void SetThreadNameWin32(DWORD dwThreadID, const char* threadName)
 #pragma warning(pop)
 }
 
-int64_t GetCurrentThreadID()
-{
-    return GetCurrentThreadId();
-}
-
 void SetThreadName(const char* name)
 {
     SetThreadNameWin32(GetCurrentThreadId(), name);
