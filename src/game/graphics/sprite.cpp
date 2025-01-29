@@ -5,7 +5,7 @@
 #include <game/skin/skin_lr2_bargraph.h>
 #include <game/skin/skin_lr2_number.h>
 
-constexpr double grad(int dst, int src, double t)
+[[nodiscard]] static constexpr double grad(int dst, int src, double t)
 {
     return (src == dst) ? src : (dst * t + src * (1.0 - t));
 }
