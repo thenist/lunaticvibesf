@@ -1,6 +1,7 @@
 #ifdef RENDER_SDL2
 
 #include <algorithm>
+#include <atomic>
 #include <climits>
 #include <cstdint>
 #include <mutex>
@@ -32,10 +33,12 @@
 
 namespace v = std::views;
 
-static SDL_Rect canvasRect;
-static SDL_Rect windowRect;
-static double canvasScaleX = 1.0;
-static double canvasScaleY = 1.0;
+static std::atomic<double> s_canvas_scale_x = 1.0;
+static std::atomic<double> s_canvas_scale_y = 1.0;
+static std::atomic<int> s_canvas_rect_h;
+static std::atomic<int> s_canvas_rect_w;
+static std::atomic<int> s_window_rect_h;
+static std::atomic<int> s_window_rect_w;
 
 int graphics_init()
 {
@@ -86,20 +89,17 @@ int graphics_init()
         {
             // fallback to windowed
         }
-        windowRect.w = ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH);
-        windowRect.h = ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
-        gFrameWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowRect.w,
-                                        windowRect.h, flags);
+        s_window_rect_w = ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH);
+        s_window_rect_h = ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
+        gFrameWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s_window_rect_w,
+                                        s_window_rect_h, flags);
         if (!gFrameWindow)
         {
             LOG_FATAL << "[SDL2] Init window ERROR! " << SDL_GetError();
             return -1;
         }
 
-        // canvasRect.w = ConfigMgr::get('V', cfg::V_RES_X, CANVAS_WIDTH);
-        // canvasRect.h = ConfigMgr::get('V', cfg::V_RES_Y, CANVAS_HEIGHT);
-        // graphics_resize_canvas(canvasRect.w, canvasRect.h);
-        graphics_resize_canvas(windowRect.w, windowRect.h);
+        graphics_resize_canvas(s_window_rect_w, s_window_rect_h);
 
         int ss = ConfigMgr::get('V', cfg::V_RES_SUPERSAMPLE, 1);
         graphics_set_supersample_level(ss);
@@ -218,10 +218,12 @@ void graphics_flush()
     SDL_SetRenderTarget(gFrameRenderer, nullptr);
     {
         // TODO scale internal canvas
-        Rect ssRect = canvasRect;
+        Rect ssRect{0, 0, s_canvas_rect_w, s_canvas_rect_h};
         int ssLevel = graphics_get_supersample_level();
         ssRect.w *= ssLevel;
         ssRect.h *= ssLevel;
+
+        const SDL_Rect windowRect{0, 0, s_window_rect_w, s_window_rect_h};
 
         // render internal canvas texture
         SDL_RenderCopy(gFrameRenderer, gInternalRenderTarget, &ssRect, &windowRect);
@@ -238,7 +240,7 @@ void graphics_flush()
         {
             int ret;
             fs::create_directories(screenshotPath.parent_path());
-            SDL_Surface* sshot = SDL_CreateRGBSurface(0, windowRect.w, windowRect.h, 32, 0, 0, 0, 0);
+            SDL_Surface* sshot = SDL_CreateRGBSurface(0, s_window_rect_w, s_window_rect_h, 32, 0, 0, 0, 0);
             if (sshot == nullptr)
             {
                 LOG_ERROR << "[SDL2] SDL_CreateRGBSurface error: " << SDL_GetError();
@@ -306,6 +308,7 @@ void graphics_copy_screen_texture(Texture& texture)
     const SDL_Rect origRect = texture.getRect();
     const SDL_Rect rect{0, 0, origRect.w * graphics_get_supersample_level(),
                         origRect.h * graphics_get_supersample_level()};
+    const SDL_Rect canvasRect{0, 0, s_canvas_rect_w, s_canvas_rect_h};
     SDL_RenderCopy(gFrameRenderer, gInternalRenderTarget, &rect, &canvasRect);
     SDL_SetRenderTarget(gFrameRenderer, gInternalRenderTarget);
 }
@@ -364,17 +367,17 @@ void graphics_resize_window(int x, int y)
 {
     LOG_INFO << "[SDL2] Resizing window mode to " << x << 'x' << y;
     lunaticvibes::graphics::save_new_window_size(x, y);
-    SDL_SetWindowSize(gFrameWindow, windowRect.w, windowRect.h);
+    SDL_SetWindowSize(gFrameWindow, s_window_rect_w, s_window_rect_h);
     SDL_SetWindowPosition(gFrameWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
 void lunaticvibes::graphics::save_new_window_size(int width, int height)
 {
     LOG_DEBUG << "[SDL2] Saving new window size " << width << 'x' << height;
-    windowRect.w = width;
-    windowRect.h = height;
-    canvasScaleX = (double)width / canvasRect.w;
-    canvasScaleY = (double)height / canvasRect.h;
+    s_window_rect_w = width;
+    s_window_rect_h = height;
+    s_canvas_scale_x = (double)width / s_canvas_rect_w;
+    s_canvas_scale_y = (double)height / s_canvas_rect_h;
     ConfigMgr::set('V', cfg::V_DISPLAY_RES_X, width);
     ConfigMgr::set('V', cfg::V_DISPLAY_RES_Y, height);
 }
@@ -389,7 +392,7 @@ static int superSampleLevel = 1;
 void graphics_set_supersample_level(int level)
 {
     LOG_INFO << "[SDL2] Setting supersample level to " << level;
-    // assert(canvasRect.w * level <= 3840);
+    // assert(s_canvas_rect_x * level <= 3840);
     superSampleLevel = level;
 }
 int graphics_get_supersample_level()
@@ -400,18 +403,18 @@ int graphics_get_supersample_level()
 void graphics_resize_canvas(int x, int y)
 {
     LOG_INFO << "[SDL2] Resizing canvas to " << x << 'x' << y;
-    canvasRect.w = x;
-    canvasRect.h = y;
-    canvasScaleX = (double)windowRect.w / x;
-    canvasScaleY = (double)windowRect.h / y;
+    s_canvas_rect_w = x;
+    s_canvas_rect_h = y;
+    s_canvas_scale_x = (double)s_window_rect_w / x;
+    s_canvas_scale_y = (double)s_window_rect_h / y;
 }
 double graphics_get_canvas_scale_x()
 {
-    return canvasScaleX;
+    return s_canvas_scale_x;
 }
 double graphics_get_canvas_scale_y()
 {
-    return canvasScaleY;
+    return s_canvas_scale_y;
 }
 
 void graphics_set_maxfps(int fps)
@@ -585,10 +588,10 @@ void startTextInput(const RectF& textBox, const std::string& oldText,
 
     SDL_Rect r;
     const RectF scaledTextBox{
-        static_cast<float>(textBox.x * canvasScaleX),
-        static_cast<float>(textBox.y * canvasScaleY),
-        static_cast<float>(textBox.w * canvasScaleX),
-        static_cast<float>(textBox.h * canvasScaleY),
+        static_cast<float>(textBox.x * s_canvas_scale_x),
+        static_cast<float>(textBox.y * s_canvas_scale_y),
+        static_cast<float>(textBox.w * s_canvas_scale_x),
+        static_cast<float>(textBox.h * s_canvas_scale_y),
     };
     r.x = static_cast<int>(std::floor(scaledTextBox.x));
     r.y = static_cast<int>(std::floor(scaledTextBox.y));
