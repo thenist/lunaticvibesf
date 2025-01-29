@@ -1,6 +1,7 @@
 #include "sprite.h"
 
 #include <algorithm>
+#include <cmath>
 
 #include <common/assert.h>
 #include <common/sysutil.h>
@@ -28,6 +29,7 @@ void SpriteSlider::updateValByInd()
 
 void SpriteSlider::updatePos()
 {
+    LVF_DEBUG_ASSERT(!std::isnan(value));
     int pos_diff = static_cast<int>(std::floor((valueRange - 1) * value));
     switch (dir)
     {

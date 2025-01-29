@@ -638,10 +638,8 @@ void SceneCustomize::load(SkinType mode)
     }
 
     topOptionIndex = 0;
-    if (!optionsMap.empty())
-    {
+    if (optionsMap.size() > 2)
         State::set(IndexSlider::SKIN_CONFIG_OPTIONS, double(topOptionIndex) / (optionsMap.size() - 1));
-    }
     updateTexts();
 }
 
