@@ -180,7 +180,7 @@ eFileEncoding getFileEncoding(std::istream& is)
 
     if (enc == eFileEncoding::EUC_KR)
     {
-        LOG_WARNING << "[Encoding] Beep, boop, detected EUC-KR encoding (rare occurrence)";
+        LOG_WARNING << "[Encoding] Detected EUC-KR encoding, this is often an error";
     }
 
     return enc;
