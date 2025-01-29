@@ -152,7 +152,7 @@ void clearContextPlay()
     gPlayContext.replayMybest.reset(); // load at decide() @ scene_select.cpp
 }
 
-template <typename T> T map_value_range(T x, T in_min, T in_max, T out_min, T out_max)
+template <typename T> [[nodiscard]] static T map_value_range(T x, T in_min, T in_max, T out_min, T out_max)
 {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -164,7 +164,8 @@ void pushGraphPoints()
     const auto song_len = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength();
     using HighresT = decltype(lunaticvibes::Time{}.hres());
     constexpr auto zero = static_cast<HighresT>(0); // Windows...
-    const auto idx = map_value_range(rt.hres(), zero, song_len.hres(), zero,
+    const auto can_ba_called_after_end = std::min(rt.hres(), song_len.hres());
+    const auto idx = map_value_range(can_ba_called_after_end, zero, song_len.hres(), zero,
                                      static_cast<HighresT>(PlayContextParams::GRAPH_POINT_NUMBER - 1));
     LVF_DEBUG_ASSERT(idx >= 0 && idx < PlayContextParams::GRAPH_POINT_NUMBER);
 
