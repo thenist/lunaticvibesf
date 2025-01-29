@@ -24,7 +24,7 @@ InputWrapper::~InputWrapper()
 void InputWrapper::loopAsync()
 {
     const auto now = lunaticvibes::Time::now();
-    auto curr = InputMgr::detect();
+    auto [curr, scratch_data] = InputMgr::detect();
 
     {
         std::unique_lock l(_inputMutex);
@@ -77,7 +77,8 @@ void InputWrapper::loopAsync()
     // detect absolute axis
     scratchAxisPrev[0] = scratchAxisCurr[0];
     scratchAxisPrev[1] = scratchAxisCurr[1];
-    InputMgr::getScratchPos(scratchAxisCurr[0], scratchAxisCurr[1]);
+    scratchAxisCurr[0] = scratch_data.first;
+    scratchAxisCurr[1] = scratch_data.second;
     if (scratchAxisSet)
     {
         double d1 = normalizeLinearGrowth(scratchAxisPrev[0], scratchAxisCurr[0]) * InputMgr::getDeadzone(Input::S1A);

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <bitset>
+#include <utility>
 
 #include "common/beat.h"
 #include "common/keymap.h"
@@ -29,12 +30,17 @@ public:
         AXIS_ABSOLUTE
     };
 
+    struct ScratchData
+    {
+        double first;
+        double second;
+    };
+
     // Game keys param / functions
 private:
     std::bitset<MAX_JOYSTICK_COUNT> joysticksConnected{};
     std::array<KeyMap, Input::ESC> padBindings{};
     std::array<double, Input::ESC> padDeadzones{};
-    double scratch1, scratch2;
 
     int debounceTime = 0;
     std::array<lunaticvibes::Time, Input::Pad::KEY_COUNT> pressedTime;
@@ -48,10 +54,9 @@ public:
     static void updateDeadzones(GameModeKeys keys);
     static double getDeadzone(Input::Pad k);
 
-    std::bitset<Input::KEY_COUNT> _detect();
-    static std::bitset<Input::KEY_COUNT> detect();
+    std::pair<std::bitset<Input::KEY_COUNT>, ScratchData> _detect();
+    static std::pair<std::bitset<Input::KEY_COUNT>, ScratchData> detect();
     static bool getMousePos(int& x, int& y);
-    static bool getScratchPos(double& s1, double& s2);
 
     static void setDebounceTime(int ms);
 };

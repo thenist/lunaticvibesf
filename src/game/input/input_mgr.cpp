@@ -100,13 +100,12 @@ double InputMgr::getDeadzone(Input::Pad k)
     return _inst.padDeadzones[k];
 }
 
-std::bitset<KEY_COUNT> InputMgr::_detect()
+std::pair<std::bitset<Input::KEY_COUNT>, InputMgr::ScratchData> InputMgr::_detect()
 {
     pollInput();
 
-    std::bitset<KEY_COUNT> res{};
-    scratch1 = 0.0;
-    scratch2 = 0.0;
+    std::pair<std::bitset<Input::KEY_COUNT>, InputMgr::ScratchData> out;
+    std::bitset<KEY_COUNT>& res = out.first;
 
     lunaticvibes::Time t;
 
@@ -144,18 +143,13 @@ std::bitset<KEY_COUNT> InputMgr::_detect()
             res[k] = true;
     }
 
+    ScratchData& scratch = out.second;
     if (padBindings[S1A].getType() == KeyMap::DeviceType::JOYSTICK)
-    {
-        const auto j = padBindings[S1A].getJoystick();
-        if (j.type == Input::Joystick::Type::AXIS_ABSOLUTE)
-            scratch1 = getJoystickAxis(j.device, j.type, j.index);
-    }
+        if (const auto j = padBindings[S1A].getJoystick(); j.type == Input::Joystick::Type::AXIS_ABSOLUTE)
+            scratch.first = getJoystickAxis(j.device, j.type, j.index);
     if (padBindings[S2A].getType() == KeyMap::DeviceType::JOYSTICK)
-    {
-        const auto j = padBindings[S2A].getJoystick();
-        if (j.type == Input::Joystick::Type::AXIS_ABSOLUTE)
-            scratch2 = getJoystickAxis(j.device, j.type, j.index);
-    }
+        if (const auto j = padBindings[S2A].getJoystick(); j.type == Input::Joystick::Type::AXIS_ABSOLUTE)
+            scratch.second = getJoystickAxis(j.device, j.type, j.index);
 
     // FN input
     res[ESC] = isKeyPressed(Keyboard::K_ESC);
@@ -197,9 +191,9 @@ std::bitset<KEY_COUNT> InputMgr::_detect()
     res[MWHEELUP] = mouseWheelState > 0;
     res[MWHEELDOWN] = mouseWheelState < 0;
 
-    return res;
+    return out;
 }
-std::bitset<KEY_COUNT> InputMgr::detect()
+std::pair<std::bitset<Input::KEY_COUNT>, InputMgr::ScratchData> InputMgr::detect()
 {
     return _inst._detect();
 }
@@ -226,13 +220,6 @@ bool InputMgr::getMousePos(int& x, int& y)
             y = (int)std::floor(y / canvasScaleY);
     }
     return ret;
-}
-
-bool InputMgr::getScratchPos(double& x, double& y)
-{
-    x = _inst.scratch1;
-    y = _inst.scratch2;
-    return true;
 }
 
 void InputMgr::setDebounceTime(int ms)
