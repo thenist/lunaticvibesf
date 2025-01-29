@@ -5,6 +5,7 @@
 #include <functional>
 #include <future>
 #include <string>
+#include <utility>
 
 #include <common/types.h>
 
@@ -39,7 +40,7 @@ void doMainThreadTask();
 void StopHandleMainThreadTask();
 bool CanHandleMainThreadTask();
 
-template <typename T> inline T pushAndWaitMainThreadTask(std::function<T()> f)
+template <typename T> inline T pushAndWaitMainThreadTask(std::move_only_function<T()> f)
 {
     if (IsMainThread())
         return f();
@@ -53,7 +54,7 @@ template <typename T> inline T pushAndWaitMainThreadTask(std::function<T()> f)
     }
     return T();
 }
-template <> inline void pushAndWaitMainThreadTask(std::function<void()> f)
+template <> inline void pushAndWaitMainThreadTask(std::move_only_function<void()> f)
 {
     if (IsMainThread())
         return f();
@@ -69,10 +70,11 @@ template <> inline void pushAndWaitMainThreadTask(std::function<void()> f)
         return taskFuture.get();
     }
 }
-template <typename T, typename... Arg> inline T pushAndWaitMainThreadTask(std::function<T(Arg...)> f, Arg... arg)
+template <typename T, typename... Arg>
+inline T pushAndWaitMainThreadTask(std::move_only_function<T(Arg...)> f, Arg... arg)
 {
     if (CanHandleMainThreadTask())
-        return pushAndWaitMainThreadTask<T>(std::bind_front(f, arg...));
+        return pushAndWaitMainThreadTask<T>(std::bind_front(std::move(f), arg...));
     return T();
 }
 
