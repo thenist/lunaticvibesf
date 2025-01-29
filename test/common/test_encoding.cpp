@@ -21,3 +21,8 @@ TEST(Encoding, CanOpenUtf8FilePath)
     std::string contents{std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>()};
     EXPECT_EQ(lunaticvibes::trim(contents), "it's so cool");
 }
+
+TEST(Encoding, Utf8ToUtf32)
+{
+    EXPECT_EQ(utf8_to_utf32("aA\nあ"), U"aA\nあ");
+}

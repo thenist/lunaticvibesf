@@ -294,7 +294,7 @@ void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)
 
 #include <iconv.h>
 
-static const char* get_iconv_encoding_name(eFileEncoding encoding)
+[[nodiscard]] static constexpr const char* get_iconv_encoding_name(eFileEncoding encoding)
 {
     switch (encoding)
     {
@@ -302,7 +302,7 @@ static const char* get_iconv_encoding_name(eFileEncoding encoding)
     case eFileEncoding::SHIFT_JIS: return "CP932";
     case eFileEncoding::EUC_KR: return "CP949";
     case eFileEncoding::UTF8: return "UTF-8";
-    case eFileEncoding::UTF32: return "UCS-4BE";
+    case eFileEncoding::UTF32: return "UCS-4LE";
     }
     lunaticvibes::assert_failed("get_iconv_encoding_name");
 }
