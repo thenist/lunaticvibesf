@@ -4,7 +4,10 @@
 #include <array>
 #include <functional>
 #include <future>
+#include <mutex>
 #include <random>
+#include <ranges>
+#include <shared_mutex>
 #include <sstream>
 #include <string>
 
@@ -30,6 +33,7 @@
 #include <game/sound/sound_sample.h>
 
 namespace r = std::ranges;
+namespace v = std::views;
 
 static constexpr lunaticvibes::Time USE_FIRST_KEYSOUNDS{-1234};
 
@@ -1183,33 +1187,28 @@ void ScenePlay::loadChart()
             auto _pChart = gChartContext.chart;
             auto chartDir = gChartContext.chart->getDirectory();
             LOG_DEBUG << "[Play] Load files from " << chartDir;
-            for (const auto& it : _pChart->wavFiles)
-            {
-                if (shouldDiscard(*this))
-                    break;
-                if (it.empty())
-                    continue;
-                ++gPlayContext.wavTotal;
-            }
+            const auto wav_file_cond = std::not_fn(&std::string::empty);
+            const auto total = r::count_if(_pChart->bgaFiles, wav_file_cond);
             if (gPlayContext.wavTotal == 0)
             {
-                gPlayContext.wavLoaded = 1;
                 gChartContext.isSampleLoaded = true;
                 gChartContext.sampleLoadedHash = gChartContext.hash;
+                std::unique_lock l{gPlayContext._mutex};
+                gPlayContext.wavTotal = 0;
+                gPlayContext.wavLoaded = 1;
                 return;
+            }
+            {
+                std::unique_lock l{gPlayContext._mutex};
+                gPlayContext.wavTotal = total;
             }
 
             std::atomic<size_t> _asyncJobs;
             std::atomic<size_t> _asyncJobsDone;
-            for (size_t i = 0; i < _pChart->wavFiles.size(); ++i)
+            for (auto [i, wav] : _pChart->wavFiles | v::filter(wav_file_cond) | v::enumerate)
             {
                 if (shouldDiscard(*this))
                     break;
-
-                const auto& wav = _pChart->wavFiles[i];
-                if (wav.empty())
-                    continue;
-
                 _asyncJobs++;
                 lunaticvibes::post_job(_asyncJobsDone, [&, i]() {
                     if (shouldDiscard(*this))
@@ -1220,6 +1219,7 @@ void ScenePlay::loadChart()
                     p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
 #endif // _WIN32
                     SoundMgr::loadNoteSample(p, i);
+                    std::unique_lock l{gPlayContext._mutex};
                     ++gPlayContext.wavLoaded;
                 });
             }
@@ -1253,40 +1253,34 @@ void ScenePlay::loadChart()
 
                 auto _pChart = gChartContext.chart;
                 auto chartDir = gChartContext.chart->getDirectory();
-                for (const auto& it : _pChart->bgaFiles)
+                const auto bga_file_cond = std::not_fn(&std::string::empty);
+                const auto total = r::count_if(_pChart->bgaFiles, bga_file_cond);
+                if (total == 0)
                 {
-                    if (shouldDiscard(*this))
-                        return;
-                    if (it.empty())
-                        continue;
-                    ++gPlayContext.bmpTotal;
-                }
-                if (gPlayContext.bmpTotal == 0)
-                {
-                    gPlayContext.bmpLoaded = 1;
                     gChartContext.isBgaLoaded = true;
                     gChartContext.bgaLoadedHash = gChartContext.hash;
+                    std::unique_lock l{gPlayContext._mutex};
+                    gPlayContext.bmpTotal = 0;
+                    gPlayContext.bmpLoaded = 1;
                     return;
                 }
+                {
+                    std::unique_lock l{gPlayContext._mutex};
+                    gPlayContext.bmpTotal = 0;
+                }
 
-                for (size_t i = 0; i < _pChart->bgaFiles.size(); ++i)
+                for (auto [i, bmp] : _pChart->bgaFiles | v::filter(bga_file_cond) | v::enumerate)
                 {
                     if (shouldDiscard(*this))
                         break;
-                    const auto& bmp = _pChart->bgaFiles[i];
-                    if (bmp.empty())
-                        continue;
-                    {
-                        if (shouldDiscard(*this))
-                            break;
-                        const auto pBmp = PathFromUTF8(bmp);
-                        fs::path p{chartDir / pBmp};
+                    const auto pBmp = PathFromUTF8(bmp);
+                    fs::path p{chartDir / pBmp};
 #ifndef _WIN32
-                        p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
+                    p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
 #endif // _WIN32
-                        gPlayContext.bgaTexture->addBmp(i, p);
-                        ++gPlayContext.bmpLoaded;
-                    }
+                    gPlayContext.bgaTexture->addBmp(i, p);
+                    std::unique_lock l{gPlayContext._mutex};
+                    ++gPlayContext.bmpLoaded;
                 }
 
                 if (shouldDiscard(*this))
@@ -1296,10 +1290,8 @@ void ScenePlay::loadChart()
                 }
 
                 LOG_DEBUG << "[Play] BGA loaded";
-                if (gPlayContext.bmpLoaded > 0)
-                {
+                if (std::shared_lock l{gPlayContext._mutex}; gPlayContext.bmpLoaded > 0)
                     gPlayContext.bgaTexture->setLoaded();
-                }
                 gPlayContext.bgaTexture->setSlotFromBMS(
                     *std::reinterpret_pointer_cast<ChartObjectBMS>(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]));
                 gChartContext.isBgaLoaded = true;
@@ -1911,9 +1903,12 @@ void ScenePlay::updateLoading(const lunaticvibes::Time& t)
     State::set(IndexNumber::PLAY_LOAD_PROGRESS_PERCENT,
                int(lunaticvibes::getWavLoadProgress() * 100 + lunaticvibes::getBgaLoadProgress() * 100) / 2);
 
-    if (gPlayContext.chartObjLoaded && gPlayContext.rulesetLoaded && gChartContext.isSampleLoaded &&
-        (!State::get(IndexSwitch::_LOAD_BGA) || gChartContext.isBgaLoaded) && (t - delayedReadyTime) > 1000 &&
-        rt > pSkin->info.timeMinimumLoad)
+    const bool chart_loaded = [&]() {
+        std::shared_lock l{gPlayContext._mutex};
+        return gPlayContext.chartObjLoaded && gPlayContext.rulesetLoaded && gChartContext.isSampleLoaded &&
+               (!State::get(IndexSwitch::_LOAD_BGA) || gChartContext.isBgaLoaded);
+    }();
+    if (chart_loaded && (t - delayedReadyTime) > 1000 && rt > pSkin->info.timeMinimumLoad)
     {
         bool trans = true;
         if (gArenaData.isOnline())

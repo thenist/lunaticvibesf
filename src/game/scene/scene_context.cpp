@@ -5,6 +5,7 @@
 #include <atomic>
 #include <mutex>
 #include <random>
+#include <shared_mutex>
 #include <string>
 
 #include <boost/format.hpp>
@@ -1674,15 +1675,18 @@ void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battl
 
 double lunaticvibes::getSysLoadProgress()
 {
+    std::shared_lock l{gPlayContext._mutex};
     return int(gPlayContext.chartObjLoaded) * 0.5 + int(gPlayContext.rulesetLoaded) * 0.5;
 }
 double lunaticvibes::getWavLoadProgress()
 {
+    std::shared_lock l{gPlayContext._mutex};
     return (gPlayContext.wavTotal == 0) ? (gChartContext.isSampleLoaded ? 1.0 : 0.0)
                                         : (double)gPlayContext.wavLoaded / gPlayContext.wavTotal;
 }
 double lunaticvibes::getBgaLoadProgress()
 {
+    std::shared_lock l{gPlayContext._mutex};
     return (gPlayContext.bmpTotal == 0) ? (gChartContext.isBgaLoaded ? 1.0 : 0.0)
                                         : (double)gPlayContext.bmpLoaded / gPlayContext.bmpTotal;
 }
