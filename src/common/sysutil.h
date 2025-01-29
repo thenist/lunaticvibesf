@@ -34,10 +34,7 @@ template <typename T> inline T pushAndWaitMainThreadTask(std::function<T()> f)
         taskFuture.wait();
         return taskFuture.get();
     }
-    else
-    {
-        return f();
-    }
+    return T();
 }
 template <> inline void pushAndWaitMainThreadTask(std::function<void()> f)
 {
