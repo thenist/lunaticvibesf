@@ -6,6 +6,7 @@
 #include <mutex>
 #include <utility>
 
+#include <common/assert.h>
 #include <common/log.h>
 #include <common/sysutil.h>
 #include <common/thread_pool.h>
@@ -446,6 +447,7 @@ void TextureBmsBga::reset()
 
 void TextureBmsBga::clear()
 {
+    LVF_ASSERT(IsMainThread());
     loaded = false;
     textureRect = Rect();
     baseSlot.clear();

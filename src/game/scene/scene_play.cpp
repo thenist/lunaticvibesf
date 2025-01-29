@@ -1249,7 +1249,7 @@ void ScenePlay::loadChart()
         {
             bgaFuture = std::async(std::launch::async, [&]() {
                 SetThreadName("ChartBgaLoad");
-                gPlayContext.bgaTexture->clear();
+                pushAndWaitMainThreadTask<void>([]() { gPlayContext.bgaTexture->clear(); });
 
                 auto _pChart = gChartContext.chart;
                 auto chartDir = gChartContext.chart->getDirectory();
