@@ -5,6 +5,7 @@
 #include <queue>
 #include <shared_mutex>
 
+#include <common/assert.h>
 #include <common/in_test_mode.h>
 #include <common/meta.h>
 
@@ -24,14 +25,10 @@ void SetWindowForeground(bool f)
     s_foreground = f;
 }
 
-void pushMainThreadTask(std::function<void()> f)
+void lunaticvibes::details::doPushMainThreadTask(std::move_only_function<void()> f)
 {
-    if (IsMainThread())
-    {
-        // LOG_DEBUG << "Warning: Calling pushMainThreadTask at main thread";
-        f();
-    }
-    else if (handleMainThreadTask)
+    LVF_DEBUG_ASSERT(!IsMainThread());
+    if (handleMainThreadTask)
     {
         std::unique_lock l(mainThreadTaskQueueMutex);
         mainThreadTaskQueue.emplace(std::move(f));

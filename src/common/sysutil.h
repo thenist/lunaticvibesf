@@ -1,11 +1,12 @@
 #pragma once
 
+#include <concepts>
 #include <ctime>
 #include <functional>
 #include <future>
 #include <string>
 
-#include "common/types.h"
+#include <common/types.h>
 
 void SetThreadAsMainThread();
 bool IsMainThread();
@@ -19,13 +20,29 @@ void getWindowHandle(void* handle);
 bool IsWindowForeground();
 void SetWindowForeground(bool foreground);
 
-void pushMainThreadTask(std::function<void()> f);
+namespace lunaticvibes::details
+{
+
+void doPushMainThreadTask(std::move_only_function<void()> f);
+
+} // namespace lunaticvibes::details
+
+void pushMainThreadTask(std::invocable<> auto f)
+{
+    if (IsMainThread())
+        f();
+    else
+        lunaticvibes::details::doPushMainThreadTask(f);
+}
+
 void doMainThreadTask();
 void StopHandleMainThreadTask();
 bool CanHandleMainThreadTask();
 
 template <typename T> inline T pushAndWaitMainThreadTask(std::function<T()> f)
 {
+    if (IsMainThread())
+        return f();
     if (CanHandleMainThreadTask())
     {
         std::promise<T> taskPromise;
@@ -38,6 +55,8 @@ template <typename T> inline T pushAndWaitMainThreadTask(std::function<T()> f)
 }
 template <> inline void pushAndWaitMainThreadTask(std::function<void()> f)
 {
+    if (IsMainThread())
+        return f();
     if (CanHandleMainThreadTask())
     {
         std::promise<void> taskPromise;
