@@ -58,14 +58,14 @@ bool CanHandleMainThreadTask()
     return handleMainThreadTask;
 }
 
-static int64_t s_main_thread{};
+static thread_local bool s_is_main_thread = false;
 void SetThreadAsMainThread()
 {
-    s_main_thread = GetCurrentThreadID();
+    s_is_main_thread = true;
 }
 bool IsMainThread()
 {
-    return s_main_thread == GetCurrentThreadID();
+    return s_is_main_thread;
 }
 
 long long getFileTimeNow()
