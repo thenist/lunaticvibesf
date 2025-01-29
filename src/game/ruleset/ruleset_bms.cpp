@@ -394,7 +394,7 @@ void GaugeHolder::feed(RulesetBMS::JudgeArea judge)
     // LOG_VERBOSE << "[RulesetBMS] GaugeHolder::feed " << static_cast<int>(judge);
     if (_did_fail)
         return;
-    process(_gauge.health_gain[static_cast<unsigned>(RulesetBMS::JudgeAreaTypeMap.at(judge))]);
+    process(_gauge.health_gain[static_cast<unsigned>(RulesetBMS::judge_area_to_type(judge))]);
 }
 
 void GaugeHolder::feed_mine(long long mine_value)
@@ -1098,10 +1098,8 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
             processHpHitMine(note.dvalue);
 
             // kpoor + 1
-            for (auto& i : JudgeAreaIndexAccMap.at(JudgeArea::MINE_KPOOR))
-            {
+            for (auto& i : judge_area_to_index(JudgeArea::MINE_KPOOR))
                 ++_basic.judge[i];
-            }
             if (showJudge)
             {
                 if (slot == PLAYER_SLOT_PLAYER)
@@ -1230,10 +1228,8 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     if (isFailed())
         return;
 
-    for (auto& i : JudgeAreaIndexAccMap.at(judge))
-    {
+    for (auto& i : judge_area_to_index(judge))
         ++_basic.judge[i];
-    }
 
     // Matches LR2.
     static constexpr lunaticvibes::Time LR2_MONEY_SCORE_ANIMATION_TIME{500};
@@ -1304,9 +1300,10 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     _basic.total_acc = 100.0 * exScore / max;
     _basic.acc = notesExpired ? (100.0 * exScore / notesExpired / 2) : 0;
 
-    const JudgeType judgeType = JudgeAreaTypeMap.at(judge);
     if (showJudge)
     {
+        const JudgeType judgeType = judge_area_to_type(judge);
+
         const bool should_show_bomb = judgeType == JudgeType::PERFECT || judgeType == JudgeType::GREAT;
         if (should_show_bomb && _bombTimerMap != nullptr)
             if (auto it = _bombTimerMap->find(ch); it != _bombTimerMap->end())
@@ -1317,14 +1314,14 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
             State::set(IndexTimer::PLAY_JUDGE_1P, t.norm());
             setJudgeInternalTimer1P(judgeType, t.norm());
             State::set(IndexNumber::_DISP_NOWCOMBO_1P, _basic.combo + _basic.comboDisplay);
-            State::set(IndexOption::PLAY_LAST_JUDGE_1P, JudgeTypeOptMap.at(judgeType));
+            State::set(IndexOption::PLAY_LAST_JUDGE_1P, judge_type_to_opt(judgeType));
         }
         else if (slot == PLAYER_SLOT_TARGET)
         {
             State::set(IndexTimer::PLAY_JUDGE_2P, t.norm());
             setJudgeInternalTimer2P(judgeType, t.norm());
             State::set(IndexNumber::_DISP_NOWCOMBO_2P, _basic.combo + _basic.comboDisplay);
-            State::set(IndexOption::PLAY_LAST_JUDGE_2P, JudgeTypeOptMap.at(judgeType));
+            State::set(IndexOption::PLAY_LAST_JUDGE_2P, judge_type_to_opt(judgeType));
         }
     }
 }

@@ -2,8 +2,10 @@
 
 #include "ruleset.h"
 
+#include <common/assert.h>
 #include <common/chartformat/chartformat.h>
 #include <common/chartformat/chartformat_bms.h>
+#include <game/runtime/index/option.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_number_animation.h>
 
@@ -84,6 +86,7 @@ enum class BmsGaugeType
     GRADE,
     EXGRADE,
 };
+std::ostream& operator<<(std::ostream& os, const BmsGaugeType& type);
 
 struct Lr2GaugeIncrements
 {
@@ -208,10 +211,19 @@ public:
         KPOOR,
         MISS,
     };
-    inline static const std::map<JudgeType, Option::e_judge_type> JudgeTypeOptMap = {
-        {JudgeType::PERFECT, Option::JUDGE_0}, {JudgeType::GREAT, Option::JUDGE_1}, {JudgeType::GOOD, Option::JUDGE_2},
-        {JudgeType::BAD, Option::JUDGE_3},     {JudgeType::KPOOR, Option::JUDGE_4}, {JudgeType::MISS, Option::JUDGE_5},
-    };
+    static constexpr Option::e_judge_type judge_type_to_opt(JudgeType type)
+    {
+        switch (type)
+        {
+        case JudgeType::PERFECT: return Option::JUDGE_0;
+        case JudgeType::GREAT: return Option::JUDGE_1;
+        case JudgeType::GOOD: return Option::JUDGE_2;
+        case JudgeType::BAD: return Option::JUDGE_3;
+        case JudgeType::KPOOR: return Option::JUDGE_4;
+        case JudgeType::MISS: return Option::JUDGE_5;
+        }
+        lunaticvibes::assert_failed("judge_type_to_opt");
+    }
 
     using GaugeType = lunaticvibes::BmsGaugeType;
 
@@ -240,30 +252,48 @@ public:
     };
 
     using JudgeArea = ::lunaticvibes::BmsJudgeArea;
-    inline static const std::map<JudgeArea, JudgeType> JudgeAreaTypeMap = {
-        {JudgeArea::NOTHING, JudgeType::MISS},          {JudgeArea::EARLY_KPOOR, JudgeType::KPOOR},
-        {JudgeArea::EARLY_BAD, JudgeType::BAD},         {JudgeArea::EARLY_GOOD, JudgeType::GOOD},
-        {JudgeArea::EARLY_GREAT, JudgeType::GREAT},     {JudgeArea::EARLY_PERFECT, JudgeType::PERFECT},
-        {JudgeArea::EXACT_PERFECT, JudgeType::PERFECT}, {JudgeArea::LATE_PERFECT, JudgeType::PERFECT},
-        {JudgeArea::LATE_GREAT, JudgeType::GREAT},      {JudgeArea::LATE_GOOD, JudgeType::GOOD},
-        {JudgeArea::LATE_BAD, JudgeType::BAD},          {JudgeArea::MISS, JudgeType::MISS},
-        {JudgeArea::LATE_KPOOR, JudgeType::KPOOR},      {JudgeArea::MINE_KPOOR, JudgeType::KPOOR},
+    static constexpr JudgeType judge_area_to_type(JudgeArea area)
+    {
+        switch (area)
+        {
+        case JudgeArea::NOTHING: return JudgeType::MISS;
+        case JudgeArea::EARLY_KPOOR: return JudgeType::KPOOR;
+        case JudgeArea::EARLY_BAD: return JudgeType::BAD;
+        case JudgeArea::EARLY_GOOD: return JudgeType::GOOD;
+        case JudgeArea::EARLY_GREAT: return JudgeType::GREAT;
+        case JudgeArea::EARLY_PERFECT:
+        case JudgeArea::EXACT_PERFECT:
+        case JudgeArea::LATE_PERFECT: return JudgeType::PERFECT;
+        case JudgeArea::LATE_GREAT: return JudgeType::GREAT;
+        case JudgeArea::LATE_GOOD: return JudgeType::GOOD;
+        case JudgeArea::LATE_BAD: return JudgeType::BAD;
+        case JudgeArea::MISS: return JudgeType::MISS;
+        case JudgeArea::LATE_KPOOR:
+        case JudgeArea::MINE_KPOOR: return JudgeType::KPOOR;
+        }
+        lunaticvibes::assert_failed("judge_area_to_type");
     };
-    inline static const std::map<JudgeArea, std::vector<JudgeIndex>> JudgeAreaIndexAccMap = {
-        {JudgeArea::NOTHING, {}},
-        {JudgeArea::EARLY_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP, JUDGE_EARLY}},
-        {JudgeArea::EARLY_BAD, {JUDGE_BAD, JUDGE_EARLY_BAD, JUDGE_BP, JUDGE_CB, JUDGE_EARLY}},
-        {JudgeArea::EARLY_GOOD, {JUDGE_GOOD, JUDGE_EARLY_GOOD, JUDGE_EARLY}},
-        {JudgeArea::EARLY_GREAT, {JUDGE_GREAT, JUDGE_EARLY_GREAT, JUDGE_EARLY}},
-        {JudgeArea::EARLY_PERFECT, {JUDGE_PERFECT, JUDGE_EARLY_PERFECT}},
-        {JudgeArea::EXACT_PERFECT, {JUDGE_PERFECT, JUDGE_EXACT_PERFECT}},
-        {JudgeArea::LATE_PERFECT, {JUDGE_PERFECT, JUDGE_LATE_PERFECT}},
-        {JudgeArea::LATE_GREAT, {JUDGE_GREAT, JUDGE_LATE_GREAT, JUDGE_LATE}},
-        {JudgeArea::LATE_GOOD, {JUDGE_GOOD, JUDGE_LATE_GOOD, JUDGE_LATE}},
-        {JudgeArea::LATE_BAD, {JUDGE_BAD, JUDGE_LATE_BAD, JUDGE_BP, JUDGE_CB, JUDGE_LATE}},
-        {JudgeArea::MISS, {JUDGE_MISS, JUDGE_POOR, JUDGE_BP, JUDGE_CB, JUDGE_LATE}},
-        {JudgeArea::LATE_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP, JUDGE_LATE}},
-        {JudgeArea::MINE_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP}},
+    static std::span<const JudgeIndex> judge_area_to_index(JudgeArea area)
+    {
+        static const std::map<JudgeArea, std::vector<JudgeIndex>> JudgeAreaIndexAccMap = {
+            {JudgeArea::NOTHING, {}},
+            {JudgeArea::EARLY_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP, JUDGE_EARLY}},
+            {JudgeArea::EARLY_BAD, {JUDGE_BAD, JUDGE_EARLY_BAD, JUDGE_BP, JUDGE_CB, JUDGE_EARLY}},
+            {JudgeArea::EARLY_GOOD, {JUDGE_GOOD, JUDGE_EARLY_GOOD, JUDGE_EARLY}},
+            {JudgeArea::EARLY_GREAT, {JUDGE_GREAT, JUDGE_EARLY_GREAT, JUDGE_EARLY}},
+            {JudgeArea::EARLY_PERFECT, {JUDGE_PERFECT, JUDGE_EARLY_PERFECT}},
+            {JudgeArea::EXACT_PERFECT, {JUDGE_PERFECT, JUDGE_EXACT_PERFECT}},
+            {JudgeArea::LATE_PERFECT, {JUDGE_PERFECT, JUDGE_LATE_PERFECT}},
+            {JudgeArea::LATE_GREAT, {JUDGE_GREAT, JUDGE_LATE_GREAT, JUDGE_LATE}},
+            {JudgeArea::LATE_GOOD, {JUDGE_GOOD, JUDGE_LATE_GOOD, JUDGE_LATE}},
+            {JudgeArea::LATE_BAD, {JUDGE_BAD, JUDGE_LATE_BAD, JUDGE_BP, JUDGE_CB, JUDGE_LATE}},
+            {JudgeArea::MISS, {JUDGE_MISS, JUDGE_POOR, JUDGE_BP, JUDGE_CB, JUDGE_LATE}},
+            {JudgeArea::LATE_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP, JUDGE_LATE}},
+            {JudgeArea::MINE_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP}},
+        };
+        if (auto it = JudgeAreaIndexAccMap.find(area); it != JudgeAreaIndexAccMap.end())
+            return it->second;
+        lunaticvibes::assert_failed("judge_area_to_index");
     };
 
     /// /////////////////////////////////////////////////////////////////////
