@@ -827,10 +827,10 @@ int SkinLR2::LR2FONT()
         // copy the whole file into ram, once for all
         std::stringstream lr2font;
         lr2font << ifsFile.rdbuf();
-        lr2font.sync();
+        lr2font.seekg(0);
+        const auto encoding = getFileEncoding(lr2font);
         ifsFile.close();
 
-        auto encoding = getFileEncoding(path);
         std::string strbuf;
         std::u32string u32strbuf;
 
