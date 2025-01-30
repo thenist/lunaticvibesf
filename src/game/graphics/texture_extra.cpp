@@ -247,7 +247,7 @@ bool TextureBmsBga::setSlotFromBMS(ChartObjectBMS& bms)
     for (const auto& l : lPoor)
         setSlot(l.dvalue, l.time, false, false, true);
     sortSlot();
-    loaded = true;
+    loaded = true; // FIXME: synchronize access
     return true;
 }
 
