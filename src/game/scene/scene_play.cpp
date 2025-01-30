@@ -1155,7 +1155,7 @@ void ScenePlay::setInitialHealthBMS()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ScenePlay::loadChart()
+void ScenePlay::asyncLoadChart()
 {
     if (!gChartContext.chart)
         return;
@@ -1172,24 +1172,19 @@ void ScenePlay::loadChart()
                this->state != ePlayState::LOADING;
     };
 
-    std::future<void> samplesFuture;
-    std::future<void> bgaFuture;
-
-    // load samples
     if ((gChartContext.sampleLoadedHash != gChartContext.hash) && !sceneEnding)
     {
-        samplesFuture = std::async(std::launch::async, [&shouldDiscard]() {
+        _samplesFuture = std::async(std::launch::async, [shouldDiscard]() {
             SetThreadName("ChartSampleLoad");
             lunaticvibes::load_audio(*gChartContext.chart, shouldDiscard);
         });
     }
 
-    // load bga
     if (State::get(IndexSwitch::_LOAD_BGA) && !sceneEnding)
     {
         if (gChartContext.bgaLoadedHash != gChartContext.hash)
         {
-            bgaFuture = std::async(std::launch::async, [&shouldDiscard]() {
+            _bgaFuture = std::async(std::launch::async, [shouldDiscard]() {
                 SetThreadName("ChartBgaLoad");
                 lunaticvibes::load_video(*gChartContext.chart, shouldDiscard);
             });
@@ -1200,11 +1195,6 @@ void ScenePlay::loadChart()
             gPlayContext.bgaTexture->setVideoSpeed();
         }
     }
-
-    if (samplesFuture.valid())
-        samplesFuture.get();
-    if (bgaFuture.valid())
-        bgaFuture.get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1782,7 +1772,7 @@ void ScenePlay::updatePrepare(const lunaticvibes::Time& t)
     {
         State::set(IndexTimer::_LOAD_START, t.norm());
         State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_LOADING);
-        _loadChartFuture = std::async(std::launch::async, std::bind_front(&ScenePlay::loadChart, this));
+        asyncLoadChart();
         state = ePlayState::LOADING;
         LOG_DEBUG << "[Play] State changed to LOADING";
     }
@@ -2264,8 +2254,6 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
     if (!sceneEnding && ft >= pSkin->info.timeOutro)
     {
         sceneEnding = true;
-        if (_loadChartFuture.valid())
-            _loadChartFuture.wait();
 
         _handleJudgeInput = false;
 

@@ -30,7 +30,8 @@ public:
     ~ScenePlay() override;
 
 private:
-    std::future<void> _loadChartFuture;
+    std::future<void> _samplesFuture;
+    std::future<void> _bgaFuture;
 
 private:
     ePlayState state;
@@ -131,7 +132,7 @@ private:
 
 protected:
     // common
-    void loadChart();
+    void asyncLoadChart();
 
 protected:
     void update_fixed(const lunaticvibes::Time& t) override;
