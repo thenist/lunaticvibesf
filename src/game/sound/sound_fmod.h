@@ -7,6 +7,7 @@
 #include <fmod.hpp>
 
 #include <array>
+#include <atomic>
 #include <map>
 #include <string>
 
@@ -23,8 +24,8 @@ private:
 protected:
     std::map<SoundChannelType, std::shared_ptr<FMOD::ChannelGroup>> channelGroup;
     std::map<SampleChannel, float> volume;
-    float sysVolume = 1.0;
-    float noteVolume = 1.0;
+    std::atomic<float> sysVolume = 1.0;
+    std::atomic<float> noteVolume = 1.0;
 
     std::atomic<float> sysVolumeGradientBegin = 1.0;
     std::atomic<float> sysVolumeGradientEnd = 1.0;

@@ -863,19 +863,15 @@ void SoundDriverFMOD::update()
     {
         if (sysVolumeGradientLength == 0)
         {
-            sysVolume = sysVolumeGradientEnd;
+            sysVolume = sysVolumeGradientEnd.load();
         }
         else
         {
             double progress = double(t.norm() - sysVolumeGradientBeginTime) / sysVolumeGradientLength;
             if (progress >= 1.0)
-            {
-                sysVolume = sysVolumeGradientEnd;
-            }
+                sysVolume = sysVolumeGradientEnd.load();
             else
-            {
                 sysVolume = sysVolumeGradientBegin + (sysVolumeGradientEnd - sysVolumeGradientBegin) * progress;
-            }
         }
         setVolume(SampleChannel::BGM, volume[SampleChannel::BGM]);
     }
@@ -884,19 +880,15 @@ void SoundDriverFMOD::update()
     {
         if (noteVolumeGradientLength == 0)
         {
-            noteVolume = noteVolumeGradientEnd;
+            noteVolume = noteVolumeGradientEnd.load();
         }
         else
         {
             double progress = double(t.norm() - noteVolumeGradientBeginTime) / noteVolumeGradientLength;
             if (progress >= 1.0)
-            {
-                noteVolume = noteVolumeGradientEnd;
-            }
+                noteVolume = noteVolumeGradientEnd.load();
             else
-            {
                 noteVolume = noteVolumeGradientBegin + (noteVolumeGradientEnd - noteVolumeGradientBegin) * progress;
-            }
         }
         setVolume(SampleChannel::MASTER, volume[SampleChannel::MASTER]);
     }
@@ -917,7 +909,7 @@ int SoundDriverFMOD::getChannelsPlaying()
 
 void SoundDriverFMOD::setSysVolume(float v, int gradientTime)
 {
-    sysVolumeGradientBegin = sysVolume;
+    sysVolumeGradientBegin = sysVolume.load();
     sysVolumeGradientEnd = v;
     sysVolumeGradientBeginTime = lunaticvibes::Time::now().norm();
     sysVolumeGradientLength = gradientTime;
@@ -925,7 +917,7 @@ void SoundDriverFMOD::setSysVolume(float v, int gradientTime)
 
 void SoundDriverFMOD::setNoteVolume(float v, int gradientTime)
 {
-    noteVolumeGradientBegin = noteVolume;
+    noteVolumeGradientBegin = noteVolume.load();
     noteVolumeGradientEnd = v;
     noteVolumeGradientBeginTime = lunaticvibes::Time::now().norm();
     noteVolumeGradientLength = gradientTime;
