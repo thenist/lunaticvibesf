@@ -1163,9 +1163,7 @@ void ScenePlay::loadChart()
     // always reload unstable resources
     if (!gChartContext.chart->resourceStable)
     {
-        gChartContext.isSampleLoaded = false;
         gChartContext.sampleLoadedHash.reset();
-        gChartContext.isBgaLoaded = false;
         gChartContext.bgaLoadedHash.reset();
     }
 
@@ -1178,22 +1176,18 @@ void ScenePlay::loadChart()
     std::future<void> bgaFuture;
 
     // load samples
-    if ((!gChartContext.isSampleLoaded || gChartContext.hash != gChartContext.sampleLoadedHash) && !sceneEnding)
+    if ((gChartContext.sampleLoadedHash != gChartContext.hash) && !sceneEnding)
     {
         samplesFuture = std::async(std::launch::async, [&shouldDiscard]() {
             SetThreadName("ChartSampleLoad");
             lunaticvibes::load_audio(*gChartContext.chart, shouldDiscard);
         });
     }
-    else
-    {
-        gChartContext.isSampleLoaded = true;
-    }
 
     // load bga
     if (State::get(IndexSwitch::_LOAD_BGA) && !sceneEnding)
     {
-        if (!gChartContext.isBgaLoaded)
+        if (gChartContext.bgaLoadedHash != gChartContext.hash)
         {
             bgaFuture = std::async(std::launch::async, [&shouldDiscard]() {
                 SetThreadName("ChartBgaLoad");
@@ -1807,8 +1801,8 @@ void ScenePlay::updateLoading(const lunaticvibes::Time& t)
 
     const bool chart_loaded = [&]() {
         std::shared_lock l{gPlayContext._mutex};
-        return gPlayContext.chartObjLoaded && gPlayContext.rulesetLoaded && gChartContext.isSampleLoaded &&
-               (!State::get(IndexSwitch::_LOAD_BGA) || gChartContext.isBgaLoaded);
+        return gPlayContext.chartObjLoaded && gPlayContext.rulesetLoaded && !gChartContext.sampleLoadedHash.empty() &&
+               (!State::get(IndexSwitch::_LOAD_BGA) || !gChartContext.bgaLoadedHash.empty());
     }();
     if (chart_loaded && (t - delayedReadyTime) > 1000 && rt > pSkin->info.timeMinimumLoad)
     {

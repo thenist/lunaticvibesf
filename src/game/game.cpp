@@ -237,9 +237,7 @@ int main(int argc, char* argv[])
         gChartContext.chart = bms;
         gChartContext.chartMybest = nullptr;
 
-        gChartContext.isSampleLoaded = false;
         gChartContext.sampleLoadedHash = HashMD5{};
-        gChartContext.isBgaLoaded = false;
         gChartContext.bgaLoadedHash = HashMD5{};
         gChartContext.started = false;
 

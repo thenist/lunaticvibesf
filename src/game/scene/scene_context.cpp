@@ -1600,15 +1600,9 @@ void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battl
     // only reload resources if selected chart is different
     gChartContext.hash = chart.fileHash;
     if (gChartContext.hash != gChartContext.sampleLoadedHash)
-    {
-        gChartContext.isSampleLoaded = false;
         gChartContext.sampleLoadedHash.reset();
-    }
     if (gChartContext.hash != gChartContext.bgaLoadedHash)
-    {
-        gChartContext.isBgaLoaded = false;
         gChartContext.bgaLoadedHash.reset();
-    }
 
     // set metadata
     gChartContext.title = chart.title;
@@ -1682,12 +1676,12 @@ double lunaticvibes::getSysLoadProgress()
 double lunaticvibes::getWavLoadProgress()
 {
     std::shared_lock l{gPlayContext._mutex};
-    return (gPlayContext.wavTotal == 0) ? (gChartContext.isSampleLoaded ? 1.0 : 0.0)
+    return (gPlayContext.wavTotal == 0) ? (gChartContext.sampleLoadedHash.empty() ? 0.0 : 1.0)
                                         : (double)gPlayContext.wavLoaded / gPlayContext.wavTotal;
 }
 double lunaticvibes::getBgaLoadProgress()
 {
     std::shared_lock l{gPlayContext._mutex};
-    return (gPlayContext.bmpTotal == 0) ? (gChartContext.isBgaLoaded ? 1.0 : 0.0)
+    return (gPlayContext.bmpTotal == 0) ? (gChartContext.bgaLoadedHash.empty() ? 0.0 : 1.0)
                                         : (double)gPlayContext.bmpLoaded / gPlayContext.bmpTotal;
 }

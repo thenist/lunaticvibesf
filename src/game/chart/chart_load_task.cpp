@@ -21,9 +21,8 @@ namespace v = std::views;
 void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()>& should_discard)
 {
     LVF_ASSERT(!IsMainThread());
-    // FIXME: synchronize gChartContext access between threads
+    // FIXME: synchronize gChartContext access between threads; also remove isBgaLoaded isSampleLoaded from that struct
 
-    gChartContext.isSampleLoaded = false;
     gChartContext.sampleLoadedHash.reset();
     SoundMgr::freeNoteSamples();
     auto chartDir = chart.getDirectory();
@@ -33,7 +32,6 @@ void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()
     if (total == 0)
     {
         LOG_VERBOSE << "[ChartLoadTask] No audio files in " << chartDir;
-        gChartContext.isSampleLoaded = true;
         gChartContext.sampleLoadedHash = gChartContext.hash;
         std::unique_lock l{gPlayContext._mutex};
         gPlayContext.wavTotal = 0;
@@ -82,7 +80,6 @@ void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()
         return;
     }
 
-    gChartContext.isSampleLoaded = true;
     gChartContext.sampleLoadedHash = chart.fileHash;
 }
 
@@ -93,7 +90,6 @@ void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()
 
     pushAndWaitMainThreadTask<void>([]() { gPlayContext.bgaTexture->clear(); });
 
-    gChartContext.isBgaLoaded = false;
     gChartContext.bgaLoadedHash.reset();
 
     auto chartDir = chart.getDirectory();
@@ -102,7 +98,6 @@ void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()
     if (total == 0)
     {
         LOG_VERBOSE << "[ChartLoadTask] No BGA files in " << chartDir;
-        gChartContext.isBgaLoaded = true;
         gChartContext.bgaLoadedHash = gChartContext.hash;
         std::unique_lock l{gPlayContext._mutex};
         gPlayContext.bmpTotal = 0;
@@ -146,6 +141,5 @@ void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()
         gPlayContext.bgaTexture->setLoaded();
     gPlayContext.bgaTexture->setSlotFromBMS(
         *std::reinterpret_pointer_cast<ChartObjectBMS>(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]));
-    gChartContext.isBgaLoaded = true;
     gChartContext.bgaLoadedHash = gChartContext.hash;
 }

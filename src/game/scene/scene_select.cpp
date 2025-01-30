@@ -2204,15 +2204,9 @@ void SceneSelect::decide()
         // only reload resources if selected chart is different
         gChartContext.hash = chart.fileHash;
         if (gChartContext.hash != gChartContext.sampleLoadedHash)
-        {
-            gChartContext.isSampleLoaded = false;
             gChartContext.sampleLoadedHash.reset();
-        }
         if (gChartContext.hash != gChartContext.bgaLoadedHash)
-        {
-            gChartContext.isBgaLoaded = false;
             gChartContext.bgaLoadedHash.reset();
-        }
 
         // gChartContext.chart = std::make_shared<ChartFormatBase>(chart);
         gChartContext.title = chart.title;
@@ -3315,7 +3309,7 @@ void SceneSelect::updatePreview()
             previewStandaloneLength = len;
             previewState = PREVIEW_PLAY;
         }
-        else if (gChartContext.isSampleLoaded)
+        else if (!gChartContext.sampleLoadedHash.empty())
         {
             LOG_DEBUG << "[Select] Direct preview ready -> PREVIEW_PLAY";
 
