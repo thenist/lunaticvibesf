@@ -42,6 +42,7 @@ add_library(
     runtime/state.cpp
     chart/chart.cpp
     chart/chart_bms.cpp
+    chart/chart_load_task.cpp
     ${GRAPHICS_BACKEND_SRC}
     graphics/dxa.cpp
     graphics/sprite.cpp

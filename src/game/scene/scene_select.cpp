@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <atomic>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -26,6 +25,7 @@
 #include <game/arena/arena_data.h>
 #include <game/arena/arena_host.h>
 #include <game/chart/chart_bms.h>
+#include <game/chart/chart_load_task.h>
 #include <game/ruleset/ruleset_bms.h>
 #include <game/ruleset/ruleset_bms_auto.h>
 #include <game/runtime/i18n.h>
@@ -3239,70 +3239,44 @@ void SceneSelect::updatePreview()
                     previewState = PREVIEW_LOADING_SAMPLES;
                 }
 
-                gChartContext.isSampleLoaded = false;
-                gChartContext.sampleLoadedHash.reset();
-
                 _previewLoading = std::jthread([&, bms] {
                     SetThreadName("PreviewSampleLoad");
+
+                    auto shouldDiscard = [this, bms]() {
+                        if (gAppIsExiting || gNextScene != SceneType::SELECT)
+                            return true;
+                        if (std::shared_lock l(previewMutex);
+                            previewChart != bms || previewState != PREVIEW_LOADING_SAMPLES)
+                            return true;
+                        return false;
+                    };
+
+                    lunaticvibes::load_audio(*bms, shouldDiscard);
+
+                    if (shouldDiscard())
+                    {
+                        LOG_DEBUG << "[Select] Scene or preview chart has changed, discarding and retrying";
+                        // previewState not changed
+                        return;
+                    }
+
+                    const bool nothing_loaded = []() {
+                        std::shared_lock l{gPlayContext._mutex};
+                        return gPlayContext.wavTotal == 0;
+                    }();
+                    if (nothing_loaded)
+                    {
+                        LOG_DEBUG << "[Select] Chart has no samples for direct preview -> PREVIEW_FINISH";
+                        std::unique_lock u(previewMutex);
+                        previewState = PREVIEW_FINISH;
+                        return;
+                    }
+
                     auto previewChartObjTmp = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, *bms);
                     auto previewRulesetTmp = std::make_shared<RulesetBMSAuto>(
                         bms, previewChartObjTmp, PlayModifiers{}, bms->gamemode, JudgeDifficulty::VERYHARD, 0.2,
                         RulesetBMS::PlaySide::RIVAL,
                         gPlayContext.shiftFiveKeyForSevenKeyIndex(bms->gamemode == 5 || bms->gamemode == 10));
-
-                    // load samples
-                    SoundMgr::freeNoteSamples();
-                    auto chartDir = bms->getDirectory();
-
-                    const int wavTotal = r::count_if(bms->wavFiles, std::not_fn(&std::string::empty));
-                    if (wavTotal == 0)
-                    {
-                        LOG_DEBUG << "[Select] Chart has no samples for direct preview -> PREVIEW_FINISH";
-                        std::unique_lock l(previewMutex);
-                        previewState = PREVIEW_FINISH;
-                        return;
-                    }
-
-                    static const auto shouldDiscard = [](SceneSelect& s, const std::shared_ptr<ChartFormatBMS>& bms) {
-                        if (gAppIsExiting || gNextScene != SceneType::SELECT)
-                            return true;
-                        if (std::shared_lock l(s.previewMutex);
-                            s.previewChart != bms || s.previewState != PREVIEW_LOADING_SAMPLES)
-                            return true;
-                        return false;
-                    };
-
-                    std::atomic<size_t> jobs;
-                    std::atomic<size_t> jobs_done;
-                    for (size_t i = 0; i < bms->wavFiles.size(); ++i)
-                    {
-                        const auto& wav = bms->wavFiles[i];
-                        if (wav.empty())
-                            continue;
-                        jobs++;
-                        lunaticvibes::post_job(jobs_done, [&, i]() {
-                            if (shouldDiscard(*this, bms))
-                                return;
-                            Path pWav = PathFromUTF8(wav);
-                            fs::path p{chartDir / pWav};
-#ifndef _WIN32
-                            p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
-#endif // _WIN32
-                            SoundMgr::loadNoteSample(p, i);
-                        });
-                    }
-                    LOG_VERBOSE << "[Select] Waiting on " << jobs << " load jobs";
-                    while (jobs != jobs_done)
-                        std::this_thread::yield();
-
-                    if (shouldDiscard(*this, bms))
-                    {
-                        LOG_DEBUG << "[Select] Scene or preview chart has changed, discarding";
-                        return;
-                    }
-
-                    gChartContext.isSampleLoaded = true;
-                    gChartContext.sampleLoadedHash = bms->fileHash;
                     LOG_DEBUG << "[Select] Preview loading finished -> PREVIEW_READY";
                     std::unique_lock l(previewMutex);
                     previewChartObj = previewChartObjTmp;
@@ -3358,8 +3332,8 @@ void SceneSelect::updatePreview()
         }
         else
         {
-            LOG_WARNING
-                << "[Select] Previews samples are not loaded but the state is 'ready', stopping -> PREVIEW_FINISH";
+            lunaticvibes::verify_failed(
+                "[Select] Preview samples are not loaded but the state is 'ready', stopping -> PREVIEW_FINISH");
             std::unique_lock l(previewMutex);
             previewState = PREVIEW_FINISH;
         }
