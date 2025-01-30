@@ -6,6 +6,7 @@
 #include <common/u8.h>
 #include <common/utils.h>
 #include <config/config_mgr.h>
+#include <game/sound/sound_driver.h>
 #include <game/sound/sound_fmod_callback.h>
 
 #include <fmod_errors.h>
@@ -15,9 +16,18 @@
 #include <windows.h>
 #endif
 
+#include <array>
 #include <cstdlib>
 #include <functional>
 #include <string_view>
+
+static constexpr auto SOUND_CHANNEL_TYPES = std::to_array({
+    SoundChannelType::BGM_SYS,
+    SoundChannelType::BGM_NOTE,
+    SoundChannelType::KEY_SYS,
+    SoundChannelType::KEY_LEFT,
+    SoundChannelType::KEY_RIGHT,
+});
 
 static FMOD_RESULT log_fmod_message(FMOD_DEBUG_FLAGS flags, const char* file, int line, const char* func,
                                     const char* message_)
@@ -216,31 +226,29 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
 
 void SoundDriverFMOD::createChannelGroups()
 {
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+    for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        const auto e = static_cast<SoundChannelType>(i);
         FMOD::ChannelGroup* pcg = nullptr;
         char name[16];
-        sprintf(name, "CHG_%d", i);
+        sprintf(name, "CHG_%d", static_cast<int>(e));
         initRet = fmodSystem->createChannelGroup(name, &pcg);
         if (initRet != FMOD_OK)
         {
-            LOG_ERROR << "Create channel group " << i << " Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+            LOG_ERROR << "Create channel group " << name << " Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
             return;
         }
         channelGroup[e] = std::shared_ptr<FMOD::ChannelGroup>(pcg, [](FMOD::ChannelGroup* p) { p->release(); });
     }
 
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+    for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        const auto e = static_cast<SoundChannelType>(i);
         FMOD::ChannelGroup* pcg = nullptr;
         char name[16];
-        sprintf(name, "CHG_%d", i);
+        sprintf(name, "CHG_%d", static_cast<int>(e));
         initRet = fmodSystem->createChannelGroup(name, &pcg);
         if (initRet != FMOD_OK)
         {
-            LOG_ERROR << "Create channel group " << i << " Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+            LOG_ERROR << "Create channel group " << name << " Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
             return;
         }
         channelGroup[e] = std::shared_ptr<FMOD::ChannelGroup>(pcg, [](FMOD::ChannelGroup* p) { p->release(); });
@@ -249,10 +257,8 @@ void SoundDriverFMOD::createChannelGroups()
     for (int c = 0; c < 3; ++c)
     {
         // create dummy dsp
-        for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT);
-             ++i)
+        for (const auto e : SOUND_CHANNEL_TYPES)
         {
-            const auto e = static_cast<SoundChannelType>(i);
             fmodSystem->createDSPByType(FMOD_DSP_TYPE_MIXER, &DSPMaster[c][e]);
             DSPMaster[c][e]->setBypass(true);
         }
@@ -280,18 +286,16 @@ void SoundDriverFMOD::createChannelGroups()
     }
 
     // create PITCHSHIFT dsp
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+    for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        const auto e = static_cast<SoundChannelType>(i);
         fmodSystem->createDSPByType(FMOD_DSP_TYPE_PITCHSHIFT, &PitchShiftFilter[e]);
         PitchShiftFilter[e]->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 512.f);
         channelGroup[e]->addDSP(6, PitchShiftFilter[e]);
     }
 
     // create MULTIBAND_EQ dsp
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+    for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        const auto e = static_cast<SoundChannelType>(i);
         fmodSystem->createDSPByType(FMOD_DSP_TYPE_MULTIBAND_EQ, &EQFilter[0][e]);
         fmodSystem->createDSPByType(FMOD_DSP_TYPE_MULTIBAND_EQ, &EQFilter[1][e]);
         EQFilter[0][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_A_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
@@ -980,10 +984,8 @@ void SoundDriverFMOD::setDSP(DSPType type, int dspIndex, SampleChannel ch, float
 
     if (fmodType == FMOD_DSP_TYPE_UNKNOWN)
     {
-        for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT);
-             ++i)
+        for (const auto e : SOUND_CHANNEL_TYPES)
         {
-            const auto e = static_cast<SoundChannelType>(i);
             DSPMaster[dspIndex][e]->setBypass(true);
         }
         DSPBgm[dspIndex][SoundChannelType::BGM_NOTE]->setBypass(true);
@@ -1068,18 +1070,14 @@ void SoundDriverFMOD::setDSP(DSPType type, int dspIndex, SampleChannel ch, float
             DSPKey[dspIndex][SoundChannelType::KEY_SYS]->setBypass(true);
             DSPKey[dspIndex][SoundChannelType::KEY_LEFT]->setBypass(true);
             DSPKey[dspIndex][SoundChannelType::KEY_RIGHT]->setBypass(true);
-            for (auto i = static_cast<int>(SoundChannelType::BGM_SYS);
-                 i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+            for (const auto e : SOUND_CHANNEL_TYPES)
             {
-                const auto e = static_cast<SoundChannelType>(i);
                 updateDSP(channelGroup[e], DSPMaster[dspIndex][e]);
             }
             break;
         case SampleChannel::KEY:
-            for (auto i = static_cast<int>(SoundChannelType::BGM_SYS);
-                 i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+            for (const auto e : SOUND_CHANNEL_TYPES)
             {
-                const auto e = static_cast<SoundChannelType>(i);
                 DSPMaster[dspIndex][e]->setBypass(true);
             }
             DSPBgm[dspIndex][SoundChannelType::BGM_NOTE]->setBypass(true);
@@ -1089,10 +1087,8 @@ void SoundDriverFMOD::setDSP(DSPType type, int dspIndex, SampleChannel ch, float
             updateDSP(channelGroup[SoundChannelType::KEY_RIGHT], DSPKey[dspIndex][SoundChannelType::KEY_RIGHT]);
             break;
         case SampleChannel::BGM:
-            for (auto i = static_cast<int>(SoundChannelType::BGM_SYS);
-                 i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+            for (const auto e : SOUND_CHANNEL_TYPES)
             {
-                const auto e = static_cast<SoundChannelType>(i);
                 DSPMaster[dspIndex][e]->setBypass(true);
             }
             DSPKey[dspIndex][SoundChannelType::KEY_SYS]->setBypass(true);
@@ -1107,9 +1103,8 @@ void SoundDriverFMOD::setDSP(DSPType type, int dspIndex, SampleChannel ch, float
 
 void SoundDriverFMOD::setFreqFactor(double f)
 {
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+    for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        const auto e = static_cast<SoundChannelType>(i);
         channelGroup[e]->setPitch(f);
         PitchShiftFilter[e]->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, 1.0f);
         PitchShiftFilter[e]->setBypass(true);
@@ -1119,9 +1114,8 @@ void SoundDriverFMOD::setFreqFactor(double f)
 void SoundDriverFMOD::setSpeed(double speed)
 {
     double pitch = 1.0 / speed;
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+    for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        const auto e = static_cast<SoundChannelType>(i);
         channelGroup[e]->setPitch(speed);
         PitchShiftFilter[e]->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, pitch);
         PitchShiftFilter[e]->setBypass(false);
@@ -1130,9 +1124,8 @@ void SoundDriverFMOD::setSpeed(double speed)
 
 void SoundDriverFMOD::setPitch(double pitch)
 {
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+    for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        const auto e = static_cast<SoundChannelType>(i);
         channelGroup[e]->setPitch(1.0);
         PitchShiftFilter[e]->setParameterFloat(FMOD_DSP_PITCHSHIFT_PITCH, pitch);
         PitchShiftFilter[e]->setBypass(false);
@@ -1173,10 +1166,8 @@ void SoundDriverFMOD::setEQ(EQFreq freq, int gain)
         ch = FMOD_DSP_MULTIBAND_EQ_D_GAIN;
         break;
     }
-    for (auto ch_i = static_cast<int>(SoundChannelType::BGM_SYS);
-         ch_i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++ch_i)
+    for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        const auto e = static_cast<SoundChannelType>(ch_i);
         EQFilter[i][e]->setParameterFloat(ch, (float)gain);
     }
 }
