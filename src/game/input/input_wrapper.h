@@ -71,7 +71,6 @@ private:
 
     // Shared data
     mutable std::mutex _inputMutex;
-    InputMask _holding = 0;
     int _cursor_x = 0;
     int _cursor_y = 0;
     bool mergeInput = false;
@@ -99,7 +98,7 @@ public:
     [[nodiscard]] InputMask Holding() const
     {
         std::lock_guard l(_inputMutex);
-        return _holding;
+        return _prev & _curr;
     }
 
     [[nodiscard]] std::pair<int, int> getCursorPos() const
