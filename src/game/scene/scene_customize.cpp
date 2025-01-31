@@ -491,14 +491,12 @@ void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
     switch (pSkin->version())
     {
     case SkinVersion::LR2beta3: {
-        LVF_DEBUG_ASSERT(idxOption < optionsKeyList.size());
+        LVF_ASSERT(idxOption < optionsKeyList.size());
         Option& op = optionsMap[optionsKeyList[idxOption]];
         if (op.id != 0)
         {
             for (size_t i = 0; i < op.entries.size(); ++i)
-            {
                 setCustomDstOpt(op.id, i, false);
-            }
             setCustomDstOpt(op.id, idxEntry, true);
         }
         else
@@ -721,20 +719,16 @@ void SceneCustomize::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
     if (m[Input::Pad::MWHEELUP] && topOptionIndex > 0)
     {
         topOptionIndex--;
-        if (!optionsMap.empty())
-        {
+        if (optionsMap.size() > 2)
             State::set(IndexSlider::SKIN_CONFIG_OPTIONS, double(topOptionIndex) / (optionsMap.size() - 1));
-        }
         updateTexts();
     }
 
     if (m[Input::Pad::MWHEELDOWN] && topOptionIndex + 1 < optionsMap.size())
     {
         topOptionIndex++;
-        if (!optionsMap.empty())
-        {
+        if (optionsMap.size() > 2)
             State::set(IndexSlider::SKIN_CONFIG_OPTIONS, double(topOptionIndex) / (optionsMap.size() - 1));
-        }
         updateTexts();
     }
 }
