@@ -77,13 +77,11 @@ public:
         RGB24,
         BGR24,
 
-        YV12,        // 4:2:0 Y + V + U
-        IYUV,        // 4:2:0 Y + U + V
-        I420 = IYUV, // 4:2:0 Y + U + V
-        YUY2,        // Y0 + U0 + Y1 + V0
-        YUYV = YUY2, // Y0 + U0 + Y1 + V0
-        UYVY,        // U0 + Y0 + V0 + Y1
-        YVYU,        // Y0 + V0 + Y1 + U0
+        YV12, // 4:2:0 Y + V + U
+        IYUV, // 4:2:0 Y + U + V aka I420
+        YUY2, // Y0 + U0 + Y1 + V0 aka YUYV
+        UYVY, // U0 + Y0 + V0 + Y1
+        YVYU, // Y0 + V0 + Y1 + U0
     };
 
 public:
