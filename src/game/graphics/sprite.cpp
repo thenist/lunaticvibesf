@@ -5,6 +5,11 @@
 #include <game/skin/skin_lr2_bargraph.h>
 #include <game/skin/skin_lr2_number.h>
 
+#include <cmath>
+#include <cstdint>
+
+using uint8_t = std::uint8_t;
+
 [[nodiscard]] static constexpr double grad(int dst, int src, double t)
 {
     return (src == dst) ? src : (dst * t + src * (1.0 - t));
@@ -170,10 +175,10 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
             _current.rect.w = (float)grad(keyFrameNext->param.rect.w, keyFrameCurr->param.rect.w, prog);
             _current.rect.h = (float)grad(keyFrameNext->param.rect.h, keyFrameCurr->param.rect.h, prog);
             //_current.rcGrid  = keyFrameNext->param.rcGrid  * prog + keyFrameCurr->param.rcGrid  * (1.0 - prog);
-            _current.color.r = (Uint8)grad(keyFrameNext->param.color.r, keyFrameCurr->param.color.r, prog);
-            _current.color.g = (Uint8)grad(keyFrameNext->param.color.g, keyFrameCurr->param.color.g, prog);
-            _current.color.b = (Uint8)grad(keyFrameNext->param.color.b, keyFrameCurr->param.color.b, prog);
-            _current.color.a = (Uint8)grad(keyFrameNext->param.color.a, keyFrameCurr->param.color.a, prog);
+            _current.color.r = (uint8_t)grad(keyFrameNext->param.color.r, keyFrameCurr->param.color.r, prog);
+            _current.color.g = (uint8_t)grad(keyFrameNext->param.color.g, keyFrameCurr->param.color.g, prog);
+            _current.color.b = (uint8_t)grad(keyFrameNext->param.color.b, keyFrameCurr->param.color.b, prog);
+            _current.color.a = (uint8_t)grad(keyFrameNext->param.color.a, keyFrameCurr->param.color.a, prog);
             //_current.color = keyFrameNext->param.color * prog + keyFrameNext->param.color * (1.0 - prog);
             _current.angle = grad(static_cast<int>(std::round(keyFrameNext->param.angle)),
                                   static_cast<int>(std::round(keyFrameCurr->param.angle)), prog);
