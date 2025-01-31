@@ -1,11 +1,5 @@
 #pragma once
 
-#include <SDL_filesystem.h>
-#include <SDL_image.h>
-#include <SDL_render.h>
-#include <SDL_ttf.h>
-#include <SDL_video.h>
-
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -16,6 +10,13 @@
 #include <game/graphics/point.h>      // IWUY pragma: export
 #include <game/graphics/rect.h>       // IWUY pragma: export
 #include <game/graphics/rectf.h>      // IWUY pragma: export
+
+// SDL forward declarations. Don't include SDL itself to avoid leaking implementation details.
+struct SDL_RWops;
+struct SDL_Renderer;
+struct SDL_Surface;
+struct SDL_Texture;
+using TTF_Font = struct _TTF_Font; // NOLINT(cert-dcl37-c,cert-dcl51-cpp,bugprone-reserved-identifier): SDL detail
 
 // global control pointer, do not modify
 inline SDL_Renderer* gFrameRenderer;

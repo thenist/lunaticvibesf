@@ -12,6 +12,12 @@
 #include <common/utils.h>
 #include <game/graphics/graphics.h>
 
+#include <SDL_filesystem.h>
+#include <SDL_image.h>
+#include <SDL_render.h>
+#include <SDL_ttf.h>
+#include <SDL_video.h>
+
 #define SDL_LOAD_NOAUTOFREE 0
 #define SDL_LOAD_AUTOFREE 1
 
