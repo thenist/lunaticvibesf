@@ -41,6 +41,10 @@
 #include <timeapi.h>
 #endif // WIN32
 
+#ifdef RENDER_SDL2
+#include <SDL_main.h> // WinMain implementation
+#endif // RENDER_SDL2
+
 #include <boost/nowide/args.hpp>
 
 #include <curl/curl.h>

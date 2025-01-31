@@ -150,7 +150,7 @@ target_precompile_headers(gamelib REUSE_FROM common)
 
 #############################################################
 
-# WIN32 - graphical application/don't spawn a console (Windows only).
+# WIN32 - graphical application/don't spawn a console and use WinMain as entry point (Windows only).
 add_executable(LunaticVibesF WIN32 game.cpp LunaticVibesF.exe.manifest)
 target_link_libraries(LunaticVibesF PRIVATE gamelib PRIVATE tinyfiledialogs)
 set_target_properties(LunaticVibesF PROPERTIES CXX_STANDARD 23)
