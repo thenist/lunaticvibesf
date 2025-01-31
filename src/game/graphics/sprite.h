@@ -14,6 +14,11 @@
 #include <string_view>
 #include <vector>
 
+namespace lunaticvibes
+{
+bool isPanelOpen(int panelIdx);
+} // namespace lunaticvibes
+
 enum class SpriteTypes
 {
     VIRTUAL,

@@ -1,10 +1,5 @@
 #include "sprite.h"
 
-namespace lunaticvibes
-{
-bool isPanelOpen(int panelIdx);
-} // namespace lunaticvibes
-
 SpriteButton::SpriteButton(const SpriteButtonBuilder& builder) : SpriteOption(builder)
 {
     _type = SpriteTypes::BUTTON;

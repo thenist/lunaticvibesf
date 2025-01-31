@@ -15,10 +15,7 @@ using uint8_t = std::uint8_t;
     return (src == dst) ? src : (dst * t + src * (1.0 - t));
 }
 
-namespace lunaticvibes
-{
-
-bool isPanelOpen(int panelIdx)
+bool lunaticvibes::isPanelOpen(int panelIdx)
 {
     switch (panelIdx)
     {
@@ -43,8 +40,6 @@ bool isPanelOpen(int panelIdx)
     default: lunaticvibes::assert_failed("isPanelPressed");
     }
 }
-
-} // namespace lunaticvibes
 
 RenderParams& RenderParams::operator=(const MotionKeyFrameParams& rhs)
 {

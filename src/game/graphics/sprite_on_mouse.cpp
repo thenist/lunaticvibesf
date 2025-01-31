@@ -1,10 +1,5 @@
 #include "sprite.h"
 
-namespace lunaticvibes
-{
-bool isPanelOpen(int panelIdx);
-} // namespace lunaticvibes
-
 SpriteOnMouse::SpriteOnMouse(const SpriteOnMouseBuilder& builder) : SpriteAnimated(builder)
 {
     _type = SpriteTypes::ONMOUSE;
