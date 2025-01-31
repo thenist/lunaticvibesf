@@ -3,6 +3,7 @@
 #include <common/assert.h>
 #include <common/sysutil.h>
 
+#include <cmath>
 #include <string_view>
 
 SpriteText::SpriteText(const SpriteTextBuilder& builder) : SpriteBase(builder)

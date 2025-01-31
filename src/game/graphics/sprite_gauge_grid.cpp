@@ -2,6 +2,8 @@
 
 #include <game/skin/skin_lr2_number.h>
 
+#include <cmath>
+
 SpriteGaugeGrid::SpriteGaugeGrid(const SpriteGaugeGridBuilder& builder) : SpriteAnimated(builder)
 {
     _type = SpriteTypes::GAUGE;
