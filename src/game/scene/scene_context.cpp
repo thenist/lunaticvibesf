@@ -1514,9 +1514,18 @@ void switchVersion(unsigned difficulty)
 
 void setDynamicTextures()
 {
-    gChartContext.texStagefile.setPath("");
-    gChartContext.texBackbmp.setPath("");
-    gChartContext.texBanner.setPath("");
+    struct LoadRequester
+    {
+        ~LoadRequester()
+        {
+            gChartContext.texStagefile.setPath(stagefile);
+            gChartContext.texBackbmp.setPath(backbmp);
+            gChartContext.texBanner.setPath(banner);
+        }
+        Path stagefile;
+        Path backbmp;
+        Path banner;
+    } requester;
 
     const EntryList& e = gSelectContext.entries;
     if (e.empty())
@@ -1545,11 +1554,11 @@ void setDynamicTextures()
         }
 
         if (!pf->stagefile.empty())
-            gChartContext.texStagefile.setPath(pf->getDirectory() / PathFromUTF8(pf->stagefile));
+            requester.stagefile = pf->getDirectory() / PathFromUTF8(pf->stagefile);
         if (!pf->backbmp.empty())
-            gChartContext.texBackbmp.setPath(pf->getDirectory() / PathFromUTF8(pf->backbmp));
+            requester.backbmp = pf->getDirectory() / PathFromUTF8(pf->backbmp);
         if (!pf->banner.empty())
-            gChartContext.texBanner.setPath(pf->getDirectory() / PathFromUTF8(pf->banner));
+            requester.banner = pf->getDirectory() / PathFromUTF8(pf->banner);
     }
     break;
 

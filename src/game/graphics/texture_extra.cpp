@@ -517,7 +517,10 @@ static std::future<Image> asyncLoadImage(Path path)
 
 void TextureDynamic::setPath(const Path& path)
 {
+    if (path == _loaded_path)
+        return;
     loaded = false;
+    _loaded_path = path;
     if (path.empty())
         return;
     _loadImage = asyncLoadImage(path);

@@ -3,8 +3,9 @@
 #include <map>
 #include <utility>
 
-#include "common/beat.h"
-#include "video.h"
+#include <common/beat.h>
+#include <common/types.h>
+#include <game/graphics/video.h>
 
 class TextureVideo : public Texture
 {
@@ -122,15 +123,15 @@ public:
 
 class TextureDynamic final : public Texture
 {
-protected:
+private:
     std::future<Image> _loadImage;
     std::unique_ptr<Texture> _dynTexture;
+    Path _loaded_path;
 
 public:
     TextureDynamic();
     ~TextureDynamic() override = default;
 
-public:
     void setPath(const Path& path); // Asynchronously load the image from disk.
     void applyImageIfNeeded();      // Synchronously upload the image to GPU.
 
