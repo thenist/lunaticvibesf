@@ -70,7 +70,7 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
 {
     // Check if object is valid
     // Note that nullptr texture shall pass
-    if (pTexture != nullptr && !pTexture->loaded)
+    if (pTexture != nullptr && !pTexture->isLoaded())
         return false;
 
     // Check if frames are valid
@@ -253,7 +253,7 @@ void SpriteStatic::draw() const
     if (isHidden())
         return;
 
-    if (_draw && pTexture->loaded)
+    if (_draw && pTexture->isLoaded())
         pTexture->draw(textureRect, _current.rect, _current.color, _current.blend, _current.filter, _current.angle,
                        _current.center);
 }
@@ -306,7 +306,7 @@ void SpriteSelection::draw() const
     if (isHidden())
         return;
 
-    if (_draw && pTexture->loaded)
+    if (_draw && pTexture->isLoaded())
         pTexture->draw(textureRects[selectionIndex], _current.rect, _current.color, _current.blend, _current.filter,
                        _current.angle, _current.center);
 }
@@ -369,7 +369,7 @@ void SpriteAnimated::draw() const
     if (isHidden())
         return;
 
-    if (_draw && animationFrameIndex < textureRects.size() && pTexture != nullptr && pTexture->loaded)
+    if (_draw && animationFrameIndex < textureRects.size() && pTexture != nullptr && pTexture->isLoaded())
     {
         pTexture->draw(textureRects[selectionIndex * animationFrames + animationFrameIndex], _current.rect,
                        _current.color, _current.blend, _current.filter, _current.angle, _current.center);

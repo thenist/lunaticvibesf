@@ -1,9 +1,11 @@
 #include "sprite_graph.h"
-#include "game/scene/scene_context.h"
 
 #include <concepts>
 #include <functional>
 #include <shared_mutex>
+
+#include <game/graphics/graph_line.h>
+#include <game/scene/scene_context.h>
 
 SpriteLine::SpriteLine(const SpriteLineBuilder& builder) : SpriteStatic(builder)
 {
@@ -14,13 +16,8 @@ SpriteLine::SpriteLine(const SpriteLineBuilder& builder) : SpriteStatic(builder)
     _field_h = builder.canvasH;
     _start = builder.start;
     _end = builder.end;
-    _line = builder.lineWeight;
+    _line = lunaticvibes::GraphLineDrawer{builder.lineWeight};
     textColor = builder.color;
-}
-
-void SpriteLine::appendPoint(const ColorPoint& c)
-{
-    _points.push_back(c);
 }
 
 void SpriteLine::draw() const
@@ -42,7 +39,7 @@ void SpriteLine::updateProgress(const lunaticvibes::Time& t)
         long long rt = t.norm() - State::get(motionStartTimer);
         if (rt >= _start)
         {
-            _progress = (double)(rt - _start) / duration;
+            _progress = static_cast<double>(rt - _start) / duration;
             _progress = std::clamp(_progress, 0.0, 1.0);
         }
         else
@@ -83,7 +80,7 @@ void SpriteLine::updateRects()
                 if (cond(points[i], points[i + 1]))
                 {
                     auto make_pos = [&](int ii) -> Point {
-                        return {r.x + _field_w * (double(ii) / (points.size() - 1)),
+                        return {r.x + _field_w * (static_cast<double>(ii) / (points.size() - 1)),
                                 r.y - _field_h * (double(clip(points[ii])) / maxh)};
                     };
                     _rects.emplace_back(make_pos(i), make_pos(i + 1));

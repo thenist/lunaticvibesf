@@ -139,7 +139,7 @@ static void panel_switch(int idx, int plus)
 {
     if (idx < 1 || idx > 9)
         return;
-    auto panel = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + idx);
+    auto panel = static_cast<IndexSwitch>(static_cast<int>(IndexSwitch::SELECT_PANEL1) - 1 + idx);
     lunaticvibes::Time t{};
 
     // close other panels
@@ -147,12 +147,12 @@ static void panel_switch(int idx, int plus)
     {
         if (i == idx)
             continue;
-        auto p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
+        auto p = static_cast<IndexSwitch>(static_cast<int>(IndexSwitch::SELECT_PANEL1) - 1 + i);
         if (State::get(p))
         {
             State::set(p, false);
-            State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_START) - 1 + i), TIMER_NEVER);
-            State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_END) - 1 + i), t.norm());
+            State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_START) - 1 + i), TIMER_NEVER);
+            State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_END) - 1 + i), t.norm());
             SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CLOSE);
         }
     }
@@ -161,15 +161,15 @@ static void panel_switch(int idx, int plus)
     {
         // close panel
         State::set(panel, false);
-        State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_START) - 1 + idx), TIMER_NEVER);
-        State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_END) - 1 + idx), t.norm());
+        State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_START) - 1 + idx), TIMER_NEVER);
+        State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_END) - 1 + idx), t.norm());
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CLOSE);
     }
     else
     {
         // open panel
         State::set(panel, true);
-        State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_START) - 1 + idx), t.norm());
+        State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_START) - 1 + idx), t.norm());
         State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_END) - 1 + idx), TIMER_NEVER);
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_OPEN);
     }
@@ -369,8 +369,8 @@ static void fx_type(int idx, int plus)
 
     if (State::get(sw))
     {
-        auto p1 = float(State::get(sli_p1));
-        auto p2 = float(State::get(sli_p2));
+        auto p1 = static_cast<float>(State::get(sli_p1));
+        auto p2 = static_cast<float>(State::get(sli_p2));
         update_fx(val, idx, ch, p1, p2);
     }
     else
@@ -396,8 +396,8 @@ static void fx_switch(int idx, int plus)
     {
         // button clicked, open fx
         State::set(sw, true);
-        auto p1 = float(State::get(sli_p1));
-        auto p2 = float(State::get(sli_p2));
+        auto p1 = static_cast<float>(State::get(sli_p1));
+        auto p2 = static_cast<float>(State::get(sli_p2));
         update_fx(State::get(op), idx, ch, p1, p2);
     }
 }
@@ -424,8 +424,8 @@ static void fx_target(int idx, int plus)
         default: break;
         }
 
-        auto p1 = float(State::get(sli_p1));
-        auto p2 = float(State::get(sli_p2));
+        auto p1 = static_cast<float>(State::get(sli_p1));
+        auto p2 = static_cast<float>(State::get(sli_p2));
         State::set(num_p1, static_cast<int>(p1 * 100));
         State::set(num_p2, static_cast<int>(p2 * 100));
         update_fx(State::get(op), idx, ch, p1, p2);
@@ -442,7 +442,7 @@ static void eq_switch(int plus)
 
         for (int idx = 0; idx < 7; ++idx)
         {
-            SoundMgr::setEQ((EQFreq)idx, 0);
+            SoundMgr::setEQ(static_cast<EQFreq>(idx), 0);
         }
     }
     else
@@ -452,8 +452,8 @@ static void eq_switch(int plus)
 
         for (int idx = 0; idx < 7; ++idx)
         {
-            int val = State::get(IndexNumber(idx + (int)IndexNumber::EQ0));
-            SoundMgr::setEQ((EQFreq)idx, val);
+            int val = State::get(IndexNumber(idx + static_cast<int>(IndexNumber::EQ0)));
+            SoundMgr::setEQ(static_cast<EQFreq>(idx), val);
         }
     }
 }
@@ -652,7 +652,7 @@ void autoscr(int player, int plus)
     if (plus % 2)
         val = !val;
     State::set(sw, val);
-    State::set(tx, Option::s_assist_type[(int)val]);
+    State::set(tx, Option::s_assist_type[static_cast<int>(val)]);
 
     if (plus != 0)
     {
@@ -1057,7 +1057,7 @@ static void vsync(int plus)
 
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 
-    graphics_change_vsync(val);
+    graphics_change_vsync(static_cast<lunaticvibes::GRAPHICS_VSYNC_MODE>(val));
 }
 
 // 83
@@ -1568,7 +1568,9 @@ std::function<void(int)> getButtonCallback(int type)
     case 106:
     case 107:
     case 108:
-    case 109: return noarg(std::bind_front(key_config_pad, Input::Pad(unsigned(Input::Pad::K11) + type - 101), false));
+    case 109:
+        return noarg(
+            std::bind_front(key_config_pad, Input::Pad(static_cast<unsigned>(Input::Pad::K11) + type - 101), false));
     case 110: return noarg(std::bind_front(key_config_pad, Input::Pad::S1L, false));
     case 111: return noarg(std::bind_front(key_config_pad, Input::Pad::S1R, false));
     case 112: return noarg(std::bind_front(key_config_pad, Input::Pad::K1START, false));
@@ -1582,7 +1584,9 @@ std::function<void(int)> getButtonCallback(int type)
     case 126:
     case 127:
     case 128:
-    case 129: return noarg(std::bind_front(key_config_pad, Input::Pad(unsigned(Input::Pad::K21) + type - 121), false));
+    case 129:
+        return noarg(
+            std::bind_front(key_config_pad, Input::Pad(static_cast<unsigned>(Input::Pad::K21) + type - 121), false));
     case 130: return noarg(std::bind_front(key_config_pad, Input::Pad::S2L, false));
     case 131: return noarg(std::bind_front(key_config_pad, Input::Pad::S2R, false));
     case 132: return noarg(std::bind_front(key_config_pad, Input::Pad::K2START, false));

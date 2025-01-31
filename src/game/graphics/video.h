@@ -2,17 +2,10 @@
 
 #include <future>
 #include <memory>
-#include <set>
 #include <shared_mutex>
-#include <type_traits>
 
-#include "common/types.h"
-#include "graphics.h"
-
-inline const std::set<std::string> video_file_extensions = {
-    ".mpg", ".mp2", ".mpeg", ".mpeg2", ".mpe", ".mpv",  ".flv", ".mp4", ".m4p",
-    ".m4v", ".f4v", ".avi",  ".wmv",   ".mkv", ".webm", ".mov", ".m1v",
-};
+#include <common/types.h>
+#include <game/graphics/graphics.h>
 
 extern "C"
 {
@@ -29,6 +22,8 @@ void video_init();
 
 namespace lunaticvibes
 {
+[[nodiscard]] bool is_video_file_path(const Path& p);
+
 struct AVCodecContextDeleter
 {
     void operator()(AVCodecContext*);
@@ -90,9 +85,9 @@ public:
     virtual ~sVideo();
     int setVideo(const Path& file, double speed, bool loop = false);
     int unsetVideo();
-    int getW() const { return w; }
-    int getH() const { return h; }
-    bool isPlaying() const { return playing; }
+    [[nodiscard]] int getW() const { return w; }
+    [[nodiscard]] int getH() const { return h; }
+    [[nodiscard]] bool isPlaying() const { return playing; }
 
 public:
     // properties
@@ -104,8 +99,8 @@ public:
     void stopPlaying();
     void decodeLoop();
 
-    int64_t getDecodedFrames() const { return decoded_frames; }
-    AVFrame* getFrame() const { return valid ? pFrame.get() : nullptr; }
+    [[nodiscard]] int64_t getDecodedFrames() const { return decoded_frames; }
+    [[nodiscard]] AVFrame* getFrame() const { return valid ? pFrame.get() : nullptr; }
 
 public:
     std::shared_mutex video_frame_mutex;

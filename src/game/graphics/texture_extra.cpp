@@ -14,6 +14,7 @@
 #include <common/u8.h>
 #include <common/utils.h>
 #include <game/chart/chart_bms.h>
+#include <game/graphics/video.h>
 #include <game/scene/scene_context.h>
 
 #include <boost/asio.hpp>
@@ -180,8 +181,7 @@ bool TextureBmsBga::addBmp(size_t idx, Path pBmp)
     }
     if (fs::exists(pBmp) && fs::is_regular_file(pBmp) && pBmp.has_extension())
     {
-        if (video_file_extensions.find(toLower(lunaticvibes::s(pBmp.extension().u8string()))) !=
-            video_file_extensions.end())
+        if (lunaticvibes::is_video_file_path(pBmp))
         {
             objs[idx].type = obj::Ty::VIDEO;
             objs[idx].pt =

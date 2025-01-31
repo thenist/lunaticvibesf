@@ -2,17 +2,11 @@
 
 #include "sprite.h"
 
+#include <game/graphics/sprite_imagetext_charmapping.h>
+
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
-
-struct CharMapping
-{
-    size_t textureIdx;
-    Rect textureRect;
-};
-using CharMappingList = std::unordered_map<char32_t, CharMapping>;
 
 class SpriteImageText : public SpriteText
 {

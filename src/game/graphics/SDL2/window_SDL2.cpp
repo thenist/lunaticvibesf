@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <bit>
 #include <climits>
 #include <cstdint>
 #include <mutex>
@@ -211,14 +212,15 @@ void graphics_clear()
 static int maxFPS = 0;
 static bool s_should_present_imgui = false;
 static std::chrono::nanoseconds desiredFrameTimeBetweenFrames;
-static std::chrono::high_resolution_clock::time_point frameTimestampPrev;
 static Path screenshotPath;
 void graphics_flush()
 {
+    static std::chrono::high_resolution_clock::time_point frameTimestampPrev;
+
     SDL_SetRenderTarget(gFrameRenderer, nullptr);
     {
         // TODO scale internal canvas
-        Rect ssRect{0, 0, s_canvas_rect_w, s_canvas_rect_h};
+        SDL_Rect ssRect{0, 0, s_canvas_rect_w, s_canvas_rect_h};
         int ssLevel = graphics_get_supersample_level();
         ssRect.w *= ssLevel;
         ssRect.h *= ssLevel;
@@ -303,9 +305,9 @@ void graphics_copy_screen_texture(Texture& texture)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
 
-    SDL_SetRenderTarget(gFrameRenderer, reinterpret_cast<SDL_Texture*>(texture.raw()));
+    SDL_SetRenderTarget(gFrameRenderer, static_cast<SDL_Texture*>(texture.raw()));
     SDL_RenderClear(gFrameRenderer);
-    const SDL_Rect origRect = texture.getRect();
+    const auto origRect = std::bit_cast<SDL_Rect>(texture.getRect());
     const SDL_Rect rect{0, 0, origRect.w * graphics_get_supersample_level(),
                         origRect.h * graphics_get_supersample_level()};
     const SDL_Rect canvasRect{0, 0, s_canvas_rect_w, s_canvas_rect_h};
@@ -313,38 +315,33 @@ void graphics_copy_screen_texture(Texture& texture)
     SDL_SetRenderTarget(gFrameRenderer, gInternalRenderTarget);
 }
 
-int graphics_get_monitor_index()
-{
-    return SDL_GetWindowDisplayIndex(gFrameWindow);
-}
-
 std::pair<int, int> graphics_get_desktop_resolution()
 {
-    int index = graphics_get_monitor_index();
+    int index = SDL_GetWindowDisplayIndex(gFrameWindow);
     SDL_DisplayMode mode{};
     SDL_GetDesktopDisplayMode(index, &mode);
     return {mode.w, mode.h};
 }
 
-std::vector<std::tuple<int, int, int>> graphics_get_resolution_list()
+std::vector<std::pair<int, int>> graphics_get_resolution_list()
 {
-    int index = graphics_get_monitor_index();
+    int index = SDL_GetWindowDisplayIndex(gFrameWindow);
     int modes = SDL_GetNumDisplayModes(index);
-    std::vector<std::tuple<int, int, int>> res;
+    std::vector<std::pair<int, int>> res;
     for (int i = 0; i < modes; ++i)
     {
         SDL_DisplayMode mode{};
         SDL_GetDisplayMode(index, i, &mode);
-        LOG_DEBUG << mode.w << 'x' << mode.h << ' ' << mode.refresh_rate << "Hz";
-        res.emplace_back(mode.w, mode.h, mode.refresh_rate);
+        LOG_DEBUG << "[SDL2] Found resolution " << mode.w << 'x' << mode.h << ' ' << mode.refresh_rate << "Hz";
+        res.emplace_back(mode.w, mode.h);
     }
     return res;
 }
 
-void graphics_change_window_mode(int mode)
+void graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE mode)
 {
     LOG_INFO << "[SDL2] Setting window mode to " << mode;
-    switch (mode)
+    switch (static_cast<int>(mode)) // TODO: remove the cast after adding 'case 3' to the enum
     {
     case 0:
         SDL_SetWindowFullscreen(gFrameWindow, 0);
@@ -376,13 +373,13 @@ void lunaticvibes::graphics::save_new_window_size(int width, int height)
     LOG_DEBUG << "[SDL2] Saving new window size " << width << 'x' << height;
     s_window_rect_w = width;
     s_window_rect_h = height;
-    s_canvas_scale_x = (double)width / s_canvas_rect_w;
-    s_canvas_scale_y = (double)height / s_canvas_rect_h;
+    s_canvas_scale_x = static_cast<double>(width) / s_canvas_rect_w;
+    s_canvas_scale_y = static_cast<double>(height) / s_canvas_rect_h;
     ConfigMgr::set('V', cfg::V_DISPLAY_RES_X, width);
     ConfigMgr::set('V', cfg::V_DISPLAY_RES_Y, height);
 }
 
-void graphics_change_vsync(int mode)
+void graphics_change_vsync(lunaticvibes::GRAPHICS_VSYNC_MODE mode)
 {
     LOG_INFO << "[SDL2] Setting vsync mode to " << mode;
     SDL_RenderSetVSync(gFrameRenderer, mode);
@@ -405,8 +402,8 @@ void graphics_resize_canvas(int x, int y)
     LOG_INFO << "[SDL2] Resizing canvas to " << x << 'x' << y;
     s_canvas_rect_w = x;
     s_canvas_rect_h = y;
-    s_canvas_scale_x = (double)s_window_rect_w / x;
-    s_canvas_scale_y = (double)s_window_rect_h / y;
+    s_canvas_scale_x = static_cast<double>(s_window_rect_w.load()) / x;
+    s_canvas_scale_y = static_cast<double>(s_window_rect_h.load()) / y;
 }
 double graphics_get_canvas_scale_x()
 {

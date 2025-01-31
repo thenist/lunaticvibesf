@@ -42,7 +42,7 @@ void SpriteText::updateTextTexture(std::string_view text, const Color& c)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
 
-    if (!pFont || !pFont->loaded)
+    if (!pFont || !pFont->isLoaded())
         return;
 
     if (pTexture != nullptr && _text == text && textColor == c)
@@ -74,7 +74,7 @@ void SpriteText::updateTextRect()
 {
     // fitting
     Rect textRect = textureRect;
-    double sizeFactor = (double)_current.rect.h / textRect.h;
+    double sizeFactor = static_cast<double>(_current.rect.h) / textRect.h;
     int text_w = static_cast<int>(std::round(textRect.w * sizeFactor));
     switch (align)
     {
@@ -131,14 +131,9 @@ void SpriteText::draw() const
     if (isHidden())
         return;
 
-    if (_draw && pTexture && pTexture->loaded)
+    if (_draw && pTexture && pTexture->isLoaded())
     {
         pTexture->draw(textureRect, _current.rect, _current.color, _current.blend, _current.filter, _current.angle,
                        _current.center);
     }
-}
-
-void SpriteText::setOutline(int width, const Color& c)
-{
-    pushMainThreadTask([&] { pFont->setOutline(width, c); });
 }

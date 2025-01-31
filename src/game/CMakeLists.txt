@@ -23,8 +23,8 @@ find_package(re2 CONFIG REQUIRED)
 if(${GRAPHICS_BACKEND} STREQUAL SDL2)
     set(GRAPHICS_BACKEND_SRC
         graphics/SDL2/common_SDL2.cpp
+        graphics/SDL2/graph_line_SDL2.cpp
         graphics/SDL2/input.cpp
-        graphics/SDL2/rect_SDL2.cpp
         graphics/SDL2/ttf_SDL2.cpp
         graphics/SDL2/window_SDL2.cpp
     )

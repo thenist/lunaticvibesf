@@ -185,7 +185,7 @@ void SpriteNumber::draw() const
     if (isHidden())
         return;
 
-    if (pTexture->loaded && _draw)
+    if (pTexture->isLoaded() && _draw)
     {
         // for (size_t i = 0; i < _outRectDigit.size(); ++i)
         //     pTexture->draw(_drawRectDigit[i], _outRectDigit[i], _current.angle);

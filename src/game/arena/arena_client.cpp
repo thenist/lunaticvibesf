@@ -12,6 +12,7 @@
 #include <git_version.h>
 
 #include <exception>
+#include <set>
 
 #include <boost/format.hpp>
 #include <cereal/archives/portable_binary.hpp>

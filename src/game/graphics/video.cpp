@@ -1,8 +1,13 @@
 #include "video.h"
-#include "common/u8.h"
+
+#include <common/log.h>
+#include <common/types.h>
+#include <common/u8.h>
+#include <common/utils.h>
 
 #include <chrono>
 #include <functional>
+#include <set>
 #include <thread>
 
 extern "C"
@@ -13,8 +18,14 @@ extern "C"
 #include <libavutil/frame.h>
 }
 
-#include <common/log.h>
-#include <common/types.h>
+bool lunaticvibes::is_video_file_path(const Path& p)
+{
+    static const std::set<std::string> exts = {
+        ".mpg", ".mp2", ".mpeg", ".mpeg2", ".mpe", ".mpv",  ".flv", ".mp4", ".m4p",
+        ".m4v", ".f4v", ".avi",  ".wmv",   ".mkv", ".webm", ".mov", ".m1v",
+    };
+    return exts.contains(toLower(lunaticvibes::s(p.extension().u8string())));
+}
 
 void lunaticvibes::AVCodecContextDeleter::operator()(AVCodecContext* avctx)
 {

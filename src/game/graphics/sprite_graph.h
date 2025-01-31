@@ -2,13 +2,10 @@
 
 #include "sprite.h"
 
+#include <game/graphics/graph_line.h>
+
 ////////////////////////////////////////////////////////////////////////////////
 // Line sprite
-struct ColorPoint
-{
-    double xf, yf;
-    Color c;
-};
 
 // Private enum, LVF internal.
 enum class LineType
@@ -27,8 +24,7 @@ private:
     int _field_w, _field_h;
     int _start, _end;
 
-    GraphLine _line;
-    std::vector<ColorPoint> _points;
+    lunaticvibes::GraphLineDrawer _line;
     std::vector<std::pair<Point, Point>> _rects;
     double _progress = 1.0; // 0 ~ 1
 
@@ -51,9 +47,6 @@ public:
     SpriteLine() = delete;
     SpriteLine(const SpriteLineBuilder& builder);
     ~SpriteLine() override = default;
-
-public:
-    void appendPoint(const ColorPoint&);
 
 public:
     void updateProgress(const lunaticvibes::Time& t);

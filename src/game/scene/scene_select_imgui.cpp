@@ -80,7 +80,7 @@ void SceneSelect::imguiInit()
     auto windowX = ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_HEIGHT);
     auto windowY = ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
     imgui_video_display_resolution_index = -1;
-    for (int i = 0; i < (int)imgui_video_display_resolution_size.size(); ++i)
+    for (int i = 0; i < static_cast<int>(imgui_video_display_resolution_size.size()); ++i)
     {
         if (imgui_video_display_resolution_size[i].first == windowX &&
             imgui_video_display_resolution_size[i].second == windowY)
@@ -565,7 +565,7 @@ void SceneSelect::imguiPageOptionsGeneral()
         ImGui::TextUnformatted(i18n::c(PROFILE));
         ImGui::SameLine(infoRowWidth);
         ImGui::Combo("##profile", &imgui_profile_index, imgui_profiles_display.data(),
-                     (int)imgui_profiles_display.size());
+                     static_cast<int>(imgui_profiles_display.size()));
 
         if (ImGui::Button(i18n::c(ADD_MORE)))
         {
@@ -592,7 +592,7 @@ void SceneSelect::imguiPageOptionsGeneral()
         ImGui::TextUnformatted(i18n::c(LANGUAGE));
         ImGui::SameLine(infoRowWidth);
         ImGui::Combo("##language", &imgui_language_index, imgui_languages_display.data(),
-                     (int)imgui_languages_display.size());
+                     static_cast<int>(imgui_languages_display.size()));
 
         /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -705,7 +705,8 @@ void SceneSelect::imguiPageOptionsVideo()
         ImGui::TextUnformatted(i18n::c(VIDEO_RESOLUTION));
         ImGui::SameLine(infoRowWidth);
         ImGui::Combo("##resolution", &imgui_video_display_resolution_index,
-                     imgui_video_display_resolution_display.data(), (int)imgui_video_display_resolution_display.size());
+                     imgui_video_display_resolution_display.data(),
+                     static_cast<int>(imgui_video_display_resolution_display.size()));
 
         ImGui::TextUnformatted(i18n::c(VIDEO_SS_LEVEL));
         ImGui::SameLine(infoRowWidth);
@@ -776,7 +777,7 @@ void SceneSelect::imguiPageOptionsAudio()
         ImGui::TextUnformatted(i18n::c(AUDIO_DEVICE));
         ImGui::SameLine(infoRowWidth);
         ImGui::Combo("##audiodevice", &imgui_audio_device_index, imgui_audio_devices_display.data(),
-                     (int)imgui_audio_devices_display.size());
+                     static_cast<int>(imgui_audio_devices_display.size()));
 
         if (ImGui::Button(i18n::c(AUDIO_REFRESH_DEVICE_LIST)))
         {
@@ -898,7 +899,7 @@ void SceneSelect::imguiPageOptionsPlay()
         imgui_play_hispeed = gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed;
         if (ImGui::SliderFloat("##hispeed", &imgui_play_hispeed, 0.01f, 10.0f, "%.02f", ImGuiSliderFlags_None))
         {
-            int hsInt = int(std::round(imgui_play_hispeed * 100.0));
+            auto hsInt = static_cast<int>(std::round(imgui_play_hispeed * 100.0));
             State::set(IndexNumber::HS_1P, hsInt);
             gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed = imgui_play_hispeed = hsInt / 100.0;
         }
@@ -1296,7 +1297,7 @@ void SceneSelect::imguiRefreshProfileList()
                 break;
             }
         }
-        if ((size_t)idx == imgui_profiles.size())
+        if (idx == static_cast<int>(imgui_profiles.size()))
         {
             imgui_profile_index = -1;
         }
@@ -1357,9 +1358,7 @@ void SceneSelect::imguiRefreshVideoDisplayResolutionList()
 {
     auto oldRes = std::make_pair<unsigned, unsigned>(0, 0);
     if (!imgui_video_display_resolution_size.empty())
-    {
         oldRes = imgui_video_display_resolution_size[imgui_video_display_resolution_index];
-    }
 
     imgui_video_display_resolution_size.clear();
     imgui_video_display_resolution.clear();
@@ -1367,34 +1366,17 @@ void SceneSelect::imguiRefreshVideoDisplayResolutionList()
 
     if (imgui_video_mode == 1)
     {
-        // get resolution list from system
-        auto list = graphics_get_resolution_list();
-        std::set<std::pair<int, int>> resolutions;
-        for (auto& r : list)
-        {
-            int x = std::get<0>(r);
-            int y = std::get<1>(r);
-            if (x >= 640 && y >= 480)
-            {
-                resolutions.insert({x, y});
-            }
-        }
-        for (auto& r : resolutions)
-        {
-            imgui_video_display_resolution_size.emplace_back(r);
-        }
+        for (auto& r : graphics_get_resolution_list())
+            if (std::pair<int, int> res = {std::get<0>(r), std::get<1>(r)}; res.first >= 640 && res.second >= 480)
+                imgui_video_display_resolution_size.emplace_back(res);
     }
     else
     {
         // filter out resolutions bigger than desktop
         auto res = graphics_get_desktop_resolution();
-        int w = res.first;
-        int h = res.second;
-        auto addResolution = [w, h, this](int dw, int dh) {
-            if (w >= dw && h >= dh)
-            {
+        auto addResolution = [res, this](int dw, int dh) {
+            if (res.first >= dw && res.second >= dh)
                 imgui_video_display_resolution_size.emplace_back(dw, dh);
-            }
         };
         addResolution(640, 480);
         addResolution(800, 600);
@@ -1417,16 +1399,13 @@ void SceneSelect::imguiRefreshVideoDisplayResolutionList()
     }
 
     for (const auto& r : imgui_video_display_resolution)
-    {
         imgui_video_display_resolution_display.push_back(r.c_str());
-    }
 
     if (oldRes.first != 0)
     {
-        for (int i = 0; i < (int)imgui_video_display_resolution_size.size(); i++)
+        for (int i = 0; i < static_cast<int>(imgui_video_display_resolution_size.size()); i++)
         {
-            auto& res = imgui_video_display_resolution_size[i];
-            if (oldRes == res)
+            if (imgui_video_display_resolution_size[i] == oldRes)
             {
                 imgui_video_display_resolution_index = i;
                 return;
@@ -1457,7 +1436,7 @@ void SceneSelect::imguiCheckSettings()
     if (imgui_video_display_resolution_index != old_video_display_resolution_index)
     {
         old_video_display_resolution_index = imgui_video_display_resolution_index;
-        if (imgui_video_display_resolution_index > (int)imgui_video_display_resolution_size.size())
+        if (imgui_video_display_resolution_index > static_cast<int>(imgui_video_display_resolution_size.size()))
         {
             imgui_video_display_resolution_index = 0;
         }
@@ -1643,16 +1622,16 @@ bool SceneSelect::imguiApplyResolution()
 
     if (imgui_video_mode == 2 && windowW == desktopW && windowH == desktopH)
     {
-        graphics_change_window_mode(3);
+        graphics_change_window_mode(static_cast<lunaticvibes::GRAPHICS_WINDOW_MODE>(3));
         graphics_resize_window(windowW, windowH);
     }
     else
     {
-        graphics_change_window_mode(imgui_video_mode);
+        graphics_change_window_mode(static_cast<lunaticvibes::GRAPHICS_WINDOW_MODE>(imgui_video_mode));
         graphics_resize_window(windowW, windowH);
     }
     graphics_set_supersample_level(imgui_video_ssLevel);
-    graphics_change_vsync(imgui_video_vsync_index);
+    graphics_change_vsync(static_cast<lunaticvibes::GRAPHICS_VSYNC_MODE>(imgui_video_vsync_index));
 
     if (imgui_video_mode != old_video_mode)
     {
@@ -1720,7 +1699,7 @@ bool SceneSelect::imguiRefreshAudioDevices()
     {
         if (adev == d.second)
         {
-            imgui_audio_device_index = (int)imgui_audio_devices.size();
+            imgui_audio_device_index = static_cast<int>(imgui_audio_devices.size());
         }
 
         if (d.first == DriverIDUnknownASIO)

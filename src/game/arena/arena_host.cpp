@@ -14,6 +14,7 @@
 
 #include <functional>
 #include <random>
+#include <set>
 
 #include <boost/format.hpp>
 #include <cereal/archives/portable_binary.hpp>

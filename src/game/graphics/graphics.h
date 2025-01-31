@@ -1,25 +1,36 @@
 #pragma once
 
-// This header intends to provide a Render Layer Selection function,
-// Which layer is used is decided by pre-defined macro.
-// e.g.
-//      #ifdef SDL2
-//          #include "graphics_SDL2.h"
-//      #elif defined SFML
-//          #include "graphics_SFML.h"
-//      #elif defined OGLNative
-//          #include "graphics_OpenGL.h"
-//      #endif
+// Don't include graphics platform here. It leaks a lot of details.
+// TODO: actually don't do that, lol.
+#include <game/graphics/SDL2/graphics_SDL2.h>
 
-#ifdef RENDER_SDL2
-#include "SDL2/graphics_SDL2.h"
-#endif
+#include <common/types.h>
+#include <game/graphics/blend_mode.h> // IWYU pragma: export
+#include <game/graphics/color.h>      // IWYU pragma: export
+#include <game/graphics/rect.h>       // IWYU pragma: export
+#include <game/graphics/rectf.h>      // IWYU pragma: export
 
 #include <functional>
+#include <utility>
 #include <vector>
 
-#include "common/types.h"
-#include <utility>
+namespace lunaticvibes
+{
+// TODO: enum class
+enum GRAPHICS_WINDOW_MODE : int
+{
+    GRAPHICS_WINDOW_MODE_WINDOWED = 0,
+    GRAPHICS_WINDOW_MODE_FULLSCREEN = 1,
+    GRAPHICS_WINDOW_MODE_BORDERLESS = 2,
+};
+// TODO: enum class
+enum GRAPHICS_VSYNC_MODE : int
+{
+    GRAPHICS_VSYNC_MODE_OFF = 0,
+    GRAPHICS_VSYNC_MODE_VSYNC = 1,
+    GRAPHICS_VSYNC_MODE_ADAPTIVE = 2,
+};
+} // namespace lunaticvibes
 
 int graphics_init();
 void graphics_clear();
@@ -28,17 +39,13 @@ int graphics_free();
 
 void graphics_copy_screen_texture(Texture& texture);
 
-// get monitor index where the window locates
-int graphics_get_monitor_index();
-
 // w, h
 std::pair<int, int> graphics_get_desktop_resolution();
 
-// w, h, hz
-std::vector<std::tuple<int, int, int>> graphics_get_resolution_list();
+// w, h
+std::vector<std::pair<int, int>> graphics_get_resolution_list();
 
-// 0: windowed / 1: fullscreen / 2: borderless
-void graphics_change_window_mode(int mode);
+void graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE mode);
 
 void graphics_resize_window(int x, int y);
 namespace lunaticvibes::graphics
@@ -47,8 +54,7 @@ namespace lunaticvibes::graphics
 void save_new_window_size(int x, int y);
 } // namespace lunaticvibes::graphics
 
-// 0: off / 1: vsync (double buffer) / 2: adaptive vsync
-void graphics_change_vsync(int mode);
+void graphics_change_vsync(lunaticvibes::GRAPHICS_VSYNC_MODE mode);
 
 // scaling functions
 void graphics_set_supersample_level(int scale);

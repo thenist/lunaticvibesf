@@ -21,7 +21,7 @@ namespace v = std::views;
 void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()>& should_discard)
 {
     LVF_ASSERT(!IsMainThread());
-    // FIXME: synchronize gChartContext access between threads; also remove isBgaLoaded isSampleLoaded from that struct
+    // FIXME: synchronize gChartContext access between threads
 
     gChartContext.sampleLoadedHash.reset();
     SoundMgr::freeNoteSamples();

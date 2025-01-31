@@ -35,10 +35,7 @@ struct ChartContextParams
     std::shared_ptr<ChartFormatBase> chart;
     std::shared_ptr<ChartFormatBase> chartMybest; // mybest obj is loaded with a different random seed
 
-    // bool isChartSamplesLoaded;
-    bool isSampleLoaded = false;
     HashMD5 sampleLoadedHash;
-    bool isBgaLoaded = false;
     HashMD5 bgaLoadedHash;
     bool started = false;
 

@@ -7,130 +7,25 @@
 #include <SDL_video.h>
 
 #include <filesystem>
-#include <limits>
 #include <memory>
 #include <string>
 
-#include "common/types.h"
+#include <common/types.h>
+#include <game/graphics/blend_mode.h> // IWYU pragma: export
+#include <game/graphics/color.h>      // IWUY pragma: export
+#include <game/graphics/point.h>      // IWUY pragma: export
+#include <game/graphics/rect.h>       // IWUY pragma: export
+#include <game/graphics/rectf.h>      // IWUY pragma: export
 
 // global control pointer, do not modify
 inline SDL_Renderer* gFrameRenderer;
 inline SDL_Texture* gInternalRenderTarget;
 
 ////////////////////////////////////////////////////////////////////////////////
-
-class Color : public SDL_Color
-{
-public:
-    Color(uint32_t rgba = 0xffffffff);
-    Color(int r, int g, int b, int a);
-    [[nodiscard]] uint32_t hex() const;
-    Color operator+(const Color& rhs) const;
-    Color operator*(const double& rhs) const;
-    Color operator*(const Color& rhs) const;
-    bool operator==(const Color& rhs) const;
-    bool operator!=(const Color& rhs) const;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// Enums
-
-enum class TTFStyle
-{
-    Normal,
-    Bold,
-    Italic,
-    BoldItalic,
-};
-
-enum class TTFHinting
-{
-    Normal,
-    Light,
-    Mono,
-    // When building on Linux something somewhere has `#define None`.
-    None_,
-};
-
-// Used by SDL_RenderCopy().
-// Other blend modes should use SDL_ComposeCustomBlendMode(6).
-enum class BlendMode
-{
-    NONE,
-    ALPHA,
-    ADD,
-    MOD,
-    SUBTRACT,
-    INVERT,
-    MULTIPLY_INVERTED_BACKGROUND,
-    MULTIPLY_WITH_ALPHA,
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
-// Point: x, y
-class Point
-{
-public:
-    double x = 0;
-    double y = 0;
-
-public:
-    constexpr Point(int zero = 0) {}
-    constexpr Point(double x, double y) : x(x), y(y) {}
-    constexpr Point operator+(const Point& rhs) const { return {x + rhs.x, y + rhs.y}; }
-    constexpr Point operator-(const Point& rhs) const { return {x - rhs.x, y - rhs.y}; }
-    constexpr Point operator*(const double& rhs) const { return {x * rhs, y * rhs}; }
-    constexpr bool operator==(const Point& rhs) const { return x == rhs.x && y == rhs.y; }
-};
-
-class Image;
-
-// Rect: x, y, w, h
-class Rect : public SDL_Rect
-{
-public:
-    Rect(int zero = 0);
-    Rect(int w, int h);
-    Rect(int x, int y, int w, int h);
-    Rect(const SDL_Rect& rect);
-    ~Rect() = default;
-
-public:
-    Rect operator+(const Rect& rhs) const;
-    Rect operator*(const double& rhs) const;
-    bool operator==(const Rect& rhs) const;
-    bool operator!=(const Rect& rhs) const;
-};
-inline static const Rect RECT_FULL = Rect(0, 0, std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
-
-// RectF: x, y, w, h
-class RectF : public SDL_FRect
-{
-public:
-    RectF(int zero = 0);
-    RectF(float w, float h);
-    RectF(float x, float y, float w, float h);
-    RectF(const SDL_FRect& rect);
-    ~RectF() = default;
-
-public:
-    RectF operator+(const RectF& rhs) const;
-    RectF operator*(const double& rhs) const;
-    bool operator==(const RectF& rhs) const;
-    bool operator!=(const RectF& rhs) const;
-};
-inline static const RectF RECTF_FULL =
-    RectF(0, 0, std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
-
-////////////////////////////////////////////////////////////////////////////////
 // SDL_Image loads pictures into SDL_Surface instances
 // Run IMG_Init outside.
 class Image
 {
-    friend class Texture;
-    friend class TextureDynamic;
-
 private:
     std::string _path;
     std::shared_ptr<SDL_RWops> _pRWop;
@@ -147,25 +42,16 @@ public:
     void setTransparentColorRGB(Color c);
     [[nodiscard]] bool hasAlphaLayer() const { return _haveAlphaLayer; }
 
-public:
     [[nodiscard]] Rect getRect() const;
+    [[nodiscard]] bool isLoaded() const { return loaded; }
+    [[nodiscard]] const std::string& path() const { return _path; }
+    [[nodiscard]] std::shared_ptr<SDL_Surface> surface() const { return _pSurface; }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Convert SDL_Surface into SDL_Texture with subarea specified.
 class Texture
 {
-    friend class SpriteBase;
-    friend class SpriteStatic;
-    friend class SpriteSelection;
-    friend class SpriteAnimated;
-    friend class SpriteText;
-    friend class SpriteNumber;
-
-    friend class SpriteLaneVertical;
-    friend class SpriteLaneVerticalLN;
-    friend class SpriteVideo;
-
 protected:
     std::shared_ptr<SDL_Texture> _texture;
     bool loaded = false;
@@ -225,9 +111,6 @@ private:
 
 public:
     TextureFull(const Color& srcColor);
-    TextureFull(const Image& srcImage);
-    TextureFull(const SDL_Surface* pSurface);
-    TextureFull(SDL_Texture* pTexture, int w, int h);
     ~TextureFull() override;
 };
 
@@ -236,45 +119,16 @@ public:
 // Run TTF_Init outside.
 class TTFFont
 {
-    friend class SpriteText;
-
-protected:
+private:
     TTF_Font* _pFont = nullptr;
     std::string _filePath;
-    int _faceIndex = -1;
     bool loaded = false;
-    int _ptsize = 0;
-
-    TTF_Font* _pFontOutline = nullptr;
-    Color _outlineColor;
-    int _outlineWidth = 0;
 
 public:
     TTFFont(const Path& filePath, int ptsize);
     TTFFont(const Path& filePath, int ptsize, int faceIndex);
     ~TTFFont();
 
-public:
-    // Attributes Settings
-    void setStyle(TTFStyle style);
-    void setOutline(int width, const Color& c);
-    void setHinting(TTFHinting mode);
-    void setKerning(bool enabled);
-
-    // Rendering Interfaces
     std::shared_ptr<Texture> TextUTF8(const char* text, const Color& c);
-    Rect getRectUTF8(const char* text);
-    // Rect getRectUTF16(const char* text);
-};
-
-////////////////////////////////////////////////////////////////////////////////
-// Thick line wrapper
-class GraphLine
-{
-public:
-    int _width = 1;
-    GraphLine(int width = 1) : _width(width) {}
-
-public:
-    void draw(Point p1, Point p2, Color c = 0xffffffff) const;
+    [[nodiscard]] bool isLoaded() const { return loaded; }
 };

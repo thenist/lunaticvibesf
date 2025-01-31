@@ -398,7 +398,6 @@ public:
     void stopEditing(bool modify);
     IndexText getInd() const { return textInd; }
     virtual void updateTextWhileEditing(const std::string& text);
-    void setOutline(int width, const Color& c);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

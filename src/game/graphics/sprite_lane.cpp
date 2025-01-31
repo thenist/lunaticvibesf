@@ -180,7 +180,7 @@ void SpriteLaneVertical::draw() const
     if (isHidden())
         return;
 
-    if (pNote && pNote->pTexture && pNote->pTexture->loaded)
+    if (pNote && pNote->pTexture && pNote->pTexture->isLoaded())
     {
         for (const auto& r : _outRect)
         {
@@ -526,7 +526,7 @@ void SpriteLaneVerticalLN::draw() const
     colorMiss.a *= 0.5;
 
     // body
-    if (pNoteBody && pNoteBody->pTexture && pNoteBody->pTexture->loaded)
+    if (pNoteBody && pNoteBody->pTexture && pNoteBody->pTexture->isLoaded())
     {
         for (auto it = _outRectBody.begin(); it != _outRectBody.end(); ++it)
         {
@@ -551,7 +551,7 @@ void SpriteLaneVerticalLN::draw() const
     }
 
     // head
-    if (pNote && pNote->pTexture && pNote->pTexture->loaded)
+    if (pNote && pNote->pTexture && pNote->pTexture->isLoaded())
     {
         for (auto it = _outRect.begin(); it != _outRect.end(); ++it)
         {
@@ -575,7 +575,7 @@ void SpriteLaneVerticalLN::draw() const
     }
 
     // tail
-    if (pNoteTail && pNoteTail->pTexture && pNoteTail->pTexture->loaded)
+    if (pNoteTail && pNoteTail->pTexture && pNoteTail->pTexture->isLoaded())
     {
         for (auto it = _outRectTail.begin(); it != _outRectTail.end(); ++it)
         {

@@ -1,11 +1,9 @@
 #include <game/graphics/SDL2/graphics_SDL2.h>
 
-#include <algorithm>
+#include <bit>
 #include <cmath>
 #include <memory>
 #include <string_view>
-
-#include <SDL2_gfxPrimitives.h>
 
 #include <common/assert.h>
 #include <common/log.h>
@@ -16,76 +14,6 @@
 
 #define SDL_LOAD_NOAUTOFREE 0
 #define SDL_LOAD_AUTOFREE 1
-
-Color::Color(uint32_t rgba)
-{
-    r = (rgba & 0xff000000) >> 24;
-    g = (rgba & 0x00ff0000) >> 16;
-    b = (rgba & 0x0000ff00) >> 8;
-    a = (rgba & 0x000000ff);
-}
-
-Color::Color(int r, int g, int b, int a)
-{
-    r = std::clamp(r, 0, 255);
-    g = std::clamp(g, 0, 255);
-    b = std::clamp(b, 0, 255);
-    a = std::clamp(a, 0, 255);
-    this->r = r;
-    this->g = g;
-    this->b = b;
-    this->a = a;
-}
-
-uint32_t Color::hex() const
-{
-    return r << 24 | g << 16 | b << 8 | a;
-}
-
-Color Color::operator+(const Color& rhs) const
-{
-    // always >=0
-    Color c;
-    c.r = (r + rhs.r <= 255) ? (r + rhs.r) : 255;
-    c.g = (g + rhs.g <= 255) ? (g + rhs.g) : 255;
-    c.b = (b + rhs.b <= 255) ? (b + rhs.b) : 255;
-    c.a = (a + rhs.a <= 255) ? (a + rhs.a) : 255;
-    return c;
-}
-
-Color Color::operator*(const double& rhs) const
-{
-    if (rhs < 0)
-        return {0};
-    Color c;
-    c.r = (r * rhs <= 255) ? (Uint8)(r * rhs) : 255;
-    c.g = (g * rhs <= 255) ? (Uint8)(g * rhs) : 255;
-    c.b = (b * rhs <= 255) ? (Uint8)(b * rhs) : 255;
-    c.a = (a * rhs <= 255) ? (Uint8)(a * rhs) : 255;
-    return c;
-}
-
-Color Color::operator*(const Color& rhs) const
-{
-    if (hex() == 0xffffffff)
-        return rhs;
-
-    Color c;
-    c.r = Uint8(r * (rhs.r / 255.0));
-    c.g = Uint8(g * (rhs.g / 255.0));
-    c.b = Uint8(b * (rhs.b / 255.0));
-    c.a = Uint8(a * (rhs.a / 255.0));
-    return c;
-}
-
-bool Color::operator==(const Color& rhs) const
-{
-    return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
-}
-bool Color::operator!=(const Color& rhs) const
-{
-    return !(*this == rhs);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Image
@@ -195,22 +123,22 @@ Rect Image::getRect() const
 
 Texture::Texture(const Image& srcImage)
 {
-    if (!srcImage.loaded)
+    if (!srcImage.isLoaded())
         return;
 
     _texture = std::shared_ptr<SDL_Texture>(
         pushAndWaitMainThreadTask<SDL_Texture*>(
-            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
+            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, srcImage.surface().get())),
         std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     if (_texture)
     {
         textureRect = srcImage.getRect();
         loaded = true;
-        LOG_VERBOSE << "[Texture] Build texture object finished. " << srcImage._path;
+        LOG_VERBOSE << "[Texture] Build texture object finished. " << srcImage.path();
     }
     else
     {
-        LOG_WARNING << "[Texture] Build texture object error! " << srcImage._path;
+        LOG_WARNING << "[Texture] Build texture object error! " << srcImage.path();
         LOG_WARNING << "[Texture] ^ " << SDL_GetError();
     }
 }
@@ -223,7 +151,7 @@ Texture::Texture(const SDL_Surface* pSurface)
         std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     if (!_texture)
         return;
-    textureRect = pSurface->clip_rect;
+    textureRect = std::bit_cast<Rect>(pSurface->clip_rect);
     loaded = true;
 }
 
@@ -286,9 +214,12 @@ int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* 
     return 0;
 }
 
-static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, const Color c, const BlendMode b,
+static void do_draw(SDL_Texture* pTex, const Rect* srcRect_, const RectF dstRectF_, const Color c, const BlendMode b,
                     const bool filter, const double angle, const Point* center)
 {
+    const auto srcRect_val = srcRect_ ? std::bit_cast<SDL_Rect>(*srcRect_) : SDL_Rect{};
+    const auto* srcRect = srcRect_ ? &srcRect_val : nullptr;
+    auto dstRectF = std::bit_cast<SDL_FRect>(dstRectF_);
     int flipFlags = 0;
     if (dstRectF.w < 0)
     {
@@ -320,12 +251,12 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
 
     SDL_FPoint scenter;
     if (center)
-        scenter = {(float)center->x * ssLevel, (float)center->y * ssLevel};
+        scenter = {static_cast<float>(center->x) * ssLevel, static_cast<float>(center->y) * ssLevel};
 
     if (b == BlendMode::INVERT)
     {
         // ... pls help
-        const Rect rc = {0, 0, (int)std::ceil(dstRectF.w), (int)std::ceil(dstRectF.h)};
+        const SDL_Rect rc = {0, 0, static_cast<int>(std::ceil(dstRectF.w)), static_cast<int>(std::ceil(dstRectF.h))};
 
         static auto pTextureInverted = std::shared_ptr<SDL_Texture>(
             SDL_CreateTexture(gFrameRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, rc.w, rc.h),
@@ -452,7 +383,7 @@ void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const Blen
 TextureFull::TextureFull(const Color& c) : Texture(nullptr)
 {
     auto surface = SDL_CreateRGBSurfaceWithFormat(0, 1, 1, 24, SDL_PIXELFORMAT_RGB24);
-    textureRect = {0, 0, 1, 1};
+    const SDL_Rect textureRect = {0, 0, 1, 1};
     SDL_FillRect(&*surface, &textureRect, SDL_MapRGBA(surface->format, c.r, c.g, c.b, c.a));
     _texture = std::shared_ptr<SDL_Texture>(
         pushAndWaitMainThreadTask<SDL_Texture*>(std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
@@ -461,12 +392,6 @@ TextureFull::TextureFull(const Color& c) : Texture(nullptr)
     SDL_FreeSurface(surface);
 }
 
-TextureFull::TextureFull(const Image& srcImage) : Texture(srcImage) {}
-
-TextureFull::TextureFull(const SDL_Surface* pSurface) : Texture(pSurface) {}
-
-TextureFull::TextureFull(SDL_Texture* pTexture, int w, int h) : Texture(pTexture, w, h) {}
-
 TextureFull::~TextureFull() = default;
 
 void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const BlendMode b, const bool filter,
@@ -474,12 +399,4 @@ void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const 
 {
     (void)ignored;
     do_draw(_texture.get(), nullptr, dstRect, c, b, filter, angle, nullptr);
-}
-
-void GraphLine::draw(Point p1, Point p2, Color c) const
-{
-    int ss = graphics_get_supersample_level();
-    thickLineRGBA(gFrameRenderer, (Sint16)p1.x * ss, (Sint16)p1.y * ss, (Sint16)p2.x * ss, (Sint16)p2.y * ss,
-                  _width * ss, c.r, c.g, c.b, c.a);
-    SDL_SetRenderDrawColor(gFrameRenderer, 0, 0, 0, 255);
 }

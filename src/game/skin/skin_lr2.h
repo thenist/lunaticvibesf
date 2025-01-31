@@ -2,19 +2,24 @@
 
 #include <common/encoding.h>
 #include <common/types.h>
-#include <game/graphics/sprite_bar_entry.h>
-#include <game/graphics/sprite_graph.h>
-#include <game/graphics/sprite_imagetext.h>
-#include <game/graphics/sprite_lane.h>
-#include <game/graphics/sprite_video.h>
+#include <game/graphics/sprite_imagetext_charmapping.h>
 #include <game/skin/skin.h>
 
 #include <array>
 #include <atomic>
 #include <bitset>
 #include <cstdint>
+#include <list>
 #include <map>
 #include <vector>
+
+class SpriteBarEntry;
+class SpriteBase;
+class SpriteLaneVertical;
+class SpriteLaneVerticalLN;
+class SpriteLine;
+class Texture;
+class sVideo;
 
 namespace LR2SkinDef
 {

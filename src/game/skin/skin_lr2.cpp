@@ -26,6 +26,10 @@
 #include <common/utils.h>
 #include <config/config_mgr.h>
 #include <game/graphics/dxa.h>
+#include <game/graphics/sprite_bar_entry.h>
+#include <game/graphics/sprite_graph.h>
+#include <game/graphics/sprite_lane.h>
+#include <game/graphics/sprite_video.h>
 #include <game/graphics/video.h>
 #include <game/runtime/i18n.h>
 #include <game/runtime/state.h>
@@ -750,7 +754,7 @@ int SkinLR2::IMAGE()
         Path pathFile = getCustomizePath(parseParamBuf[0]);
         std::string textureMapKey = std::to_string(imageCount);
 
-        if (video_file_extensions.contains(toLower(lunaticvibes::u8str(pathFile.extension()))))
+        if (lunaticvibes::is_video_file_path(pathFile))
         {
             videoNameMap[textureMapKey] = std::make_shared<sVideo>(pathFile, 1.0, true);
             textureNameMap[textureMapKey] = textureNameMap["White"];
@@ -1605,8 +1609,8 @@ ParseRet SkinLR2::SRC_TEXT()
 
     SpriteImageText::SpriteImageTextBuilder builder;
     builder.srcLine = csvLineNumber;
-    builder.textInd = (IndexText)d.st;
-    builder.align = (TextAlign)d.align;
+    builder.textInd = static_cast<IndexText>(d.st);
+    builder.align = static_cast<TextAlign>(d.align);
     builder.editable = d.edit;
 
     std::string font = std::to_string(d.font);
@@ -1731,7 +1735,7 @@ ParseRet SkinLR2::SRC_JUDGELINE()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
     (_sharedData->sprites)[spriteIdx] = builder.build();
@@ -1757,7 +1761,7 @@ ParseRet SkinLR2::SRC_NOWJUDGE(size_t idx)
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
     (_sharedData->sprites)[idx] = builder.build();
