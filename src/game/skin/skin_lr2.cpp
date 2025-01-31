@@ -3673,43 +3673,67 @@ SkinLR2::SkinLR2(std::shared_ptr<lunaticvibes::SkinLr2SharedData> sharedData, Pa
     prevSkinLR2FontNameMap.clear();
 }
 
+static YAML::Node load_or_empty(const Path& p)
+{
+    try
+    {
+        return YAML::LoadFile(lunaticvibes::u8str(p));
+    }
+    catch (YAML::BadFile&) // ugly shit
+    {
+        return {};
+    }
+}
+
 SkinLR2::~SkinLR2()
 {
     stopSpriteVideoPlayback();
 
     if (getSceneFromSkinType(info.mode) == SceneType::PLAY)
     {
-        Path pCustomize =
+        const Path pCustomize =
             ConfigMgr::Profile()->getPath() / "customize" / SceneCustomize::getConfigFileName(getFilePath());
-        try
+
+        auto yaml = load_or_empty(pCustomize);
+        const bool was_not_empty = !yaml.IsNull();
+
+        auto write_or_reset_false = [&yaml](const char* key, int value) {
+            if (!value)
+                yaml.remove(key);
+            else
+                yaml[key] = value;
+        };
+
+        auto write_or_reset_true = [&yaml](const char* key, int value) {
+            if (value)
+                yaml.remove(key);
+            else
+                yaml[key] = value;
+        };
+
+        write_or_reset_false("PLAY_JUDGE_POS_1P_X", adjustPlayJudgePosition1PX);
+        write_or_reset_false("PLAY_JUDGE_POS_1P_Y", adjustPlayJudgePosition1PY);
+        write_or_reset_false("PLAY_JUDGE_POS_2P_X", adjustPlayJudgePosition2PX);
+        write_or_reset_false("PLAY_JUDGE_POS_2P_Y", adjustPlayJudgePosition2PY);
+        write_or_reset_false("PLAY_NOTE_1P_H", adjustPlayNote1PH);
+        write_or_reset_false("PLAY_NOTE_1P_W", adjustPlayNote1PW);
+        write_or_reset_false("PLAY_NOTE_1P_X", adjustPlayNote1PX);
+        write_or_reset_false("PLAY_NOTE_1P_Y", adjustPlayNote1PY);
+        write_or_reset_false("PLAY_NOTE_2P_H", adjustPlayNote2PH);
+        write_or_reset_false("PLAY_NOTE_2P_W", adjustPlayNote2PW);
+        write_or_reset_false("PLAY_NOTE_2P_X", adjustPlayNote2PX);
+        write_or_reset_false("PLAY_NOTE_2P_Y", adjustPlayNote2PY);
+        write_or_reset_false("PLAY_SKIN_H", adjustPlaySkinH);
+        write_or_reset_false("PLAY_SKIN_W", adjustPlaySkinW);
+        write_or_reset_false("PLAY_SKIN_X", adjustPlaySkinX);
+        write_or_reset_false("PLAY_SKIN_Y", adjustPlaySkinY);
+        write_or_reset_true("PLAY_JUDGE_POS_LIFT", adjustPlayJudgePositionLift);
+
+        if (was_not_empty || !yaml.IsNull())
         {
-            auto yaml = YAML::LoadFile(lunaticvibes::u8str(pCustomize));
-
-            yaml["PLAY_SKIN_X"] = adjustPlaySkinX;
-            yaml["PLAY_SKIN_Y"] = adjustPlaySkinY;
-            yaml["PLAY_SKIN_W"] = adjustPlaySkinW;
-            yaml["PLAY_SKIN_H"] = adjustPlaySkinH;
-            yaml["PLAY_JUDGE_POS_LIFT"] = adjustPlayJudgePositionLift;
-            yaml["PLAY_JUDGE_POS_1P_X"] = adjustPlayJudgePosition1PX;
-            yaml["PLAY_JUDGE_POS_1P_Y"] = adjustPlayJudgePosition1PY;
-            yaml["PLAY_JUDGE_POS_2P_X"] = adjustPlayJudgePosition2PX;
-            yaml["PLAY_JUDGE_POS_2P_Y"] = adjustPlayJudgePosition2PY;
-            yaml["PLAY_NOTE_1P_X"] = adjustPlayNote1PX;
-            yaml["PLAY_NOTE_1P_Y"] = adjustPlayNote1PY;
-            yaml["PLAY_NOTE_1P_W"] = adjustPlayNote1PW;
-            yaml["PLAY_NOTE_1P_H"] = adjustPlayNote1PH;
-            yaml["PLAY_NOTE_2P_X"] = adjustPlayNote2PX;
-            yaml["PLAY_NOTE_2P_Y"] = adjustPlayNote2PY;
-            yaml["PLAY_NOTE_2P_W"] = adjustPlayNote2PW;
-            yaml["PLAY_NOTE_2P_H"] = adjustPlayNote2PH;
-
             std::ofstream fout(pCustomize, std::ios_base::trunc);
             fout << yaml;
             fout.close();
-        }
-        catch (YAML::BadFile&)
-        {
-            LOG_WARNING << "[Skin] Bad customize config file: " << pCustomize;
         }
     }
 }
