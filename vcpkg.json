@@ -7,7 +7,6 @@
     "overlay-ports": ["./vcpkg-overlays"]
   },
   "dependencies": [
-    "boost-algorithm",
     "boost-asio",
     "boost-format",
     "boost-nowide",

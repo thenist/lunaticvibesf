@@ -14,8 +14,6 @@
 #include <config/config_mgr.h>
 #include <game/scene/scene_customize.h>
 
-#include <boost/algorithm/string.hpp>
-
 namespace r = std::ranges;
 
 SoundSetLR2::SoundSetLR2() : SoundSetLR2(std::mt19937{std::random_device{}()})
@@ -200,6 +198,15 @@ bool SoundSetLR2::parseBody(const std::vector<StringContent>& tokens)
     return false;
 }
 
+static void replace_all(std::string& str, std::string_view from, std::string_view to)
+{
+    for (size_t pos = str.find(from); pos != std::string::npos;)
+    {
+        str.replace(pos, from.length(), to);
+        pos = str.find(from, pos + to.length());
+    }
+}
+
 bool SoundSetLR2::loadPath(const std::string& key, const std::string_view rawpath)
 {
     if (auto it = soundFilePath.find(key); it != soundFilePath.end())
@@ -230,7 +237,7 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string_view rawpat
                 }
 
                 std::string pathFile = pathU8Str;
-                boost::replace_all(pathFile, "*", cf.label[value]);
+                replace_all(pathFile, "*", cf.label[value]);
                 soundFilePath.insert_or_assign(key, pathFile);
                 LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added " << key << ": " << pathFile;
 
