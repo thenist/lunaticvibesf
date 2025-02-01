@@ -1,9 +1,9 @@
 #include "table_bms.h"
 
+#include <format>
 #include <fstream>
 #include <string>
 
-#include <boost/format.hpp>
 #include <curl/curl.h>
 #include <re2/re2.h>
 #include <tao/json.hpp>
@@ -108,9 +108,8 @@ GetResult GET(const std::string& url, std::string& result)
     }
 
     static curl_version_info_data* curlversion = curl_version_info(CURLVERSION_NOW);
-    static std::string ua = (boost::format("curl/%d.%d.%d") % (curlversion->version_num >> 16 & 0xFF) %
-                             (curlversion->version_num >> 8 & 0xFF) % (curlversion->version_num & 0xFF))
-                                .str();
+    static const std::string ua = std::format("curl/{}.{}.{}", curlversion->version_num >> 16 & 0xFF,
+                                              curlversion->version_num >> 8 & 0xFF, curlversion->version_num & 0xFF);
     code = curl_easy_setopt(conn, CURLOPT_USERAGENT, ua.c_str());
     if (code != CURLE_OK)
     {

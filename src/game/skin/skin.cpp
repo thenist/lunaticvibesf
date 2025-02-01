@@ -2,13 +2,12 @@
 
 #include <algorithm>
 #include <execution>
+#include <format>
 
 #include <common/assert.h>
 #include <game/graphics/sprite_video.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_debug.h>
-
-#include <boost/format.hpp>
 
 // FIXME: get rid of preDefinedTextures.
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::preDefinedTextures;
@@ -95,11 +94,10 @@ void SkinBase::update_mouse_click(int x, int y)
                 const RectF& rc = (*it)->_current.rect;
                 if (x >= rc.x && y >= rc.y && x < rc.x + rc.w && y < rc.y + rc.h)
                 {
-                    createNotification((boost::format("Clicked sprite #%d (%d,%d)[%dx%d] (Line:%d)") %
-                                        (int)std::distance(it, _sprites.rend()) % (*it)->_current.rect.x %
-                                        (*it)->_current.rect.y % (*it)->_current.rect.w % (*it)->_current.rect.h %
-                                        (*it)->srcLine)
-                                           .str());
+                    createNotification(std::format("Clicked sprite #{} ({},{})[{}x{}] (Line:{})",
+                                                   (int)std::distance(it, _sprites.rend()), (*it)->_current.rect.x,
+                                                   (*it)->_current.rect.y, (*it)->_current.rect.w,
+                                                   (*it)->_current.rect.h, (*it)->srcLine));
                     break;
                 }
             }

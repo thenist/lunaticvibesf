@@ -1,6 +1,7 @@
 #include "scene.h"
 
 #include <cstddef>
+#include <format>
 #include <functional>
 #include <memory>
 
@@ -19,7 +20,6 @@
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
 
-#include <boost/format.hpp>
 #include <imgui.h>
 
 // prototype
@@ -250,11 +250,10 @@ void SceneBase::draw() const
     if (queuedScreenshot)
     {
         Path p = "screenshot";
-        p /=
-            (boost::format("LV %04d-%02d-%02d %02d-%02d-%02d.png") % State::get(IndexNumber::DATE_YEAR) %
-             State::get(IndexNumber::DATE_MON) % State::get(IndexNumber::DATE_DAY) %
-             State::get(IndexNumber::DATE_HOUR) % State::get(IndexNumber::DATE_MIN) % State::get(IndexNumber::DATE_SEC))
-                .str();
+        p /= std::format("LV {:04d}-{:02d}-{:02d} {:02d}-{:02d}-{:02d}.png", State::get(IndexNumber::DATE_YEAR),
+                         State::get(IndexNumber::DATE_MON), State::get(IndexNumber::DATE_DAY),
+                         State::get(IndexNumber::DATE_HOUR), State::get(IndexNumber::DATE_MIN),
+                         State::get(IndexNumber::DATE_SEC));
 
         lunaticvibes::graphics::queue_screenshot(std::move(p));
 

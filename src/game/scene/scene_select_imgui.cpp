@@ -1,6 +1,7 @@
 #include "scene_select.h"
 
 #include <array>
+#include <format>
 #include <fstream>
 #include <string>
 
@@ -23,6 +24,7 @@
 
 #include <boost/format.hpp>
 #include <imgui.h>
+
 #include <tinyfiledialogs.h>
 
 #ifdef _WIN32
@@ -1163,15 +1165,16 @@ void SceneSelect::imguiPageAbout()
         if (ImGui::BeginChild("##pagesub21"))
         {
             ImGui::TextUnformatted("\"Lunatic Vibes F\" 2017-2024");
-            ImGui::TextUnformatted((boost::format("Version: %s %s (%s)") % PROJECT_VERSION
+            static constexpr auto&& BUILD_TYPE =
 #ifndef NDEBUG
-                                    % "Debug"
+                "Release"
 #else
-                                    % "Release"
+                "Debug"
 #endif
-                                    % GIT_REVISION)
-                                       .str()
-                                       .c_str());
+                ;
+            static const std::string version =
+                std::format("Version: {} {} ({})", PROJECT_VERSION, BUILD_TYPE, GIT_REVISION);
+            ImGui::TextUnformatted(version.c_str());
 
             ImGui::TextUnformatted("https://github.com/chown2/lunaticvibesf");
 

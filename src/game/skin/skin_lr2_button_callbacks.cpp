@@ -8,8 +8,6 @@
 #include <string_view>
 #include <utility>
 
-#include <boost/format.hpp>
-
 #include <common/assert.h>
 #include <common/entry/entry_song.h>
 #include <common/sysutil.h>
@@ -1013,8 +1011,7 @@ static void default_target_rate(int plus)
     number_change_clamp(IndexNumber::DEFAULT_TARGET_RATE, 0, 100, plus);
 
     if (State::get(IndexOption::PLAY_TARGET_TYPE) == Option::TARGET_DEFAULT)
-        State::set(IndexText::TARGET_NAME,
-                   (boost::format("RATE %d%%") % State::get(IndexNumber::DEFAULT_TARGET_RATE)).str());
+        State::set(IndexText::TARGET_NAME, std::format("RATE {}%", State::get(IndexNumber::DEFAULT_TARGET_RATE)));
 }
 
 // 77
@@ -1024,14 +1021,9 @@ void target_type(int plus)
 
     State::set(IndexOption::PLAY_TARGET_TYPE, val);
     if (val == Option::TARGET_DEFAULT)
-    {
-        State::set(IndexText::TARGET_NAME,
-                   (boost::format("RATE %d%%") % State::get(IndexNumber::DEFAULT_TARGET_RATE)).str());
-    }
+        State::set(IndexText::TARGET_NAME, std::format("RATE {}%", State::get(IndexNumber::DEFAULT_TARGET_RATE)));
     else
-    {
         State::set(IndexText::TARGET_NAME, Option::s_target_type[val]);
-    }
 
     if (plus)
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
@@ -1450,9 +1442,8 @@ void open_ir_page()
     LVF_DEBUG_ASSERT(chart != nullptr);
 
     // FIXME: unhardcode LR2IR
-    std::string link = (boost::format("http://dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=%s") %
-                        chart->fileHash.hexdigest())
-                           .str();
+    std::string link = std::format("http://dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5={}",
+                                   chart->fileHash.hexdigest());
     if (!lunaticvibes::open(link))
     {
         LOG_ERROR << "[SkinLR2] Failed to open IR page link";

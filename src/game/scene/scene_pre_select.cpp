@@ -486,14 +486,13 @@ void ScenePreSelect::loadFinished()
         if (gNextScene == SceneType::PRE_SELECT)
         {
             std::unique_lock l{_textHintMutex};
-            textHint = (boost::format("%s %s %s (%s)") % PROJECT_NAME % PROJECT_VERSION
+            textHint = std::format("{} {} {} ({})", PROJECT_NAME, PROJECT_VERSION,
 #ifndef NDEBUG
-                        % "Debug"
+                                   "Debug",
 #else
-                        % ""
+                                   "",
 #endif
-                        % GIT_REVISION)
-                           .str();
+                                   GIT_REVISION);
             textHint2 = i18n::s(i18nText::PLEASE_WAIT);
         }
     }
