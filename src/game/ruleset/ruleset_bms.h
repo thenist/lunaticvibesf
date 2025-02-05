@@ -144,11 +144,19 @@ public:
             _gauges.push_back(gauge);
     }
 
-    void feed(BmsJudgeArea judge);
-    void feed_mine(long long mine_value);
-    void update_for_show(RulesetBMS& ruleset);
-    [[nodiscard]] const Lr2GaugeIncrements& get_gauge() const;
-    [[nodiscard]] const NumberAnimation& get_health() const;
+    void feed(BmsJudgeArea judge)
+    {
+        for (auto& gauge : _gauges)
+            gauge.feed(judge);
+    }
+    void feed_mine(long long mine_value)
+    {
+        for (auto& gauge : _gauges)
+            gauge.feed_mine(mine_value);
+    }
+    void update_for_show(RulesetBMS& ruleset) { current_gauge().update_for_show(ruleset); }
+    [[nodiscard]] const Lr2GaugeIncrements& get_gauge() const { return current_gauge().get_gauge(); }
+    [[nodiscard]] const NumberAnimation& get_health() const { return current_gauge().get_health(); }
 
 private:
     // [[nodiscard]] decltype(auto) current_gauge(this auto&& self) // TODO(GCC14): use this.

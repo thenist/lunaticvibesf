@@ -485,34 +485,6 @@ void GaugeHolder::process(double diff)
     // LOG_VERBOSE << "[GaugeHolder] -> process, new=" << _health.to;
 }
 
-void GaugeHolderProxy::feed(BmsJudgeArea judge)
-{
-    for (auto& gauge : _gauges)
-        gauge.feed(judge);
-}
-
-void GaugeHolderProxy::feed_mine(long long mine_value)
-{
-    for (auto& gauge : _gauges)
-        gauge.feed_mine(mine_value);
-}
-
-void GaugeHolderProxy::update_for_show(RulesetBMS& ruleset)
-{
-    // LOG_VERBOSE << "GaugeHolderProxy update_for_show";
-    current_gauge().update_for_show(ruleset);
-}
-
-const Lr2GaugeIncrements& GaugeHolderProxy::get_gauge() const
-{
-    return current_gauge().get_gauge();
-}
-
-const NumberAnimation& GaugeHolderProxy::get_health() const
-{
-    return current_gauge().get_health();
-}
-
 } // namespace lunaticvibes
 
 static const char* randomTypeStringForShow(PlayModifierRandomType type)
