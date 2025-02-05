@@ -345,23 +345,22 @@ PlayModifierGaugeType lunaticvibes::convertGaugeType(int nType)
     };
 };
 
-unsigned lunaticvibes::getEffectiveChartTotal(ChartFormatBase& format, PlayModifierGaugeType gauge)
+static std::optional<int> chart_total(const ChartFormatBase& format)
 {
-    // https://github.com/chown2/lunaticvibesf/issues/214
-    auto chart_total = [](ChartFormatBase& format) -> std::optional<int> {
-        // TODO: make .type() const, make this function take a const ref.
-        switch (format.type())
-        {
-        case eChartFormat::UNKNOWN: return {};
-        case eChartFormat::BMS:
-            if (int total = dynamic_cast<const ChartFormatBMSMeta&>(format).total; total != -1)
-                return total;
-            return {};
-        case eChartFormat::BMSON: return {};
-        }
-        lunaticvibes::assert_failed("chart_total");
-    };
+    switch (format.type())
+    {
+    case eChartFormat::UNKNOWN: return {};
+    case eChartFormat::BMS:
+        if (int total = dynamic_cast<const ChartFormatBMSMeta&>(format).total; total != -1)
+            return total;
+        return {};
+    case eChartFormat::BMSON: return {};
+    }
+    lunaticvibes::assert_failed("chart_total");
+};
 
+unsigned lunaticvibes::getEffectiveChartTotal(const ChartFormatBase& format, PlayModifierGaugeType gauge)
+{
     auto lr2_default_total = [](RulesetBMS::GaugeType gauge) -> unsigned {
         using enum RulesetBMS::GaugeType;
         switch (gauge)

@@ -2,14 +2,12 @@
 
 #include <cmath>
 #include <memory>
-#include <numeric>
-#include <regex>
 #include <string>
 #include <vector>
 
-#include "common/beat.h"
-#include "common/hash.h"
-#include "common/types.h"
+#include <common/beat.h>
+#include <common/hash.h>
+#include <common/types.h>
 
 // Subset of chart formats.
 // Currently including BMS
@@ -29,7 +27,7 @@ protected:
     eChartFormat _type = eChartFormat::UNKNOWN;
 
 public:
-    constexpr eChartFormat type() { return _type; }
+    constexpr eChartFormat type() const { return _type; }
 
 public:
     ChartFormatBase() = default;
@@ -40,7 +38,7 @@ protected:
     bool loaded = false;
 
 public:
-    constexpr bool isLoaded() { return loaded; }
+    constexpr bool isLoaded() const { return loaded; }
 
     // following fields are generic info, which are stored in db
 public:

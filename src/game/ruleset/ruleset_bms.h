@@ -52,7 +52,7 @@ constexpr inline PlayModifierHispeedFixType convertHSType(int nType)
     default: return PlayModifierHispeedFixType::NONE;
     };
 };
-unsigned getEffectiveChartTotal(ChartFormatBase& format, PlayModifierGaugeType gauge);
+unsigned getEffectiveChartTotal(const ChartFormatBase& format, PlayModifierGaugeType gauge);
 
 // Judge area definitions.
 // e.g. EARLY_PERFECT: Perfect early half part
