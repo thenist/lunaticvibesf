@@ -1,5 +1,5 @@
 find_package(PkgConfig REQUIRED)
-if(${GRAPHICS_BACKEND} STREQUAL SDL2)
+if(${LVF_GRAPHICS_BACKEND} STREQUAL SDL2)
     pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2>=2.30.1)
     pkg_check_modules(SDL2_gfx IMPORTED_TARGET SDL2_gfx>=1.0.2)
     if(SDL2_gfx_FOUND)
@@ -32,8 +32,8 @@ find_package(cereal 1.3.2 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 
-if(${GRAPHICS_BACKEND} STREQUAL SDL2)
-    set(GRAPHICS_BACKEND_SRC
+if(${LVF_GRAPHICS_BACKEND} STREQUAL SDL2)
+    set(LVF_GRAPHICS_BACKEND_SRC
         graphics/SDL2/common_SDL2.cpp
         graphics/SDL2/graph_line_SDL2.cpp
         graphics/SDL2/input.cpp
@@ -55,7 +55,7 @@ add_library(
     chart/chart.cpp
     chart/chart_bms.cpp
     chart/chart_load_task.cpp
-    ${GRAPHICS_BACKEND_SRC}
+    ${LVF_GRAPHICS_BACKEND_SRC}
     graphics/dxa.cpp
     graphics/sprite.cpp
     graphics/sprite_bar_entry.cpp

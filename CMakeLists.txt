@@ -26,8 +26,8 @@ if(WIN32)
     add_definitions(-DNOMINMAX)
 endif()
 
-set(GRAPHICS_BACKEND SDL2 CACHE STRING "Graphics backend")
-if(${GRAPHICS_BACKEND} STREQUAL SDL2)
+set(LVF_GRAPHICS_BACKEND SDL2 CACHE STRING "Graphics backend")
+if(${LVF_GRAPHICS_BACKEND} STREQUAL SDL2)
     add_definitions(-DRENDER_SDL2)
 endif()
 
