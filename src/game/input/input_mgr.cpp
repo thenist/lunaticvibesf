@@ -5,6 +5,7 @@
 #include <config/config_mgr.h>
 #include <game/graphics/graphics.h>
 #include <shared_mutex>
+#include <tuple>
 
 #ifdef RENDER_SDL2
 #include <game/graphics/SDL2/input.h>
@@ -200,17 +201,7 @@ std::pair<std::bitset<Input::KEY_COUNT>, InputMgr::ScratchData> InputMgr::detect
 
 bool InputMgr::getMousePos(int& x, int& y)
 {
-#ifdef RENDER_SDL2
-    {
-        std::shared_lock l{sdl::state::g_input_mutex};
-        x = sdl::state::g_mouse_x;
-        y = sdl::state::g_mouse_y;
-    }
-    bool ret = true;
-#else
-#error "No mouse pos getting implementation"
-#endif
-    if (ret)
+    std::tie(x, y) = lunaticvibes::graphics::get_mouse_pos();
     {
         double canvasScaleX = graphics_get_canvas_scale_x();
         double canvasScaleY = graphics_get_canvas_scale_y();
@@ -219,7 +210,7 @@ bool InputMgr::getMousePos(int& x, int& y)
         if (canvasScaleY != 1.0)
             y = (int)std::floor(y / canvasScaleY);
     }
-    return ret;
+    return true;
 }
 
 void InputMgr::setDebounceTime(int ms)

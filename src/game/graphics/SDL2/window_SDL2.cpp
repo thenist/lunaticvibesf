@@ -706,3 +706,9 @@ void lunaticvibes::graphics::queue_screenshot(Path png)
     LOG_INFO << "[SDL2] Screenshot: " << png;
     screenshotPath = std::move(png);
 }
+
+std::pair<int, int> lunaticvibes::graphics::get_mouse_pos()
+{
+    std::shared_lock l{sdl::state::g_input_mutex};
+    return {sdl::state::g_mouse_x, sdl::state::g_mouse_y};
+}

@@ -82,4 +82,5 @@ void stopTextInput();
 namespace lunaticvibes::graphics
 {
 void queue_screenshot(Path png);
+std::pair<int, int> get_mouse_pos();
 } // namespace lunaticvibes::graphics
