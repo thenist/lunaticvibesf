@@ -11,9 +11,11 @@
 #include <game/skin/skin_lr2_number_animation.h>
 
 #include <array>
+#include <cstdint>
 #include <memory>
 #include <ranges>
 
+using uint8_t = std::uint8_t;
 using lunaticvibes::parser_bms::JudgeDifficulty;
 
 class RulesetBMS;
@@ -345,6 +347,10 @@ protected:
 private:
     unsigned int _notesSinceLastAutoadjust = 0;
 
+    std::array<double, PlayContextParams::GRAPH_POINT_NUMBER> _graphAcc;
+    std::array<uint8_t, PlayContextParams::GRAPH_POINT_NUMBER> _graphGauge;
+    size_t _graphLastWrite;
+
 protected:
     // members change in game
     std::array<JudgeArea, chart::NOTELANEINDEX_COUNT> _lnJudge{JudgeArea::NOTHING};
@@ -389,6 +395,10 @@ private:
 
     void processHp(JudgeArea judge);
     void processHpHitMine(long long mine_value);
+
+    void save_graph_point(size_t idx) override;
+    std::span<const double> get_acc_graph() override { return _graphAcc; };
+    std::span<const uint8_t> get_gauge_graph() override { return _graphGauge; };
 
 public:
     // Register to InputWrapper

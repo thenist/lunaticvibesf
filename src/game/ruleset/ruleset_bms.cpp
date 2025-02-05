@@ -4,6 +4,7 @@
 #include <array>
 #include <iterator>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <utility>
 
@@ -19,6 +20,8 @@
 #include <game/sound/sound_sample.h>
 
 using namespace chart;
+namespace r = std::ranges;
+namespace v = std::views;
 
 static void setJudgeInternalTimer1P(RulesetBMS::JudgeType judge, long long t)
 {
@@ -594,6 +597,9 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     {
         LVF_DEBUG_ASSERT(_replayNew->replay != nullptr);
     }
+
+    _graphAcc.fill({});
+    _graphGauge.fill({});
 
     static const NoteLaneTimerMap bombTimer5k[] = {
         {{
@@ -2117,5 +2123,30 @@ void RulesetBMS::updateGlobals()
         State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, diff_to_next_rank);
 
         State::set(IndexOption::RESULT_CLEAR_TYPE_2P, calculateLamp());
+    }
+}
+
+void RulesetBMS::save_graph_point(size_t idx)
+{
+    auto fill_missing = [&, idx]() {
+        if (_graphLastWrite - idx <= 1)
+            return;
+        for (size_t i = _graphLastWrite + 1; i < idx; ++i)
+        {
+            _graphGauge[i] = _graphGauge[_graphLastWrite];
+            _graphAcc[i] = _graphAcc[_graphLastWrite];
+        }
+        _graphLastWrite = idx;
+    };
+
+    const auto data = getData();
+    _graphAcc[idx] = data.total_acc;
+    _graphGauge[idx] = data.health * 100;
+    fill_missing();
+    if (isFinished())
+    {
+        constexpr auto but_not_this = 1;
+        r::fill(v::drop(_graphAcc, idx + but_not_this), _graphAcc[idx]);
+        r::fill(v::drop(_graphGauge, idx + but_not_this), _graphGauge[idx]);
     }
 }

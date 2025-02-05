@@ -8,6 +8,8 @@
 
 #include <utility>
 
+using size_t = std::size_t; // TODO: move to common/types.h
+
 enum class RulesetType : uint8_t
 {
     SOUND_ONLY,
@@ -77,6 +79,10 @@ public:
     [[nodiscard]] virtual bool isFinished() const { return notesExpired >= getMaxCombo(); }
     [[nodiscard]] virtual bool isCleared() const { return _isCleared; }
     [[nodiscard]] virtual bool isFailed() const { return _isFailed; }
+
+    virtual void save_graph_point(size_t idx) {};
+    virtual std::span<const double> get_acc_graph() { return {}; };
+    virtual std::span<const uint8_t> get_gauge_graph() { return {}; };
 
     [[nodiscard]] virtual unsigned getCurrentMaxScore() const = 0;
     [[nodiscard]] virtual unsigned getMaxScore() const = 0;

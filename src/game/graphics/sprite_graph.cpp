@@ -99,7 +99,7 @@ void SpriteLine::updateRects()
         if (gPlayContext.ruleset[_player]->failWhenNoHealth())
             break;
         const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
-        const auto& p = gPlayContext.graphGauge[_player];
+        const auto p = gPlayContext.ruleset[_player]->get_gauge_graph();
         pushRects(
             p, static_cast<uint8_t>(100), [h](int val1, int val2) { return val1 <= h || val2 <= h; },
             [h](int val2) { return val2 > h ? h : val2; });
@@ -108,7 +108,7 @@ void SpriteLine::updateRects()
     case LineType::GAUGE_C: {
         std::shared_lock l(gPlayContext._mutex);
         const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
-        const auto& p = gPlayContext.graphGauge[_player];
+        const auto p = gPlayContext.ruleset[_player]->get_gauge_graph();
         pushRects(
             p, static_cast<uint8_t>(100), [h](int val1, int val2) { return val1 >= h || val2 >= h; },
             [h](int val1) { return val1 < h ? h : val1; });
@@ -116,7 +116,7 @@ void SpriteLine::updateRects()
     }
     case LineType::SCORE: {
         std::shared_lock l(gPlayContext._mutex);
-        const auto& p = gPlayContext.graphAcc[_player];
+        const auto p = gPlayContext.ruleset[_player]->get_acc_graph();
         pushRects(p, 100.0);
         break;
     }

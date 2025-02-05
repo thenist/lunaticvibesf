@@ -164,45 +164,17 @@ void pushGraphPoints()
     const auto song_len = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength();
     using HighresT = decltype(lunaticvibes::Time{}.hres());
     constexpr auto zero = static_cast<HighresT>(0); // Windows...
-    const auto can_ba_called_after_end = std::min(rt.hres(), song_len.hres());
-    const auto idx = map_value_range(can_ba_called_after_end, zero, song_len.hres(), zero,
+    const auto can_be_called_after_end = std::min(rt.hres(), song_len.hres());
+    const auto idx = map_value_range(can_be_called_after_end, zero, song_len.hres(), zero,
                                      static_cast<HighresT>(PlayContextParams::GRAPH_POINT_NUMBER - 1));
     LVF_DEBUG_ASSERT(idx >= 0 && idx < PlayContextParams::GRAPH_POINT_NUMBER);
 
-    auto fill_missing = [idx](int slot) {
-        auto& last_write = gPlayContext.graphLastWriteIdx[slot];
-        auto& gauge = gPlayContext.graphGauge[slot];
-        auto& acc = gPlayContext.graphAcc[slot];
-        if (last_write - idx <= 1)
-            return;
-        for (int i = last_write + 1; i < idx; ++i)
-        {
-            gauge[i] = gauge[last_write];
-            acc[i] = acc[last_write];
-        }
-        last_write = idx;
-    };
-
-    auto update = [&](int slot) {
-        const auto data = gPlayContext.ruleset[slot]->getData();
-        gPlayContext.graphAcc[slot][idx] = data.total_acc;
-        gPlayContext.graphGauge[slot][idx] = data.health * 100;
-        fill_missing(slot);
-        if (gPlayContext.ruleset[slot]->isFinished())
-        {
-            constexpr auto but_not_this = 1;
-            r::fill(v::drop(gPlayContext.graphAcc[slot], idx + but_not_this), gPlayContext.graphAcc[slot][idx]);
-            r::fill(v::drop(gPlayContext.graphGauge[slot], idx + but_not_this), gPlayContext.graphGauge[slot][idx]);
-        }
-    };
-
-    std::unique_lock l(gPlayContext._mutex);
-
-    update(PLAYER_SLOT_PLAYER);
+    gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->save_graph_point(idx);
     if (gPlayContext.ruleset[PLAYER_SLOT_TARGET])
-        update(PLAYER_SLOT_TARGET);
-    if (!gPlayContext.isAuto && !gPlayContext.isReplay && gPlayContext.replayMybest)
-        update(PLAYER_SLOT_MYBEST);
+        gPlayContext.ruleset[PLAYER_SLOT_TARGET]->save_graph_point(idx);
+    // old cond: !gPlayContext.isAuto && !gPlayContext.isReplay && gPlayContext.replayMybest
+    if (gPlayContext.ruleset[PLAYER_SLOT_MYBEST])
+        gPlayContext.ruleset[PLAYER_SLOT_MYBEST]->save_graph_point(idx);
 }
 
 void loadSongList()
