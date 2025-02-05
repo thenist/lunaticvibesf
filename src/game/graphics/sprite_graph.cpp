@@ -3,6 +3,7 @@
 #include <concepts>
 #include <functional>
 #include <shared_mutex>
+#include <span>
 
 #include <common/play_modifiers.h>
 #include <game/graphics/graph_line.h>
@@ -66,8 +67,7 @@ void SpriteLine::updateRects()
 
     auto pushRects =
         [this]<typename T, typename Identity = std::identity, std::predicate<T, T> Pred = DefaultTruePredicate<T>>(
-            const std::array<T, PlayContextParams::GRAPH_POINT_NUMBER> points, T maxh, Pred cond = Pred{},
-            Identity clip = Identity{}) {
+            std::span<const T> points, T maxh, Pred cond = Pred{}, Identity clip = Identity{}) {
             _rects.clear();
 
             const auto& r = _current.rect;
