@@ -368,7 +368,7 @@ public:
                GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side, int fiveKeyMapIndex,
                std::shared_ptr<PlayContextParams::MutexReplayChart> replayNew);
 
-    void initGaugeParams(PlayModifierGaugeType gauge);
+    void initGaugeParams(const PlayModifiers& mods);
 
 private:
     [[nodiscard]] JudgeRes _calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const;

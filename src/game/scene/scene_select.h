@@ -99,6 +99,8 @@ private:
     // imgui
     bool imguiShow = false;
 
+    bool _gas_gauge;
+
 public:
     void closeReadme(const lunaticvibes::Time&);
     void openChartReadme(const lunaticvibes::Time&);

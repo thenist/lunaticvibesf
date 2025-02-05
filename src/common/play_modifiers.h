@@ -73,4 +73,5 @@ struct PlayModifiers
     PlayModifierHispeedFixType hispeedFix = PlayModifierHispeedFixType::NONE;
     PlayModifierLaneEffectType laneEffect = PlayModifierLaneEffectType::OFF;
     bool DPFlip = false;
+    bool gas_gauge = false;
 };

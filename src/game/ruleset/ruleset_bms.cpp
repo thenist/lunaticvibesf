@@ -811,7 +811,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     using namespace std::string_literals;
 
     _basic.health = health;
-    initGaugeParams(mods.gauge);
+    initGaugeParams(mods);
 
     _side = side;
     _judgeScratch = !(mods.assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
@@ -887,10 +887,9 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     lunaticvibes::assert_failed("isCourseGrade");
 }
 
-extern bool g_enable_gas_for_test;
-
-void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
+void RulesetBMS::initGaugeParams(const PlayModifiers& mods)
 {
+    const auto gauge = mods.gauge;
     const auto bms_gauge = get_gauge(gauge);
     LOG_VERBOSE << "[RulesetBMS] initGaugeParams " << bms_gauge;
 
@@ -898,7 +897,7 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
     const unsigned total = lunaticvibes::getEffectiveChartTotal(*_format, gauge);
 
     // FIXME: adjust result graph per gauge.
-    if (g_enable_gas_for_test)
+    if (mods.gas_gauge)
     {
         auto build = [this, total](GaugeType type) -> lunaticvibes::GaugeHolder {
             return {getGauge(type, total, getNoteCount())};

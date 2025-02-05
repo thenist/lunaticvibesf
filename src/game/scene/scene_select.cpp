@@ -529,6 +529,8 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     lunaticvibes::assign(_preview_chart_7k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_7K, ""));
     lunaticvibes::assign(_preview_chart_9k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_9K, ""));
 
+    _gas_gauge = false; // TODO: ConfigMgr::get('P', cfg::P_ENABLE_GAS, false);
+
     _input.register_p("SCENE_PRESS", std::bind_front(&SceneSelect::inputGamePress, this));
     _input.register_h("SCENE_HOLD", std::bind_front(&SceneSelect::inputGameHold, this));
     _input.register_r("SCENE_RELEASE", std::bind_front(&SceneSelect::inputGameRelease, this));
@@ -2158,6 +2160,7 @@ void SceneSelect::decide()
         // reset mods
         static const std::set<PlayModifierGaugeType> courseGaugeModsAllowed = {PlayModifierGaugeType::NORMAL,
                                                                                PlayModifierGaugeType::HARD};
+        // TODO: why does this compare gPlayContext.mods[x], didn't we just reset it above?
         if (courseGaugeModsAllowed.find(gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge) == courseGaugeModsAllowed.end())
         {
             State::set(IndexOption::PLAY_GAUGE_TYPE_1P, 0);
@@ -2273,6 +2276,8 @@ void SceneSelect::decide()
             lunaticvibes::convertHSType(State::get(IndexOption::PLAY_HSFIX_TYPE));
         gPlayContext.mods[PLAYER_SLOT_TARGET].hispeedFix =
             lunaticvibes::convertHSType(State::get(IndexOption::PLAY_HSFIX_TYPE));
+
+        gPlayContext.mods[PLAYER_SLOT_PLAYER].gas_gauge = _gas_gauge;
 
         if (gPlayContext.isBattle)
         {
