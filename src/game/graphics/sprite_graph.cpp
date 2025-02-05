@@ -98,20 +98,20 @@ void SpriteLine::updateRects()
         std::shared_lock l(gPlayContext._mutex);
         if (gPlayContext.ruleset[_player]->failWhenNoHealth())
             break;
-        const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
+        const auto h = gPlayContext.ruleset[_player]->getClearHealth();
         const auto p = gPlayContext.ruleset[_player]->get_gauge_graph();
         pushRects(
-            p, static_cast<uint8_t>(100), [h](int val1, int val2) { return val1 <= h || val2 <= h; },
-            [h](int val2) { return val2 > h ? h : val2; });
+            p, 1.0, [h](double val1, double val2) { return val1 <= h || val2 <= h; },
+            [h](double val2) { return val2 > h ? h : val2; });
         break;
     }
     case LineType::GAUGE_C: {
         std::shared_lock l(gPlayContext._mutex);
-        const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
+        const auto h = gPlayContext.ruleset[_player]->getClearHealth();
         const auto p = gPlayContext.ruleset[_player]->get_gauge_graph();
         pushRects(
-            p, static_cast<uint8_t>(100), [h](int val1, int val2) { return val1 >= h || val2 >= h; },
-            [h](int val1) { return val1 < h ? h : val1; });
+            p, 1.0, [h](double val1, double val2) { return val1 >= h || val2 >= h; },
+            [h](double val1) { return val1 < h ? h : val1; });
         break;
     }
     case LineType::SCORE: {

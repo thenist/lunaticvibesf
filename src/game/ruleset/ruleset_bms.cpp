@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <iterator>
 #include <optional>
 #include <ranges>
@@ -20,8 +21,10 @@
 #include <game/sound/sound_sample.h>
 
 using namespace chart;
-namespace r = std::ranges;
-namespace v = std::views;
+// namespace r = std::ranges;
+// namespace v = std::views;
+
+using std::size_t;
 
 static void setJudgeInternalTimer1P(RulesetBMS::JudgeType judge, long long t)
 {
@@ -138,6 +141,26 @@ static double calculateHardNegativeHpDiffMultiplier(unsigned total, unsigned not
         by_notes = 10.0;
 
     return std::max(by_total, by_notes);
+}
+
+template <typename T>
+static constexpr void save_graph_point_(std::span<T> l, const size_t idx_prev, size_t idx, T value)
+{
+    auto fill_missing = [&, idx]() {
+        if (idx_prev - idx <= 1)
+            return;
+        for (size_t i = idx_prev + 1; i < idx; ++i)
+            l[i] = l[idx_prev];
+    };
+
+    l[idx] = value;
+    fill_missing();
+    // if (isFinished())
+    // {
+    //     constexpr auto but_not_this = 1;
+    //     r::fill(v::drop(_graphAcc, idx + but_not_this), _graphAcc[idx]);
+    //     r::fill(v::drop(_graphGauge, idx + but_not_this), _graphGauge[idx]);
+    // }
 }
 
 static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, unsigned effective_total,
@@ -431,6 +454,12 @@ std::ostream& operator<<(std::ostream& os, const BmsGaugeType& type)
     lunaticvibes::assert_failed("operator<<(BmsGaugeType)");
 }
 
+void GaugeHolder::save_graph_point(size_t idx)
+{
+    ::save_graph_point_<double>(_graphGauge, _graphLastWrite, idx, _health.to);
+    _graphLastWrite = idx;
+}
+
 void GaugeHolder::update_for_show(RulesetBMS& ruleset)
 {
     // LOG_VERBOSE << "GaugeHolder update_for_show side=" << (int)ruleset._side << " gauge=" << _gauge.type;
@@ -571,7 +600,6 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     }
 
     _graphAcc.fill({});
-    _graphGauge.fill({});
 
     static const NoteLaneTimerMap bombTimer5k[] = {
         {{
@@ -2100,25 +2128,7 @@ void RulesetBMS::updateGlobals()
 
 void RulesetBMS::save_graph_point(size_t idx)
 {
-    auto fill_missing = [&, idx]() {
-        if (_graphLastWrite - idx <= 1)
-            return;
-        for (size_t i = _graphLastWrite + 1; i < idx; ++i)
-        {
-            _graphGauge[i] = _graphGauge[_graphLastWrite];
-            _graphAcc[i] = _graphAcc[_graphLastWrite];
-        }
-        _graphLastWrite = idx;
-    };
-
-    const auto data = getData();
-    _graphAcc[idx] = data.total_acc;
-    _graphGauge[idx] = data.health * 100;
-    fill_missing();
-    if (isFinished())
-    {
-        constexpr auto but_not_this = 1;
-        r::fill(v::drop(_graphAcc, idx + but_not_this), _graphAcc[idx]);
-        r::fill(v::drop(_graphGauge, idx + but_not_this), _graphGauge[idx]);
-    }
+    _gaugeProc.save_graph_point(idx);
+    ::save_graph_point_<double>(_graphAcc, _graphLastWrite, idx, getData().total_acc);
+    _graphLastWrite = idx;
 }

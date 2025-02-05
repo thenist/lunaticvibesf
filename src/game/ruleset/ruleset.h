@@ -82,7 +82,7 @@ public:
 
     virtual void save_graph_point(size_t idx) {};
     virtual std::span<const double> get_acc_graph() { return {}; };
-    virtual std::span<const uint8_t> get_gauge_graph() { return {}; };
+    virtual std::span<const double> get_gauge_graph() { return {}; };
 
     [[nodiscard]] virtual unsigned getCurrentMaxScore() const = 0;
     [[nodiscard]] virtual unsigned getMaxScore() const = 0;

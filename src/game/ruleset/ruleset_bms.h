@@ -11,10 +11,12 @@
 #include <game/skin/skin_lr2_number_animation.h>
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <ranges>
 
+using size_t = std::size_t;
 using uint8_t = std::uint8_t;
 using lunaticvibes::parser_bms::JudgeDifficulty;
 
@@ -119,16 +121,20 @@ public:
 
     void feed(BmsJudgeArea judge);
     void feed_mine(long long mine_value);
+    void save_graph_point(size_t idx);
     void update_for_show(RulesetBMS& ruleset);
     [[nodiscard]] bool did_fail() const { return _did_fail; };
     [[nodiscard]] const Lr2GaugeIncrements& get_gauge() const { return _gauge; };
     [[nodiscard]] const NumberAnimation& get_health() const { return _health; };
+    [[nodiscard]] std::span<const double> get_gauge_graph() { return _graphGauge; };
 
 private:
     void process(double diff);
 
     Lr2GaugeIncrements _gauge;
     NumberAnimation _health;
+    std::array<double, PlayContextParams::GRAPH_POINT_NUMBER> _graphGauge{};
+    size_t _graphLastWrite;
     bool _did_fail;
 };
 
@@ -154,9 +160,15 @@ public:
         for (auto& gauge : _gauges)
             gauge.feed_mine(mine_value);
     }
+    void save_graph_point(size_t idx)
+    {
+        for (auto& gauge : _gauges)
+            gauge.save_graph_point(idx);
+    }
     void update_for_show(RulesetBMS& ruleset) { current_gauge().update_for_show(ruleset); }
     [[nodiscard]] const Lr2GaugeIncrements& get_gauge() const { return current_gauge().get_gauge(); }
     [[nodiscard]] const NumberAnimation& get_health() const { return current_gauge().get_health(); }
+    [[nodiscard]] std::span<const double> get_gauge_graph() { return current_gauge().get_gauge_graph(); };
 
 private:
     // [[nodiscard]] decltype(auto) current_gauge(this auto&& self) // TODO(GCC14): use this.
@@ -356,7 +368,6 @@ private:
     unsigned int _notesSinceLastAutoadjust = 0;
 
     std::array<double, PlayContextParams::GRAPH_POINT_NUMBER> _graphAcc;
-    std::array<uint8_t, PlayContextParams::GRAPH_POINT_NUMBER> _graphGauge;
     size_t _graphLastWrite;
 
 protected:
@@ -406,7 +417,7 @@ private:
 
     void save_graph_point(size_t idx) override;
     std::span<const double> get_acc_graph() override { return _graphAcc; };
-    std::span<const uint8_t> get_gauge_graph() override { return _graphGauge; };
+    std::span<const double> get_gauge_graph() override { return _gaugeProc.get_gauge_graph(); };
 
 public:
     // Register to InputWrapper
