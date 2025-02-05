@@ -20,6 +20,7 @@
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/play_modifiers.h>
 #include <common/str_utils.h>
 #include <common/types.h>
 #include <common/u8.h>

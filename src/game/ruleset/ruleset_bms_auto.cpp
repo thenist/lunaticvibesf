@@ -1,6 +1,7 @@
 #include "ruleset_bms_auto.h"
 
 #include <common/assert.h>
+#include <common/play_modifiers.h>
 #include <game/chart/chart_types.h>
 #include <game/scene/scene.h>
 #include <game/scene/scene_context.h>

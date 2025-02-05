@@ -10,6 +10,7 @@
 
 #include <common/assert.h>
 #include <common/entry/entry_song.h>
+#include <common/play_modifiers.h>
 #include <common/sysutil.h>
 #include <config/config_mgr.h>
 #include <game/arena/arena_data.h>

@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <common/assert.h>
+#include <common/play_modifiers.h>
 #include <common/sysutil.h>
 #include <common/types.h>
 #include <config/config_mgr.h>

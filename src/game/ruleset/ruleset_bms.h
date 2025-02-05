@@ -5,6 +5,7 @@
 #include <common/assert.h>
 #include <common/chartformat/chartformat.h>
 #include <common/chartformat/chartformat_bms.h>
+#include <common/play_modifiers.h>
 #include <game/runtime/index/option.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_number_animation.h>

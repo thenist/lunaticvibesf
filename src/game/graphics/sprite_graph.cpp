@@ -4,6 +4,7 @@
 #include <functional>
 #include <shared_mutex>
 
+#include <common/play_modifiers.h>
 #include <game/graphics/graph_line.h>
 #include <game/scene/scene_context.h>
 

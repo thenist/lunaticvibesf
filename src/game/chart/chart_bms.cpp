@@ -6,6 +6,7 @@
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/play_modifiers.h>
 #include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 

@@ -1,7 +1,9 @@
 #include "replay_chart.h"
-#include "common/types.h"
-#include "common/utils.h"
-#include "config/config_mgr.h"
+
+#include <common/play_modifiers.h>
+#include <common/types.h>
+#include <common/utils.h>
+#include <config/config_mgr.h>
 
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/archives/xml.hpp>

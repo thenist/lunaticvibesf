@@ -15,6 +15,7 @@
 #include <common/entry/entry_song.h>
 #include <common/entry/entry_types.h>
 #include <common/keymap.h>
+#include <common/play_modifiers.h>
 #include <common/str_utils.h>
 #include <common/thread_pool.h>
 #include <common/utils.h>

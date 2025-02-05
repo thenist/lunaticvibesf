@@ -1,5 +1,6 @@
 #pragma once
 
+#include <common/play_modifiers.h>
 #include <game/ruleset/ruleset_bms.h>
 #include <game/scene/scene_context.h>
 

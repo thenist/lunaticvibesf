@@ -1,18 +1,9 @@
 #include "scene_play.h"
 
-#include <algorithm>
-#include <array>
-#include <functional>
-#include <future>
-#include <mutex>
-#include <random>
-#include <shared_mutex>
-#include <sstream>
-#include <string>
-
 #include <common/assert.h>
 #include <common/chartformat/chartformat_bms.h>
 #include <common/log.h>
+#include <common/play_modifiers.h>
 #include <common/sysutil.h>
 #include <common/thread_pool.h>
 #include <common/types.h>
@@ -31,6 +22,16 @@
 #include <game/skin/skin_lr2_slider_callbacks.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
+
+#include <algorithm>
+#include <array>
+#include <functional>
+#include <future>
+#include <mutex>
+#include <random>
+#include <shared_mutex>
+#include <sstream>
+#include <string>
 
 namespace r = std::ranges;
 

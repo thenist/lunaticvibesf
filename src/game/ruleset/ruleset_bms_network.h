@@ -1,10 +1,12 @@
 #pragma once
-#include "ruleset.h"
+
 #include "ruleset_bms.h"
 #include "ruleset_network.h"
 
-#include "cereal/cereal.hpp"
-#include "cereal/types/string.hpp"
+#include <common/play_modifiers.h>
+
+#include <cereal/cereal.hpp>
+#include <cereal/types/string.hpp>
 
 class RulesetBMSNetwork : public RulesetBMS, public vRulesetNetwork
 {
@@ -23,7 +25,7 @@ public:
     RulesetBMSNetwork(GameModeKeys keys, unsigned playerIndex);
 
 public:
-    bool isFinished() const override { return _isFinished; }
+    [[nodiscard]] bool isFinished() const override { return _isFinished; }
 
     // Register to InputWrapper
     void updatePress(InputMask& pg, const lunaticvibes::Time& t, const lunaticvibes::InputMaskTimes& tt) override {}

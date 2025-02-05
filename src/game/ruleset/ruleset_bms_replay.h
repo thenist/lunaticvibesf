@@ -1,7 +1,9 @@
 #pragma once
 
-#include "game/scene/scene_context.h"
 #include "ruleset_bms.h"
+
+#include <common/play_modifiers.h>
+#include <game/scene/scene_context.h>
 
 class RulesetBMSReplay : public RulesetBMS
 {

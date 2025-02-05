@@ -1,6 +1,8 @@
 #include "sprite_lane.h"
-#include "game/runtime/state.h"
-#include "game/scene/scene_context.h"
+
+#include <common/play_modifiers.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
 
 using namespace chart;
 

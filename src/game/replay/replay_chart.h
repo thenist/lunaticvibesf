@@ -4,6 +4,7 @@
 
 #include <common/hash.h>
 #include <common/keymap.h>
+#include <common/play_modifiers.h>
 #include <common/types.h>
 
 #include <cereal/access.hpp>

@@ -4,6 +4,7 @@
 #include <utility>
 
 #include <common/assert.h>
+#include <common/play_modifiers.h>
 #include <game/input/input_wrapper.h>
 
 RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr<ChartObjectBase> chart_,

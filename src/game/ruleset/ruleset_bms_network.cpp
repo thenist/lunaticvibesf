@@ -1,11 +1,12 @@
 #include "ruleset_bms_network.h"
 
-#include <sstream>
+#include <common/log.h>
+#include <common/play_modifiers.h>
+#include <game/scene/scene_context.h>
 
 #include <cereal/archives/portable_binary.hpp>
 
-#include "common/log.h"
-#include "game/scene/scene_context.h"
+#include <sstream>
 
 RulesetBMSNetwork::RulesetBMSNetwork(GameModeKeys keys, unsigned playerIndex)
     : RulesetBase(nullptr, nullptr),

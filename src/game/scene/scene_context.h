@@ -3,6 +3,7 @@
 #include <common/chartformat/chartformat.h>
 #include <common/difficultytable/table_bms.h>
 #include <common/entry/entry.h>
+#include <common/play_modifiers.h>
 #include <common/types.h>
 #include <game/chart/chart.h>
 #include <game/graphics/texture_extra.h>

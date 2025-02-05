@@ -2,6 +2,7 @@
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/play_modifiers.h>
 #include <common/types.h>
 #include <db/db_score.h>
 #include <game/ruleset/ruleset.h>
@@ -381,17 +382,11 @@ void SceneCourseResult::updateFadeout(const lunaticvibes::Time& t)
             if (isclear)
             {
                 if (summary[ARG_MAXCOMBO] == summary[ARG_TOTAL_NOTES])
-                {
                     score.lamp = ScoreBMS::Lamp::FULLCOMBO;
-                }
                 else if (gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge == PlayModifierGaugeType::GRADE_HARD)
-                {
                     score.lamp = ScoreBMS::Lamp::HARD;
-                }
                 else if (gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge == PlayModifierGaugeType::GRADE_NORMAL)
-                {
                     score.lamp = ScoreBMS::Lamp::NORMAL;
-                }
             }
             else
             {
