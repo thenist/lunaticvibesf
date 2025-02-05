@@ -139,9 +139,13 @@ bool RulesetBMSNetwork::unpackInit(const std::vector<unsigned char>& payload)
         return false;
     }
 
+    // No one will surely pass us any garbage instead of these enums. :^)
     randomLeft = (PlayModifierRandomType)p.randomLeft;
     randomRight = (PlayModifierRandomType)p.randomRight;
-    initGaugeParams((PlayModifierGaugeType)p.gauge);
+    PlayModifiers mods{};
+    mods.gauge = static_cast<PlayModifierGaugeType>(p.gauge);
+    mods.gas_gauge = true;
+    initGaugeParams(mods);
     assist_mask = p.assist_mask;
     dpflip = p.dpflip;
     _basic.health = p.health;

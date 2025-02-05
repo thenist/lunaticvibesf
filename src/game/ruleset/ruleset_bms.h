@@ -52,7 +52,24 @@ constexpr inline PlayModifierHispeedFixType convertHSType(int nType)
     default: return PlayModifierHispeedFixType::NONE;
     };
 };
+
+enum class BmsGaugeType
+{
+    GROOVE,
+    EASY,
+    ASSIST,
+    HARD,
+    EXHARD,
+    DEATH,
+    P_ATK,
+    G_ATK,
+    GRADE,
+    EXGRADE,
+};
+std::ostream& operator<<(std::ostream& os, const BmsGaugeType& type);
+
 unsigned getEffectiveChartTotal(const ChartFormatBase& format, PlayModifierGaugeType gauge);
+unsigned getEffectiveChartTotal(const ChartFormatBase& format, BmsGaugeType gauge);
 
 // Judge area definitions.
 // e.g. EARLY_PERFECT: Perfect early half part
@@ -73,21 +90,6 @@ enum class BmsJudgeArea
     LATE_KPOOR,
     MINE_KPOOR,
 };
-
-enum class BmsGaugeType
-{
-    GROOVE,
-    EASY,
-    ASSIST,
-    HARD,
-    EXHARD,
-    DEATH,
-    P_ATK,
-    G_ATK,
-    GRADE,
-    EXGRADE,
-};
-std::ostream& operator<<(std::ostream& os, const BmsGaugeType& type);
 
 struct Lr2GaugeIncrements
 {

@@ -359,31 +359,37 @@ static std::optional<int> chart_total(const ChartFormatBase& format)
     lunaticvibes::assert_failed("chart_total");
 };
 
-unsigned lunaticvibes::getEffectiveChartTotal(const ChartFormatBase& format, PlayModifierGaugeType gauge)
+[[nodiscard]] static constexpr unsigned lr2_default_total(RulesetBMS::GaugeType gauge)
 {
-    auto lr2_default_total = [](RulesetBMS::GaugeType gauge) -> unsigned {
-        using enum RulesetBMS::GaugeType;
-        switch (gauge)
-        {
-        case HARD:
-        case EXHARD:
-        case DEATH:
-        case GRADE:
-        case EXGRADE: return 300;
-        case P_ATK: // ?
-        case G_ATK: // ?
-        case GROOVE:
-        case EASY:
-        case ASSIST: return 160;
-        }
-        lunaticvibes::assert_failed("lr2_default_total");
-    };
+    using enum RulesetBMS::GaugeType;
+    switch (gauge)
+    {
+    case HARD:
+    case EXHARD:
+    case DEATH:
+    case GRADE:
+    case EXGRADE: return 300;
+    case P_ATK: // ?
+    case G_ATK: // ?
+    case GROOVE:
+    case EASY:
+    case ASSIST: return 160;
+    }
+    lunaticvibes::assert_failed("lr2_default_total");
+};
 
+unsigned lunaticvibes::getEffectiveChartTotal(const ChartFormatBase& format, BmsGaugeType gauge)
+{
     int total = chart_total(format).value_or(0);
     // NOTE: LR2 handles #TOTAL 0 as if total was not set.
     if (total <= 0)
-        total = lr2_default_total(get_gauge(gauge));
+        total = lr2_default_total(gauge);
     return total;
+}
+
+unsigned lunaticvibes::getEffectiveChartTotal(const ChartFormatBase& format, PlayModifierGaugeType gauge)
+{
+    return getEffectiveChartTotal(format, get_gauge(gauge));
 }
 
 namespace lunaticvibes
@@ -809,7 +815,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
 
     using namespace std::string_literals;
 
-    _basic.health = health;
+    _basic.health = health; // Needed for dans.
     initGaugeParams(mods);
 
     _side = side;
@@ -893,37 +899,39 @@ void RulesetBMS::initGaugeParams(const PlayModifiers& mods)
     LOG_VERBOSE << "[RulesetBMS] initGaugeParams " << bms_gauge;
 
     LVF_ASSERT(_format != nullptr);
-    const unsigned total = lunaticvibes::getEffectiveChartTotal(*_format, gauge);
+    auto buildGauge = [this](GaugeType type, double start_health = 0.) -> lunaticvibes::GaugeHolder {
+        const unsigned total = lunaticvibes::getEffectiveChartTotal(*_format, type);
+        auto gauge = getGauge(type, total, getNoteCount());
+        if (start_health != 0.)
+            gauge.start_health = start_health;
+        return gauge;
+    };
 
     // FIXME: adjust result graph per gauge.
     if (mods.gas_gauge)
     {
-        auto build = [this, total](GaugeType type) -> lunaticvibes::GaugeHolder {
-            return {getGauge(type, total, getNoteCount())};
-        };
         std::vector<lunaticvibes::GaugeHolder> gauges;
         if (isCourseGrade(bms_gauge))
         {
             for (auto g : std::array{GaugeType::EXGRADE, GaugeType::GRADE})
-                gauges.push_back(build(g));
+                gauges.push_back(buildGauge(g));
         }
         else if (ConfigMgr::get('P', cfg::P_ENABLE_NEW_GAUGE, false))
         {
             for (auto g : std::array{GaugeType::DEATH, GaugeType::EXHARD, GaugeType::HARD, GaugeType::GROOVE,
                                      GaugeType::EASY, GaugeType::ASSIST})
-                gauges.push_back(build(g));
+                gauges.push_back(buildGauge(g));
         }
         else
         {
             for (auto g : std::array{GaugeType::DEATH, GaugeType::HARD, GaugeType::GROOVE, GaugeType::EASY})
-                gauges.push_back(build(g));
+                gauges.push_back(buildGauge(g));
         }
         _gaugeProc = lunaticvibes::GaugeHolderProxy{gauges};
     }
     else
     {
-        _gaugeProc = lunaticvibes::GaugeHolderProxy{
-            std::array{lunaticvibes::GaugeHolder{getGauge(bms_gauge, total, getNoteCount()), _basic.health}}};
+        _gaugeProc = lunaticvibes::GaugeHolderProxy{std::array{buildGauge(bms_gauge, _basic.health)}};
     }
     // TODO: can't use 'this' in constructor :(
     // _gaugeProc.update_for_show(*this);
