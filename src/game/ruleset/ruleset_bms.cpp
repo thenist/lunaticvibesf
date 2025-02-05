@@ -137,7 +137,7 @@ static double calculateHardNegativeHpDiffMultiplier(unsigned total, unsigned not
     return std::max(by_total, by_notes);
 }
 
-static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, unsigned total,
+static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, unsigned effective_total,
                                                            unsigned note_count)
 {
     // Older reference: https://github.com/aeventyr/LR2GAS_pub
@@ -153,12 +153,12 @@ static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType
     case GROOVE:
         return {.health_gain =
                     {
-                        0.01 * total / note_count,     // PG
-                        0.01 * total / note_count,     // GR
-                        0.01 * total / note_count / 2, // GD
-                        -0.04,                         // BD
-                        -0.02,                         // KPR
-                        -0.06,                         // MISS
+                        0.01 * effective_total / note_count,     // PG
+                        0.01 * effective_total / note_count,     // GR
+                        0.01 * effective_total / note_count / 2, // GD
+                        -0.04,                                   // BD
+                        -0.02,                                   // KPR
+                        -0.06,                                   // MISS
                     },
                 .start_health = 0.2,
                 .min_health = 0.02,
@@ -168,9 +168,9 @@ static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType
     case EASY:
         return {.health_gain =
                     {
-                        0.01 * total / note_count * 1.2,
-                        0.01 * total / note_count * 1.2,
-                        0.01 * total / note_count / 2 * 1.2,
+                        0.01 * effective_total / note_count * 1.2,
+                        0.01 * effective_total / note_count * 1.2,
+                        0.01 * effective_total / note_count / 2 * 1.2,
                         -0.032,
                         -0.016,
                         -0.04800000000000001,
@@ -183,9 +183,9 @@ static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType
     case ASSIST:
         return {.health_gain =
                     {
-                        0.01 * total / note_count * 1.2,
-                        0.01 * total / note_count * 1.2,
-                        0.01 * total / note_count / 2 * 1.2,
+                        0.01 * effective_total / note_count * 1.2,
+                        0.01 * effective_total / note_count * 1.2,
+                        0.01 * effective_total / note_count / 2 * 1.2,
                         -0.032,
                         -0.016,
                         -0.048,
@@ -208,7 +208,7 @@ static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType
                 .start_health = 1.0,
                 .min_health = 0,
                 .clear_health = 0,
-                .hp_lose_multiplier = calculateHardNegativeHpDiffMultiplier(total, note_count),
+                .hp_lose_multiplier = calculateHardNegativeHpDiffMultiplier(effective_total, note_count),
                 .type = type,
                 .fail_no_health = true,
                 .reduce_below_30_hp_damage = true};
@@ -225,7 +225,7 @@ static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType
                 .start_health = 1.0,
                 .min_health = 0,
                 .clear_health = 0,
-                .hp_lose_multiplier = calculateHardNegativeHpDiffMultiplier(total, note_count),
+                .hp_lose_multiplier = calculateHardNegativeHpDiffMultiplier(effective_total, note_count),
                 .type = type,
                 .fail_no_health = true};
     case DEATH:
