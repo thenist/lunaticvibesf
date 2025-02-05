@@ -89,6 +89,7 @@
       nativeBuildInputs = with pkgs; [
         ccache # not sccache since it doesn't support precompiled headers.
         cmake
+        gersemi # CMake formatter
         mold-wrapped # Faster linker.
         ninja
         pkg-config
