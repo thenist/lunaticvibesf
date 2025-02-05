@@ -3,14 +3,26 @@ if(${GRAPHICS_BACKEND} STREQUAL SDL2)
     pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2>=2.30.1)
     pkg_check_modules(SDL2_gfx IMPORTED_TARGET SDL2_gfx>=1.0.2)
     if(SDL2_gfx_FOUND)
-        set(LVF_SDL2_GFX_TARGET PkgConfig::SDL2_gfx)
+        list(APPEND LVF_GRAPHICS_PUBLIC_TARGETS PkgConfig::SDL2_gfx)
     else()
         # vcpkg doesn't make pkg-config file for SDL2_gfx.
         find_package(sdl2-gfx CONFIG REQUIRED)
-        set(LVF_SDL2_GFX_TARGET SDL2::SDL2_gfx)
+        list(APPEND LVF_GRAPHICS_PUBLIC_TARGETS SDL2::SDL2_gfx)
     endif()
     pkg_check_modules(SDL2_image REQUIRED IMPORTED_TARGET SDL2_image>=2.8.2)
     pkg_check_modules(SDL2_ttf REQUIRED IMPORTED_TARGET SDL2_ttf>=2.22.0)
+    list(
+        APPEND
+        LVF_GRAPHICS_PUBLIC_TARGETS
+        PkgConfig::SDL2
+        PkgConfig::SDL2_image
+        PkgConfig::SDL2_ttf
+    )
+    list(
+        APPEND
+        LVF_GRAPHICS_PRIVATE_TARGETS
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main> # vcpkg
+    )
 endif()
 pkg_check_modules(libavcodec REQUIRED IMPORTED_TARGET libavcodec)
 pkg_check_modules(libavformat REQUIRED IMPORTED_TARGET libavformat)
@@ -120,6 +132,7 @@ set_target_properties(gamelib PROPERTIES CXX_STANDARD 23)
 
 target_link_libraries(
     gamelib
+    PUBLIC ${LVF_GRAPHICS_PUBLIC_TARGETS}
     PUBLIC cereal::cereal
     PUBLIC common
     PUBLIC config
@@ -131,20 +144,9 @@ target_link_libraries(
     PUBLIC PkgConfig::libavformat
     PUBLIC PkgConfig::libavutil
     PUBLIC re2::re2
+    PRIVATE ${LVF_GRAPHICS_PRIVATE_TARGETS}
     PRIVATE tinyfiledialogs
 )
-
-if(${GRAPHICS_BACKEND} STREQUAL SDL2)
-    target_link_libraries(
-        gamelib
-        PUBLIC ${LVF_SDL2_GFX_TARGET}
-        PUBLIC PkgConfig::SDL2
-        PUBLIC PkgConfig::SDL2_image
-        PUBLIC PkgConfig::SDL2_ttf
-        PRIVATE
-            $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main> # vcpkg
-    )
-endif()
 
 target_precompile_headers(gamelib REUSE_FROM common)
 
