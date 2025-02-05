@@ -121,7 +121,7 @@ public:
 
     void feed(BmsJudgeArea judge);
     void feed_mine(long long mine_value);
-    void save_graph_point(size_t idx);
+    void save_graph_point(size_t idx, bool is_finished);
     void update_for_show(RulesetBMS& ruleset);
     [[nodiscard]] bool did_fail() const { return _did_fail; };
     [[nodiscard]] const Lr2GaugeIncrements& get_gauge() const { return _gauge; };
@@ -160,10 +160,10 @@ public:
         for (auto& gauge : _gauges)
             gauge.feed_mine(mine_value);
     }
-    void save_graph_point(size_t idx)
+    void save_graph_point(size_t idx, bool is_finished)
     {
         for (auto& gauge : _gauges)
-            gauge.save_graph_point(idx);
+            gauge.save_graph_point(idx, is_finished);
     }
     void update_for_show(RulesetBMS& ruleset) { current_gauge().update_for_show(ruleset); }
     [[nodiscard]] const Lr2GaugeIncrements& get_gauge() const { return current_gauge().get_gauge(); }

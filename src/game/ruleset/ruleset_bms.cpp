@@ -21,8 +21,8 @@
 #include <game/sound/sound_sample.h>
 
 using namespace chart;
-// namespace r = std::ranges;
-// namespace v = std::views;
+namespace r = std::ranges;
+namespace v = std::views;
 
 using std::size_t;
 
@@ -143,8 +143,8 @@ static double calculateHardNegativeHpDiffMultiplier(unsigned total, unsigned not
     return std::max(by_total, by_notes);
 }
 
-template <typename T>
-static constexpr void save_graph_point_(std::span<T> l, const size_t idx_prev, size_t idx, T value)
+static constexpr void save_graph_point_(std::span<double> l, const size_t idx_prev, size_t idx, double value,
+                                        bool is_finished)
 {
     auto fill_missing = [&, idx]() {
         if (idx_prev - idx <= 1)
@@ -155,12 +155,8 @@ static constexpr void save_graph_point_(std::span<T> l, const size_t idx_prev, s
 
     l[idx] = value;
     fill_missing();
-    // if (isFinished())
-    // {
-    //     constexpr auto but_not_this = 1;
-    //     r::fill(v::drop(_graphAcc, idx + but_not_this), _graphAcc[idx]);
-    //     r::fill(v::drop(_graphGauge, idx + but_not_this), _graphGauge[idx]);
-    // }
+    if (constexpr auto but_not_this = 1; is_finished)
+        r::fill(v::drop(l, idx + but_not_this), l[idx]);
 }
 
 static constexpr lunaticvibes::Lr2GaugeIncrements getGauge(RulesetBMS::GaugeType type, unsigned effective_total,
@@ -454,9 +450,9 @@ std::ostream& operator<<(std::ostream& os, const BmsGaugeType& type)
     lunaticvibes::assert_failed("operator<<(BmsGaugeType)");
 }
 
-void GaugeHolder::save_graph_point(size_t idx)
+void GaugeHolder::save_graph_point(size_t idx, bool is_finished)
 {
-    ::save_graph_point_<double>(_graphGauge, _graphLastWrite, idx, _health.to);
+    ::save_graph_point_(_graphGauge, _graphLastWrite, idx, _health.to, is_finished);
     _graphLastWrite = idx;
 }
 
@@ -2128,7 +2124,10 @@ void RulesetBMS::updateGlobals()
 
 void RulesetBMS::save_graph_point(size_t idx)
 {
-    _gaugeProc.save_graph_point(idx);
-    ::save_graph_point_<double>(_graphAcc, _graphLastWrite, idx, getData().total_acc);
+    // Seems not to be completely right, 'true' even if didn't hit all notes.
+    // Maybe adding a 0 after last written would work.
+    const bool is_finished = isFinished();
+    _gaugeProc.save_graph_point(idx, is_finished);
+    ::save_graph_point_(_graphAcc, _graphLastWrite, idx, getData().total_acc, is_finished);
     _graphLastWrite = idx;
 }
