@@ -28,7 +28,6 @@
 #include <config/config_mgr.h>
 #include <game/graphics/SDL2/graphics_SDL2.h>
 #include <game/graphics/SDL2/input.h>
-#include <game/graphics/SDL2/window_SDL2.h>
 #include <game/graphics/graphics.h>
 #include <game/graphics/video.h>
 
@@ -40,6 +39,8 @@ static std::atomic<int> s_canvas_rect_h;
 static std::atomic<int> s_canvas_rect_w;
 static std::atomic<int> s_window_rect_h;
 static std::atomic<int> s_window_rect_w;
+
+static SDL_Window* gFrameWindow;
 
 int graphics_init()
 {
