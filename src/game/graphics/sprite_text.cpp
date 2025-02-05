@@ -34,9 +34,17 @@ void SpriteText::updateText()
     if (!_draw)
         return;
 
-    State::get(textInd, _textBuf);
-    updateTextTexture(_textBuf, _current.color);
-    updateTextRect();
+    if (textureRect.h == 0)
+    {
+        // Happens on RED BELT Result.
+        updateTextTexture("", _current.color); // Clear it.
+    }
+    else
+    {
+        State::get(textInd, _textBuf);
+        updateTextTexture(_textBuf, _current.color);
+        updateTextRect();
+    }
 }
 
 void SpriteText::updateTextTexture(std::string_view text, const Color& c)
@@ -74,9 +82,11 @@ void SpriteText::updateTextTexture(std::string_view text, const Color& c)
 void SpriteText::updateTextRect()
 {
     // fitting
-    Rect textRect = textureRect;
-    double sizeFactor = static_cast<double>(_current.rect.h) / textRect.h;
-    int text_w = static_cast<int>(std::round(textRect.w * sizeFactor));
+    if (textureRect.h == 0)
+        return;
+    const double sizeFactor = static_cast<double>(_current.rect.h) / textureRect.h;
+    LVF_DEBUG_ASSERT(!std::isnan(sizeFactor));
+    int text_w = static_cast<int>(std::round(textureRect.w * sizeFactor));
     switch (align)
     {
     case TEXT_ALIGN_LEFT: break;
