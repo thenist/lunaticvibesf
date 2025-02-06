@@ -13,14 +13,14 @@ void verify_failed(const char* msg, std::source_location loc = std::source_locat
     {                                                                                                                  \
         if (!(cond)) [[unlikely]]                                                                                      \
             lunaticvibes::assert_failed(#cond);                                                                        \
-    } while (0)
+    } while (false)
 
 #define LVF_VERIFY(cond)                                                                                               \
     do                                                                                                                 \
     {                                                                                                                  \
         if (!(cond)) [[unlikely]]                                                                                      \
             lunaticvibes::verify_failed(#cond);                                                                        \
-    } while (0)
+    } while (false)
 
 #ifndef NDEBUG
 #define LVF_DEBUG_ASSERT(cond) LVF_ASSERT(cond)
