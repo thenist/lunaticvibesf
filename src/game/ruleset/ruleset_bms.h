@@ -119,6 +119,7 @@ public:
     {
     }
 
+    void fail();
     void feed(BmsJudgeArea judge);
     void feed_mine(long long mine_value);
     void save_graph_point(size_t idx, bool is_finished);
@@ -150,6 +151,11 @@ public:
             _gauges.push_back(gauge);
     }
 
+    void fail()
+    {
+        for (auto& gauge : _gauges)
+            gauge.fail();
+    }
     void feed(BmsJudgeArea judge)
     {
         for (auto& gauge : _gauges)

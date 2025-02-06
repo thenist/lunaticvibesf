@@ -417,6 +417,13 @@ unsigned lunaticvibes::getEffectiveChartTotal(const ChartFormatBase& format, Pla
 namespace lunaticvibes
 {
 
+void GaugeHolder::fail()
+{
+    _did_fail = true;
+    _health.from = _health.to;
+    _health.to = _gauge.min_health;
+}
+
 void GaugeHolder::feed(RulesetBMS::JudgeArea judge)
 {
     // LOG_VERBOSE << "[RulesetBMS] GaugeHolder::feed " << static_cast<int>(judge);
@@ -1949,12 +1956,12 @@ void RulesetBMS::fail()
     _basic.health = _minHealth;
     _basic.combo = 0;
 
-    int notesRemain = getNoteCount() - notesExpired;
+    const int notesRemain = getNoteCount() - notesExpired;
     _basic.judge[JUDGE_BP] += notesRemain;
     _basic.judge[JUDGE_CB] += notesRemain;
     notesExpired = notesReached = getNoteCount();
 
-    //_basic.acc = _basic.total_acc;
+    _gaugeProc.fail();
 }
 
 // 1:fast 2:slow
@@ -2124,8 +2131,7 @@ void RulesetBMS::updateGlobals()
 
 void RulesetBMS::save_graph_point(size_t idx)
 {
-    // Seems not to be completely right, 'true' even if didn't hit all notes.
-    // Maybe adding a 0 after last written would work.
+    // NOTE: 'true' even if didn't hit all notes.
     const bool is_finished = isFinished();
     _gaugeProc.save_graph_point(idx, is_finished);
     ::save_graph_point_(_graphAcc, _graphLastWrite, idx, getData().total_acc, is_finished);
