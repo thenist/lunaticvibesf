@@ -53,8 +53,16 @@ static unsigned get_current_chart_length(SelectContextParams& select_ctx, ChartC
     return 0;
 }
 
+[[nodiscard]] static int decimal_part(double n)
+{
+    return static_cast<int>((n - static_cast<int>(n)) * 100);
+}
+
 int lunaticvibes::get_number(IndexNumber ind)
 {
+    // Sources:
+    // LR2
+    // beatoraja
     switch (std::to_underlying(ind))
     {
     case 100:
@@ -65,6 +73,7 @@ int lunaticvibes::get_number(IndexNumber ind)
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
             return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
         break; // might still also be in State::get
+
     case 120:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
             return static_cast<int>(std::round(ruleset->getMoneyScoreAnimation().animate({})));
@@ -73,16 +82,18 @@ int lunaticvibes::get_number(IndexNumber ind)
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
             return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
         break; // might still also be in State::get
-    case 301:
+
+    case 301: // LR2HelperG
         if (auto chart = get_chart_for_display(gSelectContext, gChartContext); chart != nullptr)
             return getEffectiveChartTotal(*chart, convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_1P)));
         return 0;
-    case 407:
+    case 407: // beatoraja
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
-            return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100'00) % 100;
-        break; // might still also be in State::get
+            return decimal_part(ruleset->getHealthAnimation().animate({}) * 100.);
+        return 0;
     case 1163: return get_current_chart_length(gSelectContext, gChartContext, gPlayContext) / 60; // beatoraja
     case 1164: return get_current_chart_length(gSelectContext, gChartContext, gPlayContext) % 60; // beatoraja
+
     default: break;
     }
     return State::get(ind);
