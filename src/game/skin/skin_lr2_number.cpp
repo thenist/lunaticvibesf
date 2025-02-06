@@ -62,6 +62,7 @@ int lunaticvibes::get_number(IndexNumber ind)
 {
     // Sources:
     // LR2
+    // LR2OOL - https://github.com/tenaibms/LR2OOL/blob/c5505559ed5cc86e1355fee3f6f9e967efaab08f/src/hooks/srcnumber.cpp
     // beatoraja
     switch (std::to_underlying(ind))
     {
@@ -83,10 +84,26 @@ int lunaticvibes::get_number(IndexNumber ind)
             return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
         break; // might still also be in State::get
 
+    case 295:           // TODO // LR2OOL: current random
+    case 296:           // TODO // LR2OOL: whole part of mean
+    case 297:           // TODO // LR2OOL: decimal part of mean
+    case 298:           // TODO // LR2OOL: whole part of stddev
+    case 299: return 0; // TODO // LR2OOL: decimal part of stddev
+
     case 301: // LR2HelperG
         if (auto chart = get_chart_for_display(gSelectContext, gChartContext); chart != nullptr)
             return getEffectiveChartTotal(*chart, convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_1P)));
         return 0;
+
+    case 400: return State::get(IndexNumber::PLAY_1P_PERFECT) / State::get(IndexNumber::PLAY_1P_GREAT); // LR2OOL
+    case 401:                                                                                           // LR2OOL
+        return decimal_part(static_cast<double>(State::get(IndexNumber::PLAY_1P_PERFECT)) /
+                            State::get(IndexNumber::PLAY_1P_GREAT));
+    case 402: return State::get(IndexNumber::PLAY_1P_PERFECT) / State::get(IndexNumber::PLAY_1P_GOOD); // LR2OOL
+    case 403:                                                                                          // LR2OOL
+        return decimal_part(static_cast<double>(State::get(IndexNumber::PLAY_1P_GREAT)) /
+                            State::get(IndexNumber::PLAY_1P_GOOD));
+
     case 407: // beatoraja
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
             return decimal_part(ruleset->getHealthAnimation().animate({}) * 100.);
