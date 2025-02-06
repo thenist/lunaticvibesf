@@ -25,5 +25,5 @@ void verify_failed(const char* msg, std::source_location loc = std::source_locat
 #ifndef NDEBUG
 #define LVF_DEBUG_ASSERT(cond) LVF_ASSERT(cond)
 #else // NDEBUG
-#define LVF_DEBUG_ASSERT(cond)
+#define LVF_DEBUG_ASSERT(cond) (void)0
 #endif // NDEBUG
