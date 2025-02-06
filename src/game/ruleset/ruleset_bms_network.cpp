@@ -10,7 +10,7 @@
 
 RulesetBMSNetwork::RulesetBMSNetwork(GameModeKeys keys, unsigned playerIndex)
     : RulesetBase(nullptr, nullptr),
-      RulesetBMS(nullptr, nullptr, PlayModifiers{}, keys, JudgeDifficulty::NORMAL, 1.0, PlaySide::NETWORK, -1, nullptr),
+      RulesetBMS(nullptr, nullptr, PlayModifiers{}, keys, JudgeDifficulty::NORMAL, 1.0, PlaySide::NETWORK, -1),
       playerIndex(playerIndex)
 {
     showJudge = false;

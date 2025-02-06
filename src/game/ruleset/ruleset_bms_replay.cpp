@@ -12,7 +12,7 @@ RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std
                                    JudgeDifficulty difficulty, double health, PlaySide side, const int fiveKeyMapIndex,
                                    const double pitchSpeed)
     : RulesetBase(format_, chart_),
-      RulesetBMS(std::move(format_), std::move(chart_), mods, keys, difficulty, health, side, fiveKeyMapIndex, nullptr),
+      RulesetBMS(std::move(format_), std::move(chart_), mods, keys, difficulty, health, side, fiveKeyMapIndex),
       replay(std::move(replay_))
 {
     LVF_DEBUG_ASSERT(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P ||

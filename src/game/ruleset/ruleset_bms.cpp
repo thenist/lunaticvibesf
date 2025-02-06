@@ -588,20 +588,14 @@ static std::string makeModsStringForShow(RulesetBMS::PlaySide side, PlayModifier
     return out;
 }
 
-RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart,
+RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr<ChartObjectBase> chart_,
                        PlayModifiers mods, GameModeKeys keys, JudgeDifficulty difficulty, double health,
-                       RulesetBMS::PlaySide side, const int fiveKeyMapIndex,
-                       std::shared_ptr<PlayContextParams::MutexReplayChart> replayNew)
-    : RulesetBase(std::move(format), std::move(chart)),
+                       RulesetBMS::PlaySide side, const int fiveKeyMapIndex)
+    : RulesetBase(std::move(format_), std::move(chart_)),
       _gaugeProc(std::array{
           lunaticvibes::GaugeHolder{getGauge(GaugeType::GROOVE, /*total*/ 0, /*note_count=*/0), _basic.health}}),
-      _judgeDifficulty(difficulty), _replayNew(std::move(replayNew))
+      _judgeDifficulty(difficulty)
 {
-    if (_replayNew)
-    {
-        LVF_DEBUG_ASSERT(_replayNew->replay != nullptr);
-    }
-
     _graphAcc.fill({});
 
     static const NoteLaneTimerMap bombTimer5k[] = {

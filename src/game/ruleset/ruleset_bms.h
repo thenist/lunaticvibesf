@@ -357,7 +357,6 @@ protected:
     PlaySide _side = PlaySide::SINGLE;
     bool _k1P = false, _k2P = false;
     JudgeDifficulty _judgeDifficulty = LR2_DEFAULT_RANK;
-    std::shared_ptr<PlayContextParams::MutexReplayChart> _replayNew;
 
     bool _judgeScratch = true;
 
@@ -398,8 +397,7 @@ protected:
 public:
     // fiveKeyMapIndex - if not 5k, set to -1.
     RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart, PlayModifiers mods,
-               GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side, int fiveKeyMapIndex,
-               std::shared_ptr<PlayContextParams::MutexReplayChart> replayNew);
+               GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side, int fiveKeyMapIndex);
 
     void initGaugeParams(const PlayModifiers& mods);
 

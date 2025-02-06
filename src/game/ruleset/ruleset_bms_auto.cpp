@@ -12,8 +12,7 @@ RulesetBMSAuto::RulesetBMSAuto(const std::shared_ptr<ChartFormatBase>& format,
                                const std::shared_ptr<ChartObjectBase>& chart, const PlayModifiers mods,
                                GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side,
                                const int fiveKeyMapIndex)
-    : RulesetBase(format, chart),
-      RulesetBMS(format, chart, mods, keys, difficulty, health, side, fiveKeyMapIndex, nullptr)
+    : RulesetBase(format, chart), RulesetBMS(format, chart, mods, keys, difficulty, health, side, fiveKeyMapIndex)
 {
     LVF_DEBUG_ASSERT(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P ||
                      side == PlaySide::RIVAL);

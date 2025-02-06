@@ -878,10 +878,10 @@ bool ScenePlay::createRuleset()
             switch (objType)
             {
             case BASE:
-                return std::make_shared<RulesetBMS>(
-                    gChartContext.chart, gPlayContext.chartObj[slot], gPlayContext.mods[slot], keys, judgeDiff,
-                    gPlayContext.initialHealth[slot], playSide,
-                    gPlayContext.shiftFiveKeyForSevenKeyIndex(keys == 5 || keys == 10), gPlayContext.replayNew);
+                return std::make_shared<RulesetBMS>(gChartContext.chart, gPlayContext.chartObj[slot],
+                                                    gPlayContext.mods[slot], keys, judgeDiff,
+                                                    gPlayContext.initialHealth[slot], playSide,
+                                                    gPlayContext.shiftFiveKeyForSevenKeyIndex(keys == 5 || keys == 10));
 
             case AUTO:
                 return std::make_shared<RulesetBMSAuto>(
