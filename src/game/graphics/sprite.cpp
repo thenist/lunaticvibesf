@@ -231,21 +231,16 @@ void SpriteBase::adjustAfterUpdate(int x, int y, int w, int h)
 SpriteStatic::SpriteStatic(const SpriteStaticBuilder& builder) : SpriteBase(builder)
 {
     _type = SpriteTypes::STATIC;
-
-    if (pTexture && builder.textureRect == RECT_FULL)
-        textureRect = pTexture->getRect();
-    else
-        textureRect = builder.textureRect;
+    // Even if RECT_FULL - it can be used by the renderer if the texture can change the size.
+    textureRect = builder.textureRect;
 }
 
 SpriteStatic::SpriteStatic(std::shared_ptr<Texture> texture, const Rect& texRect, int srcLine)
     : SpriteBase(SpriteTypes::STATIC, srcLine)
 {
     pTexture = std::move(texture);
-    if (pTexture && texRect == RECT_FULL)
-        textureRect = pTexture->getRect();
-    else
-        textureRect = texRect;
+    // Even if RECT_FULL - it can be used by the renderer if the texture can change the size.
+    textureRect = texRect;
 }
 
 void SpriteStatic::draw() const
@@ -273,31 +268,30 @@ SpriteSelection::SpriteSelection(const SpriteSelectionBuilder& builder) : Sprite
         return;
     }
 
-    Rect rcGrid;
-    if (pTexture && builder.textureRect == RECT_FULL)
-        rcGrid = pTexture->getRect();
-    else
-        rcGrid = builder.textureRect;
-    rcGrid.w /= textureSheetCols;
-    rcGrid.h /= textureSheetRows;
+    Rect rcGrid = builder.textureRect;
+    if (textureSheetRows * textureSheetCols != 1)
+    {
+        if (pTexture && builder.textureRect == RECT_FULL)
+            rcGrid = pTexture->getRect();
+        rcGrid.w /= textureSheetCols;
+        rcGrid.h /= textureSheetRows;
+    }
+    // else NOTE: avoid using texture's rect in simpler case to preserve RECT_FULL in case the underlying texture can
+    // change size (e.g. dynamic texture).
 
     if (!builder.textureSheetVerticalIndexing)
     {
         // Horizontal first
         for (unsigned r = 0; r < textureSheetRows; ++r)
             for (unsigned c = 0; c < textureSheetCols; ++c)
-            {
                 textureRects.emplace_back(rcGrid.x + rcGrid.w * c, rcGrid.y + rcGrid.h * r, rcGrid.w, rcGrid.h);
-            }
     }
     else
     {
         // Vertical first
         for (unsigned c = 0; c < textureSheetCols; ++c)
             for (unsigned r = 0; r < textureSheetRows; ++r)
-            {
                 textureRects.emplace_back(rcGrid.x + rcGrid.w * c, rcGrid.y + rcGrid.h * r, rcGrid.w, rcGrid.h);
-            }
     }
 }
 

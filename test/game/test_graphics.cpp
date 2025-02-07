@@ -1,3 +1,4 @@
+#include <game/graphics/rect.h>
 #include <game/graphics/sprite.h>
 #include <game/skin/skin_lr2_bargraph.h>
 
@@ -9,7 +10,7 @@ public:
     mock_Image() : Image("") {}
 };
 
-static Rect TEST_RECT{0, 0, 256, 256};
+static constexpr Rect TEST_RECT{0, 0, 256, 256};
 static constexpr lunaticvibes::Time t0{1}, t1{2}, t2{3}, t3{4}, t4{5}, t5{6}, t6{7}, t7{8};
 class mock_Texture : public Texture
 {
@@ -233,7 +234,8 @@ public:
 TEST_F(sSelection, rectConstruct)
 {
     EXPECT_EQ(s0.textureRects.size(), 1);
-    EXPECT_EQ(s0.textureRects[0], TEST_RECT);
+    // RECT_FULL of SpriteSelection preserved in case of single texture.
+    EXPECT_EQ(s0.textureRects[0], lunaticvibes::RECT_FULL);
 
     int w = TEST_RECT.w / 4;
     int h = TEST_RECT.h / 2;
