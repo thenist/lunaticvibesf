@@ -16,8 +16,9 @@ protected:
     double _basespd;
     double _hispeed;
     std::vector<RectF> _outRect;
-    unsigned _currentMeasure = 0;
     bool _autoNotes = false;
+    double _current_metre{};
+    unsigned _current_bar{};
 
 public:
     unsigned playerSlot;
@@ -57,6 +58,12 @@ public:
     virtual void updateNoteRect(const lunaticvibes::Time& t);
     void draw() const override;
     void adjustAfterUpdate(int x, int y, int w = 0, int h = 0) override;
+
+    void setCurrentMetreBar(double metre, unsigned bar)
+    {
+        _current_metre = metre;
+        _current_bar = bar;
+    };
 
 protected:
     bool _hiddenCompatible = false;

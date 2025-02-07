@@ -3669,8 +3669,10 @@ SkinLR2::SkinLR2(std::shared_ptr<lunaticvibes::SkinLr2SharedData> sharedData, Pa
     }
 
     for (const auto& s : _sprites)
-        if (auto pS = std::dynamic_pointer_cast<iSpriteMouse>(s); pS != nullptr)
+        if (std::dynamic_pointer_cast<iSpriteMouse>(s) != nullptr)
             _mouseSprites.push_back(s);
+        else if (auto p = std::dynamic_pointer_cast<SpriteLaneVertical>(s); p != nullptr)
+            _laneSprites.push_back(p);
 
     prevSkinTextureNameMap.clear();
     prevSkinLR2FontNameMap.clear();

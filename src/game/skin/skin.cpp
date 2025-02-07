@@ -5,6 +5,7 @@
 #include <format>
 
 #include <common/assert.h>
+#include <game/graphics/sprite_lane.h>
 #include <game/graphics/sprite_video.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_debug.h>
@@ -46,8 +47,11 @@ void SkinBase::update()
     // current beat, measure
     if (gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr)
     {
-        gUpdateContext.metre = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre();
-        gUpdateContext.bar = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBar();
+        const auto metre = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre();
+        const auto bar = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBar();
+        std::for_each(
+            std::execution::par, _laneSprites.begin(), _laneSprites.end(),
+            [metre, bar](const std::shared_ptr<SpriteLaneVertical>& s) { s->setCurrentMetreBar(metre, bar); });
     }
 
     std::for_each(std::execution::par, _sprites.begin(), _sprites.end(),

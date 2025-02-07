@@ -313,10 +313,6 @@ struct UpdateContextParams
 {
     // shared
     lunaticvibes::Time updateTime;
-
-    // SkinBase / Sprite
-    double metre;
-    unsigned bar;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

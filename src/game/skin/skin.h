@@ -55,8 +55,9 @@ protected:
 
     // Sprite elements
 protected:
-    std::vector<std::shared_ptr<SpriteBase>> _sprites;      // Only modified while parsing the skin.
-    std::vector<std::shared_ptr<SpriteBase>> _mouseSprites; // Portion of '_sprites' which are also iSpriteMouse.
+    std::vector<std::shared_ptr<SpriteBase>> _sprites;             // Only modified while parsing the skin.
+    std::vector<std::shared_ptr<SpriteLaneVertical>> _laneSprites; // Portion of '_sprites'.
+    std::vector<std::shared_ptr<SpriteBase>> _mouseSprites;        // Portion of '_sprites' which are also iSpriteMouse.
 
     // functional support
 protected:

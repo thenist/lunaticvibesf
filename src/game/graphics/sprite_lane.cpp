@@ -124,8 +124,8 @@ void SpriteLaneVertical::updateNoteRect(const lunaticvibes::Time& t)
     {
         return;
     }
-    auto metre = gUpdateContext.metre;
-    auto bar = gUpdateContext.bar;
+    auto metre = _current_metre;
+    auto bar = _current_bar;
 
     // refresh note sprites
     if (!pNote)
@@ -320,8 +320,8 @@ void SpriteLaneVerticalLN::updateNoteRect(const lunaticvibes::Time& t)
     {
         return;
     }
-    auto metre = gUpdateContext.metre;
-    auto bar = gUpdateContext.bar;
+    auto metre = _current_metre;
+    auto bar = _current_bar;
 
     // refresh note sprites
     if (!pNote)
