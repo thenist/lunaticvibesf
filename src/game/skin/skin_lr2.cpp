@@ -4387,15 +4387,13 @@ void SkinLR2::findAndExtractDXA(const Path& path)
 
 //////////////////////////////////////////////////
 
-void SkinLR2::update()
+void SkinLR2::update(const lunaticvibes::Time& t)
 {
     // update sprites
-    SkinBase::update();
+    SkinBase::update(t);
 
     // update op
     updateDstOpt();
-
-    lunaticvibes::Time t;
 
     {
         const int ttAngle1P = State::get(IndexNumber::_ANGLE_TT_1P);

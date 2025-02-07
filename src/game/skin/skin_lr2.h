@@ -1,5 +1,6 @@
 #pragma once
 
+#include <common/beat.h>
 #include <common/encoding.h>
 #include <common/types.h>
 #include <game/graphics/sprite_imagetext_charmapping.h>
@@ -383,7 +384,7 @@ protected:
     std::vector<element> drawQueue;
 
 public:
-    void update() override;
+    void update(const lunaticvibes::Time& t) override;
     void reset_bar_animation() override;
     void start_bar_animation() override;
     void draw() const override;

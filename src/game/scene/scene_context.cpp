@@ -29,7 +29,6 @@ PlayContextParams gPlayContext;
 SelectContextParams gSelectContext;
 KeyConfigContextParams gKeyconfigContext;
 CustomizeContextParams gCustomizeContext;
-UpdateContextParams gUpdateContext;
 OverlayContextParams gOverlayContext;
 std::shared_ptr<SongDB> g_pSongDB;
 std::shared_ptr<ScoreDB> g_pScoreDB;

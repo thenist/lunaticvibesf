@@ -309,14 +309,6 @@ struct CustomizeContextParams
 
 ////////////////////////////////////////////////////////////////////////////////
 
-struct UpdateContextParams
-{
-    // shared
-    lunaticvibes::Time updateTime;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
 struct OverlayContextParams
 {
     std::shared_mutex _mutex;
@@ -334,7 +326,6 @@ extern PlayContextParams gPlayContext;
 extern SelectContextParams gSelectContext;
 extern KeyConfigContextParams gKeyconfigContext;
 extern CustomizeContextParams gCustomizeContext;
-extern UpdateContextParams gUpdateContext;
 extern OverlayContextParams gOverlayContext;
 extern std::shared_ptr<SongDB> g_pSongDB;
 extern std::shared_ptr<ScoreDB> g_pScoreDB;

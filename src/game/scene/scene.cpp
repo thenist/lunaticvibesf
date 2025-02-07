@@ -122,12 +122,11 @@ SceneBase::~SceneBase()
 void SceneBase::update()
 {
     lunaticvibes::Time t;
-    gUpdateContext.updateTime = t;
 
     if (pSkin)
     {
         // update skin
-        pSkin->update();
+        pSkin->update(t);
         auto [x, y] = _input.getCursorPos();
         pSkin->update_mouse(x, y);
 

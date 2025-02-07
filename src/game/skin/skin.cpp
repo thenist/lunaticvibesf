@@ -5,6 +5,7 @@
 #include <format>
 
 #include <common/assert.h>
+#include <common/beat.h>
 #include <game/graphics/sprite_lane.h>
 #include <game/graphics/sprite_video.h>
 #include <game/scene/scene_context.h>
@@ -42,7 +43,7 @@ SkinBase::~SkinBase()
     }
 }
 
-void SkinBase::update()
+void SkinBase::update(const lunaticvibes::Time& t)
 {
     // current beat, measure
     if (gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr)
@@ -55,9 +56,9 @@ void SkinBase::update()
     }
 
     std::for_each(std::execution::par, _sprites.begin(), _sprites.end(),
-                  [](const std::shared_ptr<SpriteBase>& s) { s->update(gUpdateContext.updateTime); });
-    std::for_each(_sprites.begin(), _sprites.end(),
-                  [](const std::shared_ptr<SpriteBase>& s) { s->update_on_main(gUpdateContext.updateTime); });
+                  [t](const std::shared_ptr<SpriteBase>& s) { s->update(t); });
+    for (auto& s : _sprites)
+        s->update_on_main(t);
 }
 
 void SkinBase::update_mouse(int x, int y)
