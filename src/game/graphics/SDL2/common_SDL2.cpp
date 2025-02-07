@@ -121,6 +121,8 @@ void Image::setTransparentColorRGB(Color c)
 
 Rect Image::getRect() const
 {
+    if (_pSurface == nullptr)
+        return {};
     return {0, 0, _pSurface->w, _pSurface->h};
 }
 
