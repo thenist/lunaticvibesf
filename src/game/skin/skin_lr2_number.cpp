@@ -9,6 +9,7 @@
 #include <game/scene/scene_context.h>
 
 #include <cmath>
+#include <cstdlib>
 #include <memory>
 #include <utility>
 
@@ -55,7 +56,7 @@ static unsigned get_current_chart_length(SelectContextParams& select_ctx, ChartC
 
 [[nodiscard]] static int decimal_part(double n)
 {
-    return static_cast<int>((n - static_cast<int>(n)) * 100);
+    return std::abs(static_cast<int>((n - static_cast<int>(n)) * 100));
 }
 
 [[nodiscard]] static int ratio_whole(int x, int y)
