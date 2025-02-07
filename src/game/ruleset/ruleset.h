@@ -98,6 +98,7 @@ public:
     virtual void updateGlobals() = 0;
 
     [[nodiscard]] virtual double get_hit_mean() const = 0;
+    [[nodiscard]] virtual double get_hit_std_dev() const = 0;
 
     void setComboDisplay(unsigned combo)
     {

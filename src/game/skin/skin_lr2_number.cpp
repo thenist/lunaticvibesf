@@ -106,8 +106,14 @@ int lunaticvibes::get_number(IndexNumber ind)
             return decimal_part(ruleset->get_hit_mean());
         return 0;
 
-    case 298:           // TODO // LR2OOL: whole part of stddev
-    case 299: return 0; // TODO // LR2OOL: decimal part of stddev
+    case 298: // LR2OOL
+        if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
+            return static_cast<int>(ruleset->get_hit_std_dev());
+        return 0;
+    case 299: // LR2OOL
+        if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
+            return decimal_part(ruleset->get_hit_std_dev());
+        return 0;
 
     case 301: // LR2HelperG
         if (auto chart = get_chart_for_display(gSelectContext, gChartContext); chart != nullptr)

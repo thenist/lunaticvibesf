@@ -6,6 +6,7 @@
 #include <common/chartformat/chartformat.h>
 #include <common/chartformat/chartformat_bms.h>
 #include <common/math_mean.h>
+#include <common/math_std_dev.h>
 #include <common/play_modifiers.h>
 #include <game/runtime/index/option.h>
 #include <game/scene/scene_context.h>
@@ -377,6 +378,7 @@ private:
     size_t _graphLastWrite;
 
     lunaticvibes::math::Mean _hit_mean;
+    lunaticvibes::math::StdDev _hit_std_dev;
 
 protected:
     // members change in game
@@ -471,6 +473,7 @@ public:
     [[nodiscard]] unsigned getMaxCombo() const override;
 
     [[nodiscard]] double get_hit_mean() const override { return _hit_mean.mean(); };
+    [[nodiscard]] double get_hit_std_dev() const override { return _hit_std_dev.std_dev(); };
 
     void fail() override;
 

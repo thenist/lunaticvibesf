@@ -1026,6 +1026,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
             note.expired = true;
             notesExpired++;
             _hit_mean.insert(judge.time.norm());
+            _hit_std_dev.insert(static_cast<double>(judge.time.norm()));
             updateJudge(t, idx, judge.area, slot);
             break;
 
@@ -1034,6 +1035,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
             note.expired = true;
             notesExpired++;
             _hit_mean.insert(judge.time.norm());
+            _hit_std_dev.insert(static_cast<double>(judge.time.norm()));
             updateJudge(t, idx, judge.area, slot);
             break;
 
@@ -1064,6 +1066,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
                 note.hit = true;
                 note.expired = true;
                 _hit_mean.insert(judge.time.norm());
+                _hit_std_dev.insert(static_cast<double>(judge.time.norm()));
                 if (showJudge && _bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
                     State::set(_bombLNTimerMap->at(idx), t.norm());
                 break;
@@ -1073,6 +1076,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
                 note.expired = true;
                 notesExpired++;
                 _hit_mean.insert(judge.time.norm());
+                _hit_std_dev.insert(static_cast<double>(judge.time.norm()));
                 updateJudge(t, idx, judge.area, slot);
                 break;
 
