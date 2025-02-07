@@ -121,21 +121,21 @@ public:
         ss1_2.setMotionStartTimer(IndexTimer::K11_BOMB);
 
         ss1.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         ss1.setMotionLoopTo(0);
 
         ss1_1.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
-        ss1_1.appendMotionKeyFrame(
-            {255,
-             {Rect(255, 255, 255, 255), MotionKeyFrameParams::CONSTANT, Color(0x00000000), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
+        ss1_1.appendMotionKeyFrame({255,
+                                    {Rect(255, 255, 255, 255), MotionKeyFrameParams::CONSTANT, Color(0x00000000),
+                                     BlendMode::ALPHA, false, 0}});
         ss1_1.setMotionLoopTo(-1);
 
         ss1_2.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
-        ss1_2.appendMotionKeyFrame(
-            {255,
-             {Rect(255, 255, 255, 255), MotionKeyFrameParams::CONSTANT, Color(0x00000000), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
+        ss1_2.appendMotionKeyFrame({255,
+                                    {Rect(255, 255, 255, 255), MotionKeyFrameParams::CONSTANT, Color(0x00000000),
+                                     BlendMode::ALPHA, false, 0}});
         ss1_2.setMotionLoopTo(0);
     }
 };
@@ -218,15 +218,15 @@ public:
     {
         s0.setMotionStartTimer(IndexTimer::K11_BOMB);
         s0.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         s0.setMotionLoopTo(0);
         s.setMotionStartTimer(IndexTimer::K11_BOMB);
         s.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         s.setMotionLoopTo(0);
         sv.setMotionStartTimer(IndexTimer::K11_BOMB);
         sv.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sv.setMotionLoopTo(0);
     }
 };
@@ -288,11 +288,11 @@ public:
     {
         s.setMotionStartTimer(IndexTimer::K11_BOMB);
         s.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         s.setMotionLoopTo(0);
         ss.setMotionStartTimer(IndexTimer::K11_BOMB);
         ss.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         ss.setMotionLoopTo(0);
     }
 };
@@ -464,33 +464,33 @@ public:
     sNumber()
     {
         s1.setMotionStartTimer(IndexTimer::K11_BOMB);
-        s1.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        s1.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         s1.setMotionLoopTo(0);
         s.setMotionStartTimer(IndexTimer::K11_BOMB);
-        s.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        s.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         s.setMotionLoopTo(0);
         sa.setMotionStartTimer(IndexTimer::K11_BOMB);
-        sa.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        sa.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         sa.setMotionLoopTo(0);
 
         s11.setMotionStartTimer(IndexTimer::K11_BOMB);
-        s11.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        s11.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         s11.setMotionLoopTo(0);
         sa11.setMotionStartTimer(IndexTimer::K11_BOMB);
-        sa11.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        sa11.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         sa11.setMotionLoopTo(0);
         s24.setMotionStartTimer(IndexTimer::K11_BOMB);
-        s24.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        s24.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         s24.setMotionLoopTo(0);
         sa24.setMotionStartTimer(IndexTimer::K11_BOMB);
-        sa24.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        sa24.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         sa24.setMotionLoopTo(0);
 
         sr.setMotionStartTimer(IndexTimer::K11_BOMB);
-        sr.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        sr.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         sr.setMotionLoopTo(0);
         sc.setMotionStartTimer(IndexTimer::K11_BOMB);
-        sc.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, 0, 0}});
+        sc.appendMotionKeyFrame({0, {dstRect, MotionKeyFrameParams::CONSTANT, dstColor, BlendMode::ALPHA, false, 0}});
         sc.setMotionLoopTo(0);
     }
 };
@@ -1005,19 +1005,19 @@ public:
     {
         sL.setMotionStartTimer(IndexTimer::K11_BOMB);
         sL.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sL.setMotionLoopTo(0);
         sR.setMotionStartTimer(IndexTimer::K11_BOMB);
         sR.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sR.setMotionLoopTo(0);
         sU.setMotionStartTimer(IndexTimer::K11_BOMB);
         sU.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sU.setMotionLoopTo(0);
         sD.setMotionStartTimer(IndexTimer::K11_BOMB);
         sD.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sD.setMotionLoopTo(0);
     }
 };
@@ -1175,19 +1175,19 @@ public:
     {
         sL.setMotionStartTimer(IndexTimer::K11_BOMB);
         sL.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 200, 200), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 200, 200), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sL.setMotionLoopTo(0);
         sR.setMotionStartTimer(IndexTimer::K11_BOMB);
         sR.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 200, 200), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 200, 200), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sR.setMotionLoopTo(0);
         sU.setMotionStartTimer(IndexTimer::K11_BOMB);
         sU.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 200, 200), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 200, 200), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sU.setMotionLoopTo(0);
         sD.setMotionStartTimer(IndexTimer::K11_BOMB);
         sD.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 200, 200), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 200, 200), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         sD.setMotionLoopTo(0);
     }
 };
@@ -1347,17 +1347,17 @@ public:
     {
         ss.setMotionStartTimer(IndexTimer::K11_BOMB);
         ss.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         ss.setMotionLoopTo(0);
         ss.setInd(SpriteOption::opType::SWITCH, (unsigned)IndexSwitch::_TEST1);
         ss0.setMotionStartTimer(IndexTimer::K11_BOMB);
         ss0.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         ss0.setMotionLoopTo(0);
         ss0.setInd(SpriteOption::opType::SWITCH, (unsigned)IndexSwitch::_TEST1);
         so.setMotionStartTimer(IndexTimer::K11_BOMB);
         so.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         so.setMotionLoopTo(0);
         so.setInd(SpriteOption::opType::OPTION, (unsigned)IndexOption::_TEST1);
     }
@@ -1428,14 +1428,15 @@ public:
     {
         s1.setMotionStartTimer(IndexTimer::K11_BOMB);
         s1.appendMotionKeyFrame(
-            {0, {Rect(0, 0, 10, 40), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0, {Rect(0, 0, 10, 40), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         s1.setMotionLoopTo(0);
         s1.setFlashType(SpriteGaugeGrid::FlashType::NONE);
         s1.setGaugeType(SpriteGaugeGrid::GaugeType::GROOVE);
 
         s2.setMotionStartTimer(IndexTimer::K11_BOMB);
         s2.appendMotionKeyFrame(
-            {0, {Rect(490, 100, 10, 40), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0}});
+            {0,
+             {Rect(490, 100, 10, 40), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         s2.setMotionLoopTo(0);
         s2.setFlashType(SpriteGaugeGrid::FlashType::NONE);
         s2.setGaugeType(SpriteGaugeGrid::GaugeType::EX_SURVIVAL);
