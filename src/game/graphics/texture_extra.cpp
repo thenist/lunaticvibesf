@@ -503,6 +503,8 @@ void TextureBmsBga::setVideoSpeed()
 }
 
 // TODO: remove this and use Texture directly.
+// NOTE: TextureDynamic doesn't use any of Texture fields directly, instead passes draw() calls to another (member)
+// texture. Public Texture methods may still use this one's members though.
 TextureDynamic::TextureDynamic() : Texture(nullptr, 0, 0) {}
 
 static std::future<Image> asyncLoadImage(Path path)
@@ -517,6 +519,7 @@ static std::future<Image> asyncLoadImage(Path path)
 
 void TextureDynamic::setPath(const Path& path)
 {
+    LOG_VERBOSE << "[TextureDynamic] setPath " << _loaded_path << " -> " << path;
     if (path == _loaded_path)
         return;
     loaded = false;
@@ -533,15 +536,9 @@ void TextureDynamic::applyImageIfNeeded()
 
     Image image = _loadImage.get();
     _dynTexture = std::make_unique<Texture>(image);
-    if (_dynTexture->isLoaded())
-    {
-        textureRect = _dynTexture->getRect();
-        loaded = true;
-    }
-    else
-    {
-        loaded = false;
-    }
+    // For public Texture methods.
+    textureRect = image.getRect();
+    loaded = _dynTexture->isLoaded();
 }
 
 void TextureDynamic::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle) const

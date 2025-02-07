@@ -377,7 +377,7 @@ void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const Blen
 void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
                    const double angle, const Point& center) const
 {
-    Rect srcRectTmp(srcRect);
+    Rect srcRectTmp = srcRect;
     if (srcRectTmp.w == RECT_FULL.w)
         srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h)

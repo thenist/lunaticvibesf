@@ -1315,7 +1315,7 @@ ParseRet SkinLR2::SRC_IMAGE()
         builder.textureRect = Rect(d.x, d.y, d.w, d.h);
         builder.animationFrameCount = d.div_y * d.div_x;
         builder.animationDurationPerLoop = d.cycle;
-        builder.animationTimer = (IndexTimer)d.timer;
+        builder.animationTimer = static_cast<IndexTimer>(d.timer);
         builder.textureSheetRows = d.div_y;
         builder.textureSheetCols = d.div_x;
         _sprites.push_back(builder.build());
