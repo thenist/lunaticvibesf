@@ -58,6 +58,16 @@ static unsigned get_current_chart_length(SelectContextParams& select_ctx, ChartC
     return static_cast<int>((n - static_cast<int>(n)) * 100);
 }
 
+[[nodiscard]] static int ratio_whole(int x, int y)
+{
+    return y == 0 ? x : x / y;
+}
+
+[[nodiscard]] static int ratio_decimal(int x, int y)
+{
+    return y == 0 ? x : decimal_part(static_cast<double>(x) / y);
+}
+
 int lunaticvibes::get_number(IndexNumber ind)
 {
     // Sources:
@@ -95,14 +105,14 @@ int lunaticvibes::get_number(IndexNumber ind)
             return getEffectiveChartTotal(*chart, convertGaugeType(State::get(IndexOption::PLAY_GAUGE_TYPE_1P)));
         return 0;
 
-    case 400: return State::get(IndexNumber::PLAY_1P_PERFECT) / State::get(IndexNumber::PLAY_1P_GREAT); // LR2OOL
-    case 401:                                                                                           // LR2OOL
-        return decimal_part(static_cast<double>(State::get(IndexNumber::PLAY_1P_PERFECT)) /
-                            State::get(IndexNumber::PLAY_1P_GREAT));
-    case 402: return State::get(IndexNumber::PLAY_1P_PERFECT) / State::get(IndexNumber::PLAY_1P_GOOD); // LR2OOL
-    case 403:                                                                                          // LR2OOL
-        return decimal_part(static_cast<double>(State::get(IndexNumber::PLAY_1P_GREAT)) /
-                            State::get(IndexNumber::PLAY_1P_GOOD));
+    case 400: // LR2OOL
+        return ratio_whole(State::get(IndexNumber::PLAY_1P_PERFECT), State::get(IndexNumber::PLAY_1P_GREAT));
+    case 401: // LR2OOL
+        return ratio_decimal(State::get(IndexNumber::PLAY_1P_PERFECT), State::get(IndexNumber::PLAY_1P_GREAT));
+    case 402: // LR2OOL
+        return ratio_whole(State::get(IndexNumber::PLAY_1P_GREAT), State::get(IndexNumber::PLAY_1P_GOOD));
+    case 403: // LR2OOL
+        return ratio_decimal(State::get(IndexNumber::PLAY_1P_GREAT), State::get(IndexNumber::PLAY_1P_GOOD));
 
     case 407: // beatoraja
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
