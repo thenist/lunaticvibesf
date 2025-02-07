@@ -105,7 +105,10 @@ bool SpriteLaneVertical::update(const lunaticvibes::Time& t)
 
     if (updateMotion(t))
     {
-        _hispeed = gPlayContext.playerState[gPlayContext.isBattle ? playerSlot : PLAYER_SLOT_PLAYER].hispeedGradientNow;
+        // GCC warning: enumerated and non-enumerated type in conditional expression
+        static constexpr decltype(playerSlot) slot_player = PLAYER_SLOT_PLAYER;
+
+        _hispeed = gPlayContext.playerState[gPlayContext.isBattle ? playerSlot : slot_player].hispeedGradientNow;
         updateNoteRect(t);
         updateHIDDENCompatible();
         return true;

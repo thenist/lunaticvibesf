@@ -63,12 +63,17 @@ struct ChartContextParams
 
 ////////////////////////////////////////////////////////////////////////////////
 
-constexpr unsigned MAX_PLAYERS = 3;
-constexpr unsigned PLAYER_SLOT_PLAYER = 0;
-constexpr unsigned PLAYER_SLOT_TARGET = 1;
-constexpr unsigned PLAYER_SLOT_MYBEST = 2;
+enum PLAYER_SLOT
+{
+    PLAYER_SLOT_PLAYER = 0,
+    PLAYER_SLOT_TARGET = 1,
+    PLAYER_SLOT_MYBEST = 2,
+    MAX_PLAYERS = 3,
+};
 struct PlayContextParams
 {
+    static constexpr unsigned GRAPH_POINT_NUMBER{500};
+
     std::shared_mutex _mutex;
 
     SkinType mode = SkinType::PLAY7;
@@ -78,12 +83,8 @@ struct PlayContextParams
 
     std::shared_ptr<TextureBmsBga> bgaTexture = std::make_shared<TextureBmsBga>();
 
-    static constexpr auto GRAPH_POINT_NUMBER = 500L;
     std::array<std::shared_ptr<ChartObjectBase>, MAX_PLAYERS> chartObj{nullptr, nullptr, nullptr};
     std::array<double, MAX_PLAYERS> initialHealth{1.0, 1.0, 1.0};
-    std::array<size_t, MAX_PLAYERS> graphLastWriteIdx;
-    std::array<std::array<double, GRAPH_POINT_NUMBER>, MAX_PLAYERS> graphAcc;
-    std::array<std::array<uint8_t, GRAPH_POINT_NUMBER>, MAX_PLAYERS> graphGauge;
     std::array<GaugeDisplayType, MAX_PLAYERS> gaugeType{}; // resolve on ruleset construction
     std::array<PlayModifiers, MAX_PLAYERS> mods{};         // eMod:
 

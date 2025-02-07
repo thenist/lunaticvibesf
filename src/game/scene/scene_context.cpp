@@ -36,7 +36,6 @@ std::shared_ptr<ScoreDB> g_pScoreDB;
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
 namespace r = std::ranges;
-namespace v = r::views;
 
 std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge)
 {
@@ -115,12 +114,8 @@ void clearContextPlayForRetry()
         gPlayContext.chartObj[1].reset();
     }
     for (size_t i = 0; i < MAX_PLAYERS; ++i)
-    {
-        gPlayContext.graphGauge[i].fill(0);
-        gPlayContext.graphAcc[i].fill(0);
         if (gPlayContext.ruleset[i])
             gPlayContext.ruleset[i].reset();
-    }
 
     std::unique_lock l{gPlayContext._mutex};
     gPlayContext.replayNew.reset();
