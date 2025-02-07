@@ -27,6 +27,7 @@
 #include <common/utils.h>
 #include <config/config_mgr.h>
 #include <game/graphics/dxa.h>
+#include <game/graphics/sprite.h>
 #include <game/graphics/sprite_bar_entry.h>
 #include <game/graphics/sprite_graph.h>
 #include <game/graphics/sprite_lane.h>
@@ -42,6 +43,7 @@
 #include <game/skin/skin_lr2_slider_callbacks.h>
 
 using uint8_t = std::uint8_t;
+using lunaticvibes::SPRITE_GLOBAL_MAX;
 
 namespace r = std::ranges;
 namespace v = std::views;

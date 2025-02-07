@@ -1,14 +1,20 @@
 #pragma once
 
+#include <common/beat.h>
 #include <common/types.h>
-#include <game/graphics/sprite.h>
 #include <game/graphics/video.h>
+#include <game/runtime/index/text.h>
 
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
+
+class SpriteBase;
+class SpriteLaneVertical;
+class SpriteText;
+class iSpriteMouse;
 
 enum class SkinVersion
 {
@@ -35,21 +41,18 @@ protected:
     bool loaded = false;
 
 public:
-    constexpr bool isLoaded() { return loaded; }
+    [[nodiscard]] constexpr bool isLoaded() const { return loaded; }
     virtual void setGaugeDisplayType(unsigned slot, GaugeDisplayType type) {};
 
-    ////////////////////////////////////////////////////////////////////////////////
     // Images
 protected:
     std::map<std::string, std::shared_ptr<TTFFont>> fontNameMap;
 
-    ////////////////////////////////////////////////////////////////////////////////
     // Textures
 protected:
     static std::map<std::string, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
     std::map<std::string, std::shared_ptr<sVideo>> videoNameMap;           // Use this to get video instance from name
 
-    ////////////////////////////////////////////////////////////////////////////////
     // Sprite elements
 protected:
     std::vector<std::shared_ptr<SpriteBase>> _sprites;      // Only modified while parsing the skin.
@@ -63,7 +66,6 @@ protected:
     std::shared_ptr<SpriteText> pSpriteTextEditing = nullptr; // currently text edit element
     std::shared_ptr<iSpriteMouse> pSpriteLastClicked = nullptr;
 
-    ////////////////////////////////////////////////////////////////////////////////
 public:
     virtual void update();
     virtual void update_mouse(int x, int y);
@@ -123,9 +125,6 @@ public:
         unsigned scratchSide2P = 0;
     } info;
 
-    ///////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////////////////////////////////////
     // customize
 public:
     struct CustomizeOption
@@ -146,7 +145,6 @@ public:
     // For customize scene itself.
     void setThumbnailTextureSize(int w, int h);
 
-    ////////////////////////////////////////////////////////////////////////////////
     // extended capability support
 public:
     bool isSupportExHardAndAssistEasy = false;

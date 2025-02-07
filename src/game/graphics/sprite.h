@@ -173,7 +173,6 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////
 // Sprite placeholder
-inline const size_t SPRITE_GLOBAL_MAX = 32;
 class SpriteGlobal : public SpriteBase
 {
 protected:

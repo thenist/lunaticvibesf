@@ -2,11 +2,15 @@
 
 #include <common/types.h>
 #include <game/input/input_wrapper.h>
+#include <game/runtime/index/switch.h>
+#include <game/runtime/index/timer.h>
 #include <game/skin/skin.h>
 #include <game/skin/skin_mgr.h>
 
 #include <array>
 #include <memory>
+
+class SpriteStatic;
 
 enum class SceneType : uint8_t
 {
