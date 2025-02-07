@@ -13,7 +13,7 @@
 #include <memory>
 #include <utility>
 
-static std::shared_ptr<ChartFormatBase> get_current_select_chart(SelectContextParams& ctx)
+[[nodiscard]] static std::shared_ptr<ChartFormatBase> get_current_select_chart(SelectContextParams& ctx)
 {
     std::shared_lock u(ctx._mutex);
     const EntryList& e = ctx.entries;
@@ -25,8 +25,8 @@ static std::shared_ptr<ChartFormatBase> get_current_select_chart(SelectContextPa
     return {};
 }
 
-static std::shared_ptr<ChartFormatBase> get_chart_for_display(SelectContextParams& select_ctx,
-                                                              ChartContextParams& chart_ctx)
+[[nodiscard]] static std::shared_ptr<ChartFormatBase> get_chart_for_display(SelectContextParams& select_ctx,
+                                                                            ChartContextParams& chart_ctx)
 {
     std::shared_ptr<ChartFormatBase> chart;
     if (chart_ctx.started)
@@ -36,15 +36,15 @@ static std::shared_ptr<ChartFormatBase> get_chart_for_display(SelectContextParam
     return chart;
 }
 
-static std::shared_ptr<ChartObjectBase> get_chart_obj_for_display(PlayContextParams& play_ctx)
+[[nodiscard]] static std::shared_ptr<ChartObjectBase> get_chart_obj_for_display(PlayContextParams& play_ctx)
 {
     std::shared_lock l(play_ctx._mutex);
     return play_ctx.chartObj[PLAYER_SLOT_PLAYER];
 }
 
 // \return Seconds
-static unsigned get_current_chart_length(SelectContextParams& select_ctx, ChartContextParams& chart_ctx,
-                                         PlayContextParams& play_ctx)
+[[nodiscard]] static unsigned get_current_chart_length(SelectContextParams& select_ctx, ChartContextParams& chart_ctx,
+                                                       PlayContextParams& play_ctx)
 {
     // ChartFormatBase doesn't always have populated totalLength.
     if (auto obj = get_chart_obj_for_display(play_ctx); obj != nullptr)
