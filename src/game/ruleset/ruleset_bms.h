@@ -5,6 +5,7 @@
 #include <common/assert.h>
 #include <common/chartformat/chartformat.h>
 #include <common/chartformat/chartformat_bms.h>
+#include <common/math_mean.h>
 #include <common/play_modifiers.h>
 #include <game/runtime/index/option.h>
 #include <game/scene/scene_context.h>
@@ -375,6 +376,8 @@ private:
     std::array<double, PlayContextParams::GRAPH_POINT_NUMBER> _graphAcc;
     size_t _graphLastWrite;
 
+    lunaticvibes::math::Mean _hit_mean;
+
 protected:
     // members change in game
     std::array<JudgeArea, chart::NOTELANEINDEX_COUNT> _lnJudge{JudgeArea::NOTHING};
@@ -466,6 +469,8 @@ public:
 
     [[nodiscard]] unsigned getNoteCount() const override;
     [[nodiscard]] unsigned getMaxCombo() const override;
+
+    [[nodiscard]] double get_hit_mean() const override { return _hit_mean.mean(); };
 
     void fail() override;
 

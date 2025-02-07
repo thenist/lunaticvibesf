@@ -95,9 +95,17 @@ int lunaticvibes::get_number(IndexNumber ind)
             return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
         break; // might still also be in State::get
 
-    case 295:           // TODO // LR2OOL: current random
-    case 296:           // TODO // LR2OOL: whole part of mean
-    case 297:           // TODO // LR2OOL: decimal part of mean
+    case 295: return 1112333; // TODO // LR2OOL: current random
+
+    case 296: // LR2OOL
+        if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
+            return static_cast<int>(ruleset->get_hit_mean());
+        return 0;
+    case 297: // LR2OOL
+        if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
+            return decimal_part(ruleset->get_hit_mean());
+        return 0;
+
     case 298:           // TODO // LR2OOL: whole part of stddev
     case 299: return 0; // TODO // LR2OOL: decimal part of stddev
 
