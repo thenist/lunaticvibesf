@@ -30,6 +30,15 @@ template <class Proj = std::identity>
     return s;
 }
 
+inline void replace_all(std::string& str, std::string_view from, std::string_view to)
+{
+    for (size_t pos = str.find(from); pos != std::string::npos;)
+    {
+        str.replace(pos, from.length(), to);
+        pos = str.find(from, pos + to.length());
+    }
+}
+
 template <class T> void split(const std::string_view raw, const char delim, std::vector<T>& out)
 {
     out.clear();
