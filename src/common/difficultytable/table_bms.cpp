@@ -2,6 +2,7 @@
 
 #include <format>
 #include <fstream>
+#include <ranges>
 #include <string>
 #include <string_view>
 
@@ -16,6 +17,8 @@
 #include <common/meta.h>
 #include <common/types.h>
 #include <common/utils.h>
+
+namespace v = std::views;
 
 enum class GetResult : uint8_t
 {
@@ -370,40 +373,18 @@ void DifficultyTableBMS::parseHeader(const std::string& content)
             bodyview.remove_prefix(bom.size());
 
         tao::json::value header = tao::json::from_string(bodyview);
-        try
-        {
-            name = header["name"].get_string();
-        }
-        catch (std::bad_variant_access& e)
-        {
-        }
-        try
-        {
-            symbol = header["symbol"].get_string();
-        }
-        catch (std::bad_variant_access& e)
-        {
-        }
-        try
-        {
-            data_url = header["data_url"].get_string();
-        }
-        catch (std::bad_variant_access& e)
-        {
-        }
+        name = header["name"].optional<std::string>().value_or("");
+        symbol = header["symbol"].optional<std::string>().value_or("");
+        data_url = header["data_url"].optional<std::string>().value_or("");
+
         try
         {
             const auto& levelOrder = header["level_order"].get_array();
             int levelIndex = 0;
             for (const auto& level : levelOrder)
             {
-                try
-                {
-                    _levelOrder[level.get_string()] = levelIndex;
-                }
-                catch (const std::bad_variant_access& e)
-                {
-                }
+                if (auto s = level.optional<std::string>(); s.has_value())
+                    _levelOrder[*s] = levelIndex;
                 levelIndex += 1;
             }
         }
@@ -443,21 +424,8 @@ void DifficultyTableBMS::parseBody(const std::string& content)
                 default: level = "0"; break;
                 }
 
-                try
-                {
-                    md5 = entry["md5"].get_string();
-                }
-                catch (std::bad_variant_access& e)
-                {
-                }
-
-                try
-                {
-                    name = entry["title"].get_string();
-                }
-                catch (std::bad_variant_access& e)
-                {
-                }
+                md5 = entry["md5"].optional<std::string>().value_or("");
+                name = entry["title"].optional<std::string>().value_or("");
 
                 if (!level.empty() && !md5.empty())
                 {
