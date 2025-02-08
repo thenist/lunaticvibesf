@@ -16,7 +16,6 @@
 
 #include <boost/format.hpp>
 #include <cereal/archives/portable_binary.hpp>
-#include <re2/re2.h>
 
 std::shared_ptr<ArenaClient> g_pArenaClient = nullptr;
 
@@ -410,32 +409,17 @@ void ArenaClient::handleNotice(const std::shared_ptr<ArenaMessage>& msg)
 {
     auto pMsg = std::static_pointer_cast<ArenaMessageNotice>(msg);
 
-    static const LazyRE2 reS1{R"(.*%s.*)"};
-    static const LazyRE2 reS2{R"(.*%s.*%s.*)"};
-    static const LazyRE2 reD1{R"(.*%d.*)"};
-    static const LazyRE2 reD2{R"(.*%d.*%d.*)"};
-    switch (pMsg->format)
+    switch (static_cast<ArenaMessageNotice::Format>(pMsg->format))
     {
+        // unsafe lmao
     case ArenaMessageNotice::PLAIN: createNotification(i18n::s(pMsg->i18nIndex)); break;
-
-    case ArenaMessageNotice::S1:
-        if (RE2::FullMatch(i18n::s(pMsg->i18nIndex), *reS1))
-            createNotification((boost::format(i18n::s(pMsg->i18nIndex)) % pMsg->s1).str());
-        break;
-
+    case ArenaMessageNotice::S1: createNotification((boost::format(i18n::s(pMsg->i18nIndex)) % pMsg->s1).str()); break;
     case ArenaMessageNotice::S2:
-        if (RE2::FullMatch(i18n::s(pMsg->i18nIndex), *reS2))
-            createNotification((boost::format(i18n::s(pMsg->i18nIndex)) % pMsg->s1 % pMsg->s2).str());
+        createNotification((boost::format(i18n::s(pMsg->i18nIndex)) % pMsg->s1 % pMsg->s2).str());
         break;
-
-    case ArenaMessageNotice::D1:
-        if (RE2::FullMatch(i18n::s(pMsg->i18nIndex), *reD1))
-            createNotification((boost::format(i18n::s(pMsg->i18nIndex)) % pMsg->d1).str());
-        break;
-
+    case ArenaMessageNotice::D1: createNotification((boost::format(i18n::s(pMsg->i18nIndex)) % pMsg->d1).str()); break;
     case ArenaMessageNotice::D2:
-        if (RE2::FullMatch(i18n::s(pMsg->i18nIndex), *reD2))
-            createNotification((boost::format(i18n::s(pMsg->i18nIndex)) % pMsg->d1 % pMsg->d2).str());
+        createNotification((boost::format(i18n::s(pMsg->i18nIndex)) % pMsg->d1 % pMsg->d2).str());
         break;
     }
 
