@@ -3,6 +3,7 @@
 #include <format>
 #include <fstream>
 #include <string>
+#include <string_view>
 
 #include <curl/curl.h>
 #include <re2/re2.h>
@@ -365,8 +366,8 @@ void DifficultyTableBMS::parseHeader(const std::string& content)
     {
         std::string_view bodyview = content;
         // Some tables start with a BOM, which needs to be removed
-        if (bodyview.starts_with("\xef\xbb\xbf"))
-            bodyview = bodyview.substr(3);
+        if (constexpr std::string_view bom{"\xef\xbb\xbf"}; bodyview.starts_with(bom))
+            bodyview.remove_prefix(bom.size());
 
         tao::json::value header = tao::json::from_string(bodyview);
         try
