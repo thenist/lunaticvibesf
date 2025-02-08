@@ -6,15 +6,13 @@
 #include <common/entry/entry_song.h>
 #include <common/hash.h>
 #include <common/log.h>
+#include <common/str_utils.h>
 #include <common/sysutil.h>
 #include <common/thread_pool.h>
 #include <common/u8.h>
 #include <common/utils.h>
 #include <db/db_conn.h>
 #include <game/chart/chart_types.h>
-
-#include <re2/re2.h>
-#include <re2/stringpiece.h>
 
 #include <algorithm>
 #include <any>
@@ -372,14 +370,8 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const Hash
     LOG_INFO << "[SongDB] Search for songs matching: " << tagRaw;
 
     std::string tag = tagRaw;
-    static const std::pair<RE2, re2::StringPiece> search_replace_pattern[]{
-        {"%", "\\\\%"},
-        {"_", "\\\\_"},
-    };
-    for (const auto& [in, out] : search_replace_pattern)
-    {
-        RE2::GlobalReplace(&tag, in, out);
-    }
+    lunaticvibes::replace_all(tag, "%", "\\\\%");
+    lunaticvibes::replace_all(tag, "_", "\\\\_");
 
     std::stringstream ss;
     ss << "SELECT * FROM song WHERE ";
