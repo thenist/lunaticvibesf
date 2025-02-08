@@ -16,8 +16,6 @@
 #include <string_view>
 #include <utility>
 
-#include <re2/re2.h>
-
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/play_modifiers.h>
@@ -593,19 +591,6 @@ static void csvLineTokenizeSimple(const std::string_view raw, Tokens& res)
     lunaticvibes::split(linecsv, ',', res);
 }
 
-static void csvLineTokenizeRegex(const std::string_view raw, Tokens& res)
-{
-    res.clear();
-    StringContentView linecsv = csvLineNormalize(raw);
-    if (linecsv.empty())
-        return;
-
-    auto lineBuf = re2::StringPiece(linecsv.data(), linecsv.length());
-    static const LazyRE2 re{R"(((?:(?:\\,)|[^,])*?)(?:,|$))"};
-    for (std::string token; !lineBuf.empty() && RE2::Consume(&lineBuf, *re, &token);)
-        res.push_back(token);
-}
-
 [[nodiscard]] static Point getCenterPoint(const int& wi, const int& hi, int numpadCenter)
 {
     auto w = (double)wi;
@@ -670,12 +655,7 @@ Path SkinLR2::getCustomizePath(StringContentView input)
 
 void SkinLR2::csvLineTokenize(int line, const std::string& raw, Tokens& res)
 {
-    const auto view = std::string_view{raw}.substr(0, raw.find("//"));
-
-    if (view.contains('\\'))
-        csvLineTokenizeRegex(view, res);
-    else
-        csvLineTokenizeSimple(view, res);
+    csvLineTokenizeSimple(std::string_view{raw}.substr(0, raw.find("//")), res);
 
     // #ELSE
     if (res.size() == 1 && lunaticvibes::iequals(res[0], "#ELSE"))
