@@ -429,7 +429,7 @@ void DifficultyTableBMS::parseHeader(const std::string& content)
     }
     catch (std::exception& e)
     {
-        LOG_ERROR << "[TableBMS] Header JSON Error: " << to_utf8(e.what(), eFileEncoding::LATIN1);
+        LOG_ERROR << "[TableBMS] Header JSON Error: " << e.what();
     }
 }
 
@@ -494,6 +494,6 @@ void DifficultyTableBMS::parseBody(const std::string& content)
     }
     catch (std::exception& e)
     {
-        LOG_ERROR << "[TableBMS] Data JSON Error: " << to_utf8(e.what(), eFileEncoding::LATIN1);
+        LOG_ERROR << "[TableBMS] Data JSON Error: " << e.what();
     }
 }

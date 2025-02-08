@@ -110,7 +110,7 @@ bool ArenaClient::joinLobby(const std::string& address)
     }
     catch (std::exception& e)
     {
-        LOG_WARNING << "[Arena] Open socket failed: " << to_utf8(e.what(), eFileEncoding::LATIN1);
+        LOG_WARNING << "[Arena] Open socket failed: " << e.what();
         return false;
     }
 
@@ -284,7 +284,7 @@ void ArenaClient::handleRecv(const boost::system::error_code& error, size_t byte
 {
     if (error)
     {
-        LOG_WARNING << "[Arena] socket exception: " << to_utf8(error.message(), eFileEncoding::LATIN1);
+        LOG_WARNING << "[Arena] socket exception: " << error.message();
 
         ioc.stop();
         listen.wait();

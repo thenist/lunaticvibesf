@@ -116,8 +116,7 @@ void AsyncLooper::loopStart()
                 }
                 catch (const std::exception& e)
                 {
-                    LOG_ERROR << "[AsyncLooper] " << _tag
-                              << ": Exception: " << to_utf8(e.what(), eFileEncoding::LATIN1);
+                    LOG_ERROR << "[AsyncLooper] " << _tag << ": Exception: " << e.what();
                     throw;
                 }
             });

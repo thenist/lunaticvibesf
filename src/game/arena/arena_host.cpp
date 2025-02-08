@@ -67,7 +67,7 @@ bool ArenaHost::createLobby()
     }
     catch (std::exception& e)
     {
-        LOG_WARNING << "[Arena] ipv4 socket exception: " << to_utf8(e.what(), eFileEncoding::LATIN1);
+        LOG_WARNING << "[Arena] ipv4 socket exception: " << e.what();
     }
     if (v4 && !v4->is_open())
     {
@@ -80,7 +80,7 @@ bool ArenaHost::createLobby()
     }
     catch (std::exception& e)
     {
-        LOG_WARNING << "[Arena] ipv6 socket exception: " << to_utf8(e.what(), eFileEncoding::LATIN1);
+        LOG_WARNING << "[Arena] ipv6 socket exception: " << e.what();
     }
     if (v6 && !v6->is_open())
     {
@@ -342,7 +342,7 @@ void ArenaHost::handleRecv4(const boost::system::error_code& error, size_t bytes
 {
     if (error)
     {
-        LOG_WARNING << "[Arena] ipv4 socket exception: " << to_utf8(error.message(), eFileEncoding::LATIN1);
+        LOG_WARNING << "[Arena] ipv4 socket exception: " << error.message();
 
         /*
         if (v4)
@@ -379,7 +379,7 @@ void ArenaHost::handleRecv6(const boost::system::error_code& error, size_t bytes
 {
     if (error)
     {
-        LOG_WARNING << "[Arena] ipv6 socket exception: " << to_utf8(error.message(), eFileEncoding::LATIN1);
+        LOG_WARNING << "[Arena] ipv6 socket exception: " << error.message();
 
         /*
         if (v4)
