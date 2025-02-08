@@ -596,6 +596,8 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr
           lunaticvibes::GaugeHolder{getGauge(GaugeType::GROOVE, /*total*/ 0, /*note_count=*/0), _basic.health}}),
       _judgeDifficulty(difficulty)
 {
+    // LVF_ASSERT(getMaxScore() != 0); // This is assumed true but tests currently use it. TODO: add this.
+
     _graphAcc.fill({});
 
     static const NoteLaneTimerMap bombTimer5k[] = {

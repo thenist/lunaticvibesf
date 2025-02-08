@@ -7,8 +7,6 @@
 #include <common/u8.h>
 #include <common/utils.h>
 
-#include <re2/re2.h>
-
 #include <algorithm>
 #include <cctype>
 #include <exception>
@@ -280,8 +278,20 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 }
             }
 
-            static LazyRE2 regexNote{R"(#[\d]{3}[0-9A-Za-z]{2}:.*)"};
-            if (!RE2::FullMatch(re2::StringPiece(buf.data(), buf.length()), *regexNote))
+            static constexpr auto is09az = [](const char c) {
+                // std::isalnum can be affected by locale. We only need 0-9A-Za-z.
+                return std::isupper(c) || std::islower(c) || std::isdigit(c);
+            };
+
+            static constexpr auto is_note_cmd = [](std::string_view cmd) {
+                // (#[\d]{3}[0-9A-Za-z]{2}:.*)
+                if (cmd.size() <= std::string_view{"#000AA:"}.size())
+                    return false;
+                return cmd[0] == '#' && std::isdigit(cmd[1]) && std::isdigit(cmd[2]) && std::isdigit(cmd[3]) &&
+                       is09az(cmd[4]) && is09az(cmd[5]);
+            };
+
+            if (!is_note_cmd(buf))
             {
                 auto spacePos = std::min(buf.length(), buf.find_first_of(' '));
                 if (spacePos <= 1)
@@ -290,10 +300,13 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 StringContentView key = buf.substr(1, spacePos - 1);
                 StringContentView value = spacePos < buf.length() ? buf.substr(spacePos + 1) : "";
 
-                static LazyRE2 regexWav{R"((?i)WAV[0-9A-Za-z]{1,2})"};
-                static LazyRE2 regexBga{R"((?i)BMP[0-9A-Za-z]{1,2})"};
-                static LazyRE2 regexBpm{R"((?i)BPM[0-9A-Za-z]{1,2})"};
-                static LazyRE2 regexStop{R"((?i)STOP[0-9A-Za-z]{1,2})"};
+                auto matches_36_key = [](std::string_view xx, std::string_view key) {
+                    if (static constexpr auto idx_len = 2; key.length() != xx.length() + idx_len)
+                        return false;
+                    if (!lunaticvibes::iequals(key.substr(0, xx.length()), xx))
+                        return false;
+                    return is09az(key[key.length() - 1]) && is09az(key[key.length() - 2]);
+                };
 
                 if (key.empty())
                     continue;
@@ -390,14 +403,14 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 }
 
                 // #???xx
-                else if (RE2::FullMatch(re2::StringPiece(key.data(), key.length()), *regexWav))
+                else if (matches_36_key("wav", key))
                 {
                     int idx = base36(key[3], key[4]);
                     wavFiles[idx].assign(value.begin(), value.end());
                     if (!ifStack.empty())
                         resourceStable = false;
                 }
-                else if (RE2::FullMatch(re2::StringPiece(key.data(), key.length()), *regexBga))
+                else if (matches_36_key("bmp", key))
                 {
                     int idx = base36(key[3], key[4]);
                     if (idx != 0)
@@ -407,13 +420,13 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                             resourceStable = false;
                     }
                 }
-                else if (RE2::FullMatch(re2::StringPiece(key.data(), key.length()), *regexBpm))
+                else if (matches_36_key("bpm", key))
                 {
                     int idx = base36(key[3], key[4]);
                     if (idx != 0)
                         exBPM[idx] = toDouble(value);
                 }
-                else if (RE2::FullMatch(re2::StringPiece(key.data(), key.length()), *regexStop))
+                else if (matches_36_key("stop", key))
                 {
                     int idx = base36(key[4], key[5]);
                     if (idx != 0)
@@ -1059,7 +1072,7 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
         }
     }
 
-    LVF_DEBUG_ASSERT(false);
+    lunaticvibes::verify_failed("ChartFormatBMS::getLane");
     return emptyChannel;
 }
 
