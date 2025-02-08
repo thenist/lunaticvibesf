@@ -374,9 +374,12 @@ void SceneSelect::imguiSettings()
             }
         }
 
+#ifndef NDEBUG
+        // NOTE: only enabled in debug mode as it's not too useful and takes a lot of space.
         // If focus breaks, close and open escape screen to work-around.
         if (_imgui_show_demo_window)
             ImGui::ShowDemoWindow(&_imgui_show_demo_window);
+#endif // NDEBUG
 
         ImGui::End();
     }
@@ -1150,7 +1153,7 @@ void SceneSelect::imguiPageDebugMain()
 
     ImGui::Checkbox("Show ImGui demo window", &_imgui_show_demo_window);
     ImGui::SameLine();
-    HelpMarker("Showcase Dear ImGui's features");
+    HelpMarker("Showcase Dear ImGui's features (debug build only)");
 }
 
 void SceneSelect::imguiPageAbout()
