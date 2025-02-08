@@ -37,18 +37,8 @@ static size_t writeCb(void* contents, size_t size, size_t nmemb, void* userp)
     return realsize;
 }
 
-GetResult GET(const std::string& url, std::string& result)
+static GetResult GET(const std::string& url, std::string& result)
 {
-    std::string https, host, port, target;
-
-    static LazyRE2 regexURL{R"(http(s?)\:\/\/(.+?)(?:\:([\d]{1,5}))?(\/(?:.*)*))"};
-    if (!RE2::FullMatch(url, *regexURL, &https, &host, &port, &target))
-        return GetResult::ERR_RESOLVE;
-
-    if (port.empty())
-        port = https.empty() ? "80" : "443";
-    int iport = toInt(port);
-
     CURLcode code;
 
     struct CurlDeleter
@@ -97,13 +87,6 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_URL " << code;
-        return GetResult::ERR_SYSTEM;
-    }
-
-    code = curl_easy_setopt(conn, CURLOPT_PORT, iport);
-    if (code != CURLE_OK)
-    {
-        LOG_ERROR << "[TableBMS] CURLOPT_PORT " << code;
         return GetResult::ERR_SYSTEM;
     }
 
