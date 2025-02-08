@@ -9,6 +9,8 @@
 
 #include <re2/re2.h>
 
+#include <algorithm>
+#include <cctype>
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -20,7 +22,21 @@
 #include <string_view>
 #include <utility>
 
+namespace r = std::ranges;
+
 using lunaticvibes::parser_bms::JudgeDifficulty;
+
+[[nodiscard]] static unsigned char ascii_tolower(unsigned char c)
+{
+    if (c > 127) // UTF-8 or something
+        return c;
+    return std::tolower(c);
+};
+
+[[nodiscard]] static bool istrcontains(std::string_view lhs, std::string_view rhs)
+{
+    return r::contains_subrange(lhs, rhs, {}, ascii_tolower);
+}
 
 // https://hitkey.nekokan.dyndns.info/cmds.htm#RANK
 std::optional<JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(const int value)
@@ -611,29 +627,18 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     // implicit difficulty
     if (!hasDifficulty)
     {
-        static const LazyRE2 difficultyRegex[]{
-            {""},
-            {R"((?i)(easy|beginner|light))"},
-            {R"((?i)(normal|standard))"},
-            {R"((?i)(hard|hyper))"},
-            {R"((?i)(ex|another|insane|lunatic|maniac))"},
+        static const std::pair<std::string_view, int> difficulties[] = {
+            {"easy", 1},  {"beginner", 1}, {"light", 1},   {"normal", 2}, {"standard", 2}, {"hard", 3},
+            {"hyper", 3}, {"ex", 4},       {"another", 4}, {"insane", 4}, {"lunatic", 4},  {"maniac", 4},
         };
+
         difficulty = 2; // defaults to normal
-        for (int i = 4; i >= 1; --i)
+
+        for (auto [name, diff] : difficulties)
         {
-            if (RE2::PartialMatch(version, *difficultyRegex[i]))
+            if (istrcontains(title2, name) || istrcontains(title, name))
             {
-                difficulty = i;
-                break;
-            }
-            if (RE2::PartialMatch(title2, *difficultyRegex[i]))
-            {
-                difficulty = i;
-                break;
-            }
-            if (RE2::PartialMatch(title, *difficultyRegex[i]))
-            {
-                difficulty = i;
+                difficulty = diff;
                 break;
             }
         }

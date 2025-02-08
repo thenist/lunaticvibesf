@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <random>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -438,4 +439,25 @@ TEST(tBMS, ln)
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTELN1, 0, 4, 4, std::vector<int>{2, 3}));
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTELN2, 0, 4, 4, std::vector<int>{3}));
     EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTELN2, 0, 5, 4, std::vector<int>{0}));
+}
+
+TEST(tBMS, ImplicitDifficulty)
+{
+    auto get_difficulty = [](auto&& text) {
+        std::stringstream ss;
+        ss << text;
+        return ChartFormatBMS(ss, eFileEncoding::UTF8, 0).difficulty;
+    };
+
+    EXPECT_EQ(get_difficulty(""), 2);
+    EXPECT_EQ(get_difficulty("#DIFFICULTY 4"), 4);
+    EXPECT_EQ(get_difficulty("#DIFFICULTY 666"), 666); // ?
+    EXPECT_EQ(get_difficulty("#DIFFICULTY bogus"), 0); // ?
+    EXPECT_EQ(get_difficulty("#TITLE tesTeAsyTest"), 1);
+    EXPECT_EQ(get_difficulty("#TITLE testNormalTest"), 2);
+    EXPECT_EQ(get_difficulty("#TITLE testHARDtest"), 3);
+    EXPECT_EQ(get_difficulty("#TITLE testINSANEtest"), 4);
+    EXPECT_EQ(get_difficulty("#TITLE testINSANEtest\n#DIFFICULTY 1"), 1);
+    EXPECT_EQ(get_difficulty("#SUBTITLE testINSANEtest"), 4);
+    EXPECT_EQ(get_difficulty("#TITLE test [InSaNe]"), 4);
 }
