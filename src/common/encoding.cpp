@@ -135,17 +135,7 @@ static bool is_utf8(const std::string_view str)
     return true;
 }
 
-eFileEncoding getFileEncoding(const Path& path)
-{
-    std::ifstream fs(path);
-    if (fs.fail())
-    {
-        return eFileEncoding::LATIN1;
-    }
-    return getFileEncoding(fs);
-}
-
-eFileEncoding getFileEncoding(std::istream& is)
+eFileEncoding lunaticvibes::getFileEncoding(std::istream& is)
 {
     std::streampos oldPos = is.tellg();
 
@@ -186,7 +176,7 @@ eFileEncoding getFileEncoding(std::istream& is)
     return enc;
 }
 
-const char* getFileEncodingName(eFileEncoding enc)
+const char* lunaticvibes::getFileEncodingName(eFileEncoding enc)
 {
     switch (enc)
     {
@@ -197,13 +187,6 @@ const char* getFileEncodingName(eFileEncoding enc)
     case eFileEncoding::UTF32: return "UTF-32";
     }
     lunaticvibes::assert_failed("getFileEncodingName");
-}
-
-std::string to_utf8(const std::string& input, eFileEncoding fromEncoding)
-{
-    std::string out;
-    lunaticvibes::to_utf8(input, fromEncoding, out);
-    return out;
 }
 
 #ifdef _WIN32
@@ -250,13 +233,6 @@ static void convert(const std::string& input, eFileEncoding fromEncoding, eFileE
 void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& out)
 {
     convert(input, fromEncoding, eFileEncoding::UTF8, out);
-}
-
-std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
-{
-    std::string out;
-    convert(input, eFileEncoding::UTF8, toEncoding, out);
-    return out;
 }
 
 void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)
@@ -393,16 +369,6 @@ void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding,
         buf.assign(input);
     else
         convert(input, fromEncoding, toEncoding, buf);
-}
-
-std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
-{
-    auto fromEncoding = eFileEncoding::UTF8;
-    if (fromEncoding == toEncoding)
-        return input;
-    std::string buf;
-    convert(input, fromEncoding, toEncoding, buf);
-    return buf;
 }
 
 void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)

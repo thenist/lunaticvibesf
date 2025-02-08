@@ -8,6 +8,13 @@
 
 TEST(Encoding, CanDetermineFileEncoding)
 {
+    auto getFileEncoding = [](const Path& path) -> eFileEncoding {
+        std::ifstream fs(path);
+        if (fs.fail())
+            return eFileEncoding::LATIN1;
+        return lunaticvibes::getFileEncoding(fs);
+    };
+
     EXPECT_EQ(getFileEncoding(u8"encoding/euc_kr.txt"_p), eFileEncoding::EUC_KR);
     EXPECT_EQ(getFileEncoding(u8"encoding/sjis.txt"_p), eFileEncoding::SHIFT_JIS);
     EXPECT_EQ(getFileEncoding(u8"encoding/utf8.txt"_p), eFileEncoding::UTF8);
@@ -24,5 +31,10 @@ TEST(Encoding, CanOpenUtf8FilePath)
 
 TEST(Encoding, Utf8ToUtf32)
 {
+    auto utf8_to_utf32 = [](const std::string& str) {
+        std::u32string out;
+        lunaticvibes::utf8_to_utf32(str, out);
+        return out;
+    };
     EXPECT_EQ(utf8_to_utf32("aA\nあ"), U"aA\nあ");
 }

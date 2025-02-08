@@ -59,10 +59,11 @@ void SoundSetLR2::loadCSV(Path p)
     std::vector<StringContent> tokenBuf;
     tokenBuf.reserve(32);
 
-    for (std::string raw; std::getline(csvFile, raw);)
+    for (std::string rawUTF8, raw_; std::getline(csvFile, raw_);)
     {
         ++csvLineNumber;
-        std::string rawUTF8 = to_utf8(raw, encoding);
+        to_utf8(raw_, encoding, rawUTF8);
+        lunaticvibes::trim_in_place(rawUTF8);
         lunaticvibes::split(rawUTF8, ',', tokenBuf);
         parseHeader(tokenBuf);
     }
@@ -93,10 +94,11 @@ void SoundSetLR2::loadCSV(Path p)
     csvFile.clear();
     csvFile.seekg(0);
     csvLineNumber = 0;
-    for (std::string raw; std::getline(csvFile, raw);)
+    for (std::string rawUTF8, raw_; std::getline(csvFile, raw_);)
     {
         ++csvLineNumber;
-        std::string rawUTF8 = lunaticvibes::trim(to_utf8(raw, encoding));
+        to_utf8(raw_, encoding, rawUTF8);
+        lunaticvibes::trim_in_place(rawUTF8);
         lunaticvibes::split(rawUTF8, ',', tokenBuf);
         parseBody(tokenBuf);
     }

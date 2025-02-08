@@ -33,8 +33,12 @@ static std::stringstream readIntoUtf8StringStream(const Path& filePath)
     auto ss = readFileIntoStringStream(filePath);
     auto encoding = getFileEncoding(ss);
     std::stringstream ssUTF8;
-    for (std::string lineBuf; std::getline(ss, lineBuf);)
-        ssUTF8 << lunaticvibes::trim(to_utf8(lineBuf, encoding));
+    for (std::string rawUTF8, raw_; std::getline(ss, raw_);)
+    {
+        to_utf8(raw_, encoding, rawUTF8);
+        lunaticvibes::trim_in_place(rawUTF8);
+        ssUTF8 << rawUTF8;
+    }
     return ssUTF8;
 }
 
