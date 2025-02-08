@@ -19,6 +19,7 @@
 #include <optional>
 #include <random>
 #include <set>
+#include <sstream>
 #include <string_view>
 #include <utility>
 
@@ -68,6 +69,12 @@ ChartFormatBMS::ChartFormatBMS(const Path& filePath, uint64_t randomSeed) : Char
     initWithFile(filePath, randomSeed);
 }
 
+ChartFormatBMS::ChartFormatBMS(std::stringstream& bmsFile, eFileEncoding encoding, uint64_t randomSeed)
+    : ChartFormatBMS()
+{
+    initWithText(bmsFile, encoding, randomSeed);
+}
+
 int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 {
     using err = ErrorCode;
@@ -100,9 +107,14 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     LOG_DEBUG << "[BMS] File (" << getFileEncodingName(encoding) << "): " << absolutePath;
 
     if (lunaticvibes::iequals(lunaticvibes::s(filePath.extension().u8string()), ".pms"))
-    {
         isPMS = true;
-    }
+
+    return initWithText(bmsFile, encoding, randomSeed);
+}
+
+int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encoding, uint64_t randomSeed)
+{
+    using err = ErrorCode;
 
     // 拉面早就看出bms有多难读，直接鸽了我5年
 

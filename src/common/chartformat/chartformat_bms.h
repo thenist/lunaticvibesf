@@ -1,13 +1,16 @@
 #pragma once
 
+#include "chartformat.h"
+
 #include <array>
 #include <list>
 #include <map>
 #include <optional>
 #include <set>
 
-#include "chartformat.h"
-#include "common/types.h"
+#include <common/encoding.h>
+#include <common/types.h>
+#include <sstream>
 
 namespace bms
 {
@@ -15,8 +18,8 @@ const unsigned MAXSAMPLEIDX = 36 * 36;
 const unsigned MAXBARIDX = 999;
 enum class ErrorCode
 {
-    OK = 0,
-    FILE_ERROR = 1,
+    OK,
+    FILE_ERROR,
     ALREADY_INITIALIZED,
     VALUE_ERROR,
     TYPE_MISMATCH,
@@ -118,10 +121,12 @@ class ChartFormatBMS : public ChartFormatBMSMeta
 public:
     ChartFormatBMS();
     ChartFormatBMS(const Path& absolutePath, uint64_t randomSeed = 0);
+    ChartFormatBMS(std::stringstream& bmsFile, eFileEncoding encoding, uint64_t randomSeed);
     ~ChartFormatBMS() override = default;
 
-protected:
+private:
     int initWithFile(const Path& absolutePath, uint64_t randomSeed = 0);
+    int initWithText(std::stringstream& bmsFile, eFileEncoding encoding, uint64_t randomSeed);
 
 protected:
     ErrorCode errorCode = ErrorCode::OK;
