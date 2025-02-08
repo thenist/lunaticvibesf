@@ -4,10 +4,9 @@
 #include <sstream>
 
 #include <common/meta.h>
+#include <common/str_utils.h>
 #include <common/u8.h>
 #include <common/utils.h>
-
-#include <re2/re2.h>
 
 std::vector<i18n> i18n::languages;
 size_t i18n::currentLanguage = 0;
@@ -33,9 +32,7 @@ i18n::i18n(const Path& translationFile)
         if (i >= i18n_TEXT_COUNT)
             break;
 
-        static const RE2 regexIn{"\\\\n"};
-        static const re2::StringPiece regexOut{"\n"};
-        RE2::GlobalReplace(&line, regexIn, regexOut);
+        lunaticvibes::replace_all(line, "\\\\n", "\n");
 
         text[i] = line;
         i++;
