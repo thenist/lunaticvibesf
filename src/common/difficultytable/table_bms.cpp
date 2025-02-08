@@ -375,6 +375,7 @@ void DifficultyTableBMS::parseHeader(const std::string& content)
         tao::json::value header = tao::json::from_string(bodyview);
         name = header["name"].optional<std::string>().value_or("");
         symbol = header["symbol"].optional<std::string>().value_or("");
+        // FIXME: relative to the header, not server root. Try Notepara Combined table.
         data_url = header["data_url"].optional<std::string>().value_or("");
 
         try
