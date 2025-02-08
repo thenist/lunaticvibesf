@@ -714,18 +714,14 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     if (haveNote)
     {
         for (unsigned bar = 0; bar <= lastBarIdx; bar++)
-        {
             notes_scratch += chNotesRegular[0][bar].notes.size() + chNotesRegular[10][bar].notes.size();
-        }
 
         for (unsigned lane = 0; lane < chNotesRegular.size(); ++lane)
         {
             if (lane == 0 || lane == 10)
                 continue;
             for (const auto& [barIdx, ch] : chNotesRegular[lane])
-            {
                 notes_key += ch.notes.size();
-            }
         }
         notes_total += notes_scratch + notes_key;
     }
@@ -733,9 +729,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     if (haveLN)
     {
         for (unsigned bar = 0; bar <= lastBarIdx; bar++)
-        {
             notes_scratch_ln += chNotesLN[0][bar].notes.size() + chNotesLN[10][bar].notes.size();
-        }
         notes_scratch_ln /= 2;
 
         for (unsigned lane = 0; lane < chNotesLN.size(); ++lane)
@@ -743,25 +737,16 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
             if (lane == 0 || lane == 10)
                 continue;
             for (const auto& [barIdx, ch] : chNotesLN[lane])
-            {
                 notes_key_ln += ch.notes.size();
-            }
         }
         notes_key_ln /= 2;
 
         notes_total += notes_scratch_ln + notes_key_ln;
     }
 
-    if (haveMine)
-    {
-        for (const auto& [chIdx, chLane] : chMines)
-        {
-            for (const auto& [barIdx, ch] : chLane)
-            {
-                notes_mine += ch.notes.size();
-            }
-        }
-    }
+    for (const auto& [chIdx, chLane] : chMines)
+        for (const auto& [barIdx, ch] : chLane)
+            notes_mine += ch.notes.size();
 
     minBPM = bpm;
     maxBPM = bpm;
@@ -852,13 +837,9 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     {
         player = (have67_2 || haveAny_2) ? 3 : 1;
         if (have67 || have67_2)
-        {
             gamemode = (player == 1 ? 7 : 14);
-        }
         else
-        {
             gamemode = (player == 1 ? 5 : 10);
-        }
     }
 
     fileHash = md5file(absolutePath);
