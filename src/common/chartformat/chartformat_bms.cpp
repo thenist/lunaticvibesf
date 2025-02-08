@@ -63,11 +63,8 @@ ChartFormatBMS::ChartFormatBMS() : ChartFormatBMSMeta()
     metres.resize(MAXBARIDX + 1);
 }
 
-ChartFormatBMS::ChartFormatBMS(const Path& filePath, uint64_t randomSeed) : ChartFormatBMSMeta()
+ChartFormatBMS::ChartFormatBMS(const Path& filePath, uint64_t randomSeed) : ChartFormatBMS()
 {
-    wavFiles.resize(MAXSAMPLEIDX + 1);
-    bgaFiles.resize(MAXSAMPLEIDX + 1);
-    metres.resize(MAXBARIDX + 1);
     initWithFile(filePath, randomSeed);
 }
 
