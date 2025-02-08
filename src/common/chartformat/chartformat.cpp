@@ -1,5 +1,6 @@
 #include "chartformat.h"
 
+#include <algorithm>
 #include <fstream>
 #include <string>
 #include <utility>
@@ -9,6 +10,8 @@
 #include <common/log.h>
 #include <common/u8.h>
 #include <common/utils.h>
+
+namespace r = std::ranges;
 
 eChartFormat analyzeChartType(const Path& p)
 {
@@ -122,7 +125,7 @@ try
         }
         out.emplace_back(lunaticvibes::u8str(file.filename()), std::move(utf8_text));
     }
-    std::sort(out.begin(), out.end(), [](const Pair& lhs, const Pair& rhs) { return lhs.first < rhs.first; });
+    r::sort(out, {}, &Pair::first);
     return out;
 }
 catch (const fs::filesystem_error& e)
