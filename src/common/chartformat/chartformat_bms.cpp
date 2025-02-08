@@ -3,6 +3,7 @@
 #include <common/assert.h>
 #include <common/encoding.h>
 #include <common/log.h>
+#include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
 
@@ -16,6 +17,7 @@
 #include <optional>
 #include <random>
 #include <set>
+#include <string_view>
 #include <utility>
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
@@ -588,19 +590,21 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     // implicit subtitle
     if (title2.empty())
     {
-        static const LazyRE2 subTitleRegex[]{
-            {R"((.+?) *(-.*?-))"},   {R"((.+?) *(〜.*?〜))"}, {R"((.+?) *(\(.*?\)))"},
-            {R"((.+?) *(\[.*?\]))"}, {R"((.+?) *(<.*?>))"},
+        static constexpr std::pair<std::string_view, std::string_view> subtitle_delims[] = {
+            {"-", "-"}, {"~", "~"}, {"(", ")"}, {"[", "]"}, {"<", ">"}, {"〜", "〜"},
+            // Not sure if 〜 is needed. If not, this can also be converted to pair<char,char>.
         };
-        for (auto& reg : subTitleRegex)
+        for (auto [ld, rd] : subtitle_delims)
         {
-            std::string title1, title2;
-            if (RE2::FullMatch(title, *reg, &title1, &title2))
-            {
-                this->title = title1;
-                this->title2 = title2;
-                break;
-            }
+            auto l = title.find(ld);
+            if (l == StringContent::npos)
+                continue;
+            auto r = title.find(rd, l + 1);
+            if (r == StringContent::npos || r + 1 != title.size())
+                continue;
+            auto v = std::string_view{title};
+            title2 = v.substr(l, r);
+            title = v.substr(0, l);
         }
     }
 
