@@ -29,14 +29,80 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
 
     state = eCourseResultState::DRAW;
 
-    std::map<std::string, int> param;
-
     struct Params
     {
         Option::e_rank_type db_rank = Option::e_rank_type::RANK_NONE;
         Option::e_rank_type p1_rank = Option::e_rank_type::RANK_NONE;
         Option::e_rank_type p2_rank = Option::e_rank_type::RANK_NONE;
-    } param_new;
+
+        int p1target = 0;
+        int p1exscore = 0;
+        int p1maxcombo = 0;
+        int p1bp = 0;
+        int p1pg = 0;
+        int p1gr = 0;
+        int p1gd = 0;
+        int p1bd = 0;
+        int p1pr = 0;
+        int p1bpoor = 0;
+        int p1cb = 0;
+        int p1fast = 0;
+        int p1slow = 0;
+        int p1rate = 0;
+        int p1rated2 = 0;
+
+        int p2target = 0;
+        int p2exscore = 0;
+        int p2maxcombo = 0;
+        int p2bp = 0;
+        int p2pg = 0;
+        int p2gr = 0;
+        int p2gd = 0;
+        int p2bd = 0;
+        int p2pr = 0;
+        int p2bpoor = 0;
+        int p2cb = 0;
+        int p2fast = 0;
+        int p2slow = 0;
+        int p2rate = 0;
+        int p2rated2 = 0;
+
+        int dbexscore = 0;
+        int dbexscorediff = 0;
+        int newexscore = 0;
+        int newexscorediff = 0;
+        int dbmaxcombo = 0;
+        int newmaxcombo = 0;
+        int newmaxcombodiff = 0;
+        int dbbp = 0;
+        int newbp = 0;
+        int newbpdiff = 0;
+        int dbrate = 0;
+        int dbrated2 = 0;
+
+        int updatedscore = 0;
+        int updatedmaxcombo = 0;
+        int updatedbp = 0;
+
+        int min = 0;
+        int sec = 0;
+        int remainmin = 0;
+        int remainsec = 0;
+
+        int p1pgrate = 0;
+        int p1grrate = 0;
+        int p1gdrate = 0;
+        int p1bdrate = 0;
+        int p1prrate = 0;
+
+        int p2pgrate = 0;
+        int p2grrate = 0;
+        int p2gdrate = 0;
+        int p2bdrate = 0;
+        int p2prrate = 0;
+
+        int winlose = 0;
+    } params;
 
     if (!gPlayContext.courseStageRulesetCopy[0].empty())
     {
@@ -72,29 +138,29 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
         }
 
         // set options
-        param_new.p1_rank = Option::getRankType(acc);
-        param["1ptarget"] = summary[ARG_EXSCORE];
-        param["1pexscore"] = summary[ARG_EXSCORE];
-        param["1pmaxcombo"] = summary[ARG_MAXCOMBO];
-        param["1pbp"] = summary[ARG_BP];
-        param["1ppg"] = summary[ARG_JUDGE_0];
-        param["1pgr"] = summary[ARG_JUDGE_1];
-        param["1pgd"] = summary[ARG_JUDGE_2];
-        param["1pbd"] = summary[ARG_JUDGE_3];
-        param["1ppr"] = summary[ARG_JUDGE_4] + summary[ARG_JUDGE_5];
-        param["1pcb"] = summary[ARG_CB];
-        param["1pfast"] = summary[ARG_FAST];
-        param["1pslow"] = summary[ARG_SLOW];
-        param["1prate"] = (int)acc;
-        param["1prated2"] = (int)(acc * 100.0) % 100;
+        params.p1_rank = Option::getRankType(acc);
+        params.p1target = summary[ARG_EXSCORE];
+        params.p1exscore = summary[ARG_EXSCORE];
+        params.p1maxcombo = summary[ARG_MAXCOMBO];
+        params.p1bp = summary[ARG_BP];
+        params.p1pg = summary[ARG_JUDGE_0];
+        params.p1gr = summary[ARG_JUDGE_1];
+        params.p1gd = summary[ARG_JUDGE_2];
+        params.p1bd = summary[ARG_JUDGE_3];
+        params.p1pr = summary[ARG_JUDGE_4] + summary[ARG_JUDGE_5];
+        params.p1cb = summary[ARG_CB];
+        params.p1fast = summary[ARG_FAST];
+        params.p1slow = summary[ARG_SLOW];
+        params.p1rate = (int)acc;
+        params.p1rated2 = (int)(acc * 100.0) % 100;
 
         if (summary[ARG_TOTAL_NOTES] > 0)
         {
-            param["1ppgrate"] = int(100 * param["1ppg"] / summary[ARG_TOTAL_NOTES]);
-            param["1pgrrate"] = int(100 * param["1pgr"] / summary[ARG_TOTAL_NOTES]);
-            param["1pgdrate"] = int(100 * param["1pgd"] / summary[ARG_TOTAL_NOTES]);
-            param["1pbdrate"] = int(100 * param["1pbd"] / summary[ARG_TOTAL_NOTES]);
-            param["1pprrate"] = int(100 * param["1ppr"] / summary[ARG_TOTAL_NOTES]);
+            params.p1pgrate = int(100 * params.p1pg / summary[ARG_TOTAL_NOTES]);
+            params.p1grrate = int(100 * params.p1gr / summary[ARG_TOTAL_NOTES]);
+            params.p1gdrate = int(100 * params.p1gd / summary[ARG_TOTAL_NOTES]);
+            params.p1bdrate = int(100 * params.p1bd / summary[ARG_TOTAL_NOTES]);
+            params.p1prrate = int(100 * params.p1pr / summary[ARG_TOTAL_NOTES]);
         }
 
         if (gPlayContext.isBattle && !gPlayContext.courseStageRulesetCopy[1].empty())
@@ -133,136 +199,136 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
                 }
             }
 
-            param_new.p2_rank = Option::getRankType(acc2P);
-            param["2ptarget"] = summary2P[ARG_EXSCORE];
-            param["2pexscore"] = summary2P[ARG_EXSCORE];
-            param["2pmaxcombo"] = summary2P[ARG_MAXCOMBO];
-            param["2pbp"] = summary2P[ARG_BP];
-            param["2ppg"] = summary2P[ARG_JUDGE_0];
-            param["2pgr"] = summary2P[ARG_JUDGE_1];
-            param["2pgd"] = summary2P[ARG_JUDGE_2];
-            param["2pbd"] = summary2P[ARG_JUDGE_3];
-            param["2ppr"] = summary2P[ARG_JUDGE_4] + summary2P[ARG_JUDGE_5];
-            param["2pcb"] = summary2P[ARG_CB];
-            param["2pfast"] = summary2P[ARG_FAST];
-            param["2pslow"] = summary2P[ARG_SLOW];
-            param["2prate"] = (int)acc2P;
-            param["2prated2"] = (int)(acc2P * 100.0) % 100;
+            params.p2_rank = Option::getRankType(acc2P);
+            params.p2target = summary2P[ARG_EXSCORE];
+            params.p2exscore = summary2P[ARG_EXSCORE];
+            params.p2maxcombo = summary2P[ARG_MAXCOMBO];
+            params.p2bp = summary2P[ARG_BP];
+            params.p2pg = summary2P[ARG_JUDGE_0];
+            params.p2gr = summary2P[ARG_JUDGE_1];
+            params.p2gd = summary2P[ARG_JUDGE_2];
+            params.p2bd = summary2P[ARG_JUDGE_3];
+            params.p2pr = summary2P[ARG_JUDGE_4] + summary2P[ARG_JUDGE_5];
+            params.p2cb = summary2P[ARG_CB];
+            params.p2fast = summary2P[ARG_FAST];
+            params.p2slow = summary2P[ARG_SLOW];
+            params.p2rate = (int)acc2P;
+            params.p2rated2 = (int)(acc2P * 100.0) % 100;
 
             if (summary2P[ARG_TOTAL_NOTES] > 0)
             {
-                param["2ppgrate"] = int(100 * param["2ppg"] / summary2P[ARG_TOTAL_NOTES]);
-                param["2pgrrate"] = int(100 * param["2pgr"] / summary2P[ARG_TOTAL_NOTES]);
-                param["2pgdrate"] = int(100 * param["2pgd"] / summary2P[ARG_TOTAL_NOTES]);
-                param["2pbdrate"] = int(100 * param["2pbd"] / summary2P[ARG_TOTAL_NOTES]);
-                param["2pprrate"] = int(100 * param["2ppr"] / summary2P[ARG_TOTAL_NOTES]);
+                params.p2pgrate = int(100 * params.p2pg / summary2P[ARG_TOTAL_NOTES]);
+                params.p2grrate = int(100 * params.p2gr / summary2P[ARG_TOTAL_NOTES]);
+                params.p2gdrate = int(100 * params.p2gd / summary2P[ARG_TOTAL_NOTES]);
+                params.p2bdrate = int(100 * params.p2bd / summary2P[ARG_TOTAL_NOTES]);
+                params.p2prrate = int(100 * params.p2pr / summary2P[ARG_TOTAL_NOTES]);
             }
 
-            param["1ptarget"] = summary[ARG_EXSCORE] - summary2P[ARG_EXSCORE];
-            param["winlose"] = (param["1ptarget"] > 0) ? 1 : (param["1ptarget"] < 0) ? 2 : 0;
+            params.p1target = summary[ARG_EXSCORE] - summary2P[ARG_EXSCORE];
+            params.winlose = (params.p1target > 0) ? 1 : (params.p1target < 0) ? 2 : 0;
         }
 
         // compare to db record
         auto pScore = g_pScoreDB->getCourseScoreBMS(gPlayContext.courseHash);
         if (pScore)
         {
-            param["dbexscore"] = pScore->exscore;
-            param["dbexscorediff"] = param["1pexscore"] - pScore->exscore;
-            param["newexscore"] = param["1pexscore"];
-            param["newexscorediff"] = param["newexscore"] - pScore->exscore;
-            param["dbmaxcombo"] = (int)pScore->maxcombo;
-            param["newmaxcombo"] = param["1pmaxcombo"];
-            param["newmaxcombodiff"] = param["newmaxcombo"] - pScore->maxcombo;
-            param["dbbp"] = pScore->bp;
-            param["newbp"] = param["1pbp"];
-            param["newbpdiff"] = param["newbp"] - pScore->bp;
-            param["dbrate"] = (int)(pScore->rate);
-            param["dbrated2"] = (int)(pScore->rate * 100.0) % 100;
-            param_new.db_rank = Option::getRankType(pScore->rate);
+            params.dbexscore = pScore->exscore;
+            params.dbexscorediff = params.p1exscore - pScore->exscore;
+            params.newexscore = params.p1exscore;
+            params.newexscorediff = params.newexscore - pScore->exscore;
+            params.dbmaxcombo = (int)pScore->maxcombo;
+            params.newmaxcombo = params.p1maxcombo;
+            params.newmaxcombodiff = params.newmaxcombo - pScore->maxcombo;
+            params.dbbp = pScore->bp;
+            params.newbp = params.p1bp;
+            params.newbpdiff = params.newbp - pScore->bp;
+            params.dbrate = (int)(pScore->rate);
+            params.dbrated2 = (int)(pScore->rate * 100.0) % 100;
+            params.db_rank = Option::getRankType(pScore->rate);
 
-            param["updatedscore"] = pScore->exscore < param["1pexscore"];
-            param["updatedmaxcombo"] = pScore->maxcombo < param["1pmaxcombo"];
-            param["updatedbp"] = pScore->bp < param["1pbp"];
+            params.updatedscore = pScore->exscore < params.p1exscore;
+            params.updatedmaxcombo = pScore->maxcombo < params.p1maxcombo;
+            params.updatedbp = pScore->bp < params.p1bp;
         }
         else
         {
-            param["dbexscorediff"] = param["1pexscore"];
-            param["newexscore"] = param["1pmaxcombo"];
-            param["newexscorediff"] = param["newexscore"];
-            param["newmaxcombo"] = param["1pmaxcombo"];
-            param["newmaxcombodiff"] = param["newmaxcombo"];
-            param["newbp"] = param["1pbp"];
-            param["newbpdiff"] = param["newbp"];
-            param["updatedscore"] = true;
-            param["updatedmaxcombo"] = true;
-            param["updatedbp"] = true;
+            params.dbexscorediff = params.p1exscore;
+            params.newexscore = params.p1maxcombo;
+            params.newexscorediff = params.newexscore;
+            params.newmaxcombo = params.p1maxcombo;
+            params.newmaxcombodiff = params.newmaxcombo;
+            params.newbp = params.p1bp;
+            params.newbpdiff = params.newbp;
+            params.updatedscore = true;
+            params.updatedmaxcombo = true;
+            params.updatedbp = true;
         }
     }
 
     // save
     {
-        State::set(IndexOption::RESULT_RANK_1P, param_new.p1_rank);
-        State::set(IndexOption::RESULT_RANK_2P, param_new.p2_rank);
-        State::set(IndexNumber::PLAY_1P_EXSCORE_DIFF, param["1ptarget"]);
-        State::set(IndexNumber::PLAY_2P_EXSCORE_DIFF, param["2ptarget"]);
-        State::set(IndexOption::RESULT_BATTLE_WIN_LOSE, param["winlose"]);
+        State::set(IndexOption::RESULT_RANK_1P, params.p1_rank);
+        State::set(IndexOption::RESULT_RANK_2P, params.p2_rank);
+        State::set(IndexNumber::PLAY_1P_EXSCORE_DIFF, params.p1target);
+        State::set(IndexNumber::PLAY_2P_EXSCORE_DIFF, params.p2target);
+        State::set(IndexOption::RESULT_BATTLE_WIN_LOSE, params.winlose);
 
-        State::set(IndexNumber::PLAY_1P_EXSCORE, param["1pexscore"]);
-        State::set(IndexNumber::PLAY_1P_PERFECT, param["1ppg"]);
-        State::set(IndexNumber::PLAY_1P_GREAT, param["1pgr"]);
-        State::set(IndexNumber::PLAY_1P_GOOD, param["1pgd"]);
-        State::set(IndexNumber::PLAY_1P_BAD, param["1pbd"]);
-        State::set(IndexNumber::PLAY_1P_POOR, param["1ppr"]);
-        State::set(IndexNumber::PLAY_1P_BPOOR, param["1pbpoor"]);
-        State::set(IndexNumber::PLAY_1P_COMBOBREAK, param["1pcb"]);
-        State::set(IndexNumber::PLAY_1P_BP, param["1pbp"]);
-        State::set(IndexNumber::PLAY_1P_FAST_COUNT, param["1pfast"]);
-        State::set(IndexNumber::PLAY_1P_SLOW_COUNT, param["1pslow"]);
-        State::set(IndexNumber::PLAY_1P_RATE, param["1prate"]);
-        State::set(IndexNumber::PLAY_1P_RATEDECIMAL, param["1prated2"]);
+        State::set(IndexNumber::PLAY_1P_EXSCORE, params.p1exscore);
+        State::set(IndexNumber::PLAY_1P_PERFECT, params.p1pg);
+        State::set(IndexNumber::PLAY_1P_GREAT, params.p1gr);
+        State::set(IndexNumber::PLAY_1P_GOOD, params.p1gd);
+        State::set(IndexNumber::PLAY_1P_BAD, params.p1bd);
+        State::set(IndexNumber::PLAY_1P_POOR, params.p1pr);
+        State::set(IndexNumber::PLAY_1P_BPOOR, params.p1bpoor);
+        State::set(IndexNumber::PLAY_1P_COMBOBREAK, params.p1cb);
+        State::set(IndexNumber::PLAY_1P_BP, params.p1bp);
+        State::set(IndexNumber::PLAY_1P_FAST_COUNT, params.p1fast);
+        State::set(IndexNumber::PLAY_1P_SLOW_COUNT, params.p1slow);
+        State::set(IndexNumber::PLAY_1P_RATE, params.p1rate);
+        State::set(IndexNumber::PLAY_1P_RATEDECIMAL, params.p1rated2);
 
-        State::set(IndexNumber::PLAY_2P_EXSCORE, param["2pexscore"]);
-        State::set(IndexNumber::PLAY_2P_PERFECT, param["2ppg"]);
-        State::set(IndexNumber::PLAY_2P_GREAT, param["2pgr"]);
-        State::set(IndexNumber::PLAY_2P_GOOD, param["2pgd"]);
-        State::set(IndexNumber::PLAY_2P_BAD, param["2pbd"]);
-        State::set(IndexNumber::PLAY_2P_POOR, param["2ppr"]);
-        State::set(IndexNumber::PLAY_2P_BPOOR, param["2pbpoor"]);
-        State::set(IndexNumber::PLAY_2P_COMBOBREAK, param["2pcb"]);
-        State::set(IndexNumber::PLAY_2P_BP, param["2pbp"]);
-        State::set(IndexNumber::PLAY_2P_FAST_COUNT, param["2pfast"]);
-        State::set(IndexNumber::PLAY_2P_SLOW_COUNT, param["2pslow"]);
-        State::set(IndexNumber::PLAY_2P_RATE, param["2prate"]);
-        State::set(IndexNumber::PLAY_2P_RATEDECIMAL, param["2prated2"]);
+        State::set(IndexNumber::PLAY_2P_EXSCORE, params.p2exscore);
+        State::set(IndexNumber::PLAY_2P_PERFECT, params.p2pg);
+        State::set(IndexNumber::PLAY_2P_GREAT, params.p2gr);
+        State::set(IndexNumber::PLAY_2P_GOOD, params.p2gd);
+        State::set(IndexNumber::PLAY_2P_BAD, params.p2bd);
+        State::set(IndexNumber::PLAY_2P_POOR, params.p2pr);
+        State::set(IndexNumber::PLAY_2P_BPOOR, params.p2bpoor);
+        State::set(IndexNumber::PLAY_2P_COMBOBREAK, params.p2cb);
+        State::set(IndexNumber::PLAY_2P_BP, params.p2bp);
+        State::set(IndexNumber::PLAY_2P_FAST_COUNT, params.p2fast);
+        State::set(IndexNumber::PLAY_2P_SLOW_COUNT, params.p2slow);
+        State::set(IndexNumber::PLAY_2P_RATE, params.p2rate);
+        State::set(IndexNumber::PLAY_2P_RATEDECIMAL, params.p2rated2);
 
-        State::set(IndexNumber::PLAY_MIN, param["min"]);
-        State::set(IndexNumber::PLAY_SEC, param["sec"]);
-        State::set(IndexNumber::PLAY_REMAIN_MIN, param["min"]);
-        State::set(IndexNumber::PLAY_REMAIN_SEC, param["sec"]);
+        State::set(IndexNumber::PLAY_MIN, params.min);
+        State::set(IndexNumber::PLAY_SEC, params.sec);
+        State::set(IndexNumber::PLAY_REMAIN_MIN, params.min);
+        State::set(IndexNumber::PLAY_REMAIN_SEC, params.sec);
 
-        State::set(IndexNumber::RESULT_RECORD_EX_BEFORE, param["dbexscore"]);
-        State::set(IndexNumber::RESULT_RECORD_EX_NOW, param["newexscore"]);
-        State::set(IndexNumber::RESULT_RECORD_EX_DIFF, param["newexscorediff"]);
-        State::set(IndexNumber::RESULT_RECORD_MAXCOMBO_BEFORE, param["dbmaxcombo"]);
-        State::set(IndexNumber::RESULT_RECORD_MAXCOMBO_NOW, param["newmaxcombo"]);
-        State::set(IndexNumber::RESULT_RECORD_MAXCOMBO_DIFF, param["newmaxombodiff"]);
-        State::set(IndexNumber::RESULT_RECORD_BP_BEFORE, param["dbbp"]);
-        State::set(IndexNumber::RESULT_RECORD_BP_NOW, param["1pbp"]);
-        State::set(IndexNumber::RESULT_RECORD_BP_DIFF, param["newbpdiff"]);
-        State::set(IndexNumber::RESULT_RECORD_MYBEST_RATE, param["dbrate"]);
-        State::set(IndexNumber::RESULT_RECORD_MYBEST_RATE_DECIMAL2, param["dbrated2"]);
+        State::set(IndexNumber::RESULT_RECORD_EX_BEFORE, params.dbexscore);
+        State::set(IndexNumber::RESULT_RECORD_EX_NOW, params.newexscore);
+        State::set(IndexNumber::RESULT_RECORD_EX_DIFF, params.newexscorediff);
+        State::set(IndexNumber::RESULT_RECORD_MAXCOMBO_BEFORE, params.dbmaxcombo);
+        State::set(IndexNumber::RESULT_RECORD_MAXCOMBO_NOW, params.newmaxcombo);
+        State::set(IndexNumber::RESULT_RECORD_MAXCOMBO_DIFF, params.newmaxcombodiff);
+        State::set(IndexNumber::RESULT_RECORD_BP_BEFORE, params.dbbp);
+        State::set(IndexNumber::RESULT_RECORD_BP_NOW, params.p1bp);
+        State::set(IndexNumber::RESULT_RECORD_BP_DIFF, params.newbpdiff);
+        State::set(IndexNumber::RESULT_RECORD_MYBEST_RATE, params.dbrate);
+        State::set(IndexNumber::RESULT_RECORD_MYBEST_RATE_DECIMAL2, params.dbrated2);
 
-        State::set(IndexNumber::RESULT_MYBEST_EX, param["dbexscore"]);
-        State::set(IndexNumber::RESULT_MYBEST_DIFF, param["dbexscorediff"]);
-        State::set(IndexNumber::RESULT_MYBEST_RATE, param["dbrate"]);
-        State::set(IndexNumber::RESULT_MYBEST_RATE_DECIMAL2, param["dbrated2"]);
+        State::set(IndexNumber::RESULT_MYBEST_EX, params.dbexscore);
+        State::set(IndexNumber::RESULT_MYBEST_DIFF, params.dbexscorediff);
+        State::set(IndexNumber::RESULT_MYBEST_RATE, params.dbrate);
+        State::set(IndexNumber::RESULT_MYBEST_RATE_DECIMAL2, params.dbrated2);
 
-        State::set(IndexOption::RESULT_MYBEST_RANK, param_new.p1_rank);
-        State::set(IndexOption::RESULT_UPDATED_RANK, param_new.p2_rank);
+        State::set(IndexOption::RESULT_MYBEST_RANK, params.p1_rank);
+        State::set(IndexOption::RESULT_UPDATED_RANK, params.p2_rank);
 
-        State::set(IndexSwitch::RESULT_UPDATED_SCORE, param["updatedscore"]);
-        State::set(IndexSwitch::RESULT_UPDATED_MAXCOMBO, param["updatedmaxcombo"]);
-        State::set(IndexSwitch::RESULT_UPDATED_BP, param["updatedbp"]);
+        State::set(IndexSwitch::RESULT_UPDATED_SCORE, params.updatedscore);
+        State::set(IndexSwitch::RESULT_UPDATED_MAXCOMBO, params.updatedmaxcombo);
+        State::set(IndexSwitch::RESULT_UPDATED_BP, params.updatedbp);
     }
 
     _input.register_p("SCENE_PRESS", std::bind_front(&SceneCourseResult::inputGamePress, this));
