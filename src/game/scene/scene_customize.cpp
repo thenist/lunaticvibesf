@@ -16,9 +16,16 @@
 #include <algorithm>
 #include <fstream>
 #include <string_view>
+#include <type_traits>
 #include <utility>
+#include <variant>
 
 namespace r = std::ranges;
+
+template <class... Ts> struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
 
 static void loadPreviewChartIfNeeded(SkinType mode)
 {
@@ -90,19 +97,19 @@ static void loadPreviewChartIfNeeded(SkinType mode)
     return out;
 }
 
-SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
-    : SceneBase(skinMgr, SkinType::THEME_SELECT, 240), _skinMgr(skinMgr), _state(lunaticvibes::CustomizeState::Start)
+SceneCustomize::SceneCustomize(std::shared_ptr<SkinMgr> skinMgr_, std::optional<SkinType> mode)
+    : SceneBase(skinMgr_, SkinType::THEME_SELECT, 240), _skinMgr(std::move(skinMgr_)),
+      _state(lunaticvibes::CustomizeState::Start)
 {
     _type = SceneType::CUSTOMIZE;
 
-    gCustomizeContext.skinDir = 0;
-    gCustomizeContext.optionUpdate = false;
-
     if (gInCustomize)
     {
+        (void)mode; // unused.
+
         // Initial entry is PLAY7.
         selectedMode = SkinType::PLAY7;
-        gCustomizeContext.mode = selectedMode;
+
         gNextScene = SceneType::PLAY;
         gPlayContext.mode = selectedMode;
         gPlayContext.isAuto = true;
@@ -127,7 +134,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     }
     else
     {
-        selectedMode = gCustomizeContext.mode;
+        selectedMode = mode.value_or(SkinType{} /*maybe invalid*/);
     }
     load(selectedMode);
 
@@ -445,27 +452,30 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
         updateTexts();
     };
 
-    if (gCustomizeContext.mode != selectedMode)
-        process_mode_change(gCustomizeContext.mode);
-
-    if (gCustomizeContext.skinDir != 0)
+    if (gCustomizeContext.mode_update.has_value())
     {
-        process_skin_dir_change(gCustomizeContext.skinDir);
-        gCustomizeContext.skinDir = 0;
+        process_mode_change(gCustomizeContext.mode_update->mode);
+        gCustomizeContext.mode_update.reset();
     }
 
-    if (gCustomizeContext.optionUpdate)
+    while (!gCustomizeContext.messages.empty())
     {
-        process_option_update(gCustomizeContext.optionIdx, gCustomizeContext.optionDir);
-        gCustomizeContext.optionUpdate = false;
-        gCustomizeContext.optionIdx = {};
-        gCustomizeContext.optionDir = {};
-    }
-
-    if (gCustomizeContext.optionDragging)
-    {
-        process_option_dragging();
-        gCustomizeContext.optionDragging = false;
+        static_assert(
+            std::is_trivially_copyable_v<std::remove_reference_t<decltype(gCustomizeContext.messages.front())>>);
+        auto msg = gCustomizeContext.messages.front();
+        gCustomizeContext.messages.pop();
+        auto visitor = overloaded{
+            [&process_option_dragging](const lunaticvibes::customize_message::OptionDrag msg) {
+                process_option_dragging();
+            },
+            [&process_option_update](const lunaticvibes::customize_message::OptionUpdate msg) {
+                process_option_update(msg.idx, msg.dir);
+            },
+            [&process_skin_dir_change](const lunaticvibes::customize_message::SkinDirUpdate msg) {
+                process_skin_dir_change(msg.plus);
+            },
+        };
+        std::visit(visitor, msg);
     }
 
     if (exiting)

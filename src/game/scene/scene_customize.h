@@ -2,10 +2,17 @@
 
 #include "scene.h"
 
+#include <common/beat.h>
 #include <common/types.h>
 #include <game/skin/skin_mgr.h>
 
+#include <cstddef>
+#include <map>
 #include <memory>
+#include <optional>
+#include <vector>
+
+using std::size_t;
 
 namespace lunaticvibes
 {
@@ -22,7 +29,7 @@ enum class CustomizeState : uint8_t
 class SceneCustomize final : public SceneBase
 {
 public:
-    explicit SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr);
+    SceneCustomize(std::shared_ptr<SkinMgr> skinMgr, std::optional<SkinType> mode);
     ~SceneCustomize() override;
 
     void update_fixed(const lunaticvibes::Time& t) override;

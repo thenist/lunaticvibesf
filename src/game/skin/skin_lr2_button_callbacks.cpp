@@ -1,4 +1,5 @@
 #include "skin_lr2_button_callbacks.h"
+#include "game/scene/scene_context_customize.h"
 
 #include <algorithm>
 #include <functional>
@@ -1322,6 +1323,30 @@ void key_config_slot(const int slot)
 void skinselect_mode(int mode)
 {
     LVF_DEBUG_ASSERT(mode >= 0 && mode <= 15);
+
+    auto mode_to_idxs = [](int mode) -> std::pair<SkinType, IndexSwitch> {
+        switch (mode)
+        {
+        case 0: return {SkinType::PLAY7, IndexSwitch::SKINSELECT_7KEYS};
+        case 1: return {SkinType::PLAY5, IndexSwitch::SKINSELECT_5KEYS};
+        case 2: return {SkinType::PLAY14, IndexSwitch::SKINSELECT_14KEYS};
+        case 3: return {SkinType::PLAY10, IndexSwitch::SKINSELECT_10KEYS};
+        case 4: return {SkinType::PLAY9, IndexSwitch::SKINSELECT_9KEYS};
+        case 5: return {SkinType::MUSIC_SELECT, IndexSwitch::SKINSELECT_SELECT};
+        case 6: return {SkinType::DECIDE, IndexSwitch::SKINSELECT_DECIDE};
+        case 7: return {SkinType::RESULT, IndexSwitch::SKINSELECT_RESULT};
+        case 8: return {SkinType::KEY_CONFIG, IndexSwitch::SKINSELECT_KEYCONFIG};
+        case 9: return {SkinType::THEME_SELECT, IndexSwitch::SKINSELECT_SKINSELECT};
+        case 10: return {SkinType::SOUNDSET, IndexSwitch::SKINSELECT_SOUNDSET};
+        case 11: return {SkinType{} /*what is this?*/, IndexSwitch::SKINSELECT_THEME};
+        case 12: return {SkinType::PLAY7_2, IndexSwitch::SKINSELECT_7KEYS_BATTLE};
+        case 13: return {SkinType::PLAY5_2, IndexSwitch::SKINSELECT_5KEYS_BATTLE};
+        case 14: return {SkinType::PLAY9_2, IndexSwitch::SKINSELECT_9KEYS_BATTLE};
+        case 15: return {SkinType::COURSE_RESULT, IndexSwitch::SKINSELECT_COURSE_RESULT};
+        default: lunaticvibes::assert_failed("mode_to_idxs");
+        }
+    };
+
     State::set(IndexSwitch::SKINSELECT_7KEYS, false);
     State::set(IndexSwitch::SKINSELECT_5KEYS, false);
     State::set(IndexSwitch::SKINSELECT_14KEYS, false);
@@ -1339,88 +1364,23 @@ void skinselect_mode(int mode)
     State::set(IndexSwitch::SKINSELECT_9KEYS_BATTLE, false);
     State::set(IndexSwitch::SKINSELECT_COURSE_RESULT, false);
 
-    switch (mode)
-    {
-    case 0:
-        gCustomizeContext.mode = SkinType::PLAY7;
-        State::set(IndexSwitch::SKINSELECT_7KEYS, true);
-        break;
-    case 1:
-        gCustomizeContext.mode = SkinType::PLAY5;
-        State::set(IndexSwitch::SKINSELECT_5KEYS, true);
-        break;
-    case 2:
-        gCustomizeContext.mode = SkinType::PLAY14;
-        State::set(IndexSwitch::SKINSELECT_14KEYS, true);
-        break;
-    case 3:
-        gCustomizeContext.mode = SkinType::PLAY10;
-        State::set(IndexSwitch::SKINSELECT_10KEYS, true);
-        break;
-    case 4:
-        gCustomizeContext.mode = SkinType::PLAY9;
-        State::set(IndexSwitch::SKINSELECT_9KEYS, true);
-        break;
-    case 5:
-        gCustomizeContext.mode = SkinType::MUSIC_SELECT;
-        State::set(IndexSwitch::SKINSELECT_SELECT, true);
-        break;
-    case 6:
-        gCustomizeContext.mode = SkinType::DECIDE;
-        State::set(IndexSwitch::SKINSELECT_DECIDE, true);
-        break;
-    case 7:
-        gCustomizeContext.mode = SkinType::RESULT;
-        State::set(IndexSwitch::SKINSELECT_RESULT, true);
-        break;
-    case 8:
-        gCustomizeContext.mode = SkinType::KEY_CONFIG;
-        State::set(IndexSwitch::SKINSELECT_KEYCONFIG, true);
-        break;
-    case 9:
-        gCustomizeContext.mode = SkinType::THEME_SELECT;
-        State::set(IndexSwitch::SKINSELECT_SKINSELECT, true);
-        break;
-    case 10:
-        gCustomizeContext.mode = SkinType::SOUNDSET;
-        State::set(IndexSwitch::SKINSELECT_SOUNDSET, true);
-        break;
-    case 11: State::set(IndexSwitch::SKINSELECT_THEME, true); break;
-    case 12:
-        gCustomizeContext.mode = SkinType::PLAY7_2;
-        State::set(IndexSwitch::SKINSELECT_7KEYS_BATTLE, true);
-        break;
-    case 13:
-        gCustomizeContext.mode = SkinType::PLAY5_2;
-        State::set(IndexSwitch::SKINSELECT_5KEYS_BATTLE, true);
-        break;
-    case 14:
-        gCustomizeContext.mode = SkinType::PLAY9_2;
-        State::set(IndexSwitch::SKINSELECT_9KEYS_BATTLE, true);
-        break;
-    case 15:
-        gCustomizeContext.mode = SkinType::COURSE_RESULT;
-        State::set(IndexSwitch::SKINSELECT_COURSE_RESULT, true);
-        break;
-    default: break;
-    }
+    auto [skin, sw] = mode_to_idxs(mode);
+    gCustomizeContext.mode_update.emplace(skin);
+    State::set(sw, true);
 
-    gCustomizeContext.modeUpdate = true;
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 }
 
 void skinselect_skin(int plus)
 {
-    gCustomizeContext.skinDir = plus;
+    gCustomizeContext.messages.emplace(lunaticvibes::customize_message::SkinDirUpdate{plus});
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 }
 
 void skinselect_option(int index, int plus)
 {
     LOG_VERBOSE << "[SkinLR2] Skin select option index=" << index << " plus=" << plus;
-    gCustomizeContext.optionIdx = index;
-    gCustomizeContext.optionDir = plus;
-    gCustomizeContext.optionUpdate = true;
+    gCustomizeContext.messages.emplace(lunaticvibes::customize_message::OptionUpdate{static_cast<size_t>(index), plus});
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 }
 

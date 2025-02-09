@@ -1,7 +1,5 @@
 #include "scene_mgr.h"
 
-#include <memory>
-
 #include <common/assert.h>
 #include <game/scene/scene.h>
 #include <game/scene/scene_course_result.h>
@@ -17,6 +15,9 @@
 #include <game/scene/scene_select.h>
 #include <game/skin/skin_mgr.h>
 
+#include <memory>
+#include <optional>
+
 std::shared_ptr<SceneBase> lunaticvibes::buildScene(const std::shared_ptr<SkinMgr>& skinMgr, SceneType type)
 {
     switch (type)
@@ -31,7 +32,7 @@ std::shared_ptr<SceneBase> lunaticvibes::buildScene(const std::shared_ptr<SkinMg
     case SceneType::RESULT: return std::make_shared<SceneResult>(skinMgr);
     case SceneType::COURSE_TRANS: return std::make_shared<ScenePlayCourseTrans>();
     case SceneType::KEYCONFIG: return std::make_shared<SceneKeyConfig>(skinMgr);
-    case SceneType::CUSTOMIZE: return std::make_shared<SceneCustomize>(skinMgr);
+    case SceneType::CUSTOMIZE: return std::make_shared<SceneCustomize>(skinMgr, std::nullopt);
     case SceneType::COURSE_RESULT: return std::make_shared<SceneCourseResult>(skinMgr);
     case SceneType::EXIT_TRANS: return std::make_shared<SceneExitTrans>();
     }

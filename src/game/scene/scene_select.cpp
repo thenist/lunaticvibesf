@@ -498,7 +498,7 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     // update random options
     loadLR2Sound();
 
-    gCustomizeContext.modeUpdate = false;
+    gCustomizeContext.mode_update.reset();
     if (!gInCustomize)
     {
         SoundMgr::stopNoteSamples();
@@ -1054,9 +1054,10 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
         }
     }
 
-    if (!gInCustomize && gCustomizeContext.modeUpdate)
+    if (!gInCustomize && gCustomizeContext.mode_update.has_value())
     {
-        gCustomizeContext.modeUpdate = false;
+        auto mode_update = gCustomizeContext.mode_update.value();
+        gCustomizeContext.mode_update.reset();
 
         if (_virtualSceneCustomize == nullptr)
         {
@@ -1065,7 +1066,7 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
             pSkin->setHandleMouseEvents(false);
             // FIXME: use loadMode=2. SceneCustomize passes _skinMgr to SceneBase which creates customize skin with
             // loadMode=0.
-            _virtualSceneCustomize = std::make_shared<SceneCustomize>(_skinMgr);
+            _virtualSceneCustomize = std::make_shared<SceneCustomize>(_skinMgr, mode_update.mode);
             _virtualSceneCustomize->setIsVirtual(true);
             pSkin->setHandleMouseEvents(true);
 

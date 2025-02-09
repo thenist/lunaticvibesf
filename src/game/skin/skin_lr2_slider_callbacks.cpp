@@ -3,6 +3,7 @@
 #include "config/config_mgr.h"
 #include "game/runtime/state.h"
 #include "game/scene/scene_context.h"
+#include "game/scene/scene_context_customize.h"
 #include "game/sound/sound_mgr.h"
 #include <common/assert.h>
 
@@ -27,7 +28,7 @@ void select_pos(double p)
 void customize_scrollbar(double p)
 {
     State::set(IndexSlider::SKIN_CONFIG_OPTIONS, p);
-    gCustomizeContext.optionDragging = true;
+    gCustomizeContext.messages.emplace(lunaticvibes::customize_message::OptionDrag{});
 }
 
 void ir_ranking_scrollbar(double p)

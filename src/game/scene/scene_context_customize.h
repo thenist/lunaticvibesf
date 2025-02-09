@@ -3,19 +3,47 @@
 #include <common/types.h>
 
 #include <cstddef>
+#include <queue>
+#include <variant>
 
 using std::size_t;
 
-struct CustomizeContextParams
+namespace lunaticvibes
+{
+
+// Also used by select.
+struct ModeUpdate
 {
     SkinType mode;
-    bool modeUpdate = false;
+};
 
-    int skinDir = 0;
+namespace customize_message
+{
 
-    bool optionUpdate = false;
-    size_t optionIdx;
-    int optionDir = 0;
+struct OptionDrag
+{
+};
 
-    bool optionDragging = false;
+struct OptionUpdate
+{
+    size_t idx;
+    int dir;
+};
+
+struct SkinDirUpdate
+{
+    int plus; // -1 or 1
+};
+
+} // namespace customize_message
+
+using CustomizeMessage =
+    std::variant<customize_message::OptionDrag, customize_message::OptionUpdate, customize_message::SkinDirUpdate>;
+
+} // namespace lunaticvibes
+
+struct CustomizeContextParams
+{
+    std::queue<lunaticvibes::CustomizeMessage> messages;
+    std::optional<lunaticvibes::ModeUpdate> mode_update;
 };
