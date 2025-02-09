@@ -44,9 +44,6 @@ std::shared_ptr<Texture> TTFFont::TextUTF8(const char* text, const Color& c)
         return nullptr;
 
     SDL_Surface* surfaceText = TTF_RenderUTF8_Blended(_pFont, text, std::bit_cast<SDL_Color>(c));
-    SDL_Rect rcText{};
-    TTF_SizeUTF8(_pFont, text, &rcText.w, &rcText.h);
-
     std::shared_ptr<Texture> pTexture = std::make_shared<Texture>(surfaceText);
     SDL_FreeSurface(surfaceText);
     return pTexture;
