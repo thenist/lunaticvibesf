@@ -2161,12 +2161,12 @@ void SceneSelect::decide()
         static const std::set<PlayModifierGaugeType> courseGaugeModsAllowed = {PlayModifierGaugeType::NORMAL,
                                                                                PlayModifierGaugeType::HARD};
         // TODO: why does this compare gPlayContext.mods[x], didn't we just reset it above?
-        if (courseGaugeModsAllowed.find(gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge) == courseGaugeModsAllowed.end())
+        if (!courseGaugeModsAllowed.contains(gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge))
         {
             State::set(IndexOption::PLAY_GAUGE_TYPE_1P, 0);
             gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge = PlayModifierGaugeType::NORMAL;
         }
-        if (courseGaugeModsAllowed.find(gPlayContext.mods[PLAYER_SLOT_TARGET].gauge) == courseGaugeModsAllowed.end())
+        if (!courseGaugeModsAllowed.contains(gPlayContext.mods[PLAYER_SLOT_TARGET].gauge))
         {
             State::set(IndexOption::PLAY_GAUGE_TYPE_2P, 0);
             gPlayContext.mods[PLAYER_SLOT_TARGET].gauge = PlayModifierGaugeType::NORMAL;

@@ -337,7 +337,7 @@ void ArenaClient::handleResponse(const std::shared_ptr<ArenaMessage>& msg)
     auto pMsg = std::static_pointer_cast<ArenaMessageResponse>(msg);
 
     std::shared_lock l(tasksWaitingForResponseMutex);
-    if (tasksWaitingForResponse.find(pMsg->messageIndex) == tasksWaitingForResponse.end())
+    if (!tasksWaitingForResponse.contains(pMsg->messageIndex))
     {
         LOG_WARNING << "[Arena] Invalid req message index, or duplicate resp msg";
         return;
@@ -451,7 +451,7 @@ void ArenaClient::handlePlayerJoined(const std::shared_ptr<ArenaMessage>& msg)
     auto payload = resp.pack();
     socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
-    if (gArenaData.data.find(pMsg->playerID) != gArenaData.data.end())
+    if (gArenaData.data.contains(pMsg->playerID))
     {
         LOG_WARNING << "[Arena] player ID " << pMsg->playerID << " already exists, removing old";
 
@@ -482,7 +482,7 @@ void ArenaClient::handlePlayerLeft(const std::shared_ptr<ArenaMessage>& msg)
     auto payload = resp.pack();
     socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
-    if (gArenaData.data.find(pMsg->playerID) == gArenaData.data.end())
+    if (!gArenaData.data.contains(pMsg->playerID))
     {
         LOG_WARNING << "[Arena] player ID " << pMsg->playerID << " does not exist";
     }
@@ -632,7 +632,7 @@ void ArenaClient::handleHostPlayData(const std::shared_ptr<ArenaMessage>& msg)
     {
         for (auto& [id, payload] : pMsg->payload)
         {
-            if (gArenaData.data.find(id) == gArenaData.data.end())
+            if (!gArenaData.data.contains(id))
                 continue;
             gArenaData.data[id].ruleset->unpackFrame(payload);
         }

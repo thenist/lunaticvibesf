@@ -198,7 +198,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                     if (lunaticvibes::iequals(key, "IF"))
                     {
                         int ifBlockValue = toInt(value);
-                        if (randomUsedValues.top().find(ifBlockValue) != randomUsedValues.top().end())
+                        if (randomUsedValues.top().contains(ifBlockValue))
                         {
                             LOG_WARNING << "[BMS] duplicate #IF value found. " << absolutePath << "@" << srcLine;
                         }
@@ -675,7 +675,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
     {
         for (unsigned chIdx = 0; chIdx < 20; ++chIdx)
         {
-            if (chNotesRegular.find(chIdx) == chNotesRegular.end())
+            if (!chNotesRegular.contains(chIdx))
                 continue;
 
             decltype(std::declval<channel>().notes.begin()) LNhead;

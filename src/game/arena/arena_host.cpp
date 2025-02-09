@@ -467,7 +467,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
             {
                 if (!gArenaData.playing)
                 {
-                    if (clients.find(key) == clients.end())
+                    if (!clients.contains(key))
                     {
                         if (gArenaData.getPlayerCount() < MAX_ARENA_PLAYERS)
                         {

@@ -267,7 +267,7 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string_view rawpat
     }
 
     // Good even if it's empty, as that's not the problem with CSVs, it's missing files.
-    return soundFilePath.find(key) != soundFilePath.end();
+    return soundFilePath.contains(key);
 }
 
 static Path getPathOrDefault(const std::map<std::string, Path>& soundFilePath, const std::string& key)

@@ -850,7 +850,7 @@ int SkinLR2::LR2FONT()
             else if (matchToken(key, "#R"))
             {
                 int imgId = toInt(tokens[2]);
-                if (pf->T_id.find(imgId) == pf->T_id.end())
+                if (!pf->T_id.contains(imgId))
                     continue;
 
                 int chrId = toInt(tokens[1]);
