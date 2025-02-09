@@ -28,6 +28,7 @@
 #include <game/graphics/sprite.h>
 #include <game/graphics/sprite_bar_entry.h>
 #include <game/graphics/sprite_graph.h>
+#include <game/graphics/sprite_imagetext.h>
 #include <game/graphics/sprite_lane.h>
 #include <game/graphics/sprite_video.h>
 #include <game/graphics/video.h>
