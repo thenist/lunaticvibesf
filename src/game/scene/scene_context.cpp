@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <atomic>
 #include <mutex>
 #include <random>
 #include <shared_mutex>
@@ -21,17 +20,6 @@
 #include <game/runtime/i18n.h>
 #include <game/runtime/index/option.h>
 #include <game/runtime/state.h>
-
-std::atomic<bool> gQuitOnFinish = false;
-std::atomic<bool> gAppIsExiting = false;
-ChartContextParams gChartContext;
-PlayContextParams gPlayContext;
-SelectContextParams gSelectContext;
-KeyConfigContextParams gKeyconfigContext;
-CustomizeContextParams gCustomizeContext;
-OverlayContextParams gOverlayContext;
-std::shared_ptr<SongDB> g_pSongDB;
-std::shared_ptr<ScoreDB> g_pScoreDB;
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
 namespace r = std::ranges;
