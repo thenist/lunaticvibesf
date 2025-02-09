@@ -305,13 +305,14 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
     if (gInCustomize && _is_virtual)
         return;
 
-    // Mode has changed
-    if (gCustomizeContext.mode != selectedMode)
-    {
-        LOG_INFO << "[Customize] Mode has changed => " << (int)gCustomizeContext.mode;
+    auto process_mode_change = [&, this](SkinType mode) {
+        if (mode == selectedMode)
+            return;
 
-        SkinType modeOld = selectedMode;
-        selectedMode = gCustomizeContext.mode;
+        LOG_INFO << "[Customize] Mode has changed => " << static_cast<int>(mode);
+
+        const SkinType modeOld = selectedMode;
+        selectedMode = mode;
         save(modeOld);
 
         SoundMgr::stopNoteSamples();
@@ -333,12 +334,10 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
         }
         pSkin->setHandleMouseEvents(true);
         reload_preview(selectedMode);
-    }
+    };
 
-    // Skin has changed
-    if (gCustomizeContext.skinDir != 0)
-    {
-        LOG_INFO << "[Customize] Skin has changed " << (gCustomizeContext.skinDir > 0 ? "+" : "-");
+    auto process_skin_dir_change = [&, this](int plus) {
+        LOG_INFO << "[Customize] Skin has changed " << (plus > 0 ? "+" : "-");
 
         if (selectedMode == SkinType::SOUNDSET)
         {
@@ -353,8 +352,7 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
                         fs::equivalent(soundsetList[selectedIdx], path))
                         break;
                 }
-                selectedIdx =
-                    wrappingAdd(selectedIdx, gCustomizeContext.skinDir, 0, static_cast<int>(soundsetList.size() - 1));
+                selectedIdx = wrappingAdd(selectedIdx, plus, 0, static_cast<int>(soundsetList.size() - 1));
                 const auto& p =
                     fs::relative(soundsetList[selectedIdx], PathFromUTF8(ConfigMgr::get('E', cfg::E_LR2PATH, ".")));
 
@@ -389,8 +387,7 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
                     if (fs::exists(p1) && fs::exists(p2) && fs::equivalent(p1, p2))
                         break;
                 }
-                selectedIdx = wrappingAdd(selectedIdx, gCustomizeContext.skinDir, 0,
-                                          static_cast<int>(skinList[selectedMode].size()) - 1);
+                selectedIdx = wrappingAdd(selectedIdx, plus, 0, static_cast<int>(skinList[selectedMode].size()) - 1);
 
                 const auto p = fs::relative(skinList[selectedMode][selectedIdx],
                                             PathFromUTF8(ConfigMgr::get('E', cfg::E_LR2PATH, ".")));
@@ -415,20 +412,16 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
                 LOG_DEBUG << "[Customize] skinList[selectedMode].size() <= 1";
             }
         }
-        gCustomizeContext.skinDir = 0;
-    }
+        plus = 0;
+    };
 
-    // Option has changed
-    if (gCustomizeContext.optionUpdate)
-    {
-        gCustomizeContext.optionUpdate = false;
-
-        size_t idxOption = topOptionIndex + gCustomizeContext.optionIdx;
+    auto process_option_update = [&, this](size_t idx, int dir) {
+        size_t idxOption = topOptionIndex + idx;
         if (idxOption < optionsKeyList.size())
         {
             Option& op = optionsMap[optionsKeyList[idxOption]];
-            const size_t idxEntry = wrappingAdd(op.selectedEntry, gCustomizeContext.optionDir, 0,
-                                                op.entries.empty() ? 0 : (op.entries.size() - 1));
+            const size_t idxEntry =
+                wrappingAdd(op.selectedEntry, dir, 0, op.entries.empty() ? 0 : (op.entries.size() - 1));
 
             if (idxEntry != op.selectedEntry)
             {
@@ -445,14 +438,36 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
 
             reload_preview(selectedMode);
         }
-    }
-    if (gCustomizeContext.optionDragging)
-    {
-        gCustomizeContext.optionDragging = false;
+    };
 
+    auto process_option_dragging = [&, this] {
         topOptionIndex = State::get(IndexSlider::SKIN_CONFIG_OPTIONS) * optionsMap.size();
         updateTexts();
+    };
+
+    if (gCustomizeContext.mode != selectedMode)
+        process_mode_change(gCustomizeContext.mode);
+
+    if (gCustomizeContext.skinDir != 0)
+    {
+        process_skin_dir_change(gCustomizeContext.skinDir);
+        gCustomizeContext.skinDir = 0;
     }
+
+    if (gCustomizeContext.optionUpdate)
+    {
+        process_option_update(gCustomizeContext.optionIdx, gCustomizeContext.optionDir);
+        gCustomizeContext.optionUpdate = false;
+        gCustomizeContext.optionIdx = {};
+        gCustomizeContext.optionDir = {};
+    }
+
+    if (gCustomizeContext.optionDragging)
+    {
+        process_option_dragging();
+        gCustomizeContext.optionDragging = false;
+    }
+
     if (exiting)
     {
         State::set(IndexTimer::_SCENE_CUSTOMIZE_FADEOUT, t.norm());
