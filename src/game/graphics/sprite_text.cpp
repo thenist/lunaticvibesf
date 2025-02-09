@@ -94,39 +94,35 @@ bool SpriteText::OnClick(int x, int y)
         return false;
     if (_current.rect.x <= x && x < _current.rect.x + _current.rect.w && _current.rect.y <= y &&
         y < _current.rect.y + _current.rect.h)
-    {
         return true;
-    }
     return false;
 }
 
 void SpriteText::startEditing(bool clear)
 {
-    if (!isEditing())
-    {
-        editing = true;
-        textBeforeEdit = State::get(textInd);
-        textAfterEdit = (clear ? "" : _text);
-        startTextInput(_current.rect, textAfterEdit, std::bind_front(&SpriteText::updateTextWhileEditing, this));
-    }
+    if (isEditing())
+        return;
+    editing = true;
+    textBeforeEdit = State::get(textInd);
+    textAfterEdit = (clear ? "" : _text);
+    startTextInput(_current.rect, textAfterEdit, std::bind_front(&SpriteText::updateTextWhileEditing, this));
 }
 
 void SpriteText::stopEditing(bool modify)
 {
-    if (isEditing())
-    {
-        stopTextInput();
-        editing = false;
-        State::set(textInd, (modify ? textAfterEdit : textBeforeEdit));
-        pushMainThreadTask([this] { updateText(); });
-    }
+    if (!isEditing())
+        return;
+    stopTextInput();
+    editing = false;
+    State::set(textInd, (modify ? textAfterEdit : textBeforeEdit));
+    pushMainThreadTask(std::bind_front(&SpriteText::updateText, this));
 }
 
 void SpriteText::updateTextWhileEditing(const std::string& text)
 {
     textAfterEdit = text;
     State::set(textInd, text + "|");
-    pushMainThreadTask([this] { updateText(); });
+    pushMainThreadTask(std::bind_front(&SpriteText::updateText, this));
 }
 
 void SpriteText::draw() const
