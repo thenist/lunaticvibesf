@@ -1035,18 +1035,14 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
     {
         auto getCommonLane = [](const LaneMap& ch, unsigned barIdx) -> const channel& {
             if (auto it = ch.find(barIdx); it != ch.end())
-            {
                 return it->second;
-            }
             return emptyChannel;
         };
 
         auto getNoteLane = [&](const std::map<unsigned, LaneMap>& ch, unsigned chIdx,
                                unsigned barIdx) -> const channel& {
             if (auto it = ch.find(chIdx); it != ch.end())
-            {
                 return getCommonLane(it->second, barIdx);
-            }
             return emptyChannel;
         };
 

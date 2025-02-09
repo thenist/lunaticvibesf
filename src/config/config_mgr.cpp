@@ -97,14 +97,10 @@ void setOptions()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_SPEED_TYPE, P_SPEED_TYPE_NORMAL);
-        if (smap.find(s) != smap.end())
-        {
-            State::set(IndexOption::PLAY_HSFIX_TYPE, smap.at(s));
-        }
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::PLAY_HSFIX_TYPE, it->second);
         else
-        {
             State::set(IndexOption::PLAY_HSFIX_TYPE, SPEED_NORMAL);
-        }
     }
 
     // target type
@@ -122,14 +118,10 @@ void setOptions()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT);
-        if (smap.find(s) != smap.end())
-        {
-            State::set(IndexOption::PLAY_TARGET_TYPE, smap.at(s));
-        }
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::PLAY_TARGET_TYPE, it->second);
         else
-        {
             State::set(IndexOption::PLAY_TARGET_TYPE, TARGET_MYBEST);
-        }
     }
 
     // autoadjust
@@ -152,22 +144,14 @@ void setOptions()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_CHART_OP, P_CHART_OP_NORMAL);
         auto&& s2 = ConfigMgr::get<string>('P', P_CHART_OP_2P, P_CHART_OP_NORMAL);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexOption::PLAY_RANDOM_TYPE_1P, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexOption::PLAY_RANDOM_TYPE_1P, it->second);
         else
-        {
             State::set(IndexOption::PLAY_RANDOM_TYPE_1P, RAN_NORMAL);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexOption::PLAY_RANDOM_TYPE_2P, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexOption::PLAY_RANDOM_TYPE_2P, it->second);
         else
-        {
             State::set(IndexOption::PLAY_RANDOM_TYPE_2P, RAN_NORMAL);
-        }
     }
 
     // gauge op
@@ -182,22 +166,14 @@ void setOptions()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_GAUGE_OP, P_GAUGE_OP_NORMAL);
         auto&& s2 = ConfigMgr::get<string>('P', P_GAUGE_OP_2P, P_GAUGE_OP_NORMAL);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexOption::PLAY_GAUGE_TYPE_1P, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexOption::PLAY_GAUGE_TYPE_1P, it->second);
         else
-        {
             State::set(IndexOption::PLAY_GAUGE_TYPE_1P, GAUGE_NORMAL);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexOption::PLAY_GAUGE_TYPE_2P, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexOption::PLAY_GAUGE_TYPE_2P, it->second);
         else
-        {
             State::set(IndexOption::PLAY_GAUGE_TYPE_2P, GAUGE_NORMAL);
-        }
     }
 
     // lane effect
@@ -210,22 +186,14 @@ void setOptions()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
         auto&& s2 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_1P, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_1P, it->second);
         else
-        {
             State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_1P, LANE_OFF);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_2P, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_2P, it->second);
         else
-        {
             State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_2P, LANE_OFF);
-        }
     }
 
     // ghost type
@@ -238,22 +206,14 @@ void setOptions()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_GHOST_TYPE, "OFF");
         auto&& s2 = ConfigMgr::get<string>('P', P_GHOST_TYPE_2P, "OFF");
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexOption::PLAY_GHOST_TYPE_1P, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexOption::PLAY_GHOST_TYPE_1P, it->second);
         else
-        {
             State::set(IndexOption::PLAY_GHOST_TYPE_1P, GHOST_OFF);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexOption::PLAY_GHOST_TYPE_2P, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexOption::PLAY_GHOST_TYPE_2P, it->second);
         else
-        {
             State::set(IndexOption::PLAY_GHOST_TYPE_2P, GHOST_OFF);
-        }
     }
 
     // play mode
@@ -266,8 +226,8 @@ void setOptions()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_FILTER_KEYS, P_FILTER_KEYS_ALL);
-        if (smap.find(s) != smap.end())
-            State::set(IndexOption::SELECT_FILTER_KEYS, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::SELECT_FILTER_KEYS, it->second);
         else
             State::set(IndexOption::SELECT_FILTER_KEYS, KEYS_ALL);
     }
@@ -280,8 +240,8 @@ void setOptions()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_SORT_MODE, P_SORT_MODE_FOLDER);
-        if (smap.find(s) != smap.end())
-            State::set(IndexOption::SELECT_SORT, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::SELECT_SORT, it->second);
         else
             State::set(IndexOption::SELECT_SORT, SORT_FOLDER);
     }
@@ -295,8 +255,8 @@ void setOptions()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ALL);
-        if (smap.find(s) != smap.end())
-            State::set(IndexOption::SELECT_FILTER_DIFF, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::SELECT_FILTER_DIFF, it->second);
         else
             State::set(IndexOption::SELECT_FILTER_DIFF, DIFF_ANY);
     }
@@ -310,8 +270,8 @@ void setOptions()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_FREQ_TYPE, P_FREQ_TYPE_FREQ);
-        if (smap.find(s) != smap.end())
-            State::set(IndexOption::SOUND_PITCH_TYPE, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::SOUND_PITCH_TYPE, it->second);
         else
             State::set(IndexOption::SOUND_PITCH_TYPE, FREQ_FREQ);
     }
@@ -325,20 +285,20 @@ void setOptions()
         };
 
         auto&& s0 = ConfigMgr::get<string>('P', P_FX0_TARGET, P_FX_TARGET_MASTER);
-        if (smap.find(s0) != smap.end())
-            State::set(IndexOption::SOUND_TARGET_FX0, smap.at(s0));
+        if (auto it = smap.find(s0); it != smap.end())
+            State::set(IndexOption::SOUND_TARGET_FX0, it->second);
         else
             State::set(IndexOption::SOUND_TARGET_FX0, FX_MASTER);
 
         auto&& s1 = ConfigMgr::get<string>('P', P_FX1_TARGET, P_FX_TARGET_MASTER);
-        if (smap.find(s1) != smap.end())
-            State::set(IndexOption::SOUND_TARGET_FX1, smap.at(s1));
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexOption::SOUND_TARGET_FX1, it->second);
         else
             State::set(IndexOption::SOUND_TARGET_FX1, FX_MASTER);
 
         auto&& s2 = ConfigMgr::get<string>('P', P_FX2_TARGET, P_FX_TARGET_MASTER);
-        if (smap.find(s2) != smap.end())
-            State::set(IndexOption::SOUND_TARGET_FX2, smap.at(s2));
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexOption::SOUND_TARGET_FX2, it->second);
         else
             State::set(IndexOption::SOUND_TARGET_FX2, FX_MASTER);
     }
@@ -352,20 +312,20 @@ void setOptions()
         };
 
         auto&& s0 = ConfigMgr::get<string>('P', P_FX0_TYPE, "OFF");
-        if (smap.find(s0) != smap.end())
-            State::set(IndexOption::SOUND_FX0, smap.at(s0));
+        if (auto it = smap.find(s0); it != smap.end())
+            State::set(IndexOption::SOUND_FX0, it->second);
         else
             State::set(IndexOption::SOUND_FX0, FX_OFF);
 
         auto&& s1 = ConfigMgr::get<string>('P', P_FX1_TYPE, "OFF");
-        if (smap.find(s1) != smap.end())
-            State::set(IndexOption::SOUND_FX1, smap.at(s1));
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexOption::SOUND_FX1, it->second);
         else
             State::set(IndexOption::SOUND_FX1, FX_OFF);
 
         auto&& s2 = ConfigMgr::get<string>('P', P_FX2_TYPE, "OFF");
-        if (smap.find(s2) != smap.end())
-            State::set(IndexOption::SOUND_FX2, smap.at(s2));
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexOption::SOUND_FX2, it->second);
         else
             State::set(IndexOption::SOUND_FX2, FX_OFF);
     }
@@ -377,8 +337,8 @@ void setOptions()
                                                           {V_WINMODE_WINDOWED, WIN_WINDOWED}};
 
         auto&& s = ConfigMgr::get<string>('V', V_WINMODE, V_WINMODE_WINDOWED);
-        if (smap.find(s) != smap.end())
-            State::set(IndexOption::SYS_WINDOWED, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::SYS_WINDOWED, it->second);
         else
             State::set(IndexOption::SYS_WINDOWED, WIN_WINDOWED);
     }
@@ -424,22 +384,14 @@ void setSwitches()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
         auto&& s2 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexSwitch::P1_LANECOVER_ENABLED, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexSwitch::P1_LANECOVER_ENABLED, it->second);
         else
-        {
             State::set(IndexSwitch::P1_LANECOVER_ENABLED, false);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexSwitch::P2_LANECOVER_ENABLED, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexSwitch::P2_LANECOVER_ENABLED, it->second);
         else
-        {
             State::set(IndexSwitch::P2_LANECOVER_ENABLED, false);
-        }
     }
 
     State::set(IndexSwitch::PLAY_OPTION_DP_FLIP, ConfigMgr::get('P', P_FLIP, true));
@@ -475,8 +427,8 @@ void setText()
             };
 
             auto&& s = ConfigMgr::get<string>('P', P_BGA_TYPE, P_BGA_TYPE_ON);
-            if (smap.find(s) != smap.end())
-                State::set(IndexText::BGA, smap.at(s));
+            if (auto it = smap.find(s); it != smap.end())
+                State::set(IndexText::BGA, it->second);
             else
                 State::set(IndexText::BGA, Option::s_bga_type[Option::BGA_OFF]);
         }
@@ -487,8 +439,8 @@ void setText()
             };
 
             auto&& s = ConfigMgr::get<string>('P', P_BGA_SIZE, P_BGA_SIZE_NORMAL);
-            if (smap.find(s) != smap.end())
-                State::set(IndexText::BGA_SIZE, smap.at(s));
+            if (auto it = smap.find(s); it != smap.end())
+                State::set(IndexText::BGA_SIZE, it->second);
             else
                 State::set(IndexText::BGA_SIZE, Option::s_bga_size[Option::BGA_NORMAL]);
         }
@@ -507,8 +459,8 @@ void setText()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_SPEED_TYPE, P_SPEED_TYPE_NORMAL);
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::SCROLL_TYPE, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::SCROLL_TYPE, it->second);
         else
             State::set(IndexText::SCROLL_TYPE, Option::s_speed_type[Option::SPEED_NORMAL]);
     }
@@ -521,14 +473,10 @@ void setText()
         };
 
         auto&& s1 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexText::SHUTTER, smap.at(s1) ? "ON" : "OFF");
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexText::SHUTTER, it->second ? "ON" : "OFF");
         else
-        {
             State::set(IndexText::SHUTTER, "OFF");
-        }
     }
 
     // chart op
@@ -544,22 +492,14 @@ void setText()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_CHART_OP, P_CHART_OP_NORMAL);
         auto&& s2 = ConfigMgr::get<string>('P', P_CHART_OP_2P, P_CHART_OP_NORMAL);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexText::RANDOM_1P, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexText::RANDOM_1P, it->second);
         else
-        {
             State::set(IndexText::RANDOM_1P, Option::s_random_type[Option::RAN_NORMAL]);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexText::RANDOM_2P, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexText::RANDOM_2P, it->second);
         else
-        {
             State::set(IndexText::RANDOM_2P, Option::s_random_type[Option::RAN_NORMAL]);
-        }
     }
 
     // gauge op
@@ -575,22 +515,14 @@ void setText()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_GAUGE_OP, P_GAUGE_OP_NORMAL);
         auto&& s2 = ConfigMgr::get<string>('P', P_GAUGE_OP_2P, P_GAUGE_OP_NORMAL);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexText::GAUGE_1P, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexText::GAUGE_1P, it->second);
         else
-        {
             State::set(IndexText::GAUGE_1P, Option::s_gauge_type[Option::GAUGE_NORMAL]);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexText::GAUGE_2P, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexText::GAUGE_2P, it->second);
         else
-        {
             State::set(IndexText::GAUGE_2P, Option::s_gauge_type[Option::GAUGE_NORMAL]);
-        }
     }
 
     // assist
@@ -602,22 +534,14 @@ void setText()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_CHART_ASSIST_OP, P_CHART_ASSIST_OP_NONE);
         auto&& s2 = ConfigMgr::get<string>('P', P_CHART_ASSIST_OP_2P, P_CHART_ASSIST_OP_NONE);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexText::ASSIST_1P, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexText::ASSIST_1P, it->second);
         else
-        {
             State::set(IndexText::ASSIST_1P, Option::s_assist_type[Option::ASSIST_NONE]);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexText::ASSIST_2P, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexText::ASSIST_2P, it->second);
         else
-        {
             State::set(IndexText::ASSIST_2P, Option::s_assist_type[Option::ASSIST_NONE]);
-        }
     }
 
     // lane effect
@@ -633,22 +557,14 @@ void setText()
 
         auto&& s1 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
         auto&& s2 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
-        if (smap.find(s1) != smap.end())
-        {
-            State::set(IndexText::EFFECT_1P, smap.at(s1));
-        }
+        if (auto it = smap.find(s1); it != smap.end())
+            State::set(IndexText::EFFECT_1P, it->second);
         else
-        {
             State::set(IndexText::EFFECT_1P, Option::s_lane_effect_type[Option::LANE_OFF]);
-        }
-        if (smap.find(s2) != smap.end())
-        {
-            State::set(IndexText::EFFECT_2P, smap.at(s2));
-        }
+        if (auto it = smap.find(s2); it != smap.end())
+            State::set(IndexText::EFFECT_2P, it->second);
         else
-        {
             State::set(IndexText::EFFECT_2P, Option::s_lane_effect_type[Option::LANE_OFF]);
-        }
     }
 
     // ghost type
@@ -661,8 +577,8 @@ void setText()
         };
 
         auto&& s = ConfigMgr::get('P', P_GHOST_TYPE, P_GHOST_TYPE_OFF);
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::GHOST, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::GHOST, it->second);
         else
             State::set(IndexText::GHOST, Option::s_play_ghost_mode[Option::GHOST_OFF]);
     }
@@ -683,14 +599,10 @@ void setText()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT);
-        if (smap.find(s) != smap.end())
-        {
-            State::set(IndexText::TARGET_NAME, smap.at(s));
-        }
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::TARGET_NAME, it->second);
         else
-        {
             State::set(IndexText::TARGET_NAME, Option::s_target_type[Option::TARGET_DEFAULT]);
-        }
     }
 
     // play mode
@@ -707,8 +619,8 @@ void setText()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_FILTER_KEYS, P_FILTER_KEYS_ALL);
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::FILTER_KEYS, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::FILTER_KEYS, it->second);
         else
             State::set(IndexText::FILTER_KEYS, Option::s_filter_keys[Option::FILTER_KEYS_ALL]);
     }
@@ -724,8 +636,8 @@ void setText()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_SORT_MODE, P_SORT_MODE_FOLDER);
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::SORT_MODE, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::SORT_MODE, it->second);
         else
             State::set(IndexText::SORT_MODE, Option::s_select_sort[Option::SORT_FOLDER]);
     }
@@ -742,8 +654,8 @@ void setText()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ALL);
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::FILTER_DIFFICULTY, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::FILTER_DIFFICULTY, it->second);
         else
             State::set(IndexText::FILTER_DIFFICULTY, Option::s_select_diff[Option::DIFF_ANY]);
     }
@@ -766,8 +678,8 @@ void setText()
         };
 
         auto&& s = ConfigMgr::get<string>('V', V_WINMODE, V_WINMODE_WINDOWED);
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::WINDOWMODE, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::WINDOWMODE, it->second);
         else
             State::set(IndexText::WINDOWMODE, Option::s_windowed[Option::WIN_WINDOWED]);
     }

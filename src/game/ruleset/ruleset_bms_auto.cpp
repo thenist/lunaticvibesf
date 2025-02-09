@@ -3,6 +3,7 @@
 #include <common/assert.h>
 #include <common/play_modifiers.h>
 #include <game/chart/chart_types.h>
+#include <game/runtime/index/timer.h>
 #include <game/scene/scene.h>
 #include <game/scene/scene_context.h>
 
@@ -209,9 +210,9 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                                         State::set(IndexSwitch::S2_DOWN, true);
                                     }
 
-                                    if (_bombLNTimerMap != nullptr &&
-                                        _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
-                                        State::set(_bombLNTimerMap->at(idx), t.norm());
+                                    if (_bombLNTimerMap != nullptr)
+                                        if (auto it = _bombLNTimerMap->find(idx); it != _bombLNTimerMap->end())
+                                            State::set(it->second, t.norm());
 
                                     isPressingLN[k] = true;
                                 }
@@ -249,9 +250,9 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                                         State::set(IndexSwitch::S2_DOWN, false);
                                     }
 
-                                    if (_bombLNTimerMap != nullptr &&
-                                        _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
-                                        State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
+                                    if (_bombLNTimerMap != nullptr)
+                                        if (auto it = _bombLNTimerMap->find(idx); it != _bombLNTimerMap->end())
+                                            State::set(it->second, TIMER_NEVER);
 
                                     isPressingLN[k] = false;
                                 }

@@ -577,10 +577,8 @@ void ArenaClient::handleHostReadyStat(const std::shared_ptr<ArenaMessage>& msg)
     {
         if (id == playerID)
             gArenaData.ready = !!ready;
-        else if (gArenaData.data.find(id) != gArenaData.data.end())
-        {
-            gArenaData.data[id].ready = !!ready;
-        }
+        else if (auto it = gArenaData.data.find(id); it != gArenaData.data.end())
+            it->second.ready = !!ready;
     }
 }
 
@@ -604,14 +602,10 @@ void ArenaClient::handleHostPlayInit(const std::shared_ptr<ArenaMessage>& msg)
 
     ArenaMessageResponse resp(*pMsg);
 
-    if (gArenaData.data.find(pMsg->playerID) != gArenaData.data.end())
-    {
-        gArenaData.data[pMsg->playerID].ruleset->unpackInit(pMsg->rulesetPayload);
-    }
+    if (auto it = gArenaData.data.find(pMsg->playerID); it != gArenaData.data.end())
+        it->second.ruleset->unpackInit(pMsg->rulesetPayload);
     else
-    {
         resp.errorCode = 2;
-    }
 
     auto payload = resp.pack();
     socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));

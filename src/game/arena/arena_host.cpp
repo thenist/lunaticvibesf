@@ -513,7 +513,8 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
             }
         }
         std::shared_lock l(clientsMutex);
-        if (clients.find(key) == clients.end())
+        auto it = clients.find(key);
+        if (it == clients.end())
         {
             // unrecognized client
             return;
@@ -532,7 +533,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
         case Arena::CLIENT_FINISHED_RESULT: handleFinishedResult(key, pMsg); break;
         }
         if (pMsg->type != Arena::RESPONSE)
-            clients[key].recvMessageIndex = std::max(clients[key].recvMessageIndex, pMsg->messageIndex);
+            it->second.recvMessageIndex = std::max(it->second.recvMessageIndex, pMsg->messageIndex);
     }
 }
 
@@ -543,13 +544,14 @@ void ArenaHost::handleResponse(const std::string& clientKey, const std::shared_p
     Client& c = clients[clientKey];
 
     std::shared_lock l(c.tasksWaitingForResponseMutex);
-    if (c.tasksWaitingForResponse.find(pMsg->messageIndex) == c.tasksWaitingForResponse.end())
+    auto it = c.tasksWaitingForResponse.find(pMsg->messageIndex);
+    if (it == c.tasksWaitingForResponse.end())
     {
         LOG_WARNING << "[Arena] Invalid req message index, or duplicate resp msg";
         return;
     }
 
-    c.tasksWaitingForResponse[pMsg->messageIndex].received = true;
+    it->second.received = true;
 
     if (pMsg->errorCode != 0)
     {
@@ -736,19 +738,20 @@ void ArenaHost::handlePlayInit(const std::string& clientKey, const std::shared_p
 
     Client& c = clients[clientKey];
 
-    if (gArenaData.data.find(c.id) == gArenaData.data.end())
+    auto it = gArenaData.data.find(c.id);
+    if (it == gArenaData.data.end())
     {
         LOG_WARNING << "[Arena] Invalid player ID: " << c.id;
         return;
     }
 
-    if (gArenaData.data.at(c.id).ruleset == nullptr)
+    if (it->second.ruleset == nullptr)
     {
         LOG_WARNING << "[Arena] Player data not initialized. ID: " << c.id;
         return;
     }
 
-    gArenaData.data.at(c.id).ruleset->unpackInit(pMsg->payload);
+    it->second.ruleset->unpackInit(pMsg->payload);
 
     for (auto& [k, cc] : clients)
     {
@@ -794,19 +797,20 @@ void ArenaHost::handlePlayData(const std::string& clientKey, const std::shared_p
 
     if (pMsg->messageIndex > c.recvMessageIndex)
     {
-        if (gArenaData.data.find(c.id) == gArenaData.data.end())
+        auto it = gArenaData.data.find(c.id);
+        if (it == gArenaData.data.end())
         {
             LOG_WARNING << "[Arena] Invalid player ID: " << c.id;
             return;
         }
 
-        if (gArenaData.data.at(c.id).ruleset == nullptr)
+        if (it->second.ruleset == nullptr)
         {
             LOG_WARNING << "[Arena] Player data not initialized. ID: " << c.id;
             return;
         }
 
-        gArenaData.data.at(c.id).ruleset->unpackFrame(pMsg->payload);
+        it->second.ruleset->unpackFrame(pMsg->payload);
     }
     // no response
 }

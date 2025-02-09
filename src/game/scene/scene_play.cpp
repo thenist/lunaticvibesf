@@ -1892,27 +1892,19 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
 
             if (gPlayContext.mode == SkinType::PLAY5 || gPlayContext.mode == SkinType::PLAY5_2)
             {
-                if (REPLAY_CMD_INPUT_DOWN_MAP_5K[replayCmdMapIndex].find(cmd) !=
-                    REPLAY_CMD_INPUT_DOWN_MAP_5K[replayCmdMapIndex].end())
-                {
-                    replayKeyPressing[REPLAY_CMD_INPUT_DOWN_MAP_5K[replayCmdMapIndex].at(cmd)] = true;
-                }
-                else if (REPLAY_CMD_INPUT_UP_MAP_5K[replayCmdMapIndex].find(cmd) !=
-                         REPLAY_CMD_INPUT_UP_MAP_5K[replayCmdMapIndex].end())
-                {
-                    replayKeyPressing[REPLAY_CMD_INPUT_UP_MAP_5K[replayCmdMapIndex].at(cmd)] = false;
-                }
+                if (auto it = REPLAY_CMD_INPUT_DOWN_MAP_5K[replayCmdMapIndex].find(cmd);
+                    it != REPLAY_CMD_INPUT_DOWN_MAP_5K[replayCmdMapIndex].end())
+                    replayKeyPressing[it->second] = true;
+                else if (auto it = REPLAY_CMD_INPUT_UP_MAP_5K[replayCmdMapIndex].find(cmd);
+                         it != REPLAY_CMD_INPUT_UP_MAP_5K[replayCmdMapIndex].end())
+                    replayKeyPressing[it->second] = false;
             }
             else
             {
-                if (REPLAY_CMD_INPUT_DOWN_MAP.find(cmd) != REPLAY_CMD_INPUT_DOWN_MAP.end())
-                {
-                    replayKeyPressing[REPLAY_CMD_INPUT_DOWN_MAP.at(cmd)] = true;
-                }
-                else if (REPLAY_CMD_INPUT_UP_MAP.find(cmd) != REPLAY_CMD_INPUT_UP_MAP.end())
-                {
-                    replayKeyPressing[REPLAY_CMD_INPUT_UP_MAP.at(cmd)] = false;
-                }
+                if (auto it = REPLAY_CMD_INPUT_DOWN_MAP.find(cmd); it != REPLAY_CMD_INPUT_DOWN_MAP.end())
+                    replayKeyPressing[it->second] = true;
+                else if (auto it = REPLAY_CMD_INPUT_UP_MAP.find(cmd); it != REPLAY_CMD_INPUT_UP_MAP.end())
+                    replayKeyPressing[it->second] = false;
             }
 
             switch (cmd)
@@ -2905,18 +2897,18 @@ void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t, const 
 
                 if (gPlayContext.mode == SkinType::PLAY5 || gPlayContext.mode == SkinType::PLAY5_2)
                 {
-                    if (REPLAY_INPUT_DOWN_CMD_MAP_5K[replayCmdMapIndex].find((Input::Pad)k) !=
-                        REPLAY_INPUT_DOWN_CMD_MAP_5K[replayCmdMapIndex].end())
+                    if (auto it = REPLAY_INPUT_DOWN_CMD_MAP_5K[replayCmdMapIndex].find((Input::Pad)k);
+                        it != REPLAY_INPUT_DOWN_CMD_MAP_5K[replayCmdMapIndex].end())
                     {
-                        cmd.type = REPLAY_INPUT_DOWN_CMD_MAP_5K[replayCmdMapIndex].at((Input::Pad)k);
+                        cmd.type = it->second;
                         gPlayContext.replayNew->replay->commands.push_back(cmd);
                     }
                 }
                 else
                 {
-                    if (REPLAY_INPUT_DOWN_CMD_MAP.find((Input::Pad)k) != REPLAY_INPUT_DOWN_CMD_MAP.end())
+                    if (auto it = REPLAY_INPUT_DOWN_CMD_MAP.find((Input::Pad)k); it != REPLAY_INPUT_DOWN_CMD_MAP.end())
                     {
-                        cmd.type = REPLAY_INPUT_DOWN_CMD_MAP.at((Input::Pad)k);
+                        cmd.type = it->second;
                         gPlayContext.replayNew->replay->commands.push_back(cmd);
                     }
                 }
@@ -3279,18 +3271,18 @@ void ScenePlay::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 
             if (gPlayContext.mode == SkinType::PLAY5 || gPlayContext.mode == SkinType::PLAY5_2)
             {
-                if (REPLAY_INPUT_UP_CMD_MAP_5K[replayCmdMapIndex].find((Input::Pad)k) !=
-                    REPLAY_INPUT_UP_CMD_MAP_5K[replayCmdMapIndex].end())
+                if (auto it = REPLAY_INPUT_UP_CMD_MAP_5K[replayCmdMapIndex].find((Input::Pad)k);
+                    it != REPLAY_INPUT_UP_CMD_MAP_5K[replayCmdMapIndex].end())
                 {
-                    cmd.type = REPLAY_INPUT_UP_CMD_MAP_5K[replayCmdMapIndex].at((Input::Pad)k);
+                    cmd.type = it->second;
                     gPlayContext.replayNew->replay->commands.push_back(cmd);
                 }
             }
             else
             {
-                if (REPLAY_INPUT_UP_CMD_MAP.find((Input::Pad)k) != REPLAY_INPUT_UP_CMD_MAP.end())
+                if (auto it = REPLAY_INPUT_UP_CMD_MAP.find((Input::Pad)k); it != REPLAY_INPUT_UP_CMD_MAP.end())
                 {
-                    cmd.type = REPLAY_INPUT_UP_CMD_MAP.at((Input::Pad)k);
+                    cmd.type = it->second;
                     gPlayContext.replayNew->replay->commands.push_back(cmd);
                 }
             }

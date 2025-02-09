@@ -1008,8 +1008,9 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
     {
         // Handle scratch direction change as miss
         _judgeRelease(cat, idx, note, judge, t, slot);
-        if (showJudge && _bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
-            State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
+        if (showJudge && _bombLNTimerMap != nullptr)
+            if (auto it = _bombLNTimerMap->find(idx); it != _bombLNTimerMap->end())
+                State::set(it->second, TIMER_NEVER);
     }
 
     switch (cat)
@@ -1069,8 +1070,9 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
                 note.expired = true;
                 _hit_mean.insert(judge.time.norm());
                 _hit_std_dev.insert(static_cast<double>(judge.time.norm()));
-                if (showJudge && _bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
-                    State::set(_bombLNTimerMap->at(idx), t.norm());
+                if (showJudge && _bombLNTimerMap != nullptr)
+                    if (auto it = _bombLNTimerMap->find(idx); it != _bombLNTimerMap->end())
+                        State::set(_bombLNTimerMap->at(idx), t.norm());
                 break;
 
             case JudgeArea::EARLY_BAD:
@@ -1152,8 +1154,9 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 notesExpired++;
                 updateJudge(t, idx, _lnJudge[idx], slot);
 
-                if (showJudge && _bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
-                    State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
+                if (showJudge && _bombLNTimerMap != nullptr)
+                    if (auto it = _bombLNTimerMap->find(idx); it != _bombLNTimerMap->end())
+                        State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
 
                 _lastNoteJudge[slot].area = _lnJudge[idx];
                 _lastNoteJudge[slot].time = 0;
@@ -1219,8 +1222,9 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
             _lnJudge[idx] = RulesetBMS::JudgeArea::NOTHING;
             _lastNoteJudge[slot] = judge;
 
-            if (showJudge && _bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
-                State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
+            if (showJudge && _bombLNTimerMap != nullptr)
+                if (auto it = _bombLNTimerMap->find(idx); it != _bombLNTimerMap->end())
+                    State::set(it->second, TIMER_NEVER);
 
             break;
         }

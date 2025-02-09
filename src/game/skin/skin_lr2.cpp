@@ -721,14 +721,10 @@ int SkinLR2::IMAGE()
     if (lunaticvibes::iequals(parseParamBuf[0], "CONTINUE"))
     {
         std::string textureMapKey = std::to_string(imageCount);
-        if (prevSkinTextureNameMap.find(textureMapKey) != prevSkinTextureNameMap.end())
-        {
-            textureNameMap[textureMapKey] = prevSkinTextureNameMap[textureMapKey];
-        }
+        if (auto it = prevSkinTextureNameMap.find(textureMapKey); it != prevSkinTextureNameMap.end())
+            textureNameMap[textureMapKey] = it->second;
         else
-        {
             textureNameMap[textureMapKey] = std::make_shared<Texture>(nullptr, 0, 0);
-        }
         ++imageCount;
         return 1;
     }
@@ -1206,14 +1202,14 @@ bool SkinLR2::SRC()
             case 111: gr_key = "White"; break;
             default: gr_key = std::to_string(gr); break;
             }
-            if (videoNameMap.find(gr_key) != videoNameMap.end())
+            if (auto it = videoNameMap.find(gr_key); it != videoNameMap.end())
             {
                 textureBuf = textureNameMap["White"];
-                videoBuf = videoNameMap[gr_key];
+                videoBuf = it->second;
             }
-            else if (textureNameMap.find(gr_key) != textureNameMap.end())
+            else if (auto it = textureNameMap.find(gr_key); it != textureNameMap.end())
             {
-                textureBuf = textureNameMap[gr_key];
+                textureBuf = it->second;
                 videoBuf = nullptr;
             }
             else
@@ -1991,33 +1987,22 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
 
     // load raw into data struct
     lr2skin::s_basic d(parseParamBuf, _sharedData->flipSide, csvLineNumber);
-    if (flipSide)
-    {
-        if (type == DefType::LINE)
-        {
-            d._null = (d._null == 0) ? 1 : 0;
-        }
-    }
+    if (flipSide && type == DefType::LINE)
+        d._null = (d._null == 0) ? 1 : 0;
 
     IndexTimer iTimer = lr2skin::timer(d.timer);
 
     // Find texture from map by gr
     std::shared_ptr<Texture> tex = nullptr;
     std::string gr_key = std::to_string(d.gr);
-    if (textureNameMap.find(gr_key) != textureNameMap.end())
-    {
-        tex = textureNameMap[gr_key];
-    }
+    if (auto it = textureNameMap.find(gr_key); it != textureNameMap.end())
+        tex = it->second;
     else
-    {
         tex = textureNameMap["Error"];
-    }
 
     // SRC
     if (d._null >= 20)
-    {
         return ParseRet::PARAM_INVALID;
-    }
 
     NoteLaneCategory cat = NoteLaneCategory::_;
     NoteLaneIndex idx = NoteLaneIndex::_;

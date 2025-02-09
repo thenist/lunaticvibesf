@@ -1663,8 +1663,8 @@ bool SceneSelect::imguiApplyResolution()
         };
 
         auto&& s = imgui_video_mode;
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::WINDOWMODE, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::WINDOWMODE, it->second);
         else
             State::set(IndexText::WINDOWMODE, "WINDOW");
     }
@@ -1682,8 +1682,8 @@ bool SceneSelect::imguiApplyResolution()
         };
 
         auto&& s = imgui_video_vsync_index;
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::VSYNC, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::VSYNC, it->second);
         else
             State::set(IndexText::VSYNC, "OFF");
     }

@@ -29,13 +29,9 @@ void EntryFolderSong::pushChart(std::shared_ptr<ChartFormatBase> c)
 const std::vector<std::shared_ptr<ChartFormatBase>>& EntryFolderSong::getDifficultyList(int gamemode,
                                                                                         unsigned difficulty) const
 {
-    if (chartMap.find(gamemode) != chartMap.end())
-    {
-        const auto& diffMap = chartMap.at(gamemode);
-        if (diffMap.find(difficulty) != diffMap.end())
-            return diffMap.at(difficulty);
-    }
-
+    if (auto diffMap = chartMap.find(gamemode); diffMap != chartMap.end())
+        if (auto diffList = diffMap->second.find(difficulty); diffList != diffMap->second.end())
+            return diffList->second;
     static const std::vector<std::shared_ptr<ChartFormatBase>> emptyList;
     return emptyList;
 }
