@@ -34,17 +34,9 @@ void SpriteText::updateText()
     if (!_draw)
         return;
 
-    if (textureRect.h == 0)
-    {
-        // Happens on RED BELT Result.
-        updateTextTexture("", _current.color); // Clear it.
-    }
-    else
-    {
-        State::get(textInd, _textBuf);
-        updateTextTexture(_textBuf, _current.color);
-        updateTextRect();
-    }
+    State::get(textInd, _textBuf);
+    updateTextTexture(_textBuf, _current.color);
+    updateTextRect();
 }
 
 void SpriteText::updateTextTexture(std::string_view text, const Color& c)
