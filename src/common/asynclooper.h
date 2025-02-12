@@ -31,10 +31,6 @@ protected:
 
     LooperHandler handler;
 
-#ifndef NDEBUG
-    int64_t _runThreadID = 0;
-#endif
-
 #ifdef _WIN32
 protected:
     std::future<void> loopFuture;
