@@ -35,8 +35,7 @@ private:
         std::shared_lock l(_mutex);
         switch (type)
         {
-        case 'E':
-        case 'V': return G->get<Ty_v>(key, fallback);
+        case 'E': return G->get<Ty_v>(key, fallback);
         }
         lunaticvibes::assert_failed("ConfigMgr::_get");
     }
@@ -45,8 +44,7 @@ private:
         std::unique_lock l(_mutex);
         switch (type)
         {
-        case 'E':
-        case 'V': return G->set<Ty_v>(key, value);
+        case 'E': return G->set<Ty_v>(key, value);
         }
         lunaticvibes::assert_failed("ConfigMgr::_set");
     }
