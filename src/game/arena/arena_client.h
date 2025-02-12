@@ -76,7 +76,7 @@ private:
     }
 
 public:
-    int getPlayerID() const { return playerID; }
+    [[nodiscard]] int getPlayerID() const { return playerID; }
 
 public:
     // lobby
@@ -92,10 +92,10 @@ public:
     void setCreatedRuleset();
     void setPlayingFinished();
     void setResultFinished();
-    bool isLoadingFinished() const { return _isLoadingFinished; }
-    bool isCreatedRuleset() const { return _isCreatedRuleset; }
-    bool isPlayingFinished() const { return _isPlayingFinished; }
-    bool isResultFinished() const { return _isResultFinished; }
+    [[nodiscard]] bool isLoadingFinished() const { return _isLoadingFinished; }
+    [[nodiscard]] bool isCreatedRuleset() const { return _isCreatedRuleset; }
+    [[nodiscard]] bool isPlayingFinished() const { return _isPlayingFinished; }
+    [[nodiscard]] bool isResultFinished() const { return _isResultFinished; }
 
 protected:
     void asyncRecv();
