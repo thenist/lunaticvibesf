@@ -12,6 +12,7 @@
 #include <common/assert.h>
 #include <common/chartformat/chartformat_bms.h>
 #include <common/entry/entry_types.h>
+#include <common/log.h>
 #include <common/str_utils.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>

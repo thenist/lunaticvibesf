@@ -1,5 +1,4 @@
 #include "skin_lr2_button_callbacks.h"
-#include "game/scene/scene_context_customize.h"
 
 #include <algorithm>
 #include <functional>
@@ -11,12 +10,14 @@
 
 #include <common/assert.h>
 #include <common/entry/entry_song.h>
+#include <common/log.h>
 #include <common/play_modifiers.h>
 #include <common/sysutil.h>
 #include <config/config_mgr.h>
 #include <game/arena/arena_data.h>
 #include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
+#include <game/scene/scene_context_customize.h>
 #include <game/scene/scene_keyconfig.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>

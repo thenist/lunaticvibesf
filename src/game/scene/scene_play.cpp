@@ -17,6 +17,10 @@
 #include <game/ruleset/ruleset_bms.h>
 #include <game/ruleset/ruleset_bms_auto.h>
 #include <game/ruleset/ruleset_bms_replay.h>
+#include <game/runtime/index/number.h>
+#include <game/runtime/index/option.h>
+#include <game/runtime/index/timer.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_button_callbacks.h>
 #include <game/skin/skin_lr2_slider_callbacks.h>

@@ -8,6 +8,7 @@
 #include <game/ruleset/ruleset.h>
 #include <game/ruleset/ruleset_bms.h>
 #include <game/runtime/index/option.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>

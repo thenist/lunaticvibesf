@@ -3,7 +3,9 @@
 #include <common/assert.h>
 #include <common/play_modifiers.h>
 #include <game/chart/chart_types.h>
+#include <game/runtime/index/switch.h>
 #include <game/runtime/index/timer.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene.h>
 #include <game/scene/scene_context.h>
 

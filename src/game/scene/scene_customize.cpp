@@ -2,11 +2,13 @@
 
 #include <common/assert.h>
 #include <common/hash.h>
+#include <common/log.h>
 #include <common/sysutil.h>
 #include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
 #include <config/config_mgr.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2.h>
 #include <game/skin/skin_mgr.h>

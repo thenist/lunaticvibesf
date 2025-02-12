@@ -10,6 +10,7 @@
 #include <game/arena/arena_host.h>
 #include <game/ruleset/ruleset.h>
 #include <game/ruleset/ruleset_bms_network.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 
 ArenaData gArenaData;

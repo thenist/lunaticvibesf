@@ -2,6 +2,8 @@
 
 #include <common/log.h>
 #include <common/play_modifiers.h>
+#include <game/runtime/index/number.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 
 #include <cereal/archives/portable_binary.hpp>

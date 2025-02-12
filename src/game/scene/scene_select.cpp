@@ -15,6 +15,7 @@
 #include <common/entry/entry_song.h>
 #include <common/entry/entry_types.h>
 #include <common/keymap.h>
+#include <common/log.h>
 #include <common/play_modifiers.h>
 #include <common/str_utils.h>
 #include <common/thread_pool.h>
@@ -31,6 +32,7 @@
 #include <game/ruleset/ruleset_bms_auto.h>
 #include <game/runtime/i18n.h>
 #include <game/runtime/index/number.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/scene/scene_customize.h>
 #include <game/scene/scene_pre_select.h>

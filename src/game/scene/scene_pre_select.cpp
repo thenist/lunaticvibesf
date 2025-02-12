@@ -14,11 +14,14 @@
 #include <common/entry/entry_arena.h>
 #include <common/entry/entry_course.h>
 #include <common/entry/entry_table.h>
+#include <common/log.h>
 #include <common/sysutil.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
 #include <db/db_song.h>
 #include <game/runtime/i18n.h>
+#include <game/runtime/index/number.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <git_version.h>
 

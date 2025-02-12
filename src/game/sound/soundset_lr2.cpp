@@ -8,6 +8,7 @@
 #include <utility>
 
 #include <common/encoding.h>
+#include <common/log.h>
 #include <common/str_utils.h>
 #include <common/u8.h>
 #include <common/utils.h>

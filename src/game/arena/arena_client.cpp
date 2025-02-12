@@ -8,6 +8,7 @@
 #include <game/arena/arena_data.h>
 #include <game/arena/arena_internal.h>
 #include <game/runtime/i18n.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <git_version.h>
 

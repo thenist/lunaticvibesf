@@ -1,11 +1,12 @@
 #include "scene_decide.h"
-#include "scene_context.h"
 
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
-
-#include "common/log.h"
-#include "game/arena/arena_data.h"
+#include <common/log.h>
+#include <game/arena/arena_data.h>
+#include <game/runtime/index/timer.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
 
 #include <functional>
 

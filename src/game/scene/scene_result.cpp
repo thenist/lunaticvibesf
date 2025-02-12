@@ -2,6 +2,7 @@
 
 #include <common/assert.h>
 #include <common/beat.h>
+#include <common/log.h>
 #include <common/play_modifiers.h>
 #include <common/types.h>
 #include <config/config_mgr.h>
@@ -12,7 +13,9 @@
 #include <game/arena/arena_host.h>
 #include <game/ruleset/ruleset.h>
 #include <game/ruleset/ruleset_bms.h>
+#include <game/runtime/index/number.h>
 #include <game/runtime/index/option.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>

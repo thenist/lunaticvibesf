@@ -1,7 +1,12 @@
 #include "scene_keyconfig.h"
 
+#include <common/log.h>
 #include <config/config_mgr.h>
 #include <game/runtime/i18n.h>
+#include <game/runtime/index/slider.h>
+#include <game/runtime/index/switch.h>
+#include <game/runtime/index/text.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/sound/sound_mgr.h>
 

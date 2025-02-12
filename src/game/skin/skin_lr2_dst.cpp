@@ -2,6 +2,7 @@
 #include <game/arena/arena_data.h>
 #include <game/ruleset/ruleset_bms.h>
 #include <game/runtime/index/option.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2.h>
 

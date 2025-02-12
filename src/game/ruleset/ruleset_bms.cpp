@@ -10,11 +10,13 @@
 #include <utility>
 
 #include <common/assert.h>
+#include <common/log.h>
 #include <common/play_modifiers.h>
 #include <common/sysutil.h>
 #include <common/types.h>
 #include <config/config_mgr.h>
 #include <game/chart/chart_bms.h>
+#include <game/runtime/index/timer.h>
 #include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
 #include <game/sound/sound_mgr.h>

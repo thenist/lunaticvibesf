@@ -18,6 +18,7 @@
 #include <game/input/input_mgr.h>
 #include <game/runtime/generic_info.h>
 #include <game/runtime/i18n.h>
+#include <game/runtime/state.h>
 #include <game/scene/scene.h>
 #include <game/scene/scene_context.h>
 #include <game/scene/scene_mgr.h>

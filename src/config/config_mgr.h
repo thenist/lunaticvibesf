@@ -4,6 +4,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
+#include <string_view>
 
 #include "common/log.h"
 #include "config/cfg_general.h"

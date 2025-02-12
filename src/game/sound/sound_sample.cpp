@@ -1,7 +1,9 @@
 #include "sound_sample.h"
-#include "config/config_mgr.h"
-#include "sound_mgr.h"
-#include "soundset_lr2.h"
+
+#include <common/log.h>
+#include <config/config_mgr.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/soundset_lr2.h>
 
 void loadLR2Sound()
 {

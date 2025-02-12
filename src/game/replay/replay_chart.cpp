@@ -1,5 +1,6 @@
 #include "replay_chart.h"
 
+#include <common/log.h>
 #include <common/play_modifiers.h>
 #include <common/types.h>
 #include <common/utils.h>
