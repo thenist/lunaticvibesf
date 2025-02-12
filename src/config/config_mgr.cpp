@@ -783,7 +783,7 @@ int ConfigMgr::_selectProfile(const std::string& name)
         }
         else
         {
-            std::ofstream(p).close();
+            (void)std::ofstream{p};
         }
         return false;
     };

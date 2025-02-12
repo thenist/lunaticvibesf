@@ -59,5 +59,4 @@ void vConfig::save()
 {
     std::ofstream fout(_path, std::ios_base::trunc);
     fout << _yaml;
-    fout.close();
 }

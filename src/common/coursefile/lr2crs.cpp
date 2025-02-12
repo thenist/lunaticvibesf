@@ -24,7 +24,6 @@ static std::stringstream readFileIntoStringStream(const Path& filePath)
     }
     std::stringstream ss;
     ss << ifs.rdbuf();
-    ifs.close();
     return ss;
 }
 

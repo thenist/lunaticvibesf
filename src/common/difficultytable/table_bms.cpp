@@ -238,7 +238,6 @@ void DifficultyTableBMS::updateFromUrl(std::function<void(DifficultyTable::Updat
                     fs::create_directories(tablePath);
                 std::ofstream ofs(tablePath / "header.json", std::ios_base::binary);
                 ofs << body;
-                ofs.close();
             }
         }
         else
@@ -321,30 +320,28 @@ bool DifficultyTableBMS::loadFromFile()
         return false;
     }
 
-    // parse Header
-    std::ifstream headerifs(headerPath);
-    if (headerifs.fail())
-    {
-        LOG_WARNING << "[TableBMS] Open header.json failed!";
-        return false;
-    }
     std::stringstream headerFile;
-    headerFile << headerifs.rdbuf();
-    headerifs.sync();
-    headerifs.close();
+    {
+        std::ifstream headerifs(headerPath);
+        if (headerifs.fail())
+        {
+            LOG_WARNING << "[TableBMS] Open header.json failed!";
+            return false;
+        }
+        headerFile << headerifs.rdbuf();
+    }
     parseHeader(headerFile.str());
 
-    // parse Data
-    std::ifstream dataifs(dataPath);
-    if (dataifs.fail())
-    {
-        LOG_WARNING << "[TableBMS] Open data.json failed!";
-        return false;
-    }
     std::stringstream dataFile;
-    dataFile << dataifs.rdbuf();
-    dataifs.sync();
-    dataifs.close();
+    {
+        std::ifstream dataifs(dataPath);
+        if (dataifs.fail())
+        {
+            LOG_WARNING << "[TableBMS] Open data.json failed!";
+            return false;
+        }
+        dataFile << dataifs.rdbuf();
+    }
     parseBody(dataFile.str());
 
     return true;
@@ -442,7 +439,6 @@ void DifficultyTableBMS::parseBody(const std::string& content)
                 fs::create_directories(tablePath);
             std::ofstream ofs(tablePath / "data.json", std::ios_base::binary);
             ofs << content;
-            ofs.close();
         }
     }
     catch (std::exception& e)

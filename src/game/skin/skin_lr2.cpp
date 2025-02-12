@@ -3704,7 +3704,6 @@ SkinLR2::~SkinLR2()
         {
             std::ofstream fout(pCustomize, std::ios_base::trunc);
             fout << yaml;
-            fout.close();
         }
     }
 }

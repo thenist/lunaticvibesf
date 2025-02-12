@@ -707,7 +707,6 @@ void SceneCustomize::save(SkinType mode) const
 
         std::ofstream fout(pCustomize, std::ios_base::trunc);
         fout << yaml;
-        fout.close();
     }
 }
 

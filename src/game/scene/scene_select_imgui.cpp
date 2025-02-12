@@ -1209,11 +1209,11 @@ Special Thanks:
             static std::string text;
             if (text.empty())
             {
-                std::ifstream ifsFile(Path(GAMEDATA_PATH) / "resources" / "LICENSE_3RD_PARTY");
                 std::stringstream ss;
-                ss << ifsFile.rdbuf();
-                ss.sync();
-                ifsFile.close();
+                {
+                    std::ifstream ifsFile(Path(GAMEDATA_PATH) / "resources" / "LICENSE_3RD_PARTY");
+                    ss << ifsFile.rdbuf();
+                }
                 text = ss.str();
             }
             ImGui::TextUnformatted(text.c_str());
