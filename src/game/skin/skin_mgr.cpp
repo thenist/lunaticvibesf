@@ -85,7 +85,7 @@ void SkinMgr::reload(SkinType e, bool simple)
     case SkinType::MODE_COUNT: version = SkinVersion::UNDEF; break;
     }
 
-    skinFilePath = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), skinFilePathStr);
+    skinFilePath = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), skinFilePathStr);
 
     switch (version)
     {

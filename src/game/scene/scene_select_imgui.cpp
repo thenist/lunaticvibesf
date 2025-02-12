@@ -61,7 +61,7 @@ void SceneSelect::imguiInit()
     imguiRefreshLanguageList();
     old_language_index = imgui_language_index;
 
-    imgui_log_level = ConfigMgr::get('E', cfg::E_LOG_LEVEL, 1);
+    imgui_log_level = ConfigMgr::General()->get(cfg::E_LOG_LEVEL, 1);
 
     imguiRefreshFolderList();
     imguiRefreshTableList();
@@ -327,10 +327,11 @@ void SceneSelect::imguiSettings()
                         }
                         else
                         {
-                            if (ConfigMgr::createProfile(imgui_add_profile_buf,
-                                                         imgui_add_profile_copy_from_current
-                                                             ? ConfigMgr::get('E', cfg::E_PROFILE, cfg::PROFILE_DEFAULT)
-                                                             : "") == 0)
+                            if (ConfigMgr::createProfile(
+                                    imgui_add_profile_buf,
+                                    imgui_add_profile_copy_from_current
+                                        ? ConfigMgr::General()->get(cfg::E_PROFILE, cfg::PROFILE_DEFAULT)
+                                        : "") == 0)
                             {
                                 memset(imgui_add_profile_buf, 0, sizeof(imgui_add_profile_buf));
                                 ImGui::CloseCurrentPopup();
@@ -612,7 +613,7 @@ void SceneSelect::imguiPageOptionsGeneral()
                          imgui_log_level_display.size()))
         {
             lunaticvibes::SetLogLevel(static_cast<lunaticvibes::LogLevel>(imgui_log_level));
-            ConfigMgr::set('E', cfg::E_LOG_LEVEL, imgui_log_level);
+            ConfigMgr::General()->set(cfg::E_LOG_LEVEL, imgui_log_level);
         }
 
         ImGui::EndChild();
@@ -1295,7 +1296,7 @@ void SceneSelect::imguiRefreshProfileList()
     if (!imgui_profiles.empty())
     {
         int idx = -1;
-        std::string profile = ConfigMgr::get('E', cfg::E_PROFILE, cfg::PROFILE_DEFAULT);
+        std::string profile = ConfigMgr::General()->get(cfg::E_PROFILE, cfg::PROFILE_DEFAULT);
         for (const auto& p : imgui_profiles)
         {
             idx++;

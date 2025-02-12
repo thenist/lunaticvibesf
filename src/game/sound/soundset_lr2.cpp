@@ -37,7 +37,7 @@ void SoundSetLR2::loadCSV(Path p)
     auto srcLineNumberParent = csvLineNumber;
     csvLineNumber = 0;
 
-    p = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), p);
+    p = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), p);
 
     std::ifstream ifsFile(p, std::ios::binary);
     if (!ifsFile.is_open())
@@ -132,7 +132,8 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
         if (tokens.size() > 3)
             maker = tokens[3];
         if (tokens.size() > 4)
-            thumbnailPath = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), lunaticvibes::trim(tokens[4]));
+            thumbnailPath =
+                convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), lunaticvibes::trim(tokens[4]));
 
         return true;
     }
@@ -146,7 +147,7 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
 
         const auto& title = tokens[1];
         const auto& path = tokens[2];
-        Path pathf = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), path);
+        Path pathf = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), path);
         const auto& def = tokens[3];
 
         LOG_DEBUG << "[SoundSet] " << csvLineNumber << ": Loaded Custom file " << title << ": " << pathf;
@@ -209,7 +210,7 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string_view rawpat
         return false;
     }
 
-    Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), rawpath);
+    Path path = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), rawpath);
     const std::string pathU8Str = lunaticvibes::u8str(path);
     const std::string_view pathU8StrView{pathU8Str};
     if (pathU8StrView.find(u8'*') != pathU8StrView.npos)

@@ -140,8 +140,8 @@ SceneCustomize::SceneCustomize(std::shared_ptr<SkinMgr> skinMgr_, std::optional<
     }
     load(selectedMode);
 
-    auto skinFileList =
-        recursiveFindFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/"), ".lr2skin");
+    auto skinFileList = recursiveFindFiles(
+        convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), "LR2files/Theme/"), ".lr2skin");
     r::sort(skinFileList);
     auto dummySharedData = std::make_shared<lunaticvibes::SkinLr2SharedData>();
     for (auto& p : skinFileList)
@@ -160,7 +160,7 @@ SceneCustomize::SceneCustomize(std::shared_ptr<SkinMgr> skinMgr_, std::optional<
     }
 
     auto soundsetFileList =
-        recursiveFindFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/"), ".lr2ss");
+        recursiveFindFiles(convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), "LR2files/Sound/"), ".lr2ss");
     r::sort(soundsetFileList);
     for (auto& p : soundsetFileList)
     {
@@ -356,15 +356,15 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
                 for (selectedIdx = 0; selectedIdx < (int)soundsetList.size(); selectedIdx++)
                 {
                     Path path =
-                        convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                        convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."),
                                        ConfigMgr::Skin()->get(cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
                     if (fs::exists(soundsetList[selectedIdx]) && fs::exists(path) &&
                         fs::equivalent(soundsetList[selectedIdx], path))
                         break;
                 }
                 selectedIdx = wrappingAdd(selectedIdx, plus, 0, static_cast<int>(soundsetList.size() - 1));
-                const auto& p =
-                    fs::relative(soundsetList[selectedIdx], PathFromUTF8(ConfigMgr::get('E', cfg::E_LR2PATH, ".")));
+                const auto& p = fs::relative(soundsetList[selectedIdx],
+                                             PathFromUTF8(ConfigMgr::General()->get(cfg::E_LR2PATH, ".")));
 
                 ConfigMgr::Skin()->set(cfg::S_PATH_SOUNDSET, lunaticvibes::u8str(p));
 
@@ -400,7 +400,7 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
                 selectedIdx = wrappingAdd(selectedIdx, plus, 0, static_cast<int>(skinList[selectedMode].size()) - 1);
 
                 const auto p = fs::relative(skinList[selectedMode][selectedIdx],
-                                            PathFromUTF8(ConfigMgr::get('E', cfg::E_LR2PATH, ".")));
+                                            PathFromUTF8(ConfigMgr::General()->get(cfg::E_LR2PATH, ".")));
                 if (const char* key = configOptionNameForSkinType(selectedMode); key != nullptr)
                 {
                     ConfigMgr::Skin()->set(key, lunaticvibes::u8str(p));
@@ -543,7 +543,7 @@ void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
 
     if (selectedMode == SkinType::SOUNDSET)
     {
-        Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+        Path path = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."),
                                    ConfigMgr::Skin()->get(cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);
@@ -569,7 +569,7 @@ void SceneCustomize::load(SkinType mode)
         optionsMap.clear();
         optionsKeyList.clear();
 
-        Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+        Path path = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."),
                                    ConfigMgr::Skin()->get(cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);
@@ -675,7 +675,7 @@ void SceneCustomize::save(SkinType mode) const
     Path pCustomize;
     if (mode == SkinType::SOUNDSET)
     {
-        Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+        Path path = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."),
                                    ConfigMgr::Skin()->get(cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);

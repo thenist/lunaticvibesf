@@ -620,7 +620,7 @@ static void csvLineTokenizeSimple(const std::string_view raw, Tokens& res)
 
 Path SkinLR2::getCustomizePath(StringContentView input)
 {
-    Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), input);
+    Path path = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), input);
     StringPath pathStr = path.native();
     std::string pathU8Str = lunaticvibes::u8str(path);
 
@@ -687,7 +687,7 @@ int SkinLR2::HELPFILE()
         return 1;
     }
 
-    const auto filePath = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), parseParamBuf[0]);
+    const auto filePath = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), parseParamBuf[0]);
 
     std::ifstream ifs{filePath};
     if (ifs.fail())
@@ -3330,7 +3330,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
 
         auto& title(parseParamBuf[0]);
         auto& path(parseParamBuf[1]);
-        Path pathf = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), path);
+        Path pathf = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), path);
         auto& def(parseParamBuf[2]);
 
         auto ls = findFiles(pathf);
@@ -3717,7 +3717,7 @@ bool SkinLR2::loadCSV(Path p)
     auto srcLineNumberParent = csvLineNumber;
     csvLineNumber = 0;
 
-    p = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), p);
+    p = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), p);
 
     std::ifstream ifsFile(p, std::ios::binary);
     if (!ifsFile.is_open())
