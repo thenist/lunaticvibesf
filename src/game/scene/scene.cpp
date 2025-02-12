@@ -25,7 +25,7 @@
 
 // prototype
 SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType, unsigned rate, bool backgroundInput)
-    : _type(SceneType::NOT_INIT), _input(ConfigMgr::get('P', cfg::P_INPUT_POLLING_RATE, 1000), backgroundInput),
+    : _type(SceneType::NOT_INIT), _input(ConfigMgr::Profile()->get(cfg::P_INPUT_POLLING_RATE, 1000), backgroundInput),
       _rate(rate)
 {
     // Disable skin caching for now. dst options are changing all the time

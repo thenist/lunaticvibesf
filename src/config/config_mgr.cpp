@@ -17,42 +17,42 @@ void setNumbers()
 
     if (State::get(IndexNumber::HS_1P) == 0)
     {
-        State::set(IndexNumber::HS_1P, ConfigMgr::get('P', cfg::P_HISPEED, 1.0) * 100);
+        State::set(IndexNumber::HS_1P, ConfigMgr::Profile()->get(cfg::P_HISPEED, 1.0) * 100);
     }
     if (State::get(IndexNumber::HS_2P) == 0)
     {
-        State::set(IndexNumber::HS_2P, ConfigMgr::get('P', cfg::P_HISPEED_2P, 1.0) * 100);
+        State::set(IndexNumber::HS_2P, ConfigMgr::Profile()->get(cfg::P_HISPEED_2P, 1.0) * 100);
     }
 
-    State::set(IndexNumber::LANECOVER100_1P, ConfigMgr::get('P', P_LANECOVER_TOP, 0) / 10);
-    State::set(IndexNumber::LANECOVER100_2P, ConfigMgr::get('P', P_LANECOVER_TOP, 0) / 10);
+    State::set(IndexNumber::LANECOVER100_1P, ConfigMgr::Profile()->get(P_LANECOVER_TOP, 0) / 10);
+    State::set(IndexNumber::LANECOVER100_2P, ConfigMgr::Profile()->get(P_LANECOVER_TOP, 0) / 10);
 
-    State::set(IndexNumber::TIMING_ADJUST_VISUAL, ConfigMgr::get('P', P_JUDGE_OFFSET, 0));
+    State::set(IndexNumber::TIMING_ADJUST_VISUAL, ConfigMgr::Profile()->get(P_JUDGE_OFFSET, 0));
 
-    State::set(IndexNumber::DEFAULT_TARGET_RATE, ConfigMgr::get('P', P_GHOST_TARGET, 50));
+    State::set(IndexNumber::DEFAULT_TARGET_RATE, ConfigMgr::Profile()->get(P_GHOST_TARGET, 50));
 
-    State::set(IndexNumber::VOLUME_MASTER, ConfigMgr::get('P', P_VOL_MASTER, 1.0) * 100);
-    State::set(IndexNumber::VOLUME_KEY, ConfigMgr::get('P', P_VOL_KEY, 1.0) * 100);
-    State::set(IndexNumber::VOLUME_BGM, ConfigMgr::get('P', P_VOL_BGM, 1.0) * 100);
+    State::set(IndexNumber::VOLUME_MASTER, ConfigMgr::Profile()->get(P_VOL_MASTER, 1.0) * 100);
+    State::set(IndexNumber::VOLUME_KEY, ConfigMgr::Profile()->get(P_VOL_KEY, 1.0) * 100);
+    State::set(IndexNumber::VOLUME_BGM, ConfigMgr::Profile()->get(P_VOL_BGM, 1.0) * 100);
 
-    State::set(IndexNumber::FX0_P1, ConfigMgr::get('P', P_FX0_P1, 0));
-    State::set(IndexNumber::FX0_P2, ConfigMgr::get('P', P_FX0_P2, 0));
-    State::set(IndexNumber::FX1_P1, ConfigMgr::get('P', P_FX1_P1, 0));
-    State::set(IndexNumber::FX1_P2, ConfigMgr::get('P', P_FX1_P2, 0));
-    State::set(IndexNumber::FX2_P1, ConfigMgr::get('P', P_FX2_P1, 0));
-    State::set(IndexNumber::FX2_P2, ConfigMgr::get('P', P_FX2_P2, 0));
+    State::set(IndexNumber::FX0_P1, ConfigMgr::Profile()->get(P_FX0_P1, 0));
+    State::set(IndexNumber::FX0_P2, ConfigMgr::Profile()->get(P_FX0_P2, 0));
+    State::set(IndexNumber::FX1_P1, ConfigMgr::Profile()->get(P_FX1_P1, 0));
+    State::set(IndexNumber::FX1_P2, ConfigMgr::Profile()->get(P_FX1_P2, 0));
+    State::set(IndexNumber::FX2_P1, ConfigMgr::Profile()->get(P_FX2_P1, 0));
+    State::set(IndexNumber::FX2_P2, ConfigMgr::Profile()->get(P_FX2_P2, 0));
 
-    State::set(IndexNumber::EQ0, ConfigMgr::get('P', P_EQ0, 0));
-    State::set(IndexNumber::EQ1, ConfigMgr::get('P', P_EQ1, 0));
-    State::set(IndexNumber::EQ2, ConfigMgr::get('P', P_EQ2, 0));
-    State::set(IndexNumber::EQ3, ConfigMgr::get('P', P_EQ3, 0));
-    State::set(IndexNumber::EQ4, ConfigMgr::get('P', P_EQ4, 0));
-    State::set(IndexNumber::EQ5, ConfigMgr::get('P', P_EQ5, 0));
-    State::set(IndexNumber::EQ6, ConfigMgr::get('P', P_EQ6, 0));
+    State::set(IndexNumber::EQ0, ConfigMgr::Profile()->get(P_EQ0, 0));
+    State::set(IndexNumber::EQ1, ConfigMgr::Profile()->get(P_EQ1, 0));
+    State::set(IndexNumber::EQ2, ConfigMgr::Profile()->get(P_EQ2, 0));
+    State::set(IndexNumber::EQ3, ConfigMgr::Profile()->get(P_EQ3, 0));
+    State::set(IndexNumber::EQ4, ConfigMgr::Profile()->get(P_EQ4, 0));
+    State::set(IndexNumber::EQ5, ConfigMgr::Profile()->get(P_EQ5, 0));
+    State::set(IndexNumber::EQ6, ConfigMgr::Profile()->get(P_EQ6, 0));
 
-    State::set(IndexNumber::PITCH, ConfigMgr::get('P', P_FREQ_VAL, 0));
+    State::set(IndexNumber::PITCH, ConfigMgr::Profile()->get(P_FREQ_VAL, 0));
 
-    State::set(IndexNumber::NEW_ENTRY_SECONDS, ConfigMgr::get('P', P_NEW_SONG_DURATION, 0) * 60 * 60);
+    State::set(IndexNumber::NEW_ENTRY_SECONDS, ConfigMgr::Profile()->get(P_NEW_SONG_DURATION, 0) * 60 * 60);
 }
 
 void setOptions()
@@ -69,7 +69,7 @@ void setOptions()
             {P_BGA_TYPE_AUTOPLAY, Option::BGA_AUTOPLAY},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_BGA_TYPE, P_BGA_TYPE_ON);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_BGA_TYPE, P_BGA_TYPE_ON);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::PLAY_BGA_TYPE, it->second);
         else
@@ -81,7 +81,7 @@ void setOptions()
             {P_BGA_SIZE_EXTEND, Option::BGA_EXTEND},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_BGA_SIZE, P_BGA_SIZE_NORMAL);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_BGA_SIZE, P_BGA_SIZE_NORMAL);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::PLAY_BGA_SIZE, it->second);
         else
@@ -96,7 +96,7 @@ void setOptions()
             {P_SPEED_TYPE_INITIAL, SPEED_FIX_INITIAL}, {P_SPEED_TYPE_MAIN, SPEED_FIX_MAIN},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_SPEED_TYPE, P_SPEED_TYPE_NORMAL);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_SPEED_TYPE, P_SPEED_TYPE_NORMAL);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::PLAY_HSFIX_TYPE, it->second);
         else
@@ -117,7 +117,7 @@ void setOptions()
             {P_TARGET_TYPE_IR_AVERAGE, TARGET_IR_AVERAGE},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::PLAY_TARGET_TYPE, it->second);
         else
@@ -126,7 +126,7 @@ void setOptions()
 
     // autoadjust
     {
-        State::set(IndexOption::PLAY_AUTOADJUST, ConfigMgr::get('P', P_JUDGE_AUTOADJUST, 0));
+        State::set(IndexOption::PLAY_AUTOADJUST, ConfigMgr::Profile()->get(P_JUDGE_AUTOADJUST, 0));
     }
 
     // chart op
@@ -142,8 +142,8 @@ void setOptions()
             {P_CHART_OP_DB_SYMMETRY, RAN_DB_SYMMETRY_RANDOM},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_CHART_OP, P_CHART_OP_NORMAL);
-        auto&& s2 = ConfigMgr::get<string>('P', P_CHART_OP_2P, P_CHART_OP_NORMAL);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_CHART_OP, P_CHART_OP_NORMAL);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_CHART_OP_2P, P_CHART_OP_NORMAL);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexOption::PLAY_RANDOM_TYPE_1P, it->second);
         else
@@ -164,8 +164,8 @@ void setOptions()
             {P_GAUGE_OP_ASSISTEASY, GAUGE_ASSISTEASY},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_GAUGE_OP, P_GAUGE_OP_NORMAL);
-        auto&& s2 = ConfigMgr::get<string>('P', P_GAUGE_OP_2P, P_GAUGE_OP_NORMAL);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_GAUGE_OP, P_GAUGE_OP_NORMAL);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_GAUGE_OP_2P, P_GAUGE_OP_NORMAL);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexOption::PLAY_GAUGE_TYPE_1P, it->second);
         else
@@ -184,8 +184,8 @@ void setOptions()
             {P_LANE_EFFECT_OP_LIFT, LANE_LIFT},     {P_LANE_EFFECT_OP_LIFTSUD, LANE_LIFTSUD},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
-        auto&& s2 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_1P, it->second);
         else
@@ -204,8 +204,8 @@ void setOptions()
             {P_GHOST_TYPE_C, GHOST_SIDE_BOTTOM},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_GHOST_TYPE, "OFF");
-        auto&& s2 = ConfigMgr::get<string>('P', P_GHOST_TYPE_2P, "OFF");
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_GHOST_TYPE, "OFF");
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_GHOST_TYPE_2P, "OFF");
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexOption::PLAY_GHOST_TYPE_1P, it->second);
         else
@@ -225,7 +225,7 @@ void setOptions()
             {P_FILTER_KEYS_10K, FILTER_KEYS_10},        {P_FILTER_KEYS_9K, FILTER_KEYS_9},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_FILTER_KEYS, P_FILTER_KEYS_ALL);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_FILTER_KEYS, P_FILTER_KEYS_ALL);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::SELECT_FILTER_KEYS, it->second);
         else
@@ -239,7 +239,7 @@ void setOptions()
             {P_SORT_MODE_CLEAR, SORT_CLEAR},   {P_SORT_MODE_RATE, SORT_RATE},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_SORT_MODE, P_SORT_MODE_FOLDER);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_SORT_MODE, P_SORT_MODE_FOLDER);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::SELECT_SORT, it->second);
         else
@@ -254,7 +254,7 @@ void setOptions()
             {P_DIFFICULTY_FILTER_ANOTHER, DIFF_ANOTHER}, {P_DIFFICULTY_FILTER_INSANE, DIFF_INSANE},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ALL);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ALL);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::SELECT_FILTER_DIFF, it->second);
         else
@@ -269,7 +269,7 @@ void setOptions()
             {P_FREQ_TYPE_SPEED, FREQ_SPEED},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_FREQ_TYPE, P_FREQ_TYPE_FREQ);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_FREQ_TYPE, P_FREQ_TYPE_FREQ);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::SOUND_PITCH_TYPE, it->second);
         else
@@ -284,19 +284,19 @@ void setOptions()
             {P_FX_TARGET_BGM, FX_BGM},
         };
 
-        auto&& s0 = ConfigMgr::get<string>('P', P_FX0_TARGET, P_FX_TARGET_MASTER);
+        auto&& s0 = ConfigMgr::Profile()->get<string>(P_FX0_TARGET, P_FX_TARGET_MASTER);
         if (auto it = smap.find(s0); it != smap.end())
             State::set(IndexOption::SOUND_TARGET_FX0, it->second);
         else
             State::set(IndexOption::SOUND_TARGET_FX0, FX_MASTER);
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_FX1_TARGET, P_FX_TARGET_MASTER);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_FX1_TARGET, P_FX_TARGET_MASTER);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexOption::SOUND_TARGET_FX1, it->second);
         else
             State::set(IndexOption::SOUND_TARGET_FX1, FX_MASTER);
 
-        auto&& s2 = ConfigMgr::get<string>('P', P_FX2_TARGET, P_FX_TARGET_MASTER);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_FX2_TARGET, P_FX_TARGET_MASTER);
         if (auto it = smap.find(s2); it != smap.end())
             State::set(IndexOption::SOUND_TARGET_FX2, it->second);
         else
@@ -311,19 +311,19 @@ void setOptions()
             {P_FX_TYPE_DIST, FX_DISTORTION},
         };
 
-        auto&& s0 = ConfigMgr::get<string>('P', P_FX0_TYPE, "OFF");
+        auto&& s0 = ConfigMgr::Profile()->get<string>(P_FX0_TYPE, "OFF");
         if (auto it = smap.find(s0); it != smap.end())
             State::set(IndexOption::SOUND_FX0, it->second);
         else
             State::set(IndexOption::SOUND_FX0, FX_OFF);
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_FX1_TYPE, "OFF");
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_FX1_TYPE, "OFF");
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexOption::SOUND_FX1, it->second);
         else
             State::set(IndexOption::SOUND_FX1, FX_OFF);
 
-        auto&& s2 = ConfigMgr::get<string>('P', P_FX2_TYPE, "OFF");
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_FX2_TYPE, "OFF");
         if (auto it = smap.find(s2); it != smap.end())
             State::set(IndexOption::SOUND_FX2, it->second);
         else
@@ -348,26 +348,26 @@ void setSliders()
 {
     using namespace cfg;
 
-    State::set(IndexSlider::VOLUME_MASTER, ConfigMgr::get('P', P_VOL_MASTER, 1.0));
-    State::set(IndexSlider::VOLUME_KEY, ConfigMgr::get('P', P_VOL_KEY, 1.0));
-    State::set(IndexSlider::VOLUME_BGM, ConfigMgr::get('P', P_VOL_BGM, 1.0));
+    State::set(IndexSlider::VOLUME_MASTER, ConfigMgr::Profile()->get(P_VOL_MASTER, 1.0));
+    State::set(IndexSlider::VOLUME_KEY, ConfigMgr::Profile()->get(P_VOL_KEY, 1.0));
+    State::set(IndexSlider::VOLUME_BGM, ConfigMgr::Profile()->get(P_VOL_BGM, 1.0));
 
-    State::set(IndexSlider::EQ0, ((ConfigMgr::get('P', P_EQ0, 0) + 12) / 24.0));
-    State::set(IndexSlider::EQ1, ((ConfigMgr::get('P', P_EQ1, 0) + 12) / 24.0));
-    State::set(IndexSlider::EQ2, ((ConfigMgr::get('P', P_EQ2, 0) + 12) / 24.0));
-    State::set(IndexSlider::EQ3, ((ConfigMgr::get('P', P_EQ3, 0) + 12) / 24.0));
-    State::set(IndexSlider::EQ4, ((ConfigMgr::get('P', P_EQ4, 0) + 12) / 24.0));
-    State::set(IndexSlider::EQ5, ((ConfigMgr::get('P', P_EQ5, 0) + 12) / 24.0));
-    State::set(IndexSlider::EQ6, ((ConfigMgr::get('P', P_EQ6, 0) + 12) / 24.0));
+    State::set(IndexSlider::EQ0, ((ConfigMgr::Profile()->get(P_EQ0, 0) + 12) / 24.0));
+    State::set(IndexSlider::EQ1, ((ConfigMgr::Profile()->get(P_EQ1, 0) + 12) / 24.0));
+    State::set(IndexSlider::EQ2, ((ConfigMgr::Profile()->get(P_EQ2, 0) + 12) / 24.0));
+    State::set(IndexSlider::EQ3, ((ConfigMgr::Profile()->get(P_EQ3, 0) + 12) / 24.0));
+    State::set(IndexSlider::EQ4, ((ConfigMgr::Profile()->get(P_EQ4, 0) + 12) / 24.0));
+    State::set(IndexSlider::EQ5, ((ConfigMgr::Profile()->get(P_EQ5, 0) + 12) / 24.0));
+    State::set(IndexSlider::EQ6, ((ConfigMgr::Profile()->get(P_EQ6, 0) + 12) / 24.0));
 
-    State::set(IndexSlider::PITCH, ((ConfigMgr::get('P', P_FREQ_VAL, 0) + 12) / 24.0));
+    State::set(IndexSlider::PITCH, ((ConfigMgr::Profile()->get(P_FREQ_VAL, 0) + 12) / 24.0));
 
-    State::set(IndexSlider::FX0_P1, ConfigMgr::get('P', P_FX0_P1, 0) / 100.0);
-    State::set(IndexSlider::FX0_P2, ConfigMgr::get('P', P_FX0_P2, 0) / 100.0);
-    State::set(IndexSlider::FX1_P1, ConfigMgr::get('P', P_FX1_P1, 0) / 100.0);
-    State::set(IndexSlider::FX1_P2, ConfigMgr::get('P', P_FX1_P2, 0) / 100.0);
-    State::set(IndexSlider::FX2_P1, ConfigMgr::get('P', P_FX2_P1, 0) / 100.0);
-    State::set(IndexSlider::FX2_P2, ConfigMgr::get('P', P_FX2_P2, 0) / 100.0);
+    State::set(IndexSlider::FX0_P1, ConfigMgr::Profile()->get(P_FX0_P1, 0) / 100.0);
+    State::set(IndexSlider::FX0_P2, ConfigMgr::Profile()->get(P_FX0_P2, 0) / 100.0);
+    State::set(IndexSlider::FX1_P1, ConfigMgr::Profile()->get(P_FX1_P1, 0) / 100.0);
+    State::set(IndexSlider::FX1_P2, ConfigMgr::Profile()->get(P_FX1_P2, 0) / 100.0);
+    State::set(IndexSlider::FX2_P1, ConfigMgr::Profile()->get(P_FX2_P1, 0) / 100.0);
+    State::set(IndexSlider::FX2_P2, ConfigMgr::Profile()->get(P_FX2_P2, 0) / 100.0);
 }
 
 void setSwitches()
@@ -382,8 +382,8 @@ void setSwitches()
             {P_LANE_EFFECT_OP_SUDHID, true}, {P_LANE_EFFECT_OP_LIFT, false},  {P_LANE_EFFECT_OP_LIFTSUD, true},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
-        auto&& s2 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexSwitch::P1_LANECOVER_ENABLED, it->second);
         else
@@ -394,19 +394,21 @@ void setSwitches()
             State::set(IndexSwitch::P2_LANECOVER_ENABLED, false);
     }
 
-    State::set(IndexSwitch::PLAY_OPTION_DP_FLIP, ConfigMgr::get('P', P_FLIP, true));
-    State::set(IndexSwitch::SYSTEM_SCOREGRAPH, ConfigMgr::get('P', P_SCORE_GRAPH, true));
+    State::set(IndexSwitch::PLAY_OPTION_DP_FLIP, ConfigMgr::Profile()->get(P_FLIP, true));
+    State::set(IndexSwitch::SYSTEM_SCOREGRAPH, ConfigMgr::Profile()->get(P_SCORE_GRAPH, true));
     State::set(IndexSwitch::SOUND_VOLUME, true);
-    State::set(IndexSwitch::SOUND_EQ, ConfigMgr::get('P', P_EQ, true));
-    State::set(IndexSwitch::SOUND_PITCH, ConfigMgr::get('P', P_FREQ, true));
-    State::set(IndexSwitch::SOUND_FX0, ConfigMgr::get('P', P_FX0, true));
-    State::set(IndexSwitch::SOUND_FX1, ConfigMgr::get('P', P_FX1, true));
-    State::set(IndexSwitch::SOUND_FX2, ConfigMgr::get('P', P_FX2, true));
+    State::set(IndexSwitch::SOUND_EQ, ConfigMgr::Profile()->get(P_EQ, true));
+    State::set(IndexSwitch::SOUND_PITCH, ConfigMgr::Profile()->get(P_FREQ, true));
+    State::set(IndexSwitch::SOUND_FX0, ConfigMgr::Profile()->get(P_FX0, true));
+    State::set(IndexSwitch::SOUND_FX1, ConfigMgr::Profile()->get(P_FX1, true));
+    State::set(IndexSwitch::SOUND_FX2, ConfigMgr::Profile()->get(P_FX2, true));
 
     State::set(IndexSwitch::PLAY_OPTION_AUTOSCR_1P,
-               ConfigMgr::get<string>('P', P_CHART_ASSIST_OP, P_CHART_ASSIST_OP_NONE) == P_CHART_ASSIST_OP_AUTOSCR);
+               ConfigMgr::Profile()->get<string>(P_CHART_ASSIST_OP, P_CHART_ASSIST_OP_NONE) ==
+                   P_CHART_ASSIST_OP_AUTOSCR);
     State::set(IndexSwitch::PLAY_OPTION_AUTOSCR_2P,
-               ConfigMgr::get<string>('P', P_CHART_ASSIST_OP_2P, P_CHART_ASSIST_OP_NONE) == P_CHART_ASSIST_OP_AUTOSCR);
+               ConfigMgr::Profile()->get<string>(P_CHART_ASSIST_OP_2P, P_CHART_ASSIST_OP_NONE) ==
+                   P_CHART_ASSIST_OP_AUTOSCR);
 }
 
 void setText()
@@ -426,7 +428,7 @@ void setText()
                 {P_BGA_TYPE_AUTOPLAY, Option::s_bga_type[Option::BGA_AUTOPLAY]},
             };
 
-            auto&& s = ConfigMgr::get<string>('P', P_BGA_TYPE, P_BGA_TYPE_ON);
+            auto&& s = ConfigMgr::Profile()->get<string>(P_BGA_TYPE, P_BGA_TYPE_ON);
             if (auto it = smap.find(s); it != smap.end())
                 State::set(IndexText::BGA, it->second);
             else
@@ -438,7 +440,7 @@ void setText()
                 {P_BGA_SIZE_EXTEND, Option::s_bga_size[Option::BGA_EXTEND]},
             };
 
-            auto&& s = ConfigMgr::get<string>('P', P_BGA_SIZE, P_BGA_SIZE_NORMAL);
+            auto&& s = ConfigMgr::Profile()->get<string>(P_BGA_SIZE, P_BGA_SIZE_NORMAL);
             if (auto it = smap.find(s); it != smap.end())
                 State::set(IndexText::BGA_SIZE, it->second);
             else
@@ -458,7 +460,7 @@ void setText()
             {P_SPEED_TYPE_MAIN, Option::s_speed_type[Option::SPEED_FIX_MAIN]},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_SPEED_TYPE, P_SPEED_TYPE_NORMAL);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_SPEED_TYPE, P_SPEED_TYPE_NORMAL);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexText::SCROLL_TYPE, it->second);
         else
@@ -472,7 +474,7 @@ void setText()
             {P_LANE_EFFECT_OP_SUDHID, true}, {P_LANE_EFFECT_OP_LIFT, false},  {P_LANE_EFFECT_OP_LIFTSUD, true},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexText::SHUTTER, it->second ? "ON" : "OFF");
         else
@@ -490,8 +492,8 @@ void setText()
             {P_CHART_OP_ALLSCR, Option::s_random_type[Option::RAN_ALLSCR]},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_CHART_OP, P_CHART_OP_NORMAL);
-        auto&& s2 = ConfigMgr::get<string>('P', P_CHART_OP_2P, P_CHART_OP_NORMAL);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_CHART_OP, P_CHART_OP_NORMAL);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_CHART_OP_2P, P_CHART_OP_NORMAL);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexText::RANDOM_1P, it->second);
         else
@@ -513,8 +515,8 @@ void setText()
             {P_GAUGE_OP_ASSISTEASY, Option::s_gauge_type[Option::GAUGE_ASSISTEASY]},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_GAUGE_OP, P_GAUGE_OP_NORMAL);
-        auto&& s2 = ConfigMgr::get<string>('P', P_GAUGE_OP_2P, P_GAUGE_OP_NORMAL);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_GAUGE_OP, P_GAUGE_OP_NORMAL);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_GAUGE_OP_2P, P_GAUGE_OP_NORMAL);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexText::GAUGE_1P, it->second);
         else
@@ -532,8 +534,8 @@ void setText()
             {P_CHART_ASSIST_OP_AUTOSCR, Option::s_assist_type[Option::ASSIST_AUTOSCR]},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_CHART_ASSIST_OP, P_CHART_ASSIST_OP_NONE);
-        auto&& s2 = ConfigMgr::get<string>('P', P_CHART_ASSIST_OP_2P, P_CHART_ASSIST_OP_NONE);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_CHART_ASSIST_OP, P_CHART_ASSIST_OP_NONE);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_CHART_ASSIST_OP_2P, P_CHART_ASSIST_OP_NONE);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexText::ASSIST_1P, it->second);
         else
@@ -555,8 +557,8 @@ void setText()
             {P_LANE_EFFECT_OP_LIFTSUD, Option::s_lane_effect_type[Option::LANE_LIFTSUD]},
         };
 
-        auto&& s1 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
-        auto&& s2 = ConfigMgr::get<string>('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
+        auto&& s1 = ConfigMgr::Profile()->get<string>(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF);
+        auto&& s2 = ConfigMgr::Profile()->get<string>(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF);
         if (auto it = smap.find(s1); it != smap.end())
             State::set(IndexText::EFFECT_1P, it->second);
         else
@@ -576,7 +578,7 @@ void setText()
             {P_GHOST_TYPE_C, Option::s_play_ghost_mode[Option::GHOST_SIDE_BOTTOM]},
         };
 
-        auto&& s = ConfigMgr::get('P', P_GHOST_TYPE, P_GHOST_TYPE_OFF);
+        auto&& s = ConfigMgr::Profile()->get(P_GHOST_TYPE, P_GHOST_TYPE_OFF);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexText::GHOST, it->second);
         else
@@ -598,7 +600,7 @@ void setText()
             {P_TARGET_TYPE_IR_AVERAGE, Option::s_target_type[Option::TARGET_IR_AVERAGE]},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexText::TARGET_NAME, it->second);
         else
@@ -618,7 +620,7 @@ void setText()
             {P_FILTER_KEYS_9K, Option::s_filter_keys[Option::FILTER_KEYS_9]},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_FILTER_KEYS, P_FILTER_KEYS_ALL);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_FILTER_KEYS, P_FILTER_KEYS_ALL);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexText::FILTER_KEYS, it->second);
         else
@@ -635,7 +637,7 @@ void setText()
             {P_SORT_MODE_RATE, Option::s_select_sort[Option::SORT_RATE]},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_SORT_MODE, P_SORT_MODE_FOLDER);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_SORT_MODE, P_SORT_MODE_FOLDER);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexText::SORT_MODE, it->second);
         else
@@ -653,7 +655,7 @@ void setText()
             {P_DIFFICULTY_FILTER_INSANE, Option::s_select_diff[Option::DIFF_INSANE]},
         };
 
-        auto&& s = ConfigMgr::get<string>('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ALL);
+        auto&& s = ConfigMgr::Profile()->get<string>(P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ALL);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexText::FILTER_DIFFICULTY, it->second);
         else
@@ -664,10 +666,10 @@ void setText()
     State::set(IndexText::BATTLE, Option::s_battle_type[State::get(IndexOption::PLAY_BATTLE_TYPE)]);
 
     // flip
-    State::set(IndexText::FLIP, ConfigMgr::get('P', P_FLIP, true) ? "DP FLIP" : "OFF");
+    State::set(IndexText::FLIP, ConfigMgr::Profile()->get(P_FLIP, true) ? "DP FLIP" : "OFF");
 
     // graph
-    State::set(IndexText::SCORE_GRAPH, ConfigMgr::get('P', P_SCORE_GRAPH, true) ? "ON" : "OFF");
+    State::set(IndexText::SCORE_GRAPH, ConfigMgr::Profile()->get(P_SCORE_GRAPH, true) ? "ON" : "OFF");
 
     // windowed
     {
@@ -701,7 +703,7 @@ void setText()
     {
         State::set(IndexText::AUTOADJUST,
                    Option::s_autoadjust[std::min((unsigned int)std::size(Option::s_autoadjust),
-                                                 (unsigned int)ConfigMgr::get('P', P_JUDGE_AUTOADJUST, 0))]);
+                                                 (unsigned int)ConfigMgr::Profile()->get(P_JUDGE_AUTOADJUST, 0))]);
     }
 
     // fixed tokens

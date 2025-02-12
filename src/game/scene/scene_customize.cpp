@@ -69,7 +69,7 @@ static void loadPreviewChartIfNeeded(SkinType mode)
     gChartContext.chart.reset();
     gChartContext.path.clear();
 
-    auto path = ConfigMgr::get('P', key, "");
+    auto path = ConfigMgr::Profile()->get(key, "");
     if (path.empty())
     {
         LOG_ERROR << "[Customize] No preview chart specified";

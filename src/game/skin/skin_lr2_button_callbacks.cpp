@@ -182,7 +182,7 @@ void select_difficulty_filter(int iterateCount, int plus)
     if (!gSelectContext.backtrace.front().ignoreFilters && iterateCount < 6)
     {
         unsigned val = (State::get(IndexOption::SELECT_FILTER_DIFF) + 6 + plus) % 6;
-        if (val == Option::DIFF_ANY && ConfigMgr::get('P', cfg::P_DISABLE_DIFFICULTY_ALL, false))
+        if (val == Option::DIFF_ANY && ConfigMgr::Profile()->get(cfg::P_DISABLE_DIFFICULTY_ALL, false))
         {
             val++;
             iterateCount++;
@@ -221,17 +221,17 @@ void select_keys_filter(int iterateCount, int plus)
     if (!gSelectContext.backtrace.front().ignoreFilters && iterateCount < 8)
     {
         unsigned val = (State::get(IndexOption::SELECT_FILTER_KEYS) + 8 + plus) % 8;
-        if (val == Option::FILTER_KEYS_ALL && ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_ALL, false))
+        if (val == Option::FILTER_KEYS_ALL && ConfigMgr::Profile()->get(cfg::P_DISABLE_PLAYMODE_ALL, false))
         {
             val++;
             iterateCount++;
         }
-        if (val == Option::FILTER_KEYS_SINGLE && ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_SINGLE, false))
+        if (val == Option::FILTER_KEYS_SINGLE && ConfigMgr::Profile()->get(cfg::P_DISABLE_PLAYMODE_SINGLE, false))
         {
             val++;
             iterateCount++;
         }
-        if (val == Option::FILTER_KEYS_DOUBLE && ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_DOUBLE, false))
+        if (val == Option::FILTER_KEYS_DOUBLE && ConfigMgr::Profile()->get(cfg::P_DISABLE_PLAYMODE_DOUBLE, false))
         {
             val++;
             iterateCount++;
@@ -542,7 +542,7 @@ void gauge_type(int player, int plus)
     }
 
     // PlayModifierGaugeType
-    int types = ConfigMgr::get('P', cfg::P_ENABLE_NEW_GAUGE, false) ? 8 : 4;
+    int types = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_GAUGE, false) ? 8 : 4;
     unsigned val = (State::get(op) + types + plus) % types;
     if (val == Option::GAUGE_PATTACK || val == Option::GAUGE_GATTACK)
     {
@@ -580,7 +580,7 @@ void random_type(int player, int plus)
     }
 
     // PlayModifierRandomType
-    int types = ConfigMgr::get('P', cfg::P_ENABLE_NEW_RANDOM, false) ? 9 : 6;
+    int types = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_RANDOM, false) ? 9 : 6;
     int oldVal = State::get(op);
     unsigned val = (State::get(op) + types + plus) % types;
     if (val == Option::RAN_DB_SYNCHRONIZE_RANDOM || val == Option::RAN_DB_SYMMETRY_RANDOM)
@@ -735,7 +735,7 @@ void lane_effect(int player, int plus)
     }
 
     //
-    int types = ConfigMgr::get('P', cfg::P_ENABLE_NEW_LANE_OPTION, false) ? 6 : 4;
+    int types = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_LANE_OPTION, false) ? 6 : 4;
     unsigned val = (State::get(op) + types + plus) % types;
     State::set(op, val);
     State::set(tx, Option::s_lane_effect_type[val]);
@@ -978,7 +978,7 @@ static void bga(int plus)
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 
     // Play scene will check this config
-    ConfigMgr::set('P', cfg::P_BGA_TYPE, val);
+    ConfigMgr::Profile()->set(cfg::P_BGA_TYPE, val);
 }
 
 // 73
@@ -992,7 +992,7 @@ static void bga_size(int plus)
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 
     // Play scene will check this config
-    ConfigMgr::set('P', cfg::P_BGA_SIZE, val);
+    ConfigMgr::Profile()->set(cfg::P_BGA_SIZE, val);
 }
 
 // 75
@@ -1005,7 +1005,7 @@ static void judge_auto_adjust(int plus)
 
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 
-    ConfigMgr::set('P', cfg::P_JUDGE_AUTOADJUST, State::get(IndexOption::PLAY_AUTOADJUST));
+    ConfigMgr::Profile()->set(cfg::P_JUDGE_AUTOADJUST, State::get(IndexOption::PLAY_AUTOADJUST));
 }
 
 // 76

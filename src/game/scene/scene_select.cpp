@@ -79,283 +79,283 @@ static void config_player()
 
     switch (State::get(IndexOption::PLAY_TARGET_TYPE))
     {
-    case Option::TARGET_0: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_0); break;
-    case Option::TARGET_MYBEST: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_MYBEST); break;
-    case Option::TARGET_AAA: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_AAA); break;
-    case Option::TARGET_AA: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_AA); break;
-    case Option::TARGET_A: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_A); break;
-    case Option::TARGET_DEFAULT: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT); break;
-    case Option::TARGET_IR_TOP: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_IR_TOP); break;
-    case Option::TARGET_IR_NEXT: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_IR_NEXT); break;
-    case Option::TARGET_IR_AVERAGE: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_IR_AVERAGE); break;
-    default: ConfigMgr::set('P', P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT); break;
+    case Option::TARGET_0: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_0); break;
+    case Option::TARGET_MYBEST: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_MYBEST); break;
+    case Option::TARGET_AAA: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_AAA); break;
+    case Option::TARGET_AA: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_AA); break;
+    case Option::TARGET_A: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_A); break;
+    case Option::TARGET_DEFAULT: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT); break;
+    case Option::TARGET_IR_TOP: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_IR_TOP); break;
+    case Option::TARGET_IR_NEXT: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_IR_NEXT); break;
+    case Option::TARGET_IR_AVERAGE: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_IR_AVERAGE); break;
+    default: ConfigMgr::Profile()->set(P_TARGET_TYPE, P_TARGET_TYPE_DEFAULT); break;
     }
 
     switch (State::get(IndexOption::PLAY_BGA_TYPE))
     {
-    case Option::BGA_OFF: ConfigMgr::set('P', P_BGA_TYPE, P_BGA_TYPE_OFF); break;
-    case Option::BGA_ON: ConfigMgr::set('P', P_BGA_TYPE, P_BGA_TYPE_ON); break;
-    case Option::BGA_AUTOPLAY: ConfigMgr::set('P', P_BGA_TYPE, P_BGA_TYPE_AUTOPLAY); break;
-    default: ConfigMgr::set('P', P_BGA_TYPE, P_BGA_TYPE_ON); break;
+    case Option::BGA_OFF: ConfigMgr::Profile()->set(P_BGA_TYPE, P_BGA_TYPE_OFF); break;
+    case Option::BGA_ON: ConfigMgr::Profile()->set(P_BGA_TYPE, P_BGA_TYPE_ON); break;
+    case Option::BGA_AUTOPLAY: ConfigMgr::Profile()->set(P_BGA_TYPE, P_BGA_TYPE_AUTOPLAY); break;
+    default: ConfigMgr::Profile()->set(P_BGA_TYPE, P_BGA_TYPE_ON); break;
     }
     switch (State::get(IndexOption::PLAY_BGA_SIZE))
     {
-    case Option::BGA_NORMAL: ConfigMgr::set('P', P_BGA_SIZE, P_BGA_SIZE_NORMAL); break;
-    case Option::BGA_EXTEND: ConfigMgr::set('P', P_BGA_SIZE, P_BGA_SIZE_EXTEND); break;
-    default: ConfigMgr::set('P', P_BGA_SIZE, P_BGA_SIZE_NORMAL); break;
+    case Option::BGA_NORMAL: ConfigMgr::Profile()->set(P_BGA_SIZE, P_BGA_SIZE_NORMAL); break;
+    case Option::BGA_EXTEND: ConfigMgr::Profile()->set(P_BGA_SIZE, P_BGA_SIZE_EXTEND); break;
+    default: ConfigMgr::Profile()->set(P_BGA_SIZE, P_BGA_SIZE_NORMAL); break;
     }
 
     if (!gPlayContext.isReplay)
     {
-        ConfigMgr::set('P', P_HISPEED, gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed);
-        ConfigMgr::set('P', P_HISPEED_2P, gPlayContext.playerState[PLAYER_SLOT_TARGET].hispeed);
-        ConfigMgr::set('P', cfg::P_GREENNUMBER, State::get(IndexNumber::GREEN_NUMBER_1P));
-        ConfigMgr::set('P', cfg::P_GREENNUMBER_2P, State::get(IndexNumber::GREEN_NUMBER_2P));
+        ConfigMgr::Profile()->set(P_HISPEED, gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed);
+        ConfigMgr::Profile()->set(P_HISPEED_2P, gPlayContext.playerState[PLAYER_SLOT_TARGET].hispeed);
+        ConfigMgr::Profile()->set(cfg::P_GREENNUMBER, State::get(IndexNumber::GREEN_NUMBER_1P));
+        ConfigMgr::Profile()->set(cfg::P_GREENNUMBER_2P, State::get(IndexNumber::GREEN_NUMBER_2P));
 
         switch (State::get(IndexOption::PLAY_HSFIX_TYPE))
         {
-        case Option::SPEED_FIX_MAX: ConfigMgr::set('P', P_SPEED_TYPE, P_SPEED_TYPE_MAX); break;
-        case Option::SPEED_FIX_MIN: ConfigMgr::set('P', P_SPEED_TYPE, P_SPEED_TYPE_MIN); break;
-        case Option::SPEED_FIX_AVG: ConfigMgr::set('P', P_SPEED_TYPE, P_SPEED_TYPE_AVG); break;
-        case Option::SPEED_FIX_CONSTANT: ConfigMgr::set('P', P_SPEED_TYPE, P_SPEED_TYPE_CONSTANT); break;
-        case Option::SPEED_FIX_INITIAL: ConfigMgr::set('P', P_SPEED_TYPE, P_SPEED_TYPE_INITIAL); break;
-        case Option::SPEED_FIX_MAIN: ConfigMgr::set('P', P_SPEED_TYPE, P_SPEED_TYPE_MAIN); break;
-        default: ConfigMgr::set('P', P_SPEED_TYPE, P_SPEED_TYPE_NORMAL); break;
+        case Option::SPEED_FIX_MAX: ConfigMgr::Profile()->set(P_SPEED_TYPE, P_SPEED_TYPE_MAX); break;
+        case Option::SPEED_FIX_MIN: ConfigMgr::Profile()->set(P_SPEED_TYPE, P_SPEED_TYPE_MIN); break;
+        case Option::SPEED_FIX_AVG: ConfigMgr::Profile()->set(P_SPEED_TYPE, P_SPEED_TYPE_AVG); break;
+        case Option::SPEED_FIX_CONSTANT: ConfigMgr::Profile()->set(P_SPEED_TYPE, P_SPEED_TYPE_CONSTANT); break;
+        case Option::SPEED_FIX_INITIAL: ConfigMgr::Profile()->set(P_SPEED_TYPE, P_SPEED_TYPE_INITIAL); break;
+        case Option::SPEED_FIX_MAIN: ConfigMgr::Profile()->set(P_SPEED_TYPE, P_SPEED_TYPE_MAIN); break;
+        default: ConfigMgr::Profile()->set(P_SPEED_TYPE, P_SPEED_TYPE_NORMAL); break;
         }
 
         switch (State::get(IndexOption::PLAY_RANDOM_TYPE_1P))
         {
-        case Option::RAN_MIRROR: ConfigMgr::set('P', P_CHART_OP, P_CHART_OP_MIRROR); break;
-        case Option::RAN_RANDOM: ConfigMgr::set('P', P_CHART_OP, P_CHART_OP_RANDOM); break;
-        case Option::RAN_SRAN: ConfigMgr::set('P', P_CHART_OP, P_CHART_OP_SRAN); break;
-        case Option::RAN_HRAN: ConfigMgr::set('P', P_CHART_OP, P_CHART_OP_HRAN); break;
-        case Option::RAN_ALLSCR: ConfigMgr::set('P', P_CHART_OP, P_CHART_OP_ALLSCR); break;
-        case Option::RAN_RRAN: ConfigMgr::set('P', P_CHART_OP, P_CHART_OP_RRAN); break;
-        default: ConfigMgr::set('P', P_CHART_OP, P_CHART_OP_NORMAL); break;
+        case Option::RAN_MIRROR: ConfigMgr::Profile()->set(P_CHART_OP, P_CHART_OP_MIRROR); break;
+        case Option::RAN_RANDOM: ConfigMgr::Profile()->set(P_CHART_OP, P_CHART_OP_RANDOM); break;
+        case Option::RAN_SRAN: ConfigMgr::Profile()->set(P_CHART_OP, P_CHART_OP_SRAN); break;
+        case Option::RAN_HRAN: ConfigMgr::Profile()->set(P_CHART_OP, P_CHART_OP_HRAN); break;
+        case Option::RAN_ALLSCR: ConfigMgr::Profile()->set(P_CHART_OP, P_CHART_OP_ALLSCR); break;
+        case Option::RAN_RRAN: ConfigMgr::Profile()->set(P_CHART_OP, P_CHART_OP_RRAN); break;
+        default: ConfigMgr::Profile()->set(P_CHART_OP, P_CHART_OP_NORMAL); break;
         }
         switch (State::get(IndexOption::PLAY_RANDOM_TYPE_2P))
         {
-        case Option::RAN_MIRROR: ConfigMgr::set('P', P_CHART_OP_2P, P_CHART_OP_MIRROR); break;
-        case Option::RAN_RANDOM: ConfigMgr::set('P', P_CHART_OP_2P, P_CHART_OP_RANDOM); break;
-        case Option::RAN_SRAN: ConfigMgr::set('P', P_CHART_OP_2P, P_CHART_OP_SRAN); break;
-        case Option::RAN_HRAN: ConfigMgr::set('P', P_CHART_OP_2P, P_CHART_OP_HRAN); break;
-        case Option::RAN_ALLSCR: ConfigMgr::set('P', P_CHART_OP_2P, P_CHART_OP_ALLSCR); break;
-        case Option::RAN_RRAN: ConfigMgr::set('P', P_CHART_OP_2P, P_CHART_OP_RRAN); break;
-        default: ConfigMgr::set('P', P_CHART_OP_2P, P_CHART_OP_NORMAL); break;
+        case Option::RAN_MIRROR: ConfigMgr::Profile()->set(P_CHART_OP_2P, P_CHART_OP_MIRROR); break;
+        case Option::RAN_RANDOM: ConfigMgr::Profile()->set(P_CHART_OP_2P, P_CHART_OP_RANDOM); break;
+        case Option::RAN_SRAN: ConfigMgr::Profile()->set(P_CHART_OP_2P, P_CHART_OP_SRAN); break;
+        case Option::RAN_HRAN: ConfigMgr::Profile()->set(P_CHART_OP_2P, P_CHART_OP_HRAN); break;
+        case Option::RAN_ALLSCR: ConfigMgr::Profile()->set(P_CHART_OP_2P, P_CHART_OP_ALLSCR); break;
+        case Option::RAN_RRAN: ConfigMgr::Profile()->set(P_CHART_OP_2P, P_CHART_OP_RRAN); break;
+        default: ConfigMgr::Profile()->set(P_CHART_OP_2P, P_CHART_OP_NORMAL); break;
         }
 
         switch (State::get(IndexOption::PLAY_GAUGE_TYPE_1P))
         {
-        case Option::GAUGE_HARD: ConfigMgr::set('P', P_GAUGE_OP, P_GAUGE_OP_HARD); break;
-        case Option::GAUGE_EASY: ConfigMgr::set('P', P_GAUGE_OP, P_GAUGE_OP_EASY); break;
-        case Option::GAUGE_DEATH: ConfigMgr::set('P', P_GAUGE_OP, P_GAUGE_OP_DEATH); break;
-        case Option::GAUGE_EXHARD: ConfigMgr::set('P', P_GAUGE_OP, P_GAUGE_OP_EXHARD); break;
-        case Option::GAUGE_ASSISTEASY: ConfigMgr::set('P', P_GAUGE_OP, P_GAUGE_OP_ASSISTEASY); break;
-        default: ConfigMgr::set('P', P_GAUGE_OP, P_GAUGE_OP_NORMAL); break;
+        case Option::GAUGE_HARD: ConfigMgr::Profile()->set(P_GAUGE_OP, P_GAUGE_OP_HARD); break;
+        case Option::GAUGE_EASY: ConfigMgr::Profile()->set(P_GAUGE_OP, P_GAUGE_OP_EASY); break;
+        case Option::GAUGE_DEATH: ConfigMgr::Profile()->set(P_GAUGE_OP, P_GAUGE_OP_DEATH); break;
+        case Option::GAUGE_EXHARD: ConfigMgr::Profile()->set(P_GAUGE_OP, P_GAUGE_OP_EXHARD); break;
+        case Option::GAUGE_ASSISTEASY: ConfigMgr::Profile()->set(P_GAUGE_OP, P_GAUGE_OP_ASSISTEASY); break;
+        default: ConfigMgr::Profile()->set(P_GAUGE_OP, P_GAUGE_OP_NORMAL); break;
         }
         switch (State::get(IndexOption::PLAY_GAUGE_TYPE_2P))
         {
-        case Option::GAUGE_HARD: ConfigMgr::set('P', P_GAUGE_OP_2P, P_GAUGE_OP_HARD); break;
-        case Option::GAUGE_EASY: ConfigMgr::set('P', P_GAUGE_OP_2P, P_GAUGE_OP_EASY); break;
-        case Option::GAUGE_DEATH: ConfigMgr::set('P', P_GAUGE_OP_2P, P_GAUGE_OP_DEATH); break;
-        case Option::GAUGE_EXHARD: ConfigMgr::set('P', P_GAUGE_OP_2P, P_GAUGE_OP_EXHARD); break;
-        case Option::GAUGE_ASSISTEASY: ConfigMgr::set('P', P_GAUGE_OP_2P, P_GAUGE_OP_ASSISTEASY); break;
-        default: ConfigMgr::set('P', P_GAUGE_OP_2P, P_GAUGE_OP_NORMAL); break;
+        case Option::GAUGE_HARD: ConfigMgr::Profile()->set(P_GAUGE_OP_2P, P_GAUGE_OP_HARD); break;
+        case Option::GAUGE_EASY: ConfigMgr::Profile()->set(P_GAUGE_OP_2P, P_GAUGE_OP_EASY); break;
+        case Option::GAUGE_DEATH: ConfigMgr::Profile()->set(P_GAUGE_OP_2P, P_GAUGE_OP_DEATH); break;
+        case Option::GAUGE_EXHARD: ConfigMgr::Profile()->set(P_GAUGE_OP_2P, P_GAUGE_OP_EXHARD); break;
+        case Option::GAUGE_ASSISTEASY: ConfigMgr::Profile()->set(P_GAUGE_OP_2P, P_GAUGE_OP_ASSISTEASY); break;
+        default: ConfigMgr::Profile()->set(P_GAUGE_OP_2P, P_GAUGE_OP_NORMAL); break;
         }
 
         switch (State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_1P))
         {
-        case Option::LANE_OFF: ConfigMgr::set('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF); break;
-        case Option::LANE_HIDDEN: ConfigMgr::set('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_HIDDEN); break;
-        case Option::LANE_SUDDEN: ConfigMgr::set('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_SUDDEN); break;
-        case Option::LANE_SUDHID: ConfigMgr::set('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_SUDHID); break;
-        case Option::LANE_LIFT: ConfigMgr::set('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_LIFT); break;
-        case Option::LANE_LIFTSUD: ConfigMgr::set('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_LIFTSUD); break;
-        default: ConfigMgr::set('P', P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF); break;
+        case Option::LANE_OFF: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF); break;
+        case Option::LANE_HIDDEN: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_HIDDEN); break;
+        case Option::LANE_SUDDEN: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_SUDDEN); break;
+        case Option::LANE_SUDHID: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_SUDHID); break;
+        case Option::LANE_LIFT: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_LIFT); break;
+        case Option::LANE_LIFTSUD: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_LIFTSUD); break;
+        default: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP, P_LANE_EFFECT_OP_OFF); break;
         }
         switch (State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_2P))
         {
-        case Option::LANE_OFF: ConfigMgr::set('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF); break;
-        case Option::LANE_HIDDEN: ConfigMgr::set('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_HIDDEN); break;
-        case Option::LANE_SUDDEN: ConfigMgr::set('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_SUDDEN); break;
-        case Option::LANE_SUDHID: ConfigMgr::set('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_SUDHID); break;
-        case Option::LANE_LIFT: ConfigMgr::set('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_LIFT); break;
-        case Option::LANE_LIFTSUD: ConfigMgr::set('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_LIFTSUD); break;
-        default: ConfigMgr::set('P', P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF); break;
+        case Option::LANE_OFF: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF); break;
+        case Option::LANE_HIDDEN: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_HIDDEN); break;
+        case Option::LANE_SUDDEN: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_SUDDEN); break;
+        case Option::LANE_SUDHID: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_SUDHID); break;
+        case Option::LANE_LIFT: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_LIFT); break;
+        case Option::LANE_LIFTSUD: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_LIFTSUD); break;
+        default: ConfigMgr::Profile()->set(P_LANE_EFFECT_OP_2P, P_LANE_EFFECT_OP_OFF); break;
         }
 
-        ConfigMgr::set('P', P_CHART_ASSIST_OP,
-                       State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_1P) ? P_CHART_ASSIST_OP_AUTOSCR
-                                                                       : P_CHART_ASSIST_OP_NONE);
-        ConfigMgr::set('P', P_CHART_ASSIST_OP_2P,
-                       State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_2P) ? P_CHART_ASSIST_OP_AUTOSCR
-                                                                       : P_CHART_ASSIST_OP_NONE);
+        ConfigMgr::Profile()->set(P_CHART_ASSIST_OP, State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_1P)
+                                                         ? P_CHART_ASSIST_OP_AUTOSCR
+                                                         : P_CHART_ASSIST_OP_NONE);
+        ConfigMgr::Profile()->set(P_CHART_ASSIST_OP_2P, State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_2P)
+                                                            ? P_CHART_ASSIST_OP_AUTOSCR
+                                                            : P_CHART_ASSIST_OP_NONE);
 
-        ConfigMgr::set('P', P_FLIP, State::get(IndexSwitch::PLAY_OPTION_DP_FLIP));
+        ConfigMgr::Profile()->set(P_FLIP, State::get(IndexSwitch::PLAY_OPTION_DP_FLIP));
     }
 
     switch (State::get(IndexOption::PLAY_GHOST_TYPE_1P))
     {
-    case Option::GHOST_TOP: ConfigMgr::set('P', P_GHOST_TYPE, P_GHOST_TYPE_A); break;
-    case Option::GHOST_SIDE: ConfigMgr::set('P', P_GHOST_TYPE, P_GHOST_TYPE_B); break;
-    case Option::GHOST_SIDE_BOTTOM: ConfigMgr::set('P', P_GHOST_TYPE, P_GHOST_TYPE_C); break;
-    default: ConfigMgr::set('P', P_GHOST_TYPE, "OFF"); break;
+    case Option::GHOST_TOP: ConfigMgr::Profile()->set(P_GHOST_TYPE, P_GHOST_TYPE_A); break;
+    case Option::GHOST_SIDE: ConfigMgr::Profile()->set(P_GHOST_TYPE, P_GHOST_TYPE_B); break;
+    case Option::GHOST_SIDE_BOTTOM: ConfigMgr::Profile()->set(P_GHOST_TYPE, P_GHOST_TYPE_C); break;
+    default: ConfigMgr::Profile()->set(P_GHOST_TYPE, "OFF"); break;
     }
     switch (State::get(IndexOption::PLAY_GHOST_TYPE_2P))
     {
-    case Option::GHOST_TOP: ConfigMgr::set('P', P_GHOST_TYPE_2P, P_GHOST_TYPE_A); break;
-    case Option::GHOST_SIDE: ConfigMgr::set('P', P_GHOST_TYPE_2P, P_GHOST_TYPE_B); break;
-    case Option::GHOST_SIDE_BOTTOM: ConfigMgr::set('P', P_GHOST_TYPE_2P, P_GHOST_TYPE_C); break;
-    default: ConfigMgr::set('P', P_GHOST_TYPE_2P, "OFF"); break;
+    case Option::GHOST_TOP: ConfigMgr::Profile()->set(P_GHOST_TYPE_2P, P_GHOST_TYPE_A); break;
+    case Option::GHOST_SIDE: ConfigMgr::Profile()->set(P_GHOST_TYPE_2P, P_GHOST_TYPE_B); break;
+    case Option::GHOST_SIDE_BOTTOM: ConfigMgr::Profile()->set(P_GHOST_TYPE_2P, P_GHOST_TYPE_C); break;
+    default: ConfigMgr::Profile()->set(P_GHOST_TYPE_2P, "OFF"); break;
     }
 
-    ConfigMgr::set('P', P_JUDGE_OFFSET, State::get(IndexNumber::TIMING_ADJUST_VISUAL));
-    ConfigMgr::set('P', P_GHOST_TARGET, State::get(IndexNumber::DEFAULT_TARGET_RATE));
+    ConfigMgr::Profile()->set(P_JUDGE_OFFSET, State::get(IndexNumber::TIMING_ADJUST_VISUAL));
+    ConfigMgr::Profile()->set(P_GHOST_TARGET, State::get(IndexNumber::DEFAULT_TARGET_RATE));
 
     switch (State::get(IndexOption::SELECT_FILTER_KEYS))
     {
-    case Option::FILTER_KEYS_SINGLE: ConfigMgr::set('P', P_FILTER_KEYS, P_FILTER_KEYS_SINGLE); break;
-    case Option::FILTER_KEYS_7: ConfigMgr::set('P', P_FILTER_KEYS, P_FILTER_KEYS_7K); break;
-    case Option::FILTER_KEYS_5: ConfigMgr::set('P', P_FILTER_KEYS, P_FILTER_KEYS_5K); break;
-    case Option::FILTER_KEYS_14: ConfigMgr::set('P', P_FILTER_KEYS, P_FILTER_KEYS_14K); break;
-    case Option::FILTER_KEYS_DOUBLE: ConfigMgr::set('P', P_FILTER_KEYS, P_FILTER_KEYS_DOUBLE); break;
-    case Option::FILTER_KEYS_10: ConfigMgr::set('P', P_FILTER_KEYS, P_FILTER_KEYS_10K); break;
-    case Option::FILTER_KEYS_9: ConfigMgr::set('P', P_FILTER_KEYS, P_FILTER_KEYS_9K); break;
-    default: ConfigMgr::set('P', P_FILTER_KEYS, P_FILTER_KEYS_ALL); break;
+    case Option::FILTER_KEYS_SINGLE: ConfigMgr::Profile()->set(P_FILTER_KEYS, P_FILTER_KEYS_SINGLE); break;
+    case Option::FILTER_KEYS_7: ConfigMgr::Profile()->set(P_FILTER_KEYS, P_FILTER_KEYS_7K); break;
+    case Option::FILTER_KEYS_5: ConfigMgr::Profile()->set(P_FILTER_KEYS, P_FILTER_KEYS_5K); break;
+    case Option::FILTER_KEYS_14: ConfigMgr::Profile()->set(P_FILTER_KEYS, P_FILTER_KEYS_14K); break;
+    case Option::FILTER_KEYS_DOUBLE: ConfigMgr::Profile()->set(P_FILTER_KEYS, P_FILTER_KEYS_DOUBLE); break;
+    case Option::FILTER_KEYS_10: ConfigMgr::Profile()->set(P_FILTER_KEYS, P_FILTER_KEYS_10K); break;
+    case Option::FILTER_KEYS_9: ConfigMgr::Profile()->set(P_FILTER_KEYS, P_FILTER_KEYS_9K); break;
+    default: ConfigMgr::Profile()->set(P_FILTER_KEYS, P_FILTER_KEYS_ALL); break;
     }
 
     switch (State::get(IndexOption::SELECT_SORT))
     {
-    case Option::SORT_TITLE: ConfigMgr::set('P', P_SORT_MODE, P_SORT_MODE_TITLE); break;
-    case Option::SORT_LEVEL: ConfigMgr::set('P', P_SORT_MODE, P_SORT_MODE_LEVEL); break;
-    case Option::SORT_CLEAR: ConfigMgr::set('P', P_SORT_MODE, P_SORT_MODE_CLEAR); break;
-    case Option::SORT_RATE: ConfigMgr::set('P', P_SORT_MODE, P_SORT_MODE_RATE); break;
-    default: ConfigMgr::set('P', P_SORT_MODE, P_SORT_MODE_FOLDER); break;
+    case Option::SORT_TITLE: ConfigMgr::Profile()->set(P_SORT_MODE, P_SORT_MODE_TITLE); break;
+    case Option::SORT_LEVEL: ConfigMgr::Profile()->set(P_SORT_MODE, P_SORT_MODE_LEVEL); break;
+    case Option::SORT_CLEAR: ConfigMgr::Profile()->set(P_SORT_MODE, P_SORT_MODE_CLEAR); break;
+    case Option::SORT_RATE: ConfigMgr::Profile()->set(P_SORT_MODE, P_SORT_MODE_RATE); break;
+    default: ConfigMgr::Profile()->set(P_SORT_MODE, P_SORT_MODE_FOLDER); break;
     }
 
     switch (State::get(IndexOption::SELECT_FILTER_DIFF))
     {
-    case Option::DIFF_BEGINNER: ConfigMgr::set('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_BEGINNER); break;
-    case Option::DIFF_NORMAL: ConfigMgr::set('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_NORMAL); break;
-    case Option::DIFF_HYPER: ConfigMgr::set('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_HYPER); break;
-    case Option::DIFF_ANOTHER: ConfigMgr::set('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ANOTHER); break;
-    case Option::DIFF_INSANE: ConfigMgr::set('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_INSANE); break;
-    default: ConfigMgr::set('P', P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ALL); break;
+    case Option::DIFF_BEGINNER: ConfigMgr::Profile()->set(P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_BEGINNER); break;
+    case Option::DIFF_NORMAL: ConfigMgr::Profile()->set(P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_NORMAL); break;
+    case Option::DIFF_HYPER: ConfigMgr::Profile()->set(P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_HYPER); break;
+    case Option::DIFF_ANOTHER: ConfigMgr::Profile()->set(P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ANOTHER); break;
+    case Option::DIFF_INSANE: ConfigMgr::Profile()->set(P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_INSANE); break;
+    default: ConfigMgr::Profile()->set(P_DIFFICULTY_FILTER, P_DIFFICULTY_FILTER_ALL); break;
     }
 
-    ConfigMgr::set('P', P_SCORE_GRAPH, State::get(IndexSwitch::SYSTEM_SCOREGRAPH));
+    ConfigMgr::Profile()->set(P_SCORE_GRAPH, State::get(IndexSwitch::SYSTEM_SCOREGRAPH));
 }
 
 static void config_vol()
 {
     using namespace cfg;
 
-    ConfigMgr::set('P', P_VOL_MASTER, State::get(IndexSlider::VOLUME_MASTER));
-    ConfigMgr::set('P', P_VOL_KEY, State::get(IndexSlider::VOLUME_KEY));
-    ConfigMgr::set('P', P_VOL_BGM, State::get(IndexSlider::VOLUME_BGM));
+    ConfigMgr::Profile()->set(P_VOL_MASTER, State::get(IndexSlider::VOLUME_MASTER));
+    ConfigMgr::Profile()->set(P_VOL_KEY, State::get(IndexSlider::VOLUME_KEY));
+    ConfigMgr::Profile()->set(P_VOL_BGM, State::get(IndexSlider::VOLUME_BGM));
 }
 
 static void config_eq()
 {
     using namespace cfg;
 
-    ConfigMgr::set('P', P_EQ, State::get(IndexSwitch::SOUND_EQ));
-    ConfigMgr::set('P', P_EQ0, State::get(IndexNumber::EQ0));
-    ConfigMgr::set('P', P_EQ1, State::get(IndexNumber::EQ1));
-    ConfigMgr::set('P', P_EQ2, State::get(IndexNumber::EQ2));
-    ConfigMgr::set('P', P_EQ3, State::get(IndexNumber::EQ3));
-    ConfigMgr::set('P', P_EQ4, State::get(IndexNumber::EQ4));
-    ConfigMgr::set('P', P_EQ5, State::get(IndexNumber::EQ5));
-    ConfigMgr::set('P', P_EQ6, State::get(IndexNumber::EQ6));
+    ConfigMgr::Profile()->set(P_EQ, State::get(IndexSwitch::SOUND_EQ));
+    ConfigMgr::Profile()->set(P_EQ0, State::get(IndexNumber::EQ0));
+    ConfigMgr::Profile()->set(P_EQ1, State::get(IndexNumber::EQ1));
+    ConfigMgr::Profile()->set(P_EQ2, State::get(IndexNumber::EQ2));
+    ConfigMgr::Profile()->set(P_EQ3, State::get(IndexNumber::EQ3));
+    ConfigMgr::Profile()->set(P_EQ4, State::get(IndexNumber::EQ4));
+    ConfigMgr::Profile()->set(P_EQ5, State::get(IndexNumber::EQ5));
+    ConfigMgr::Profile()->set(P_EQ6, State::get(IndexNumber::EQ6));
 }
 
 static void config_freq()
 {
     using namespace cfg;
 
-    ConfigMgr::set('P', P_FREQ, State::get(IndexSwitch::SOUND_PITCH));
+    ConfigMgr::Profile()->set(P_FREQ, State::get(IndexSwitch::SOUND_PITCH));
     switch (State::get(IndexOption::SOUND_PITCH_TYPE))
     {
-    case Option::FREQ_FREQ: ConfigMgr::set('P', P_FREQ_TYPE, P_FREQ_TYPE_FREQ); break;
-    case Option::FREQ_PITCH: ConfigMgr::set('P', P_FREQ_TYPE, P_FREQ_TYPE_PITCH); break;
-    case Option::FREQ_SPEED: ConfigMgr::set('P', P_FREQ_TYPE, P_FREQ_TYPE_SPEED); break;
+    case Option::FREQ_FREQ: ConfigMgr::Profile()->set(P_FREQ_TYPE, P_FREQ_TYPE_FREQ); break;
+    case Option::FREQ_PITCH: ConfigMgr::Profile()->set(P_FREQ_TYPE, P_FREQ_TYPE_PITCH); break;
+    case Option::FREQ_SPEED: ConfigMgr::Profile()->set(P_FREQ_TYPE, P_FREQ_TYPE_SPEED); break;
     default: break;
     }
-    ConfigMgr::set('P', P_FREQ_VAL, State::get(IndexNumber::PITCH));
+    ConfigMgr::Profile()->set(P_FREQ_VAL, State::get(IndexNumber::PITCH));
 }
 
 static void config_fx()
 {
     using namespace cfg;
 
-    ConfigMgr::set('P', P_FX0, State::get(IndexSwitch::SOUND_FX0));
+    ConfigMgr::Profile()->set(P_FX0, State::get(IndexSwitch::SOUND_FX0));
     switch (State::get(IndexOption::SOUND_TARGET_FX0))
     {
-    case Option::FX_MASTER: ConfigMgr::set('P', P_FX0_TARGET, P_FX_TARGET_MASTER); break;
-    case Option::FX_KEY: ConfigMgr::set('P', P_FX0_TARGET, P_FX_TARGET_KEY); break;
-    case Option::FX_BGM: ConfigMgr::set('P', P_FX0_TARGET, P_FX_TARGET_BGM); break;
+    case Option::FX_MASTER: ConfigMgr::Profile()->set(P_FX0_TARGET, P_FX_TARGET_MASTER); break;
+    case Option::FX_KEY: ConfigMgr::Profile()->set(P_FX0_TARGET, P_FX_TARGET_KEY); break;
+    case Option::FX_BGM: ConfigMgr::Profile()->set(P_FX0_TARGET, P_FX_TARGET_BGM); break;
     default: break;
     }
     switch (State::get(IndexOption::SOUND_FX0))
     {
-    case Option::FX_OFF: ConfigMgr::set('P', P_FX0_TYPE, "OFF"); break;
-    case Option::FX_REVERB: ConfigMgr::set('P', P_FX0_TYPE, P_FX_TYPE_REVERB); break;
-    case Option::FX_DELAY: ConfigMgr::set('P', P_FX0_TYPE, P_FX_TYPE_DELAY); break;
-    case Option::FX_LOWPASS: ConfigMgr::set('P', P_FX0_TYPE, P_FX_TYPE_LOWPASS); break;
-    case Option::FX_HIGHPASS: ConfigMgr::set('P', P_FX0_TYPE, P_FX_TYPE_HIGHPASS); break;
-    case Option::FX_FLANGER: ConfigMgr::set('P', P_FX0_TYPE, P_FX_TYPE_FLANGER); break;
-    case Option::FX_CHORUS: ConfigMgr::set('P', P_FX0_TYPE, P_FX_TYPE_CHORUS); break;
-    case Option::FX_DISTORTION: ConfigMgr::set('P', P_FX0_TYPE, P_FX_TYPE_DIST); break;
+    case Option::FX_OFF: ConfigMgr::Profile()->set(P_FX0_TYPE, "OFF"); break;
+    case Option::FX_REVERB: ConfigMgr::Profile()->set(P_FX0_TYPE, P_FX_TYPE_REVERB); break;
+    case Option::FX_DELAY: ConfigMgr::Profile()->set(P_FX0_TYPE, P_FX_TYPE_DELAY); break;
+    case Option::FX_LOWPASS: ConfigMgr::Profile()->set(P_FX0_TYPE, P_FX_TYPE_LOWPASS); break;
+    case Option::FX_HIGHPASS: ConfigMgr::Profile()->set(P_FX0_TYPE, P_FX_TYPE_HIGHPASS); break;
+    case Option::FX_FLANGER: ConfigMgr::Profile()->set(P_FX0_TYPE, P_FX_TYPE_FLANGER); break;
+    case Option::FX_CHORUS: ConfigMgr::Profile()->set(P_FX0_TYPE, P_FX_TYPE_CHORUS); break;
+    case Option::FX_DISTORTION: ConfigMgr::Profile()->set(P_FX0_TYPE, P_FX_TYPE_DIST); break;
     default: break;
     }
-    ConfigMgr::set('P', P_FX0_P1, State::get(IndexNumber::FX0_P1));
-    ConfigMgr::set('P', P_FX0_P2, State::get(IndexNumber::FX0_P2));
+    ConfigMgr::Profile()->set(P_FX0_P1, State::get(IndexNumber::FX0_P1));
+    ConfigMgr::Profile()->set(P_FX0_P2, State::get(IndexNumber::FX0_P2));
 
-    ConfigMgr::set('P', P_FX1, State::get(IndexSwitch::SOUND_FX1));
+    ConfigMgr::Profile()->set(P_FX1, State::get(IndexSwitch::SOUND_FX1));
     switch (State::get(IndexOption::SOUND_TARGET_FX1))
     {
-    case Option::FX_MASTER: ConfigMgr::set('P', P_FX1_TARGET, P_FX_TARGET_MASTER); break;
-    case Option::FX_KEY: ConfigMgr::set('P', P_FX1_TARGET, P_FX_TARGET_KEY); break;
-    case Option::FX_BGM: ConfigMgr::set('P', P_FX1_TARGET, P_FX_TARGET_BGM); break;
+    case Option::FX_MASTER: ConfigMgr::Profile()->set(P_FX1_TARGET, P_FX_TARGET_MASTER); break;
+    case Option::FX_KEY: ConfigMgr::Profile()->set(P_FX1_TARGET, P_FX_TARGET_KEY); break;
+    case Option::FX_BGM: ConfigMgr::Profile()->set(P_FX1_TARGET, P_FX_TARGET_BGM); break;
     default: break;
     }
     switch (State::get(IndexOption::SOUND_FX1))
     {
-    case Option::FX_OFF: ConfigMgr::set('P', P_FX1_TYPE, "OFF"); break;
-    case Option::FX_REVERB: ConfigMgr::set('P', P_FX1_TYPE, P_FX_TYPE_REVERB); break;
-    case Option::FX_DELAY: ConfigMgr::set('P', P_FX1_TYPE, P_FX_TYPE_DELAY); break;
-    case Option::FX_LOWPASS: ConfigMgr::set('P', P_FX1_TYPE, P_FX_TYPE_LOWPASS); break;
-    case Option::FX_HIGHPASS: ConfigMgr::set('P', P_FX1_TYPE, P_FX_TYPE_HIGHPASS); break;
-    case Option::FX_FLANGER: ConfigMgr::set('P', P_FX1_TYPE, P_FX_TYPE_FLANGER); break;
-    case Option::FX_CHORUS: ConfigMgr::set('P', P_FX1_TYPE, P_FX_TYPE_CHORUS); break;
-    case Option::FX_DISTORTION: ConfigMgr::set('P', P_FX1_TYPE, P_FX_TYPE_DIST); break;
+    case Option::FX_OFF: ConfigMgr::Profile()->set(P_FX1_TYPE, "OFF"); break;
+    case Option::FX_REVERB: ConfigMgr::Profile()->set(P_FX1_TYPE, P_FX_TYPE_REVERB); break;
+    case Option::FX_DELAY: ConfigMgr::Profile()->set(P_FX1_TYPE, P_FX_TYPE_DELAY); break;
+    case Option::FX_LOWPASS: ConfigMgr::Profile()->set(P_FX1_TYPE, P_FX_TYPE_LOWPASS); break;
+    case Option::FX_HIGHPASS: ConfigMgr::Profile()->set(P_FX1_TYPE, P_FX_TYPE_HIGHPASS); break;
+    case Option::FX_FLANGER: ConfigMgr::Profile()->set(P_FX1_TYPE, P_FX_TYPE_FLANGER); break;
+    case Option::FX_CHORUS: ConfigMgr::Profile()->set(P_FX1_TYPE, P_FX_TYPE_CHORUS); break;
+    case Option::FX_DISTORTION: ConfigMgr::Profile()->set(P_FX1_TYPE, P_FX_TYPE_DIST); break;
     default: break;
     }
-    ConfigMgr::set('P', P_FX1_P1, State::get(IndexNumber::FX1_P1));
-    ConfigMgr::set('P', P_FX1_P2, State::get(IndexNumber::FX1_P2));
+    ConfigMgr::Profile()->set(P_FX1_P1, State::get(IndexNumber::FX1_P1));
+    ConfigMgr::Profile()->set(P_FX1_P2, State::get(IndexNumber::FX1_P2));
 
-    ConfigMgr::set('P', P_FX2, State::get(IndexSwitch::SOUND_FX2));
+    ConfigMgr::Profile()->set(P_FX2, State::get(IndexSwitch::SOUND_FX2));
     switch (State::get(IndexOption::SOUND_TARGET_FX2))
     {
-    case Option::FX_MASTER: ConfigMgr::set('P', P_FX2_TARGET, P_FX_TARGET_MASTER); break;
-    case Option::FX_KEY: ConfigMgr::set('P', P_FX2_TARGET, P_FX_TARGET_KEY); break;
-    case Option::FX_BGM: ConfigMgr::set('P', P_FX2_TARGET, P_FX_TARGET_BGM); break;
+    case Option::FX_MASTER: ConfigMgr::Profile()->set(P_FX2_TARGET, P_FX_TARGET_MASTER); break;
+    case Option::FX_KEY: ConfigMgr::Profile()->set(P_FX2_TARGET, P_FX_TARGET_KEY); break;
+    case Option::FX_BGM: ConfigMgr::Profile()->set(P_FX2_TARGET, P_FX_TARGET_BGM); break;
     default: break;
     }
     switch (State::get(IndexOption::SOUND_FX2))
     {
-    case Option::FX_OFF: ConfigMgr::set('P', P_FX2_TYPE, "OFF"); break;
-    case Option::FX_REVERB: ConfigMgr::set('P', P_FX2_TYPE, P_FX_TYPE_REVERB); break;
-    case Option::FX_DELAY: ConfigMgr::set('P', P_FX2_TYPE, P_FX_TYPE_DELAY); break;
-    case Option::FX_LOWPASS: ConfigMgr::set('P', P_FX2_TYPE, P_FX_TYPE_LOWPASS); break;
-    case Option::FX_HIGHPASS: ConfigMgr::set('P', P_FX2_TYPE, P_FX_TYPE_HIGHPASS); break;
-    case Option::FX_FLANGER: ConfigMgr::set('P', P_FX2_TYPE, P_FX_TYPE_FLANGER); break;
-    case Option::FX_CHORUS: ConfigMgr::set('P', P_FX2_TYPE, P_FX_TYPE_CHORUS); break;
-    case Option::FX_DISTORTION: ConfigMgr::set('P', P_FX2_TYPE, P_FX_TYPE_DIST); break;
+    case Option::FX_OFF: ConfigMgr::Profile()->set(P_FX2_TYPE, "OFF"); break;
+    case Option::FX_REVERB: ConfigMgr::Profile()->set(P_FX2_TYPE, P_FX_TYPE_REVERB); break;
+    case Option::FX_DELAY: ConfigMgr::Profile()->set(P_FX2_TYPE, P_FX_TYPE_DELAY); break;
+    case Option::FX_LOWPASS: ConfigMgr::Profile()->set(P_FX2_TYPE, P_FX_TYPE_LOWPASS); break;
+    case Option::FX_HIGHPASS: ConfigMgr::Profile()->set(P_FX2_TYPE, P_FX_TYPE_HIGHPASS); break;
+    case Option::FX_FLANGER: ConfigMgr::Profile()->set(P_FX2_TYPE, P_FX_TYPE_FLANGER); break;
+    case Option::FX_CHORUS: ConfigMgr::Profile()->set(P_FX2_TYPE, P_FX_TYPE_CHORUS); break;
+    case Option::FX_DISTORTION: ConfigMgr::Profile()->set(P_FX2_TYPE, P_FX_TYPE_DIST); break;
     default: break;
     }
-    ConfigMgr::set('P', P_FX2_P1, State::get(IndexNumber::FX2_P1));
-    ConfigMgr::set('P', P_FX2_P2, State::get(IndexNumber::FX2_P2));
+    ConfigMgr::Profile()->set(P_FX2_P1, State::get(IndexNumber::FX2_P1));
+    ConfigMgr::Profile()->set(P_FX2_P2, State::get(IndexNumber::FX2_P2));
 }
 
 #pragma endregion
@@ -437,8 +437,8 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
 
     State::set(IndexSwitch::SOUND_PITCH, true);
     lr2skin::slider::pitch(0.5);
-    State::set(IndexSwitch::SOUND_PITCH, ConfigMgr::get('P', cfg::P_FREQ, false));
-    lr2skin::slider::pitch((ConfigMgr::get('P', cfg::P_FREQ_VAL, 0) + 12) / 24.0);
+    State::set(IndexSwitch::SOUND_PITCH, ConfigMgr::Profile()->get(cfg::P_FREQ, false));
+    lr2skin::slider::pitch((ConfigMgr::Profile()->get(cfg::P_FREQ_VAL, 0) + 12) / 24.0);
 
     gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed = State::get(IndexNumber::HS_1P) / 100.0;
     gPlayContext.playerState[PLAYER_SLOT_TARGET].hispeed = State::get(IndexNumber::HS_2P) / 100.0;
@@ -452,8 +452,8 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
         State::set(IndexSwitch::P1_LOCK_SPEED, true);
         State::set(IndexSwitch::P2_LOCK_SPEED, true);
     }
-    State::set(IndexNumber::GREEN_NUMBER_1P, ConfigMgr::get('P', cfg::P_GREENNUMBER, 300));
-    State::set(IndexNumber::GREEN_NUMBER_2P, ConfigMgr::get('P', cfg::P_GREENNUMBER_2P, 300));
+    State::set(IndexNumber::GREEN_NUMBER_1P, ConfigMgr::Profile()->get(cfg::P_GREENNUMBER, 300));
+    State::set(IndexNumber::GREEN_NUMBER_2P, ConfigMgr::Profile()->get(cfg::P_GREENNUMBER_2P, 300));
 
     const auto stats = g_pScoreDB->getStats();
     State::set(IndexNumber::PROFILE_PLAY_COUNT, stats.play_count);
@@ -476,7 +476,7 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     if (!gInCustomize)
     {
         using namespace cfg;
-        auto bindings = ConfigMgr::get('P', P_SELECT_KEYBINDINGS, P_SELECT_KEYBINDINGS_7K);
+        auto bindings = ConfigMgr::Profile()->get(P_SELECT_KEYBINDINGS, P_SELECT_KEYBINDINGS_7K);
         if (bindings == P_SELECT_KEYBINDINGS_5K)
         {
             InputMgr::updateBindings(5);
@@ -491,9 +491,9 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
             InputMgr::updateBindings(7);
         }
     }
-    _show_random_any = ConfigMgr::get('P', cfg::P_SELECT_SHOW_RANDOM_ANY, false);
-    _show_random_failed = ConfigMgr::get('P', cfg::P_SELECT_SHOW_RANDOM_FAILED, false);
-    _show_random_noplay = ConfigMgr::get('P', cfg::P_SELECT_SHOW_RANDOM_NOPLAY, false);
+    _show_random_any = ConfigMgr::Profile()->get(cfg::P_SELECT_SHOW_RANDOM_ANY, false);
+    _show_random_failed = ConfigMgr::Profile()->get(cfg::P_SELECT_SHOW_RANDOM_FAILED, false);
+    _show_random_noplay = ConfigMgr::Profile()->get(cfg::P_SELECT_SHOW_RANDOM_NOPLAY, false);
 
     state = eSelectState::PREPARE;
 
@@ -521,17 +521,17 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
 
     imguiInit();
 
-    _config_enable_preview_dedicated = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, false);
-    _config_enable_preview_direct = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
-    _config_list_scroll_time_initial = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
-    lunaticvibes::assign(_lr2_db_import_path, ConfigMgr::get('P', cfg::P_LR2_DB_IMPORT_PATH, ""));
-    lunaticvibes::assign(_preview_chart_10k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_10K, ""));
-    lunaticvibes::assign(_preview_chart_14k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_14K, ""));
-    lunaticvibes::assign(_preview_chart_5k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_5K, ""));
-    lunaticvibes::assign(_preview_chart_7k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_7K, ""));
-    lunaticvibes::assign(_preview_chart_9k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_9K, ""));
+    _config_enable_preview_dedicated = ConfigMgr::Profile()->get(cfg::P_PREVIEW_DEDICATED, false);
+    _config_enable_preview_direct = ConfigMgr::Profile()->get(cfg::P_PREVIEW_DIRECT, false);
+    _config_list_scroll_time_initial = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
+    lunaticvibes::assign(_lr2_db_import_path, ConfigMgr::Profile()->get(cfg::P_LR2_DB_IMPORT_PATH, ""));
+    lunaticvibes::assign(_preview_chart_10k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_10K, ""));
+    lunaticvibes::assign(_preview_chart_14k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_14K, ""));
+    lunaticvibes::assign(_preview_chart_5k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_5K, ""));
+    lunaticvibes::assign(_preview_chart_7k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_7K, ""));
+    lunaticvibes::assign(_preview_chart_9k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_9K, ""));
 
-    _gas_gauge = false; // TODO: ConfigMgr::get('P', cfg::P_ENABLE_GAS, false);
+    _gas_gauge = false; // TODO: ConfigMgr::Profile()->get(cfg::P_ENABLE_GAS, false);
 
     _input.register_p("SCENE_PRESS", std::bind_front(&SceneSelect::inputGamePress, this));
     _input.register_h("SCENE_HOLD", std::bind_front(&SceneSelect::inputGameHold, this));
@@ -564,12 +564,12 @@ SceneSelect::~SceneSelect()
     config_eq();
     config_freq();
     config_fx();
-    ConfigMgr::set('P', cfg::P_LR2_DB_IMPORT_PATH, _lr2_db_import_path.data());
-    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_10K, _preview_chart_10k.data());
-    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_14K, _preview_chart_14k.data());
-    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_5K, _preview_chart_5k.data());
-    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_7K, _preview_chart_7k.data());
-    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_9K, _preview_chart_9k.data());
+    ConfigMgr::Profile()->set(cfg::P_LR2_DB_IMPORT_PATH, _lr2_db_import_path.data());
+    ConfigMgr::Profile()->set(cfg::P_PREVIEW_CHART_10K, _preview_chart_10k.data());
+    ConfigMgr::Profile()->set(cfg::P_PREVIEW_CHART_14K, _preview_chart_14k.data());
+    ConfigMgr::Profile()->set(cfg::P_PREVIEW_CHART_5K, _preview_chart_5k.data());
+    ConfigMgr::Profile()->set(cfg::P_PREVIEW_CHART_7K, _preview_chart_7k.data());
+    ConfigMgr::Profile()->set(cfg::P_PREVIEW_CHART_9K, _preview_chart_9k.data());
     ConfigMgr::save();
 
     _input.loopEnd();
@@ -1124,11 +1124,11 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                 std::stringstream ss;
                 bool lock1 = State::get(IndexSwitch::P1_LOCK_SPEED);
                 if (lock1)
-                    ss << "G(1P): FIX " << ConfigMgr::get('P', cfg::P_GREENNUMBER, 0);
+                    ss << "G(1P): FIX " << ConfigMgr::Profile()->get(cfg::P_GREENNUMBER, 0);
 
                 bool lock2 = State::get(IndexSwitch::P2_LOCK_SPEED);
                 if (lock2)
-                    ss << (lock1 ? " | " : "") << "G(2P): FIX " << ConfigMgr::get('P', cfg::P_GREENNUMBER_2P, 0);
+                    ss << (lock1 ? " | " : "") << "G(2P): FIX " << ConfigMgr::Profile()->get(cfg::P_GREENNUMBER_2P, 0);
 
                 std::string s = ss.str();
                 if (!s.empty())
@@ -1136,7 +1136,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                     State::set((IndexText)line++, ss.str());
                 }
             }
-            if (!pSkin->isSupportNewRandom && ConfigMgr::get('P', cfg::P_ENABLE_NEW_RANDOM, false))
+            if (!pSkin->isSupportNewRandom && ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_RANDOM, false))
             {
                 std::stringstream ss;
                 int lane1 = State::get(IndexOption::PLAY_RANDOM_TYPE_1P);
@@ -1178,7 +1178,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                     State::set((IndexText)line++, ss.str());
                 }
             }
-            if (!pSkin->isSupportExHardAndAssistEasy && ConfigMgr::get('P', cfg::P_ENABLE_NEW_GAUGE, false))
+            if (!pSkin->isSupportExHardAndAssistEasy && ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_GAUGE, false))
             {
                 std::stringstream ss;
                 int lane1 = State::get(IndexOption::PLAY_GAUGE_TYPE_1P);
@@ -1212,7 +1212,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                     State::set((IndexText)line++, ss.str());
                 }
             }
-            if (!pSkin->isSupportLift && ConfigMgr::get('P', cfg::P_ENABLE_NEW_LANE_OPTION, false))
+            if (!pSkin->isSupportLift && ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_LANE_OPTION, false))
             {
                 std::stringstream ss;
                 int lane1 = State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_1P);
@@ -1664,7 +1664,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
         {
             if (scrollAccumulator != 0.0)
             {
-                gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+                gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
             }
             scrollAccumulator -= 1.0;
             scrollButtonTimestamp = t;
@@ -1674,7 +1674,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
         {
             if (scrollAccumulator != 0.0)
             {
-                gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+                gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
             }
             scrollAccumulator += 1.0;
             scrollButtonTimestamp = t;
@@ -1693,14 +1693,14 @@ void SceneSelect::inputGameHoldSelect(InputMask& input, const lunaticvibes::Time
     // navigate
     if (isHoldingUp && (t - scrollButtonTimestamp).norm() >= gSelectContext.scrollTimeLength)
     {
-        gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+        gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
         scrollButtonTimestamp = t;
         scrollAccumulator -= 1.0;
         scrollAccumulatorAddUnit = scrollAccumulator / gSelectContext.scrollTimeLength * (1000.0 / getRate());
     }
     if (isHoldingDown && (t - scrollButtonTimestamp).norm() >= gSelectContext.scrollTimeLength)
     {
-        gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+        gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
         scrollButtonTimestamp = t;
         scrollAccumulator += 1.0;
         scrollAccumulatorAddUnit = scrollAccumulator / gSelectContext.scrollTimeLength * (1000.0 / getRate());

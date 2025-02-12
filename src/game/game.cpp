@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
 
     // language
     i18n::init();
-    i18n::setLanguage(ConfigMgr::get('P', cfg::P_LANGUAGE, "English"));
+    i18n::setLanguage(ConfigMgr::Profile()->get(cfg::P_LANGUAGE, "English"));
 
     // imgui font
     int fontIndex = 0;
@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
+    gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
 
     // load songs / tables at ScenePreSelect
 

@@ -923,7 +923,7 @@ void RulesetBMS::initGaugeParams(const PlayModifiers& mods)
             for (auto g : std::array{GaugeType::EXGRADE, GaugeType::GRADE})
                 gauges.push_back(buildGauge(g));
         }
-        else if (ConfigMgr::get('P', cfg::P_ENABLE_NEW_GAUGE, false))
+        else if (ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_GAUGE, false))
         {
             for (auto g : std::array{GaugeType::DEATH, GaugeType::EXHARD, GaugeType::HARD, GaugeType::GROOVE,
                                      GaugeType::EASY, GaugeType::ASSIST})

@@ -494,8 +494,8 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
         {
             playerState[slot].origLanecoverType = (Option::e_lane_effect_type)State::get(indLanecoverType);
 
-            sudden = ConfigMgr::get('P', cfgLanecoverTop, 0) / 1000.0;
-            hidden = ConfigMgr::get('P', cfgLanecoverBottom, 0) / 1000.0;
+            sudden = ConfigMgr::Profile()->get(cfgLanecoverTop, 0) / 1000.0;
+            hidden = ConfigMgr::Profile()->get(cfgLanecoverBottom, 0) / 1000.0;
             switch (playerState[slot].origLanecoverType)
             {
             case Option::LANE_OFF:
@@ -572,7 +572,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
         default: bpm = gPlayContext.chartObj[slot]->getCurrentBPM(); break;
         }
 
-        int green = ConfigMgr::get('P', cfg, 1200);
+        int green = ConfigMgr::Profile()->get(cfg, 1200);
         const auto [hs, val] = calcHiSpeed(bpm, slot, green);
 
         *pHispeed = hs;
@@ -606,16 +606,16 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
-    adjustHispeedWithUpDown = ConfigMgr::get('P', cfg::P_ADJUST_HISPEED_WITH_ARROWKEYS, false);
-    adjustHispeedWithSelect = ConfigMgr::get('P', cfg::P_ADJUST_HISPEED_WITH_SELECT, false);
-    adjustLanecoverWithStart67 = ConfigMgr::get('P', cfg::P_ADJUST_LANECOVER_WITH_START_67, false);
-    adjustLanecoverWithMousewheel = ConfigMgr::get('P', cfg::P_ADJUST_LANECOVER_WITH_MOUSEWHEEL, false);
-    adjustLanecoverWithLeftRight = ConfigMgr::get('P', cfg::P_ADJUST_LANECOVER_WITH_ARROWKEYS, false);
+    adjustHispeedWithUpDown = ConfigMgr::Profile()->get(cfg::P_ADJUST_HISPEED_WITH_ARROWKEYS, false);
+    adjustHispeedWithSelect = ConfigMgr::Profile()->get(cfg::P_ADJUST_HISPEED_WITH_SELECT, false);
+    adjustLanecoverWithStart67 = ConfigMgr::Profile()->get(cfg::P_ADJUST_LANECOVER_WITH_START_67, false);
+    adjustLanecoverWithMousewheel = ConfigMgr::Profile()->get(cfg::P_ADJUST_LANECOVER_WITH_MOUSEWHEEL, false);
+    adjustLanecoverWithLeftRight = ConfigMgr::Profile()->get(cfg::P_ADJUST_LANECOVER_WITH_ARROWKEYS, false);
 
     if (adjustLanecoverWithMousewheel)
         _inputAvailable |= INPUT_MASK_MOUSE;
 
-    poorBgaDuration = ConfigMgr::get('P', cfg::P_MISSBGA_LENGTH, 500);
+    poorBgaDuration = ConfigMgr::Profile()->get(cfg::P_MISSBGA_LENGTH, 500);
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2328,31 +2328,31 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
                 case Option::LANE_LIFTSUD: saveBottom = true; break;
                 }
                 if (saveTop)
-                    ConfigMgr::set('P', cfgLanecoverTop, State::get(indLanecoverTop));
+                    ConfigMgr::Profile()->set(cfgLanecoverTop, State::get(indLanecoverTop));
                 if (saveBottom)
-                    ConfigMgr::set('P', cfgLanecoverBottom, State::get(indLanecoverBottom));
+                    ConfigMgr::Profile()->set(cfgLanecoverBottom, State::get(indLanecoverBottom));
 
                 if (State::get(indLockSpeed))
                 {
-                    ConfigMgr::set('P', cfgGreenNumber, playerState[slot].lockspeedGreenNumber);
+                    ConfigMgr::Profile()->set(cfgGreenNumber, playerState[slot].lockspeedGreenNumber);
 
                     if (State::get(IndexOption::PLAY_HSFIX_TYPE) == Option::SPEED_NORMAL)
                     {
-                        ConfigMgr::set('P', cfg::P_SPEED_TYPE, cfg::P_SPEED_TYPE_INITIAL);
+                        ConfigMgr::Profile()->set(cfg::P_SPEED_TYPE, cfg::P_SPEED_TYPE_INITIAL);
                     }
                 }
 
                 // only save OFF -> SUD+
                 if (playerState[slot].origLanecoverType == Option::LANE_OFF && State::get(indLanecoverEnabled))
                 {
-                    ConfigMgr::set('P', cfgLaneEffect, cfg::P_LANE_EFFECT_OP_SUDDEN);
+                    ConfigMgr::Profile()->set(cfgLaneEffect, cfg::P_LANE_EFFECT_OP_SUDDEN);
                 }
             };
             saveLanecoverSide(PLAYER_SLOT_PLAYER);
             if (gPlayContext.isBattle)
                 saveLanecoverSide(PLAYER_SLOT_TARGET);
 
-            ConfigMgr::set('P', cfg::P_JUDGE_OFFSET, State::get(IndexNumber::TIMING_ADJUST_VISUAL));
+            ConfigMgr::Profile()->set(cfg::P_JUDGE_OFFSET, State::get(IndexNumber::TIMING_ADJUST_VISUAL));
         }
 
         // reset BGA

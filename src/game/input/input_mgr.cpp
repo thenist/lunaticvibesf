@@ -19,7 +19,7 @@ void InputMgr::init()
 {
     initInput();
 
-    setDebounceTime(ConfigMgr::get('P', cfg::P_MIN_INPUT_INTERVAL, 16));
+    setDebounceTime(ConfigMgr::Profile()->get(cfg::P_MIN_INPUT_INTERVAL, 16));
 }
 
 void InputMgr::updateDevices()

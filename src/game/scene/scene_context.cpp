@@ -189,11 +189,11 @@ void loadSongList()
 
         // apply filter
         auto checkFilterKeys = [](unsigned keys) {
-            if ((keys == 10 || keys == 14) && ConfigMgr::get('P', cfg::P_IGNORE_DP_CHARTS, false))
+            if ((keys == 10 || keys == 14) && ConfigMgr::Profile()->get(cfg::P_IGNORE_DP_CHARTS, false))
             {
                 return false;
             }
-            if (keys == 9 && ConfigMgr::get('P', cfg::P_IGNORE_9KEYS_CHARTS, false))
+            if (keys == 9 && ConfigMgr::Profile()->get(cfg::P_IGNORE_9KEYS_CHARTS, false))
             {
                 return false;
             }
@@ -238,7 +238,7 @@ void loadSongList()
 
             bool have7k = false;
             bool have14k = false;
-            if (ConfigMgr::get('P', cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false))
+            if (ConfigMgr::Profile()->get(cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false))
             {
                 for (size_t idx = 0; idx < f->getContentsCount() && !skip; ++idx)
                 {
@@ -254,7 +254,7 @@ void loadSongList()
             {
                 auto pBase = f->getChart(idx);
 
-                if (ConfigMgr::get('P', cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false))
+                if (ConfigMgr::Profile()->get(cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false))
                 {
                     if (pBase->gamemode == 5 && have7k)
                         continue;
@@ -614,7 +614,7 @@ void setBarInfo()
     const size_t cursor = gSelectContext.highlightBarIndex;
     const size_t count =
         size_t(IndexText::_SELECT_BAR_TITLE_FULL_MAX) - size_t(IndexText::_SELECT_BAR_TITLE_FULL_0) + 1;
-    const bool subtitle = !ConfigMgr::get('P', cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, false);
+    const bool subtitle = !ConfigMgr::Profile()->get(cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, false);
 
     auto setSingleBarInfo = [&](size_t list_idx, size_t bar_index) {
         auto entry = e[list_idx].first;
