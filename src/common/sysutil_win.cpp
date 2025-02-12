@@ -1,16 +1,17 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 
-#include "common/utils.h"
 #include "sysutil.h"
 
-#include <chrono>
-#include <cstdio>
-#include <filesystem>
+#include <common/utils.h>
 
 #include <VersionHelpers.h>
 #include <shellapi.h>
 #include <windows.h>
+
+#include <chrono>
+#include <cstdio>
+#include <filesystem>
 
 const DWORD MS_VC_EXCEPTION = 0x406D1388;
 
@@ -24,8 +25,9 @@ typedef struct tagTHREADNAME_INFO
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-void SetThreadNameWin32(DWORD dwThreadID, const char* threadName)
+static void SetThreadNameWin32(DWORD dwThreadID, const char* threadName)
 {
+    // TODO: revert c2b4c595 Remove SetThreadDescription() call? #win
 
     // change VS debugger thread name
     THREADNAME_INFO info;
@@ -53,12 +55,8 @@ void SetThreadName(const char* name)
 Path GetExecutablePath()
 {
     char fullpath[256] = {0};
-
     if (!GetModuleFileNameA(nullptr, fullpath, sizeof(fullpath)))
-    {
         return {};
-    }
-
     return fs::path(fullpath).parent_path();
 }
 
@@ -74,8 +72,9 @@ void getWindowHandle(void* handle)
 
 long long getFileLastWriteTime(const Path& p)
 {
+    constexpr auto TO_UNIX_EPOCH = 11644473600;
     return std::chrono::duration_cast<std::chrono::seconds>(fs::last_write_time(p).time_since_epoch()).count() -
-           11644473600;
+           TO_UNIX_EPOCH;
 }
 
 const char* safe_strerror(int errnum, char* buffer, size_t buffer_length)
@@ -86,7 +85,7 @@ const char* safe_strerror(int errnum, char* buffer, size_t buffer_length)
 
 bool lunaticvibes::open(const std::string& link)
 {
-    // TODO: check UTF-8 compatibility.
+    // TODO: check UTF-8 compatibility. #win
     auto res = reinterpret_cast<INT_PTR>(ShellExecute(nullptr, "open", link.c_str(), nullptr, nullptr, SW_SHOWDEFAULT));
     // > .. can be cast only to an INT_PTR
     // > If the function succeeds, it returns a value greater than 32.
