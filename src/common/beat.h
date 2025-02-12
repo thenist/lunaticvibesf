@@ -52,14 +52,12 @@ private:
     decltype(std::declval<timeHighRes>().count()) _highres;
 
 public:
-    // TODO: have a separate helper that would construct with current time.
-    Time()
+    constexpr Time() = default;
+    static Time now()
     {
-        auto now = std::chrono::system_clock::now().time_since_epoch();
-        _regular = std::chrono::duration_cast<timeNormRes>(now).count();
-        _highres = std::chrono::duration_cast<timeHighRes>(now).count();
-    }
-    static Time now() { return Time{}; };
+        return {std::chrono::duration_cast<timeHighRes>(std::chrono::system_clock::now().time_since_epoch()).count(),
+                true};
+    };
     constexpr Time(long long n, bool init_with_high_resolution_timestamp = false) : _regular(), _highres()
     {
         // PERF: avoid chrono::duration_cast here, it's ungodly slow with ASAN.
