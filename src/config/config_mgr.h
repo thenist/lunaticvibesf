@@ -6,11 +6,12 @@
 #include <string>
 #include <string_view>
 
-#include "common/log.h"
-#include "config/cfg_general.h"
-#include "config/cfg_input.h"
-#include "config/cfg_profile.h"
-#include "config/cfg_skin.h"
+#include <common/assert.h>
+#include <common/log.h>
+#include <config/cfg_general.h>
+#include <config/cfg_input.h>
+#include <config/cfg_profile.h>
+#include <config/cfg_skin.h>
 
 class ConfigMgr
 {
@@ -76,49 +77,32 @@ private:
         std::shared_lock l(_mutex);
         switch (type)
         {
-        case 'A':                                                      // Audio
-        case 'E':                                                      // Audio
-        case 'V': return G ? G->get<Ty_v>(key, fallback) : fallback;   // Video
-        case 'P': return P ? P->get<Ty_v>(key, fallback) : fallback;   // Play
-        case '5': return I5 ? I5->get<Ty_v>(key, fallback) : fallback; // Input
-        case '7': return I7 ? I7->get<Ty_v>(key, fallback) : fallback; // Input
-        case '9': return I9 ? I9->get<Ty_v>(key, fallback) : fallback; // Input
-        case 'S': return S ? S->get<Ty_v>(key, fallback) : fallback;   // Skin
+        case 'A':
+        case 'E':
+        case 'V': return G->get<Ty_v>(key, fallback);
+        case 'P': return P->get<Ty_v>(key, fallback);
+        case '5': return I5->get<Ty_v>(key, fallback);
+        case '7': return I7->get<Ty_v>(key, fallback);
+        case '9': return I9->get<Ty_v>(key, fallback);
+        case 'S': return S->get<Ty_v>(key, fallback);
         }
-        return Ty_v();
+        lunaticvibes::assert_failed("ConfigMgr::_get");
     }
     template <class Ty_v> void _set(char type, const std::string& key, const Ty_v& value) noexcept
     {
         std::unique_lock l(_mutex);
         switch (type)
         {
-        case 'A': // Audio
-        case 'E': // Audio
-        case 'V':
-            if (G)
-                return G->set<Ty_v>(key, value);
-            break; // Play
-        case 'P':
-            if (P)
-                return P->set<Ty_v>(key, value);
-            break; // Play
-        case '5':
-            if (I5)
-                return I5->set<Ty_v>(key, value);
-            break; // Input
-        case '7':
-            if (I7)
-                return I7->set<Ty_v>(key, value);
-            break; // Input
-        case '9':
-            if (I9)
-                return I9->set<Ty_v>(key, value);
-            break; // Input
-        case 'S':
-            if (S)
-                return S->set<Ty_v>(key, value);
-            break; // Skin
+        case 'A':
+        case 'E':
+        case 'V': return G->set<Ty_v>(key, value);
+        case 'P': return P->set<Ty_v>(key, value);
+        case '5': return I5->set<Ty_v>(key, value);
+        case '7': return I7->set<Ty_v>(key, value);
+        case '9': return I9->set<Ty_v>(key, value);
+        case 'S': return S->set<Ty_v>(key, value);
         }
+        lunaticvibes::assert_failed("ConfigMgr::_set");
     }
 
 protected:
@@ -142,7 +126,7 @@ public:
         case 5: return I5;
         case 7: return I7;
         case 9: return I9;
-        default: return nullptr;
+        default: lunaticvibes::assert_failed("ConfigMgr::Input1");
         }
     }
 
