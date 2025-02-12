@@ -2715,7 +2715,7 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
 
 void ScenePlay::spinTurntable(bool startedPlaying)
 {
-    auto rt = startedPlaying ? lunaticvibes::Time().norm() - State::get(IndexTimer::PLAY_START) : 0;
+    auto rt = startedPlaying ? lunaticvibes::Time::now().norm() - State::get(IndexTimer::PLAY_START) : 0;
     auto angle = rt * 360 / 1000; // This matches LR2.
                                   // This doesn't match LR2:
     State::set(IndexNumber::_ANGLE_TT_1P, (angle + (int)playerState[0].turntableAngleAdd) % 180);
@@ -2727,7 +2727,7 @@ void ScenePlay::requestExit()
     if (state == ePlayState::FADEOUT || state == ePlayState::WAIT_ARENA)
         return;
 
-    lunaticvibes::Time t;
+    auto t = lunaticvibes::Time::now();
 
     playInterrupted = true;
 

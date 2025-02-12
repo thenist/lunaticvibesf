@@ -214,7 +214,7 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
     _input.register_p("SCENE_PRESS", std::bind_front(&SceneResult::inputGamePress, this));
     _input.register_h("SCENE_HOLD", std::bind_front(&SceneResult::inputGameHold, this));
 
-    lunaticvibes::Time t;
+    auto t = lunaticvibes::Time::now();
     State::set(IndexTimer::RESULT_GRAPH_START, t.norm());
 
     if (!gInCustomize)

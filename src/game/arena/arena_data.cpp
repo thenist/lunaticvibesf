@@ -125,7 +125,7 @@ void ArenaData::updateTexts()
 
 void ArenaData::updateGlobals()
 {
-    lunaticvibes::Time t;
+    auto t = lunaticvibes::Time::now();
     std::vector<std::pair<unsigned, IndexOption>> ranking;
     for (size_t i = 0; i < getPlayerCount(); ++i)
     {

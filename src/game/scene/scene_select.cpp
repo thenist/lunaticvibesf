@@ -517,7 +517,7 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     }
 
     if (gArenaData.isOnline())
-        State::set(IndexTimer::ARENA_SHOW_LOBBY, lunaticvibes::Time().norm());
+        State::set(IndexTimer::ARENA_SHOW_LOBBY, lunaticvibes::Time::now().norm());
 
     imguiInit();
 
@@ -728,7 +728,7 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
                     resetJukeboxText();
                 }
 
-                State::set(IndexTimer::LIST_MOVE, lunaticvibes::Time().norm());
+                State::set(IndexTimer::LIST_MOVE, lunaticvibes::Time::now().norm());
                 SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_F_OPEN);
 
                 refreshingSongList = false;
@@ -793,7 +793,7 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
             }
 
             // reset infos, play sound
-            navigateEnter(lunaticvibes::Time());
+            navigateEnter(lunaticvibes::Time::now());
 
             refreshingSongList = false;
         }
@@ -942,7 +942,7 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
         scrollAccumulator = 0.;
         scrollAccumulatorAddUnit = 0.;
 
-        State::set(IndexTimer::LIST_MOVE, lunaticvibes::Time().norm());
+        State::set(IndexTimer::LIST_MOVE, lunaticvibes::Time::now().norm());
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_F_OPEN);
 
         gSelectContext.remoteRequestedChart.reset();
@@ -2722,7 +2722,7 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
         scrollAccumulator = 0.;
         scrollAccumulatorAddUnit = 0.;
 
-        State::set(IndexTimer::LIST_MOVE, lunaticvibes::Time().norm());
+        State::set(IndexTimer::LIST_MOVE, lunaticvibes::Time::now().norm());
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_F_OPEN);
     }
 }
@@ -3078,7 +3078,7 @@ void SceneSelect::searchSong(const std::string& text)
     loadSongList();
     sortSongList();
 
-    navigateTimestamp = lunaticvibes::Time();
+    navigateTimestamp = lunaticvibes::Time::now();
     postStartPreview();
 
     gSelectContext.selectedEntryIndex = 0;
@@ -3327,7 +3327,7 @@ void SceneSelect::updatePreview()
             std::unique_lock l(previewMutex);
 
             // start from beginning. It's difficult to seek a chart for playback due to lengthy BGM samples...
-            previewStartTime = lunaticvibes::Time() - previewChartObj->getLeadInTime();
+            previewStartTime = lunaticvibes::Time::now() - previewChartObj->getLeadInTime();
             previewEndTime = 0;
             previewRuleset->setStartTime(previewStartTime);
 
@@ -3352,12 +3352,12 @@ void SceneSelect::updatePreview()
             if (previewStartTime == 0)
             {
                 LOG_DEBUG << "[Select] Starting standalone preview";
-                previewStartTime = lunaticvibes::Time();
+                previewStartTime = lunaticvibes::Time::now();
 
                 size_t idx = STANDALONE_PREVIEW_SAMPLE_INDEX;
                 SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, 1, &idx);
             }
-            else if ((lunaticvibes::Time() - previewStartTime).norm() > previewStandaloneLength)
+            else if ((lunaticvibes::Time::now() - previewStartTime).norm() > previewStandaloneLength)
             {
                 LOG_DEBUG << "[Select] Standalone preview finished -> PREVIEW_FINISH";
 
@@ -3367,7 +3367,7 @@ void SceneSelect::updatePreview()
         }
         else
         {
-            auto t = lunaticvibes::Time();
+            auto t = lunaticvibes::Time::now();
             auto rt = t - previewStartTime;
             previewChartObj->update(rt);
             previewRuleset->update(t);
@@ -3459,7 +3459,7 @@ void SceneSelect::arenaHostLobby()
         g_pArenaHost->loopStart();
         createNotification(i18n::s(i18nText::ARENA_HOST_SUCCESS));
 
-        lunaticvibes::Time t;
+        auto t = lunaticvibes::Time::now();
         navigateBack(t, false);
         State::set(IndexTimer::ARENA_SHOW_LOBBY, t.norm());
 
@@ -3492,7 +3492,7 @@ void SceneSelect::arenaLeaveLobby()
         g_pArenaHost->disbandLobby();
     }
 
-    lunaticvibes::Time t;
+    auto t = lunaticvibes::Time::now();
     navigateBack(t, false);
     State::set(IndexTimer::ARENA_SHOW_LOBBY, TIMER_NEVER);
 
@@ -3524,7 +3524,7 @@ void SceneSelect::arenaJoinLobby()
         g_pArenaClient->loopStart();
         createNotification(i18n::s(i18nText::ARENA_JOIN_SUCCESS));
 
-        lunaticvibes::Time t;
+        auto t = lunaticvibes::Time::now();
         navigateBack(t, false);
         State::set(IndexTimer::ARENA_SHOW_LOBBY, t.norm());
 

@@ -121,7 +121,7 @@ SceneBase::~SceneBase()
 
 void SceneBase::update()
 {
-    lunaticvibes::Time t;
+    auto t = lunaticvibes::Time::now();
 
     if (pSkin)
     {

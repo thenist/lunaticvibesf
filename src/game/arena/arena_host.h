@@ -91,7 +91,7 @@ private:
         void addTaskWaitingForResponse(int messageIndex, std::shared_ptr<std::vector<unsigned char>> msg)
         {
             std::unique_lock l(tasksWaitingForResponseMutex);
-            tasksWaitingForResponse[messageIndex] = {lunaticvibes::Time(), std::move(msg), 0, false};
+            tasksWaitingForResponse[messageIndex] = {lunaticvibes::Time::now(), std::move(msg), 0, false};
         }
     };
     int clientID = 0;

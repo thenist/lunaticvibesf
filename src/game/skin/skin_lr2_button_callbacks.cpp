@@ -141,7 +141,7 @@ static void panel_switch(int idx, int plus)
     if (idx < 1 || idx > 9)
         return;
     auto panel = static_cast<IndexSwitch>(static_cast<int>(IndexSwitch::SELECT_PANEL1) - 1 + idx);
-    lunaticvibes::Time t{};
+    const auto t = lunaticvibes::Time::now();
 
     // close other panels
     for (int i = 1; i <= 9; ++i)

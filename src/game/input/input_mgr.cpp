@@ -108,7 +108,7 @@ std::pair<std::bitset<Input::KEY_COUNT>, InputMgr::ScratchData> InputMgr::_detec
     std::pair<std::bitset<Input::KEY_COUNT>, InputMgr::ScratchData> out;
     std::bitset<KEY_COUNT>& res = out.first;
 
-    lunaticvibes::Time t;
+    auto t = lunaticvibes::Time::now();
 
     // game input
     for (int k = S1L; k < LANE_COUNT; k++)

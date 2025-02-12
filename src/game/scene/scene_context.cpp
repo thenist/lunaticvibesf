@@ -142,7 +142,7 @@ template <typename T> [[nodiscard]] static T map_value_range(T x, T in_min, T in
 
 void pushGraphPoints()
 {
-    const auto t = lunaticvibes::Time();
+    const auto t = lunaticvibes::Time::now();
     const auto rt = t - State::get(IndexTimer::PLAY_START);
     const auto song_len = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength();
     using HighresT = decltype(lunaticvibes::Time{}.hres());
@@ -1538,7 +1538,7 @@ void setDynamicTextures()
 void createNotification(StringContent text)
 {
     std::unique_lock lock(gOverlayContext._mutex);
-    gOverlayContext.notifications.emplace_back(lunaticvibes::Time(), std::move(text));
+    gOverlayContext.notifications.emplace_back(lunaticvibes::Time::now(), std::move(text));
 }
 
 [[nodiscard]] static SkinType skinTypeForKeysBattle(unsigned keys)

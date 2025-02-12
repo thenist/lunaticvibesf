@@ -79,20 +79,20 @@ int lunaticvibes::get_number(IndexNumber ind)
     {
     case 100:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
-            return static_cast<int>(std::round(ruleset->getMoneyScoreAnimation().animate({})));
+            return static_cast<int>(std::round(ruleset->getMoneyScoreAnimation().animate(lunaticvibes::Time::now())));
         return 0;
     case 107:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
-            return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
+            return static_cast<int>(ruleset->getHealthAnimation().animate(lunaticvibes::Time::now()) * 100);
         break; // might still also be in State::get
 
     case 120:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
-            return static_cast<int>(std::round(ruleset->getMoneyScoreAnimation().animate({})));
+            return static_cast<int>(std::round(ruleset->getMoneyScoreAnimation().animate(lunaticvibes::Time::now())));
         return 0;
     case 127:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
-            return static_cast<int>(ruleset->getHealthAnimation().animate({}) * 100);
+            return static_cast<int>(ruleset->getHealthAnimation().animate(lunaticvibes::Time::now()) * 100);
         break; // might still also be in State::get
 
     case 295: return 1112333; // TODO // LR2OOL: current random
@@ -131,7 +131,7 @@ int lunaticvibes::get_number(IndexNumber ind)
 
     case 407: // beatoraja
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
-            return decimal_part(ruleset->getHealthAnimation().animate({}) * 100.);
+            return decimal_part(ruleset->getHealthAnimation().animate(lunaticvibes::Time::now()) * 100.);
         return 0;
     case 1163: return get_current_chart_length(gSelectContext, gChartContext, gPlayContext) / 60; // beatoraja
     case 1164: return get_current_chart_length(gSelectContext, gChartContext, gPlayContext) % 60; // beatoraja

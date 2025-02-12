@@ -173,7 +173,7 @@ SceneCustomize::SceneCustomize(std::shared_ptr<SkinMgr> skinMgr_, std::optional<
 
     LOG_DEBUG << "[Customize] Start";
 
-    State::set(IndexTimer::_SCENE_CUSTOMIZE_START, lunaticvibes::Time().norm());
+    State::set(IndexTimer::_SCENE_CUSTOMIZE_START, lunaticvibes::Time::now().norm());
 }
 
 SceneCustomize::~SceneCustomize()

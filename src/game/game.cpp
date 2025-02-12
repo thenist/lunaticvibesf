@@ -426,7 +426,7 @@ void mainLoop()
                 State::set(IndexTimer::PLAY_START, TIMER_NEVER);
                 scene = lunaticvibes::buildScene(skinMgr, currentScene);
                 LVF_DEBUG_ASSERT(scene != nullptr);
-                lunaticvibes::Time t;
+                auto t = lunaticvibes::Time::now();
                 State::set(IndexTimer::SCENE_START, t.norm());
                 State::set(IndexTimer::START_INPUT, t.norm() + (scene ? scene->getSkinInfo().timeIntro : 0));
                 if (!gInCustomize)

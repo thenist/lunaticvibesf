@@ -573,7 +573,7 @@ void ArenaHost::handleHeartbeatResp(const std::string& clientKey, const std::sha
 
     Client& c = clients[clientKey];
     c.heartbeatPending = false;
-    c.heartbeatRecvTime = lunaticvibes::Time();
+    c.heartbeatRecvTime = lunaticvibes::Time::now();
 
     // RTT
     c.ping = (c.heartbeatRecvTime - c.heartbeatSendTime).norm();
@@ -845,7 +845,7 @@ void ArenaHost::handleFinishedResult(const std::string& clientKey, const std::sh
 
 void ArenaHost::update()
 {
-    lunaticvibes::Time now;
+    auto now = lunaticvibes::Time::now();
 
     // wait response timeout
     {
@@ -896,7 +896,7 @@ void ArenaHost::update()
             if ((now - cc.heartbeatRecvTime).norm() > 5000 && !cc.heartbeatPending)
             {
                 cc.heartbeatPending = true;
-                cc.heartbeatSendTime = lunaticvibes::Time();
+                cc.heartbeatSendTime = lunaticvibes::Time::now();
 
                 auto n = std::make_shared<ArenaMessageHeartbeat>();
                 n->messageIndex = ++cc.sendMessageIndex;

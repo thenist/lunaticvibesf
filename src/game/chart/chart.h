@@ -1,15 +1,17 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <limits>
 #include <list>
 #include <utility>
 #include <vector>
 
-#include "common/beat.h"
-#include "common/chartformat/chartformat.h"
-#include "game/input/input_mgr.h"
-#include "game/runtime/state.h"
+#include <common/beat.h>
+#include <common/chartformat/chartformat.h>
+#include <common/keymap.h>
+
+using std::size_t;
 
 struct HitableNote : Note
 {

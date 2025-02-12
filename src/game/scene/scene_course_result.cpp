@@ -336,7 +336,7 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
     _input.register_h("SCENE_HOLD", std::bind_front(&SceneCourseResult::inputGameHold, this));
     _input.register_r("SCENE_RELEASE", std::bind_front(&SceneCourseResult::inputGameRelease, this));
 
-    lunaticvibes::Time t;
+    auto t = lunaticvibes::Time::now();
     State::set(IndexTimer::RESULT_GRAPH_START, t.norm());
 
     if (!gInCustomize)
