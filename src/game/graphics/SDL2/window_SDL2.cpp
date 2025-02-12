@@ -78,7 +78,7 @@ int graphics_init()
         Uint32 flags = SDL_WINDOW_HIDDEN; // window created with opengles2 will destroy itself when creating Renderer,
                                           // resulting in flashes
         flags |= SDL_WINDOW_RESIZABLE;
-        auto mode = ConfigMgr::get('V', cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
+        auto mode = ConfigMgr::General()->get(cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
         if (lunaticvibes::iequals(mode, cfg::V_WINMODE_BORDERLESS))
         {
             flags |= SDL_WINDOW_BORDERLESS;
@@ -91,8 +91,8 @@ int graphics_init()
         {
             // fallback to windowed
         }
-        s_window_rect_w = ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH);
-        s_window_rect_h = ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
+        s_window_rect_w = ConfigMgr::General()->get(cfg::V_DISPLAY_RES_X, CANVAS_WIDTH);
+        s_window_rect_h = ConfigMgr::General()->get(cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
         gFrameWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s_window_rect_w,
                                         s_window_rect_h, flags);
         if (!gFrameWindow)
@@ -103,16 +103,16 @@ int graphics_init()
 
         graphics_resize_canvas(s_window_rect_w, s_window_rect_h);
 
-        int ss = ConfigMgr::get('V', cfg::V_RES_SUPERSAMPLE, 1);
+        int ss = ConfigMgr::General()->get(cfg::V_RES_SUPERSAMPLE, 1);
         graphics_set_supersample_level(ss);
 
-        int maxFPS = ConfigMgr::get('V', cfg::V_MAXFPS, 480);
+        int maxFPS = ConfigMgr::General()->get(cfg::V_MAXFPS, 480);
         if (maxFPS < 30 && maxFPS != 0)
             maxFPS = 30;
         graphics_set_maxfps(maxFPS);
 
         unsigned renderer_flags = SDL_RENDERER_TARGETTEXTURE;
-        if (ConfigMgr::get('V', cfg::V_VSYNC, 0) != 0)
+        if (ConfigMgr::General()->get(cfg::V_VSYNC, 0) != 0)
             renderer_flags += SDL_RENDERER_PRESENTVSYNC;
         gFrameRenderer = SDL_CreateRenderer(gFrameWindow, -1, renderer_flags);
         if (!gFrameRenderer)
@@ -376,8 +376,8 @@ void lunaticvibes::graphics::save_new_window_size(int width, int height)
     s_window_rect_h = height;
     s_canvas_scale_x = static_cast<double>(width) / s_canvas_rect_w;
     s_canvas_scale_y = static_cast<double>(height) / s_canvas_rect_h;
-    ConfigMgr::set('V', cfg::V_DISPLAY_RES_X, width);
-    ConfigMgr::set('V', cfg::V_DISPLAY_RES_Y, height);
+    ConfigMgr::General()->set(cfg::V_DISPLAY_RES_X, width);
+    ConfigMgr::General()->set(cfg::V_DISPLAY_RES_Y, height);
 }
 
 void graphics_change_vsync(lunaticvibes::GRAPHICS_VSYNC_MODE mode)

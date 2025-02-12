@@ -336,7 +336,7 @@ static void setOptions()
                                                           {V_WINMODE_BORDERLESS, WIN_BORDERLESS},
                                                           {V_WINMODE_WINDOWED, WIN_WINDOWED}};
 
-        auto&& s = ConfigMgr::get<string>('V', V_WINMODE, V_WINMODE_WINDOWED);
+        auto&& s = ConfigMgr::General()->get<string>(V_WINMODE, V_WINMODE_WINDOWED);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexOption::SYS_WINDOWED, it->second);
         else
@@ -679,7 +679,7 @@ static void setText()
             {V_WINMODE_WINDOWED, Option::s_windowed[Option::WIN_WINDOWED]},
         };
 
-        auto&& s = ConfigMgr::get<string>('V', V_WINMODE, V_WINMODE_WINDOWED);
+        auto&& s = ConfigMgr::General()->get<string>(V_WINMODE, V_WINMODE_WINDOWED);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexText::WINDOWMODE, it->second);
         else
@@ -692,7 +692,7 @@ static void setText()
                                                    {1, Option::s_vsync_mode[Option::VSYNC_ON]},
                                                    {2, Option::s_vsync_mode[Option::VSYNC_ADAPTIVE]}};
 
-        auto&& s = ConfigMgr::get<int>('V', V_VSYNC, 0);
+        auto&& s = ConfigMgr::General()->get<int>(V_VSYNC, 0);
         if (auto it = smap.find(s); it != smap.end())
             State::set(IndexText::VSYNC, it->second);
         else

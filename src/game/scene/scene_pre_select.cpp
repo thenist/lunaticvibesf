@@ -502,7 +502,7 @@ void ScenePreSelect::loadFinished()
 
     if (ready && !_switchedScene)
     {
-        int maxFPS = ConfigMgr::get('V', cfg::V_MAXFPS, 480);
+        int maxFPS = ConfigMgr::General()->get(cfg::V_MAXFPS, 480);
         if (maxFPS < 30 && maxFPS != 0)
             maxFPS = 30;
         graphics_set_maxfps(maxFPS);
@@ -523,8 +523,8 @@ void ScenePreSelect::updateImgui()
         return;
 
     ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
-                                    static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
+    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::General()->get(cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
+                                    static_cast<float>(ConfigMgr::General()->get(cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
                              ImGuiCond_Always);
     if (ImGui::Begin("LoadSong", nullptr,
                      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |

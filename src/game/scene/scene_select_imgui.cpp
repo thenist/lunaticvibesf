@@ -66,9 +66,9 @@ void SceneSelect::imguiInit()
     imguiRefreshFolderList();
     imguiRefreshTableList();
 
-    imgui_video_ssLevel = ConfigMgr::get('V', cfg::V_RES_SUPERSAMPLE, 1);
+    imgui_video_ssLevel = ConfigMgr::General()->get(cfg::V_RES_SUPERSAMPLE, 1);
 
-    auto winMode = ConfigMgr::get('V', cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
+    auto winMode = ConfigMgr::General()->get(cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
     if (winMode == cfg::V_WINMODE_FULL)
         imgui_video_mode = 1;
     else if (winMode == cfg::V_WINMODE_BORDERLESS)
@@ -78,8 +78,8 @@ void SceneSelect::imguiInit()
     old_video_mode = imgui_video_mode;
 
     imguiRefreshVideoDisplayResolutionList();
-    auto windowX = ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_HEIGHT);
-    auto windowY = ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
+    auto windowX = ConfigMgr::General()->get(cfg::V_DISPLAY_RES_X, CANVAS_HEIGHT);
+    auto windowY = ConfigMgr::General()->get(cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
     imgui_video_display_resolution_index = -1;
     for (int i = 0; i < static_cast<int>(imgui_video_display_resolution_size.size()); ++i)
     {
@@ -96,13 +96,13 @@ void SceneSelect::imguiInit()
     }
     old_video_display_resolution_index = imgui_video_display_resolution_index;
 
-    imgui_video_vsync_index = ConfigMgr::get('V', cfg::V_VSYNC, 0);
+    imgui_video_vsync_index = ConfigMgr::General()->get(cfg::V_VSYNC, 0);
 #ifdef _WIN32
     if (imgui_video_vsync_index >= 2)
         imgui_video_vsync_index = 1;
 #endif
 
-    imgui_video_maxFPS = ConfigMgr::get('V', cfg::V_MAXFPS, 240);
+    imgui_video_maxFPS = ConfigMgr::General()->get(cfg::V_MAXFPS, 240);
 
     auto [count, size] = SoundMgr::getDSPBufferSize();
     imgui_audio_bufferCount = count;
@@ -200,9 +200,10 @@ void SceneSelect::imguiSettings()
         ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
 
         ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
-                                        static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
-                                 ImGuiCond_Always);
+        ImGui::SetNextWindowSize(
+            ImVec2(static_cast<float>(ConfigMgr::General()->get(cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
+                   static_cast<float>(ConfigMgr::General()->get(cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
+            ImGuiCond_Always);
         if (ImGui::Begin("Main", nullptr,
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
@@ -763,9 +764,9 @@ void SceneSelect::imguiPageOptionsVideo()
             {
                 imgui_video_maxFPS = 30;
             }
-            if (imgui_video_maxFPS != ConfigMgr::get('V', cfg::V_MAXFPS, infoRowWidth))
+            if (imgui_video_maxFPS != ConfigMgr::General()->get(cfg::V_MAXFPS, infoRowWidth))
             {
-                ConfigMgr::set('V', cfg::V_MAXFPS, imgui_video_maxFPS);
+                ConfigMgr::General()->set(cfg::V_MAXFPS, imgui_video_maxFPS);
                 graphics_set_maxfps(imgui_video_maxFPS);
             }
         }
@@ -1650,10 +1651,10 @@ bool SceneSelect::imguiApplyResolution()
         case 1: windowMode = cfg::V_WINMODE_FULL; break;
         case 2: windowMode = cfg::V_WINMODE_BORDERLESS; break;
         }
-        ConfigMgr::set('V', cfg::V_WINMODE, windowMode);
+        ConfigMgr::General()->set(cfg::V_WINMODE, windowMode);
     }
-    ConfigMgr::set('V', cfg::V_RES_SUPERSAMPLE, imgui_video_ssLevel);
-    ConfigMgr::set('V', cfg::V_VSYNC, imgui_video_vsync_index);
+    ConfigMgr::General()->set(cfg::V_RES_SUPERSAMPLE, imgui_video_ssLevel);
+    ConfigMgr::General()->set(cfg::V_VSYNC, imgui_video_vsync_index);
 
     // windowed
     {
@@ -1773,9 +1774,10 @@ bool SceneSelect::imguiArenaJoinLobbyPrompt()
         ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
 
         ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
-                                        static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
-                                 ImGuiCond_Always);
+        ImGui::SetNextWindowSize(
+            ImVec2(static_cast<float>(ConfigMgr::General()->get(cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
+                   static_cast<float>(ConfigMgr::General()->get(cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
+            ImGuiCond_Always);
         if (ImGui::Begin("Join Lobby Main", nullptr,
                          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
                              ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
