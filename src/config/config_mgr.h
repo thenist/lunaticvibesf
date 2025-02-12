@@ -1,10 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
 #include <shared_mutex>
 #include <string>
-#include <string_view>
 
 #include <common/assert.h>
 #include <config/cfg_general.h>
@@ -29,25 +27,6 @@ private:
     int _selectProfile(const std::string& name);
     int _createProfile(const std::string& newProfile, const std::string& oldProfile);
     void _setGlobals();
-
-    template <class Ty_v> Ty_v _get(char type, const std::string& key, const Ty_v& fallback)
-    {
-        std::shared_lock l(_mutex);
-        switch (type)
-        {
-        case 'E': return G->get<Ty_v>(key, fallback);
-        }
-        lunaticvibes::assert_failed("ConfigMgr::_get");
-    }
-    template <class Ty_v> void _set(char type, const std::string& key, const Ty_v& value) noexcept
-    {
-        std::unique_lock l(_mutex);
-        switch (type)
-        {
-        case 'E': return G->set<Ty_v>(key, value);
-        }
-        lunaticvibes::assert_failed("ConfigMgr::_set");
-    }
 
 protected:
     std::shared_ptr<ConfigGeneral> G;
@@ -88,28 +67,4 @@ public:
     static std::shared_ptr<ConfigProfile> Profile() { return getInst().Profile1(); }
     static std::shared_ptr<ConfigInput> Input(GameModeKeys mode) { return getInst().Input1(mode); }
     static std::shared_ptr<ConfigSkin> Skin() { return getInst().Skin1(); }
-
-    template <class Ty_v> static Ty_v get(char type, const std::string& key, const Ty_v& fallback)
-    {
-        static_assert(!std::is_same_v<Ty_v, std::string_view>, "string_view isn't supported by YAML-cpp");
-        return getInst()._get(type, key, fallback);
-    }
-
-    static std::string get(char type, const std::string& key, const std::string& fallback)
-    {
-        return get<std::string>(type, key, fallback);
-    }
-
-    template <class Ty_v> static void set(char type, const std::string& key, const Ty_v& value) noexcept
-    {
-        static_assert(!std::is_same_v<Ty_v, std::string_view>, "string_view isn't supported by YAML-cpp");
-        return getInst()._set(type, key, value);
-    }
-
-    static void set(char type, const std::string& key, const std::string& value) noexcept
-    {
-        return set<std::string>(type, key, value);
-    }
-
-public:
 };
