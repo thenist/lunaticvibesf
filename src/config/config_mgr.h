@@ -80,7 +80,6 @@ private:
         case 'A':
         case 'E':
         case 'V': return G->get<Ty_v>(key, fallback);
-        case 'P': return P->get<Ty_v>(key, fallback);
         case 'S': return S->get<Ty_v>(key, fallback);
         }
         lunaticvibes::assert_failed("ConfigMgr::_get");
@@ -93,7 +92,6 @@ private:
         case 'A':
         case 'E':
         case 'V': return G->set<Ty_v>(key, value);
-        case 'P': return P->set<Ty_v>(key, value);
         case 'S': return S->set<Ty_v>(key, value);
         }
         lunaticvibes::assert_failed("ConfigMgr::_set");
