@@ -42,8 +42,6 @@ using timeHighRes = std::chrono::nanoseconds;
 namespace lunaticvibes
 {
 
-#pragma warning(push)
-#pragma warning(disable : 4244)
 class Time
 {
 private:
@@ -110,7 +108,6 @@ public:
     [[nodiscard]] constexpr auto norm() const { return _regular; } // ms
     [[nodiscard]] constexpr auto hres() const { return _highres; } // ns
 };
-#pragma warning(pop)
 
 } // namespace lunaticvibes
 

@@ -3,8 +3,6 @@
 #include <cstdlib>
 #include <numeric>
 
-#pragma warning(disable : 4244)
-
 static bool trim(long long& _numerator, long long& _denominator)
 {
     if (_numerator == 0)

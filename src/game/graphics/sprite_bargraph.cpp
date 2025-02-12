@@ -22,8 +22,6 @@ void SpriteBargraph::updateValByInd()
     updateVal(lunaticvibes::get_bargraph(barInd));
 }
 
-#pragma warning(push)
-#pragma warning(disable : 4244)
 void SpriteBargraph::updateSize()
 {
     int tmp;
@@ -43,7 +41,6 @@ void SpriteBargraph::updateSize()
         break;
     }
 }
-#pragma warning(pop)
 
 bool SpriteBargraph::update(const lunaticvibes::Time& t)
 {

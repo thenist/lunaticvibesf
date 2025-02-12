@@ -34,7 +34,7 @@ void SetThreadNameWin32(DWORD dwThreadID, const char* threadName)
     info.dwThreadID = dwThreadID;
     info.dwFlags = 0;
 #pragma warning(push)
-#pragma warning(disable : 6320 6322)
+#pragma warning(disable : 6320 6322) // bare except and empty catch body
     __try
     {
         RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
