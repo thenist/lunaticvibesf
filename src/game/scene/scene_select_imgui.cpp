@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 
+#include <common/assert.h>
 #include <common/log.h>
 #include <common/str_utils.h>
 #include <common/utils.h>
@@ -841,29 +842,19 @@ void SceneSelect::imguiPageOptionsPlay()
         if (ImGui::Combo("##inputpollingrate", &imgui_play_inputPollingRate, imgui_play_inputPollingRate_display,
                          imgui_play_inputPollingRate_count))
         {
-            switch (imgui_play_inputPollingRate)
-            {
-            case 0:
-                ConfigMgr::Profile()->set(cfg::P_INPUT_POLLING_RATE, 1000);
-                _input.setRate(1000);
-                break;
-            case 1:
-                ConfigMgr::Profile()->set(cfg::P_INPUT_POLLING_RATE, 2000);
-                _input.setRate(2000);
-                break;
-            case 2:
-                ConfigMgr::Profile()->set(cfg::P_INPUT_POLLING_RATE, 4000);
-                _input.setRate(4000);
-                break;
-            case 3:
-                ConfigMgr::Profile()->set(cfg::P_INPUT_POLLING_RATE, 8000);
-                _input.setRate(8000);
-                break;
-            case 4:
-                ConfigMgr::Profile()->set(cfg::P_INPUT_POLLING_RATE, 0);
-                _input.setRate(0);
-                break;
-            }
+            int rate = [this] {
+                switch (imgui_play_inputPollingRate)
+                {
+                case 0: return 1000;
+                case 1: return 2000;
+                case 2: return 4000;
+                case 3: return 8000;
+                case 4: return 0;
+                default: lunaticvibes::assert_failed("imgui_play_inputPollingRate");
+                }
+            }();
+            ConfigMgr::Profile()->set(cfg::P_INPUT_POLLING_RATE, rate);
+            _input.setRate(rate);
         }
 #ifdef _WIN32
         ImGui::SameLine();
