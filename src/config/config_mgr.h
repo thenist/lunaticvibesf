@@ -35,7 +35,6 @@ private:
         std::shared_lock l(_mutex);
         switch (type)
         {
-        case 'A':
         case 'E':
         case 'V': return G->get<Ty_v>(key, fallback);
         }
@@ -46,7 +45,6 @@ private:
         std::unique_lock l(_mutex);
         switch (type)
         {
-        case 'A':
         case 'E':
         case 'V': return G->set<Ty_v>(key, value);
         }
