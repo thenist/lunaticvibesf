@@ -11,7 +11,7 @@
 #include "common/utils.h"
 #include "game/runtime/state.h"
 
-void setNumbers()
+static void setNumbers()
 {
     using namespace cfg;
 
@@ -55,7 +55,7 @@ void setNumbers()
     State::set(IndexNumber::NEW_ENTRY_SECONDS, ConfigMgr::Profile()->get(P_NEW_SONG_DURATION, 0) * 60 * 60);
 }
 
-void setOptions()
+static void setOptions()
 {
     using namespace Option;
     using namespace cfg;
@@ -344,7 +344,7 @@ void setOptions()
     }
 }
 
-void setSliders()
+static void setSliders()
 {
     using namespace cfg;
 
@@ -370,7 +370,7 @@ void setSliders()
     State::set(IndexSlider::FX2_P2, ConfigMgr::Profile()->get(P_FX2_P2, 0) / 100.0);
 }
 
-void setSwitches()
+static void setSwitches()
 {
     using namespace cfg;
     using std::string;
@@ -411,7 +411,7 @@ void setSwitches()
                    P_CHART_ASSIST_OP_AUTOSCR);
 }
 
-void setText()
+static void setText()
 {
     using namespace cfg;
     using std::string;
