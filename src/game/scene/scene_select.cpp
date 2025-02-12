@@ -66,10 +66,10 @@ static void config_sys()
 
     switch (State::get(IndexOption::SYS_WINDOWED))
     {
-    case Option::WIN_FULLSCREEN: ConfigMgr::set('C', V_WINMODE, V_WINMODE_FULL); break;
-    case Option::WIN_BORDERLESS: ConfigMgr::set('C', V_WINMODE, V_WINMODE_BORDERLESS); break;
-    case Option::WIN_WINDOWED:
-    default: ConfigMgr::set('C', V_WINMODE, V_WINMODE_WINDOWED); break;
+    case Option::WIN_FULLSCREEN: ConfigMgr::set('V', V_WINMODE, V_WINMODE_FULL); break;
+    case Option::WIN_BORDERLESS: ConfigMgr::set('V', V_WINMODE, V_WINMODE_BORDERLESS); break;
+    case Option::WIN_WINDOWED: ConfigMgr::set('V', V_WINMODE, V_WINMODE_WINDOWED); break;
+    default: lunaticvibes::verify_failed("config_sys"); break;
     }
 }
 
