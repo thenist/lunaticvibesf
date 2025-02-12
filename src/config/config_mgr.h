@@ -7,7 +7,6 @@
 #include <string_view>
 
 #include <common/assert.h>
-#include <common/log.h>
 #include <config/cfg_general.h>
 #include <config/cfg_input.h>
 #include <config/cfg_profile.h>
@@ -24,50 +23,9 @@ private:
         return inst;
     }
 
-    void _init()
-    {
-        LOG_INFO << "[cfg] Initializing...";
-
-        G = std::make_shared<ConfigGeneral>(GAMEDATA_PATH "/config.yml");
-        profileName = G->get(cfg::E_PROFILE, cfg::PROFILE_DEFAULT);
-        P = std::make_shared<ConfigProfile>(profileName);
-        I5 = std::make_shared<ConfigInput>(profileName, 5);
-        I7 = std::make_shared<ConfigInput>(profileName, 7);
-        I9 = std::make_shared<ConfigInput>(profileName, 9);
-        S = std::make_shared<ConfigSkin>(profileName);
-
-        G->setDefaults();
-        P->setDefaults();
-        I5->setDefaults();
-        I7->setDefaults();
-        I9->setDefaults();
-        S->setDefaults();
-
-        LOG_INFO << "[cfg] Init finished. ";
-    }
-
-    void _load()
-    {
-        LOG_INFO << "[cfg] Load Profile: " << profileName;
-        std::unique_lock l(_mutex);
-        G->load();
-        P->load();
-        I5->load();
-        I7->load();
-        I9->load();
-        S->load();
-    }
-    void _save()
-    {
-        LOG_INFO << "[cfg] Save Profile: " << profileName;
-        std::shared_lock l(_mutex);
-        G->save();
-        P->save();
-        I5->save();
-        I7->save();
-        I9->save();
-        S->save();
-    }
+    void _init();
+    void _load();
+    void _save();
     int _selectProfile(const std::string& name);
     int _createProfile(const std::string& newProfile, const std::string& oldProfile);
     void _setGlobals();

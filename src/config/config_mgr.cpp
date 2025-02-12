@@ -5,11 +5,11 @@
 #include <mutex>
 #include <string>
 
-#include "common/log.h"
-#include "common/meta.h"
-#include "common/u8.h"
-#include "common/utils.h"
-#include "game/runtime/state.h"
+#include <common/log.h>
+#include <common/meta.h>
+#include <common/u8.h>
+#include <common/utils.h>
+#include <game/runtime/state.h>
 
 static void setNumbers()
 {
@@ -712,6 +712,52 @@ static void setText()
 
     State::set(IndexText::TRIAL1, "NOT SUPPORTED");
     State::set(IndexText::TRIAL2, "THANK YOU FOR PLAYING!");
+}
+
+void ConfigMgr::_init()
+{
+    LOG_INFO << "[cfg] Initializing...";
+
+    G = std::make_shared<ConfigGeneral>(GAMEDATA_PATH "/config.yml");
+    profileName = G->get(cfg::E_PROFILE, cfg::PROFILE_DEFAULT);
+    P = std::make_shared<ConfigProfile>(profileName);
+    I5 = std::make_shared<ConfigInput>(profileName, 5);
+    I7 = std::make_shared<ConfigInput>(profileName, 7);
+    I9 = std::make_shared<ConfigInput>(profileName, 9);
+    S = std::make_shared<ConfigSkin>(profileName);
+
+    G->setDefaults();
+    P->setDefaults();
+    I5->setDefaults();
+    I7->setDefaults();
+    I9->setDefaults();
+    S->setDefaults();
+
+    LOG_INFO << "[cfg] Init finished. ";
+}
+
+void ConfigMgr::_load()
+{
+    LOG_INFO << "[cfg] Load Profile: " << profileName;
+    std::unique_lock l(_mutex);
+    G->load();
+    P->load();
+    I5->load();
+    I7->load();
+    I9->load();
+    S->load();
+}
+
+void ConfigMgr::_save()
+{
+    LOG_INFO << "[cfg] Save Profile: " << profileName;
+    std::shared_lock l(_mutex);
+    G->save();
+    P->save();
+    I5->save();
+    I7->save();
+    I9->save();
+    S->save();
 }
 
 int ConfigMgr::_selectProfile(const std::string& name)
