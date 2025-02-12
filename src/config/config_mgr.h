@@ -69,7 +69,6 @@ private:
     }
     int _selectProfile(const std::string& name);
     int _createProfile(const std::string& newProfile, const std::string& oldProfile);
-    std::string _getProfileName() { return P->getName(); }
     void _setGlobals();
 
     template <class Ty_v> Ty_v _get(char type, const std::string& key, const Ty_v& fallback)
@@ -120,27 +119,6 @@ private:
                 return S->set<Ty_v>(key, value);
             break; // Skin
         }
-    }
-
-    KeyMap _getKeyBindings(GameModeKeys mode, Input::Pad key)
-    {
-        std::shared_lock l(_mutex);
-        switch (mode)
-        {
-        case 5:
-            if (I5)
-                return I5->getBindings(key);
-            break;
-        case 7:
-            if (I7)
-                return I7->getBindings(key);
-            break;
-        case 9:
-            if (I9)
-                return I9->getBindings(key);
-            break;
-        }
-        return {};
     }
 
 protected:
