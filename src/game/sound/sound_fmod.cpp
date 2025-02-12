@@ -7,7 +7,6 @@
 #include <common/utils.h>
 #include <config/config_mgr.h>
 #include <game/sound/sound_driver.h>
-#include <game/sound/sound_fmod_callback.h>
 
 #include <fmod_errors.h>
 
@@ -213,8 +212,6 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
         LOG_INFO << "[FMOD] DSP Buffers: " << bufferLen << ", " << buffers;
         ConfigMgr::General()->set(cfg::A_BUFLEN, int(bufferLen));
         ConfigMgr::General()->set(cfg::A_BUFCOUNT, buffers);
-
-        // setAsyncIO();
     }
 
     volume[SampleChannel::MASTER] = 1.0f;
@@ -654,21 +651,6 @@ std::pair<int, int> SoundDriverFMOD::getDSPBufferSize()
     int buffers;
     fmodSystem->getDSPBufferSize(&bufferLen, &buffers);
     return {buffers, int(bufferLen)};
-}
-
-int SoundDriverFMOD::setAsyncIO(bool async)
-{
-    if (async)
-    {
-        fmodSystem->setFileSystem(FmodCallbackFileOpen, FmodCallbackFileClose, nullptr, nullptr, FmodCallbackAsyncRead,
-                                  FmodCallbackAsyncReadCancel, -1);
-    }
-    else
-    {
-        // Fallback
-        fmodSystem->setFileSystem(nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, -1);
-    }
-    return 0;
 }
 
 static constexpr const char8_t* wavExtensionList[]{

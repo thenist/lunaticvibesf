@@ -70,9 +70,6 @@ private:
     int findDriver(const std::string& name, int driverIDUnknown);
 
 public:
-    int setAsyncIO(bool async = true);
-
-public:
     int loadNoteSample(const Path& path, size_t index) override;
     void playNoteSample(SoundChannelType ch, size_t count, size_t index[]) override;
     void stopNoteSamples() override;

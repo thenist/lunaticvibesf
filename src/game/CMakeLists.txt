@@ -112,7 +112,6 @@ add_library(
     skin/skin_lr2_number_animation.cpp
     skin/skin_mgr.cpp
     sound/sound_fmod.cpp
-    sound/sound_fmod_callback.cpp
     sound/sound_mgr.cpp
     sound/sound_sample.cpp
     sound/soundset.cpp
