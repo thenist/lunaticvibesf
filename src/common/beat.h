@@ -1,7 +1,8 @@
 #pragma once
 
-#include <chrono>
 #include <common/fraction.h>
+
+#include <chrono>
 #include <cstdint>
 #include <limits>
 
@@ -115,7 +116,7 @@ public:
 
 struct Note
 {
-    enum Flags : std::uint8_t
+    enum Flags : uint8_t
     {
         LN_TAIL = 1 << 0,
 
