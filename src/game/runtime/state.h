@@ -25,10 +25,6 @@ protected:
     template <class Key, class Value, size_t _size> class StateContainer
     {
     public:
-        using KeyType = Key;
-        using ValType = Value;
-
-    public:
         StateContainer() : _data{{}}, _dataDefault{{}} { static_assert(_size > 0); }
         StateContainer(Value defVal) : StateContainer()
         {
