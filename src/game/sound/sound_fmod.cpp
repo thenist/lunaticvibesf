@@ -61,7 +61,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
     int driver = -1;
     FMOD_OUTPUTTYPE outputType = FMOD_OUTPUTTYPE_AUTODETECT;
     auto devList = getDeviceList();
-    auto devName = ConfigMgr::get('A', cfg::A_DEVNAME, "");
+    auto devName = ConfigMgr::General()->get(cfg::A_DEVNAME, "");
     if (!devName.empty())
     {
         for (auto& i : devList)
@@ -129,8 +129,8 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
     }
 
     // set DSP size
-    int len = ConfigMgr::get('A', cfg::A_BUFLEN, 128);
-    int count = ConfigMgr::get('A', cfg::A_BUFCOUNT, 2);
+    int len = ConfigMgr::General()->get(cfg::A_BUFLEN, 128);
+    int count = ConfigMgr::General()->get(cfg::A_BUFCOUNT, 2);
     if (FMOD_RESULT res = fmodSystem->setDSPBufferSize(len, count); res != FMOD_OK)
     {
         LOG_WARNING << "[FMOD] Set DSP buffer size (" << len << ", " << count
@@ -211,8 +211,8 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
         int buffers;
         fmodSystem->getDSPBufferSize(&bufferLen, &buffers);
         LOG_INFO << "[FMOD] DSP Buffers: " << bufferLen << ", " << buffers;
-        ConfigMgr::set('A', cfg::A_BUFLEN, int(bufferLen));
-        ConfigMgr::set('A', cfg::A_BUFCOUNT, buffers);
+        ConfigMgr::General()->set(cfg::A_BUFLEN, int(bufferLen));
+        ConfigMgr::General()->set(cfg::A_BUFCOUNT, buffers);
 
         // setAsyncIO();
     }
@@ -563,8 +563,8 @@ int SoundDriverFMOD::setDevice(size_t index)
         }
     }
 
-    if (FMOD_RESULT res =
-            pSystem->setDSPBufferSize(ConfigMgr::get('A', cfg::A_BUFLEN, 128), ConfigMgr::get('A', cfg::A_BUFCOUNT, 2));
+    if (FMOD_RESULT res = pSystem->setDSPBufferSize(ConfigMgr::General()->get(cfg::A_BUFLEN, 128),
+                                                    ConfigMgr::General()->get(cfg::A_BUFCOUNT, 2));
         res != FMOD_OK)
     {
         LOG_WARNING << "[FMOD] Set DSP buffer size failed: " << FMOD_ErrorString((FMOD_RESULT)res);
@@ -635,8 +635,8 @@ int SoundDriverFMOD::setDevice(size_t index)
         int buffers;
         fmodSystem->getDSPBufferSize(&bufferLen, &buffers);
         LOG_INFO << "[FMOD] DSP Buffers: " << bufferLen << ", " << buffers;
-        ConfigMgr::set('A', cfg::A_BUFLEN, int(bufferLen));
-        ConfigMgr::set('A', cfg::A_BUFCOUNT, buffers);
+        ConfigMgr::General()->set(cfg::A_BUFLEN, int(bufferLen));
+        ConfigMgr::General()->set(cfg::A_BUFCOUNT, buffers);
     }
 
     createChannelGroups();

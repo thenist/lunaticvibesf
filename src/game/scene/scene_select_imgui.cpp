@@ -1699,7 +1699,7 @@ bool SceneSelect::imguiRefreshAudioDevices()
     imgui_audio_device_index = -1;
     imgui_audio_devices.clear();
     imgui_audio_devices_display.clear();
-    auto adev = ConfigMgr::get('A', cfg::A_DEVNAME, "");
+    auto adev = ConfigMgr::General()->get(cfg::A_DEVNAME, "");
 
     auto devList = SoundMgr::getDeviceList();
     for (auto& d : devList)
@@ -1732,13 +1732,13 @@ bool SceneSelect::imguiRefreshAudioDevices()
 bool SceneSelect::imguiApplyAudioSettings()
 {
     bool ret;
-    ConfigMgr::set('A', cfg::A_BUFCOUNT, imgui_audio_bufferCount);
-    ConfigMgr::set('A', cfg::A_BUFLEN, imgui_audio_bufferSize);
+    ConfigMgr::General()->set(cfg::A_BUFCOUNT, imgui_audio_bufferCount);
+    ConfigMgr::General()->set(cfg::A_BUFLEN, imgui_audio_bufferSize);
     if (SoundMgr::setDevice(imgui_audio_device_index) == 0)
     {
         const auto mode = std::next(imgui_audio_devices.begin(), imgui_audio_device_index);
-        ConfigMgr::set('A', cfg::A_DEVNAME, mode->second);
-        ConfigMgr::set('A', cfg::A_MODE, mode->first < 0 ? cfg::A_MODE_ASIO : cfg::A_MODE_AUTO);
+        ConfigMgr::General()->set(cfg::A_DEVNAME, mode->second);
+        ConfigMgr::General()->set(cfg::A_MODE, mode->first < 0 ? cfg::A_MODE_ASIO : cfg::A_MODE_AUTO);
 
         SoundMgr::stopSysSamples();
         SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::BGM_SELECT);
@@ -1751,8 +1751,8 @@ bool SceneSelect::imguiApplyAudioSettings()
     }
 
     auto [count, size] = SoundMgr::getDSPBufferSize();
-    ConfigMgr::set('A', cfg::A_BUFCOUNT, count);
-    ConfigMgr::set('A', cfg::A_BUFLEN, size);
+    ConfigMgr::General()->set(cfg::A_BUFCOUNT, count);
+    ConfigMgr::General()->set(cfg::A_BUFLEN, size);
     imgui_audio_bufferCount = count;
     imgui_audio_bufferSize = size;
 
