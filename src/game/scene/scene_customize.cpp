@@ -355,8 +355,9 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
                 int selectedIdx;
                 for (selectedIdx = 0; selectedIdx < (int)soundsetList.size(); selectedIdx++)
                 {
-                    Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                                               ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
+                    Path path =
+                        convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                       ConfigMgr::Skin()->get(cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
                     if (fs::exists(soundsetList[selectedIdx]) && fs::exists(path) &&
                         fs::equivalent(soundsetList[selectedIdx], path))
                         break;
@@ -365,7 +366,7 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
                 const auto& p =
                     fs::relative(soundsetList[selectedIdx], PathFromUTF8(ConfigMgr::get('E', cfg::E_LR2PATH, ".")));
 
-                ConfigMgr::set('S', cfg::S_PATH_SOUNDSET, lunaticvibes::u8str(p));
+                ConfigMgr::Skin()->set(cfg::S_PATH_SOUNDSET, lunaticvibes::u8str(p));
 
                 pSkin->setHandleMouseEvents(false);
                 SoundMgr::stopSysSamples();
@@ -402,7 +403,7 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
                                             PathFromUTF8(ConfigMgr::get('E', cfg::E_LR2PATH, ".")));
                 if (const char* key = configOptionNameForSkinType(selectedMode); key != nullptr)
                 {
-                    ConfigMgr::set('S', key, lunaticvibes::u8str(p));
+                    ConfigMgr::Skin()->set(key, lunaticvibes::u8str(p));
                 }
                 else
                 {
@@ -543,7 +544,7 @@ void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
     if (selectedMode == SkinType::SOUNDSET)
     {
         Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                                   ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
+                                   ConfigMgr::Skin()->get(cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);
         Path bgmOld = ss.getPathBGMSelect();
@@ -569,7 +570,7 @@ void SceneCustomize::load(SkinType mode)
         optionsKeyList.clear();
 
         Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                                   ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
+                                   ConfigMgr::Skin()->get(cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);
 
@@ -675,7 +676,7 @@ void SceneCustomize::save(SkinType mode) const
     if (mode == SkinType::SOUNDSET)
     {
         Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                                   ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
+                                   ConfigMgr::Skin()->get(cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);
 
