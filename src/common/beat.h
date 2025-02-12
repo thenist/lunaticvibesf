@@ -19,15 +19,15 @@ public:
     Metre(long long division_level, long long multiple_level) : fraction(division_level, multiple_level, false) {}
     Metre(double value) : fraction(static_cast<long long>(value * 1e12), 1'000'000'000'000, true) {}
 
-    double toDouble() const { return operator double(); }
-    bool operator==(const Metre& rhs) const
+    [[nodiscard]] double toDouble() const { return operator double(); }
+    [[nodiscard]] bool operator==(const Metre& rhs) const
     {
         return fraction(division_level(), multiple_level(), true) ==
                fraction(rhs.division_level(), rhs.multiple_level(), true);
     }
 
-    long long division_level() const { return _numerator; }
-    long long multiple_level() const { return _denominator; }
+    [[nodiscard]] long long division_level() const { return _numerator; }
+    [[nodiscard]] long long multiple_level() const { return _denominator; }
 };
 
 // Normal rhythm indicator, must be normalized (value: [0, 1)).
