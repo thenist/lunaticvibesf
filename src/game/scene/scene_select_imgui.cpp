@@ -874,17 +874,13 @@ void SceneSelect::imguiPageOptionsPlay()
         ImGui::SameLine(infoRowWidth);
         imgui_play_defaultTarget = State::get(IndexNumber::DEFAULT_TARGET_RATE);
         if (ImGui::SliderInt("##defaulttarget", &imgui_play_defaultTarget, 0, 100, "%d %%", ImGuiSliderFlags_None))
-        {
             State::set(IndexNumber::DEFAULT_TARGET_RATE, std::clamp(imgui_play_defaultTarget, 0, 100));
-        }
 
         ImGui::TextUnformatted(i18n::c(JUDGE_TIMING));
         ImGui::SameLine(infoRowWidth);
         imgui_play_judgeTiming = State::get(IndexNumber::TIMING_ADJUST_VISUAL);
         if (ImGui::SliderInt("##judgetiming", &imgui_play_judgeTiming, -99, 99, "%d ms", ImGuiSliderFlags_None))
-        {
             State::set(IndexNumber::TIMING_ADJUST_VISUAL, imgui_play_judgeTiming);
-        }
         ImGui::SameLine();
         HelpMarker(i18n::c(JUDGE_TIMING_HINT));
 
@@ -934,30 +930,20 @@ void SceneSelect::imguiPageOptionsPlay()
         ImGui::Separator();
 
         if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_HISPEED_WITH_ARROWKEYS), &imgui_play_adjustHispeedWithUpDown))
-        {
             ConfigMgr::Profile()->set(cfg::P_ADJUST_HISPEED_WITH_ARROWKEYS, imgui_play_adjustHispeedWithUpDown);
-        }
 
         if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_HISPEED_WITH_SELECT), &imgui_play_adjustHispeedWithSelect))
-        {
             ConfigMgr::Profile()->set(cfg::P_ADJUST_HISPEED_WITH_SELECT, imgui_play_adjustHispeedWithSelect);
-        }
 
         if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_LANECOVER_WITH_START_67), &imgui_play_adjustLanecoverWithStart67))
-        {
             ConfigMgr::Profile()->set(cfg::P_ADJUST_LANECOVER_WITH_START_67, imgui_play_adjustLanecoverWithStart67);
-        }
 
         if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_LANECOVER_WITH_ARROWKEYS), &imgui_play_adjustLanecoverWithLeftRight))
-        {
             ConfigMgr::Profile()->set(cfg::P_ADJUST_LANECOVER_WITH_ARROWKEYS, imgui_play_adjustLanecoverWithLeftRight);
-        }
 
         if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_LANECOVER_WITH_MOUSEWHEEL), &imgui_play_adjustLanecoverWithMousewheel))
-        {
             ConfigMgr::Profile()->set(cfg::P_ADJUST_LANECOVER_WITH_MOUSEWHEEL,
                                       imgui_play_adjustLanecoverWithMousewheel);
-        }
 
         ImGui::EndChild();
     }
@@ -1013,49 +999,27 @@ void SceneSelect::imguiPageOptionsSelect()
         ImGui::Separator();
 
         if (ImGui::Checkbox(i18n::c(ONLY_DISPLAY_MAIN_TITLE_ON_BARS), &imgui_sel_onlyDisplayMainTitleOnBars))
-        {
             ConfigMgr::Profile()->set(cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, imgui_sel_onlyDisplayMainTitleOnBars);
-        }
         if (ImGui::Checkbox(i18n::c(DISABLE_PLAYMODE_ALL), &imgui_sel_disablePlaymodeAll))
-        {
             ConfigMgr::Profile()->set(cfg::P_DISABLE_PLAYMODE_ALL, imgui_sel_disablePlaymodeAll);
-        }
         if (ImGui::Checkbox(i18n::c(DISABLE_DIFFICULTY_ALL), &imgui_sel_disableDifficultyAll))
-        {
             ConfigMgr::Profile()->set(cfg::P_DISABLE_DIFFICULTY_ALL, imgui_sel_disableDifficultyAll);
-        }
         if (ImGui::Checkbox(i18n::c(DISABLE_PLAYMODE_SINGLE), &imgui_sel_disablePlaymodeSingle))
-        {
             ConfigMgr::Profile()->set(cfg::P_DISABLE_PLAYMODE_SINGLE, imgui_sel_disablePlaymodeSingle);
-        }
         if (ImGui::Checkbox(i18n::c(DISABLE_PLAYMODE_DOUBLE), &imgui_sel_disablePlaymodeDouble))
-        {
             ConfigMgr::Profile()->set(cfg::P_DISABLE_PLAYMODE_DOUBLE, imgui_sel_disablePlaymodeDouble);
-        }
         if (ImGui::Checkbox(i18n::c(IGNORE_DP_CHARTS), &imgui_sel_ignoreDPCharts))
-        {
             ConfigMgr::Profile()->set(cfg::P_IGNORE_DP_CHARTS, imgui_sel_ignoreDPCharts);
-        }
         if (ImGui::Checkbox(i18n::c(IGNORE_9K_CHARTS), &imgui_sel_ignore9keys))
-        {
             ConfigMgr::Profile()->set(cfg::P_IGNORE_9KEYS_CHARTS, imgui_sel_ignore9keys);
-        }
         if (ImGui::Checkbox(i18n::c(IGNORE_5K_IF_7K_EXISTS), &imgui_sel_ignore5keysif7keysexist))
-        {
             ConfigMgr::Profile()->set(cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, imgui_sel_ignore5keysif7keysexist);
-        }
         if (ImGui::Checkbox(_("Show random any"), &_show_random_any))
-        {
             ConfigMgr::Profile()->set(cfg::P_SELECT_SHOW_RANDOM_ANY, _show_random_any);
-        }
         if (ImGui::Checkbox(_("Show random failed"), &_show_random_failed))
-        {
             ConfigMgr::Profile()->set(cfg::P_SELECT_SHOW_RANDOM_FAILED, _show_random_failed);
-        }
         if (ImGui::Checkbox(_("Show random noplay"), &_show_random_noplay))
-        {
             ConfigMgr::Profile()->set(cfg::P_SELECT_SHOW_RANDOM_NOPLAY, _show_random_noplay);
-        }
 
         ImGui::EndChild();
     }
