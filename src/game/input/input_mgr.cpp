@@ -4,12 +4,7 @@
 #include <common/types.h>
 #include <config/config_mgr.h>
 #include <game/graphics/graphics.h>
-#include <shared_mutex>
 #include <tuple>
-
-#ifdef RENDER_SDL2
-#include <game/graphics/SDL2/input.h>
-#endif
 
 InputMgr InputMgr::_inst;
 
