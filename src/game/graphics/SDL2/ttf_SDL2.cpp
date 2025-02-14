@@ -32,9 +32,7 @@ TTFFont::~TTFFont()
 {
     if (!loaded)
         return;
-
-    if (_pFont)
-        pushAndWaitMainThreadTask<void>(std::bind_front(TTF_CloseFont, _pFont));
+    pushAndWaitMainThreadTask<void>(std::bind_front(TTF_CloseFont, _pFont));
 }
 
 std::shared_ptr<Texture> TTFFont::TextUTF8(const char* text, const Color& c)
