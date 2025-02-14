@@ -29,6 +29,8 @@ endif()
 set(LVF_GRAPHICS_BACKEND SDL2 CACHE STRING "Graphics backend")
 if(${LVF_GRAPHICS_BACKEND} STREQUAL SDL2)
     add_definitions(-DRENDER_SDL2)
+else()
+    message(FATAL_ERROR "Invalid LVF_GRAPHICS_BACKEND")
 endif()
 
 add_subdirectory(ext)
