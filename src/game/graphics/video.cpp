@@ -44,8 +44,6 @@ void lunaticvibes::AVPacketDeleter::operator()(AVPacket* pkt)
     av_packet_free(&pkt);
 }
 
-void video_init() {}
-
 sVideo::~sVideo()
 {
     if (haveVideo)

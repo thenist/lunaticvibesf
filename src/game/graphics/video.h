@@ -18,8 +18,6 @@ extern "C"
 class SceneBase;
 class SkinBase;
 
-void video_init();
-
 namespace lunaticvibes
 {
 [[nodiscard]] bool is_video_file_path(const Path& p);

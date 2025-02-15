@@ -157,9 +157,6 @@ int graphics_init()
         LOG_INFO << "[SDL2] SDL2 init finished";
     }
 
-    // libav
-    video_init();
-
     // imgui
     LOG_INFO << "[SDL2] Initializing ImGui for SDL renderer...";
     if (!ImGui_ImplSDL2_InitForSDLRenderer(gFrameWindow, gFrameRenderer) ||
