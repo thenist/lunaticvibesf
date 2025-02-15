@@ -302,19 +302,19 @@ std::vector<std::pair<int, int>> lunaticvibes::window::graphics_get_resolution_l
 
 void lunaticvibes::window::graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE mode)
 {
-    LOG_INFO << "[SDL2] Setting window mode to " << mode;
+    LOG_INFO << "[SDL2] Setting window mode to " << static_cast<int>(mode);
     switch (mode)
     {
-    case GRAPHICS_WINDOW_MODE_WINDOWED:
+    case GRAPHICS_WINDOW_MODE::WINDOWED:
         SDL_SetWindowFullscreen(gFrameWindow, 0);
         SDL_SetWindowBordered(gFrameWindow, SDL_TRUE);
         return;
-    case GRAPHICS_WINDOW_MODE_BORDERLESS: SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN); return;
-    case GRAPHICS_WINDOW_MODE_FULLSCREEN:
+    case GRAPHICS_WINDOW_MODE::BORDERLESS: SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN); return;
+    case GRAPHICS_WINDOW_MODE::FULLSCREEN:
         SDL_SetWindowFullscreen(gFrameWindow, 0);
         SDL_SetWindowBordered(gFrameWindow, SDL_FALSE);
         return;
-    case GRAPHICS_WINDOW_MODE_FAKE_FULLSCREEN:
+    case GRAPHICS_WINDOW_MODE::FAKE_FULLSCREEN:
         SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
         SDL_SetWindowBordered(gFrameWindow, SDL_FALSE);
         return;
