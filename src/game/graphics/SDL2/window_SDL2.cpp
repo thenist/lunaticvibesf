@@ -341,10 +341,10 @@ void lunaticvibes::window::save_new_window_size(int width, int height)
     ConfigMgr::General()->set(cfg::V_DISPLAY_RES_Y, height);
 }
 
-void lunaticvibes::window::graphics_change_vsync(lunaticvibes::GRAPHICS_VSYNC_MODE mode)
+void lunaticvibes::window::graphics_change_vsync(bool on)
 {
-    LOG_INFO << "[SDL2] Setting vsync mode to " << mode;
-    SDL_RenderSetVSync(gFrameRenderer, mode);
+    LOG_INFO << "[SDL2] Setting vsync mode to " << on;
+    SDL_RenderSetVSync(gFrameRenderer, on ? 1 : 0);
 }
 
 static int superSampleLevel = 1;

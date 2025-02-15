@@ -25,12 +25,6 @@ enum class GRAPHICS_WINDOW_MODE
     BORDERLESS = 2,
     FAKE_FULLSCREEN = 3,
 };
-// TODO: enum class
-enum GRAPHICS_VSYNC_MODE : int
-{
-    GRAPHICS_VSYNC_MODE_OFF = 0,
-    GRAPHICS_VSYNC_MODE_VSYNC = 1,
-};
 } // namespace lunaticvibes
 
 namespace lunaticvibes::window
@@ -53,7 +47,7 @@ void graphics_resize_window(int x, int y);
 // save passed windows size as the new one, without applying it (for that refer to graphics_resize_window)
 void save_new_window_size(int x, int y);
 
-void graphics_change_vsync(lunaticvibes::GRAPHICS_VSYNC_MODE mode);
+void graphics_change_vsync(bool);
 
 // scaling functions
 void graphics_set_supersample_level(int scale);

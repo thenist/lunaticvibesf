@@ -98,7 +98,7 @@ void SceneSelect::imguiInit()
     }
     old_video_display_resolution_index = imgui_video_display_resolution_index;
 
-    imgui_video_vsync_index = ConfigMgr::General()->get(cfg::V_VSYNC, 0);
+    _imgui_enable_vsync = ConfigMgr::General()->get(cfg::V_VSYNC, false);
 
     imgui_video_maxFPS = ConfigMgr::General()->get(cfg::V_MAXFPS, 240);
 
@@ -738,11 +738,7 @@ void SceneSelect::imguiPageOptionsVideo()
             imguiRefreshVideoDisplayResolutionList();
         }
 
-        ImGui::TextUnformatted(i18n::c(VIDEO_VSYNC));
-        ImGui::SameLine(infoRowWidth);
-        const char* imgui_vsync_mode_display[] = {i18n::c(OFF), i18n::c(ON)};
-        ImGui::Combo("##vsync", &imgui_video_vsync_index, imgui_vsync_mode_display,
-                     sizeof(imgui_vsync_mode_display) / sizeof(char*));
+        ImGui::Checkbox(i18n::c(VIDEO_VSYNC), &_imgui_enable_vsync);
 
         ImGui::TextUnformatted(i18n::c(VIDEO_MAXFPS));
         ImGui::SameLine(infoRowWidth);
@@ -1582,8 +1578,7 @@ bool SceneSelect::imguiApplyResolution()
         lunaticvibes::window::graphics_resize_window(windowW, windowH);
     }
     lunaticvibes::window::graphics_set_supersample_level(imgui_video_ssLevel);
-    lunaticvibes::window::graphics_change_vsync(
-        static_cast<lunaticvibes::GRAPHICS_VSYNC_MODE>(imgui_video_vsync_index));
+    lunaticvibes::window::graphics_change_vsync(_imgui_enable_vsync);
 
     if (imgui_video_mode != old_video_mode)
     {
@@ -1598,7 +1593,7 @@ bool SceneSelect::imguiApplyResolution()
         ConfigMgr::General()->set(cfg::V_WINMODE, windowMode);
     }
     ConfigMgr::General()->set(cfg::V_RES_SUPERSAMPLE, imgui_video_ssLevel);
-    ConfigMgr::General()->set(cfg::V_VSYNC, imgui_video_vsync_index);
+    ConfigMgr::General()->set(cfg::V_VSYNC, _imgui_enable_vsync);
 
     // windowed
     {
@@ -1618,18 +1613,8 @@ bool SceneSelect::imguiApplyResolution()
     }
     // vsync
     {
-        State::set(IndexOption::SYS_VSYNC, imgui_video_vsync_index == 0 ? 0 : 1);
-
-        static const std::map<int, std::string> smap = {
-            {0, "OFF"},
-            {1, "ON"},
-        };
-
-        auto&& s = imgui_video_vsync_index;
-        if (auto it = smap.find(s); it != smap.end())
-            State::set(IndexText::VSYNC, it->second);
-        else
-            State::set(IndexText::VSYNC, "OFF");
+        State::set(IndexOption::SYS_VSYNC, static_cast<int>(_imgui_enable_vsync));
+        State::set(IndexText::VSYNC, _imgui_enable_vsync ? "ON" : "OFF");
     }
 
     return true;

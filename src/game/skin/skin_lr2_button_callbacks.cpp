@@ -1048,7 +1048,7 @@ static void vsync(int plus)
 
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 
-    lunaticvibes::window::graphics_change_vsync(static_cast<lunaticvibes::GRAPHICS_VSYNC_MODE>(val));
+    lunaticvibes::window::graphics_change_vsync(val % 1 == 1);
 }
 
 // 83

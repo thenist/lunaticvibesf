@@ -249,7 +249,7 @@ private:
     int old_video_mode, imgui_video_mode; // 0:windowed 1:fullscreen 2:borderless
     int imgui_video_ssLevel;
 
-    int imgui_video_vsync_index;
+    bool _imgui_enable_vsync;
 
     int imgui_video_maxFPS;
 
