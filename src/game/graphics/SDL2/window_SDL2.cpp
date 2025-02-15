@@ -351,7 +351,6 @@ static int superSampleLevel = 1;
 void lunaticvibes::window::graphics_set_supersample_level(int level)
 {
     LOG_INFO << "[SDL2] Setting supersample level to " << level;
-    // assert(s_canvas_rect_x * level <= 3840);
     superSampleLevel = level;
 }
 int lunaticvibes::window::graphics_get_supersample_level()

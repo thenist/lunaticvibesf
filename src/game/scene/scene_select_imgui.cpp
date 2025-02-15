@@ -826,14 +826,10 @@ void SceneSelect::imguiPageOptionsPlay()
         ImGui::InputInt("##mininputinterval", &imgui_adv_minInputInterval, 1, 10);
         ImGui::SameLine();
         HelpMarker(i18n::c(MIN_INPUT_INTERVAL_HINT));
-        // ImGui::Checkbox("Accept mouse movements as Analog input", &imgui_adv_mouseAnalog);
 
         ImGui::TextUnformatted(i18n::c(INPUT_POLLING_RATE));
         ImGui::SameLine(infoRowWidth);
-        static const char* imgui_play_inputPollingRate_display[] = {
-            "1000 Hz", "2000 Hz", "4000 Hz", "8000 Hz",
-            //"Unlimited (Not recommended)"
-        };
+        static const char* imgui_play_inputPollingRate_display[] = {"1000 Hz", "2000 Hz", "4000 Hz", "8000 Hz"};
 #ifdef _WIN32
         int imgui_play_inputPollingRate_count = IsWindows10OrGreater() ? 2 : 1;
 #else
