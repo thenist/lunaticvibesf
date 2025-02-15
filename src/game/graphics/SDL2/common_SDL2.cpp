@@ -18,9 +18,6 @@
 #include <SDL_ttf.h>
 #include <SDL_video.h>
 
-#define SDL_LOAD_NOAUTOFREE 0
-#define SDL_LOAD_AUTOFREE 1
-
 ////////////////////////////////////////////////////////////////////////////////
 // Image
 
@@ -83,7 +80,9 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _
     if (_path.empty())
         return;
     LVF_DEBUG_ASSERT(_pRWop);
+
     const std::string_view pathView{path};
+    static constexpr int LEAVE_RWOP_OPEN = 0;
     if (isTGA(pathView))
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_LoadTGA_RW(_pRWop.get()), SDL_FreeSurface);
     else if (isPNG(pathView))
@@ -91,7 +90,7 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _
     else if (isGIF(pathView))
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_LoadGIF_RW(_pRWop.get()), SDL_FreeSurface);
     else
-        _pSurface = std::shared_ptr<SDL_Surface>(IMG_Load_RW(_pRWop.get(), SDL_LOAD_NOAUTOFREE), SDL_FreeSurface);
+        _pSurface = std::shared_ptr<SDL_Surface>(IMG_Load_RW(_pRWop.get(), LEAVE_RWOP_OPEN), SDL_FreeSurface);
 
     if (!_pSurface)
     {
