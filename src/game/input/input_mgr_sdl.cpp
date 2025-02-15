@@ -60,8 +60,6 @@ void initInput()
     (void)getInputState();
 }
 
-inline SDL_GameController* g_game_controller;
-
 void refreshInputDevices()
 {
     auto& state = getInputState();
