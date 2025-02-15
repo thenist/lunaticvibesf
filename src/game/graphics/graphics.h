@@ -61,8 +61,7 @@ void graphics_set_supersample_level(int scale);
 int graphics_get_supersample_level();
 
 void graphics_resize_canvas(int x, int y);
-double graphics_get_canvas_scale_x();
-double graphics_get_canvas_scale_y();
+std::pair<double, double> graphics_get_canvas_scale(); // x, y
 
 void graphics_set_maxfps(int fps);
 

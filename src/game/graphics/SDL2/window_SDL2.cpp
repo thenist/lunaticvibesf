@@ -367,13 +367,9 @@ void lunaticvibes::window::graphics_resize_canvas(int x, int y)
     s_canvas_scale_x = static_cast<double>(s_window_rect_w.load()) / x;
     s_canvas_scale_y = static_cast<double>(s_window_rect_h.load()) / y;
 }
-double lunaticvibes::window::graphics_get_canvas_scale_x()
+std::pair<double, double> lunaticvibes::window::graphics_get_canvas_scale()
 {
-    return s_canvas_scale_x;
-}
-double lunaticvibes::window::graphics_get_canvas_scale_y()
-{
-    return s_canvas_scale_y;
+    return {s_canvas_scale_x, s_canvas_scale_y};
 }
 
 void lunaticvibes::window::graphics_set_maxfps(int fps)
