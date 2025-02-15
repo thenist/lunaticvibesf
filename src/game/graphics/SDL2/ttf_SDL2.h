@@ -9,8 +9,6 @@ using TTF_Font = struct _TTF_Font; // NOLINT(cert-dcl37-c,cert-dcl51-cpp,bugpron
 
 class Texture;
 
-// SDL_ttf encapsulation. Mostly as same as Image
-// Run TTF_Init outside.
 class TTFFont
 {
 private:

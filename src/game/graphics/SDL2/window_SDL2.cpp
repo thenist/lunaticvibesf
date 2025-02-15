@@ -13,7 +13,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_syswm.h>
-#include <SDL_ttf.h>
 
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
@@ -172,19 +171,6 @@ int graphics_init()
         LOG_INFO << "[SDL2] SDL2_Image init finished. Version " << SDL_IMAGE_MAJOR_VERSION << '.'
                  << SDL_IMAGE_MINOR_VERSION << "." << SDL_IMAGE_PATCHLEVEL;
     }
-    // SDL_ttf
-    {
-        LOG_INFO << "[SDL2] Initializing SDL2_TTF...";
-
-        if (-1 == TTF_Init())
-        {
-            // error handling
-            LOG_FATAL << "[SDL2] SDL2_TTF init failed: " << TTF_GetError();
-            return 2;
-        }
-        LOG_INFO << "[SDL2] SDL2_TTF init finished. Version " << SDL_TTF_MAJOR_VERSION << '.' << SDL_TTF_MINOR_VERSION
-                 << "." << SDL_TTF_PATCHLEVEL;
-    }
 
     // libav
     video_init();
@@ -291,8 +277,6 @@ int graphics_free()
     SDL_DestroyWindow(gFrameWindow);
     gFrameWindow = nullptr;
 
-    LOG_INFO << "[SDL2] De-initializing TTF module...";
-    TTF_Quit();
     LOG_INFO << "[SDL2] De-initializing Image module...";
     IMG_Quit();
     LOG_INFO << "[SDL2] De-initializing SDL2...";

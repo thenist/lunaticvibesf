@@ -11,8 +11,32 @@
 
 #include <functional>
 
+struct TtfInitQuit
+{
+    TtfInitQuit()
+    {
+        LOG_INFO << "[TTF] Initializing SDL_ttf...";
+        if (TTF_Init() == -1)
+            panic("SDL_ttf init failed", TTF_GetError());
+        LOG_INFO << "[TTF] Initialized SDL_ttf " << SDL_TTF_MAJOR_VERSION << '.' << SDL_TTF_MINOR_VERSION << "."
+                 << SDL_TTF_PATCHLEVEL;
+    }
+    ~TtfInitQuit()
+    {
+        LOG_INFO << "[TTF] De-initializing SDL_ttf...";
+        TTF_Quit();
+    };
+};
+
+static void maybe_init_ttf_font()
+{
+    static TtfInitQuit _;
+    (void)_;
+}
+
 TTFFont::TTFFont(const Path& filePath, int ptsize) : _filePath(lunaticvibes::cs(filePath.u8string()))
 {
+    maybe_init_ttf_font();
     pushAndWaitMainThreadTask<void>([&]() { _pFont = TTF_OpenFont(_filePath.c_str(), ptsize); });
     if (!_pFont)
         LOG_WARNING << "[TTF] " << filePath << ": " << TTF_GetError();
@@ -22,6 +46,7 @@ TTFFont::TTFFont(const Path& filePath, int ptsize) : _filePath(lunaticvibes::cs(
 
 TTFFont::TTFFont(const Path& filePath, int ptsize, int faceIndex) : _filePath(lunaticvibes::cs(filePath.u8string()))
 {
+    maybe_init_ttf_font();
     pushAndWaitMainThreadTask<void>([&]() { _pFont = TTF_OpenFontIndex(_filePath.c_str(), ptsize, faceIndex); });
     if (!_pFont)
         LOG_WARNING << "[TTF] " << filePath << ": " << TTF_GetError();
