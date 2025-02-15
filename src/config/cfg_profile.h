@@ -290,6 +290,11 @@ constexpr char P_PREVIEW_CHART_7K[] = "sPreviewChart7k";
 constexpr char P_PREVIEW_CHART_9K[] = "sPreviewChart9k";
 
 constexpr char P_LR2_DB_IMPORT_PATH[] = "sLr2DbImportPath";
+
+namespace P
+{
+constexpr char ENABLE_GAS[] = "bEnableGas";
+} // namespace P
 } // namespace cfg
 
 class ConfigProfile : public vConfig

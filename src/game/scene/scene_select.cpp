@@ -528,8 +528,7 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     lunaticvibes::assign(_preview_chart_5k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_5K, ""));
     lunaticvibes::assign(_preview_chart_7k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_7K, ""));
     lunaticvibes::assign(_preview_chart_9k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_9K, ""));
-
-    _gas_gauge = false; // TODO: ConfigMgr::Profile()->get(cfg::P_ENABLE_GAS, false);
+    _gas_gauge = ConfigMgr::Profile()->get(cfg::P::ENABLE_GAS, false);
 
     _input.register_p("SCENE_PRESS", std::bind_front(&SceneSelect::inputGamePress, this));
     _input.register_h("SCENE_HOLD", std::bind_front(&SceneSelect::inputGameHold, this));
@@ -568,6 +567,7 @@ SceneSelect::~SceneSelect()
     ConfigMgr::Profile()->set(cfg::P_PREVIEW_CHART_5K, _preview_chart_5k.data());
     ConfigMgr::Profile()->set(cfg::P_PREVIEW_CHART_7K, _preview_chart_7k.data());
     ConfigMgr::Profile()->set(cfg::P_PREVIEW_CHART_9K, _preview_chart_9k.data());
+    ConfigMgr::Profile()->set(cfg::P::ENABLE_GAS, _gas_gauge);
     ConfigMgr::save();
 
     _input.loopEnd();
