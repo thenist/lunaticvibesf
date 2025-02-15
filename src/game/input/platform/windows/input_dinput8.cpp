@@ -2,7 +2,7 @@
 
 #include <common/assert.h>
 #include <common/log.h>
-#include <game/input/input_dinput8.h>
+#include <game/input/platform/windows/input_dinput8.h>
 
 InputDirectInput8::InputDirectInput8()
 {

@@ -39,6 +39,7 @@ if(${LVF_GRAPHICS_BACKEND} STREQUAL SDL2)
         graphics/SDL2/input_SDL2.cpp
         graphics/SDL2/ttf_SDL2.cpp
         graphics/SDL2/window_SDL2.cpp
+        input/platform/sdl2/input_sdl2.cpp
     )
 endif()
 
@@ -75,9 +76,8 @@ add_library(
     graphics/texture_extra.cpp
     graphics/video.cpp
     input/input_mgr.cpp
-    input/input_mgr_sdl.cpp
-    input/input_dinput8.cpp
-    input/input_windows.cpp
+    input/platform/windows/input_dinput8.cpp
+    input/platform/windows/input_windows.cpp
     input/input_wrapper.cpp
     ruleset/ruleset_bms.cpp
     ruleset/ruleset_bms_auto.cpp

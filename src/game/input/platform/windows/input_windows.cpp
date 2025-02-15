@@ -1,6 +1,8 @@
 #ifdef _WIN32
-#include "input_dinput8.h"
-#include "input_mgr.h"
+
+#include <game/input/input_mgr.h>
+#include <game/input/platform/windows/input_dinput8.h>
+
 #include <cmath>
 
 void initInput()
