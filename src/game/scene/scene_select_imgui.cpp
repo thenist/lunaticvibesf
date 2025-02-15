@@ -769,7 +769,7 @@ void SceneSelect::imguiPageOptionsVideo()
             if (imgui_video_maxFPS != ConfigMgr::General()->get(cfg::V_MAXFPS, infoRowWidth))
             {
                 ConfigMgr::General()->set(cfg::V_MAXFPS, imgui_video_maxFPS);
-                graphics_set_maxfps(imgui_video_maxFPS);
+                lunaticvibes::window::graphics_set_maxfps(imgui_video_maxFPS);
             }
         }
         ImGui::EndChild();
@@ -1330,14 +1330,14 @@ void SceneSelect::imguiRefreshVideoDisplayResolutionList()
 
     if (imgui_video_mode == 1)
     {
-        for (auto& r : graphics_get_resolution_list())
+        for (auto& r : lunaticvibes::window::graphics_get_resolution_list())
             if (std::pair<int, int> res = {std::get<0>(r), std::get<1>(r)}; res.first >= 640 && res.second >= 480)
                 imgui_video_display_resolution_size.emplace_back(res);
     }
     else
     {
         // filter out resolutions bigger than desktop
-        auto res = graphics_get_desktop_resolution();
+        auto res = lunaticvibes::window::graphics_get_desktop_resolution();
         auto addResolution = [res, this](int dw, int dh) {
             if (res.first >= dw && res.second >= dh)
                 imgui_video_display_resolution_size.emplace_back(dw, dh);
@@ -1582,20 +1582,22 @@ bool SceneSelect::imguiApplyResolution()
     const auto& windowSize = imgui_video_display_resolution_size[imgui_video_display_resolution_index];
     const auto windowW = static_cast<int>(windowSize.first);
     const auto windowH = static_cast<int>(windowSize.second);
-    auto [desktopW, desktopH] = graphics_get_desktop_resolution();
+    auto [desktopW, desktopH] = lunaticvibes::window::graphics_get_desktop_resolution();
 
     if (imgui_video_mode == 2 && windowW == desktopW && windowH == desktopH)
     {
-        graphics_change_window_mode(static_cast<lunaticvibes::GRAPHICS_WINDOW_MODE>(3));
-        graphics_resize_window(windowW, windowH);
+        lunaticvibes::window::graphics_change_window_mode(static_cast<lunaticvibes::GRAPHICS_WINDOW_MODE>(3));
+        lunaticvibes::window::graphics_resize_window(windowW, windowH);
     }
     else
     {
-        graphics_change_window_mode(static_cast<lunaticvibes::GRAPHICS_WINDOW_MODE>(imgui_video_mode));
-        graphics_resize_window(windowW, windowH);
+        lunaticvibes::window::graphics_change_window_mode(
+            static_cast<lunaticvibes::GRAPHICS_WINDOW_MODE>(imgui_video_mode));
+        lunaticvibes::window::graphics_resize_window(windowW, windowH);
     }
-    graphics_set_supersample_level(imgui_video_ssLevel);
-    graphics_change_vsync(static_cast<lunaticvibes::GRAPHICS_VSYNC_MODE>(imgui_video_vsync_index));
+    lunaticvibes::window::graphics_set_supersample_level(imgui_video_ssLevel);
+    lunaticvibes::window::graphics_change_vsync(
+        static_cast<lunaticvibes::GRAPHICS_VSYNC_MODE>(imgui_video_vsync_index));
 
     if (imgui_video_mode != old_video_mode)
     {

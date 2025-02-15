@@ -767,7 +767,7 @@ void SceneCustomize::draw() const
 {
     // screenshot
     std::shared_ptr<Texture> pTex = pSkin->getTextureCustomizeThumbnail();
-    graphics_copy_screen_texture(*pTex);
+    lunaticvibes::window::graphics_copy_screen_texture(*pTex);
 
     // draw own things
     SceneBase::draw();

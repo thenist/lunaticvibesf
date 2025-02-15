@@ -142,7 +142,7 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect_, const RectF dstRect
     if (mode != current_mode)
         SDL_SetTextureScaleMode(pTex, mode);
 
-    int ssLevel = graphics_get_supersample_level();
+    int ssLevel = lunaticvibes::window::graphics_get_supersample_level();
     dstRectF.x *= ssLevel;
     dstRectF.y *= ssLevel;
     dstRectF.w *= ssLevel;

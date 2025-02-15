@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
     // further operations present in graphics_init()
 
     // init graphics
-    if (auto ginit = graphics_init())
+    if (auto ginit = lunaticvibes::window::graphics_init())
         return ginit;
 
     // init sound
@@ -312,7 +312,7 @@ int main(int argc, char* argv[])
     timeEndPeriod(1);
 #endif
 
-    graphics_free();
+    lunaticvibes::window::graphics_free();
 
     ImGui::DestroyContext();
 
@@ -444,7 +444,7 @@ void mainLoop()
 
         // draw
         {
-            graphics_clear();
+            lunaticvibes::window::graphics_clear();
             doMainThreadTask();
 
             if (scene)
@@ -468,7 +468,7 @@ void mainLoop()
                 sceneCustomize->update();
                 sceneCustomize->draw();
             }
-            graphics_flush();
+            lunaticvibes::window::graphics_flush();
         }
         lunaticvibes::g_feed_frametime(lunaticvibes::FrameTimeType::Fps, lunaticvibes::Time::now() - t);
     }

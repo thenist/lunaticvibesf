@@ -168,8 +168,8 @@ int lunaticvibes::window::graphics_init()
     LOG_INFO << "[SDL2] ImGui init finished";
 
     // Draw a black frame to prevent flashbang
-    graphics_clear();
-    graphics_flush();
+    lunaticvibes::window::graphics_clear();
+    lunaticvibes::window::graphics_flush();
 
     return 0;
 }
@@ -191,7 +191,7 @@ void lunaticvibes::window::graphics_flush()
     {
         // TODO scale internal canvas
         SDL_Rect ssRect{0, 0, s_canvas_rect_w, s_canvas_rect_h};
-        int ssLevel = graphics_get_supersample_level();
+        int ssLevel = lunaticvibes::window::graphics_get_supersample_level();
         ssRect.w *= ssLevel;
         ssRect.h *= ssLevel;
 
@@ -270,8 +270,8 @@ void lunaticvibes::window::graphics_copy_screen_texture(Texture& texture)
     SDL_SetRenderTarget(gFrameRenderer, static_cast<SDL_Texture*>(texture.raw()));
     SDL_RenderClear(gFrameRenderer);
     const auto origRect = std::bit_cast<SDL_Rect>(texture.getRect());
-    const SDL_Rect rect{0, 0, origRect.w * graphics_get_supersample_level(),
-                        origRect.h * graphics_get_supersample_level()};
+    const auto scale = lunaticvibes::window::graphics_get_supersample_level();
+    const SDL_Rect rect{0, 0, origRect.w * scale, origRect.h * scale};
     const SDL_Rect canvasRect{0, 0, s_canvas_rect_w, s_canvas_rect_h};
     SDL_RenderCopy(gFrameRenderer, gInternalRenderTarget, &rect, &canvasRect);
     SDL_SetRenderTarget(gFrameRenderer, gInternalRenderTarget);

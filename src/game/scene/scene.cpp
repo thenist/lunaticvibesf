@@ -48,7 +48,7 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
     {
         const int x = pSkin->info.resolution.first;
         const int y = pSkin->info.resolution.second;
-        graphics_resize_canvas(x, y);
+        lunaticvibes::window::graphics_resize_canvas(x, y);
         notificationPosY = y;
         notificationWidth = x;
     }
@@ -178,7 +178,7 @@ void SceneBase::update()
 
     if ((!gInCustomize || _type == SceneType::CUSTOMIZE) && shouldShowImgui())
     {
-        ImGuiNewFrame();
+        lunaticvibes::window::ImGuiNewFrame();
         updateImgui();
         ImGui::Render();
     }

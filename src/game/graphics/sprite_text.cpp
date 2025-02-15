@@ -105,14 +105,15 @@ void SpriteText::startEditing(bool clear)
     editing = true;
     textBeforeEdit = State::get(textInd);
     textAfterEdit = (clear ? "" : _text);
-    startTextInput(_current.rect, textAfterEdit, std::bind_front(&SpriteText::updateTextWhileEditing, this));
+    lunaticvibes::window::startTextInput(_current.rect, textAfterEdit,
+                                         std::bind_front(&SpriteText::updateTextWhileEditing, this));
 }
 
 void SpriteText::stopEditing(bool modify)
 {
     if (!isEditing())
         return;
-    stopTextInput();
+    lunaticvibes::window::stopTextInput();
     editing = false;
     State::set(textInd, (modify ? textAfterEdit : textBeforeEdit));
     pushMainThreadTask(std::bind_front(&SpriteText::updateText, this));

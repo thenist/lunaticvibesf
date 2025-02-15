@@ -36,7 +36,7 @@ ScenePreSelect::ScenePreSelect() : SceneBase(nullptr, SkinType::PRE_SELECT, 240)
 
     rootFolderProp = SongListProperties{{}, ROOT_FOLDER_HASH, "", {}, {}, 0};
 
-    graphics_set_maxfps(30);
+    lunaticvibes::window::graphics_set_maxfps(30);
 
     LOG_INFO << "[List] ------------------------------------------------------------";
 
@@ -505,7 +505,7 @@ void ScenePreSelect::loadFinished()
         int maxFPS = ConfigMgr::General()->get(cfg::V_MAXFPS, 480);
         if (maxFPS < 30 && maxFPS != 0)
             maxFPS = 30;
-        graphics_set_maxfps(maxFPS);
+        lunaticvibes::window::graphics_set_maxfps(maxFPS);
 
         gNextScene = SceneType::SELECT;
         _switchedScene = true;
