@@ -4,7 +4,7 @@
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/types.h>
-#include <game/graphics/SDL2/input.h>
+#include <game/graphics/SDL2/input_SDL2.h>
 #include <game/input/input_mgr.h>
 
 #include <algorithm>

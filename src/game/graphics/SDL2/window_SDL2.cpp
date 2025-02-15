@@ -27,7 +27,7 @@
 #include <common/u8.h>
 #include <config/config_mgr.h>
 #include <game/graphics/SDL2/graphics_SDL2.h>
-#include <game/graphics/SDL2/input.h>
+#include <game/graphics/SDL2/input_SDL2.h>
 #include <game/graphics/graphics.h>
 #include <game/graphics/video.h>
 

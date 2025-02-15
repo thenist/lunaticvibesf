@@ -1,4 +1,4 @@
-#include "input.h"
+#include "input_SDL2.h"
 
 #include <common/assert.h>
 
