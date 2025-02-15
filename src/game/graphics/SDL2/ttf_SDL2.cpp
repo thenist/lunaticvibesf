@@ -34,16 +34,6 @@ static void maybe_init_ttf_font()
     (void)_;
 }
 
-TTFFont::TTFFont(const Path& filePath, int ptsize) : _filePath(lunaticvibes::cs(filePath.u8string()))
-{
-    maybe_init_ttf_font();
-    pushAndWaitMainThreadTask<void>([&]() { _pFont = TTF_OpenFont(_filePath.c_str(), ptsize); });
-    if (!_pFont)
-        LOG_WARNING << "[TTF] " << filePath << ": " << TTF_GetError();
-    else
-        loaded = true;
-}
-
 TTFFont::TTFFont(const Path& filePath, int ptsize, int faceIndex) : _filePath(lunaticvibes::cs(filePath.u8string()))
 {
     maybe_init_ttf_font();

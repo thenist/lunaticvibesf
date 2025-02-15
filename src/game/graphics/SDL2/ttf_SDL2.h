@@ -17,7 +17,6 @@ private:
     bool loaded = false;
 
 public:
-    TTFFont(const Path& filePath, int ptsize);
     TTFFont(const Path& filePath, int ptsize, int faceIndex);
     ~TTFFont();
 
