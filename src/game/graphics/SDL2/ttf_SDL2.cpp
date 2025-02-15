@@ -1,4 +1,4 @@
-#include "graphics_SDL2.h"
+#include "ttf_SDL2.h"
 
 #include <SDL_ttf.h>
 
@@ -7,6 +7,7 @@
 #include <common/sysutil.h>
 #include <common/types.h>
 #include <common/u8.h>
+#include <game/graphics/SDL2/graphics_SDL2.h>
 
 #include <functional>
 
