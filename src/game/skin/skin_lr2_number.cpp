@@ -77,6 +77,9 @@ int lunaticvibes::get_number(IndexNumber ind)
     // beatoraja
     switch (std::to_underlying(ind))
     {
+    case 40:           // Trial level
+    case 41: return 0; // Trial level prev
+
     case 100:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
             return static_cast<int>(std::round(ruleset->getMoneyScoreAnimation().animate(lunaticvibes::Time::now())));

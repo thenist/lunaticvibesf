@@ -466,10 +466,6 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     State::set(IndexNumber::PROFILE_POOR, stats.poor);
     State::set(IndexNumber::PROFILE_RUNNING_COMBO, stats.running_combo);
     State::set(IndexNumber::PROFILE_RUNNING_COMBO_MAX, stats.max_running_combo);
-    // TODO: if profile was imported from LR2, show trial level from
-    // there, otherwise a static value.
-    State::set(IndexNumber::PROFILE_TRIAL_LEVEL, 0);
-    State::set(IndexNumber::PROFILE_TRIAL_LEVEL_PREV, 0);
 
     lr2skin::button::target_type(0);
 
