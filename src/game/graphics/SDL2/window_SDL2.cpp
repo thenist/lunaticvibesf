@@ -42,7 +42,7 @@ static std::atomic<int> s_window_rect_w;
 static SDL_Texture* gInternalRenderTarget;
 static SDL_Window* gFrameWindow;
 
-int graphics_init()
+int lunaticvibes::window::graphics_init()
 {
     LOG_INFO << "[SDL2] Initializing...";
 
@@ -174,7 +174,7 @@ int graphics_init()
     return 0;
 }
 
-void graphics_clear()
+void lunaticvibes::window::graphics_clear()
 {
     SDL_RenderClear(gFrameRenderer);
 }
@@ -183,7 +183,7 @@ static int maxFPS = 0;
 static bool s_should_present_imgui = false;
 static std::chrono::nanoseconds desiredFrameTimeBetweenFrames;
 static Path screenshotPath;
-void graphics_flush()
+void lunaticvibes::window::graphics_flush()
 {
     static std::chrono::high_resolution_clock::time_point frameTimestampPrev;
 
@@ -241,7 +241,7 @@ void graphics_flush()
     frameTimestampPrev = std::chrono::high_resolution_clock::now();
 }
 
-int graphics_free()
+int lunaticvibes::window::graphics_free()
 {
     LOG_INFO << "[SDL2] Shutting down ImGui module...";
     ImGui_ImplSDLRenderer2_Shutdown();
@@ -263,7 +263,7 @@ int graphics_free()
     return 0;
 }
 
-void graphics_copy_screen_texture(Texture& texture)
+void lunaticvibes::window::graphics_copy_screen_texture(Texture& texture)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
 
@@ -277,7 +277,7 @@ void graphics_copy_screen_texture(Texture& texture)
     SDL_SetRenderTarget(gFrameRenderer, gInternalRenderTarget);
 }
 
-std::pair<int, int> graphics_get_desktop_resolution()
+std::pair<int, int> lunaticvibes::window::graphics_get_desktop_resolution()
 {
     int index = SDL_GetWindowDisplayIndex(gFrameWindow);
     SDL_DisplayMode mode{};
@@ -285,7 +285,7 @@ std::pair<int, int> graphics_get_desktop_resolution()
     return {mode.w, mode.h};
 }
 
-std::vector<std::pair<int, int>> graphics_get_resolution_list()
+std::vector<std::pair<int, int>> lunaticvibes::window::graphics_get_resolution_list()
 {
     int index = SDL_GetWindowDisplayIndex(gFrameWindow);
     int modes = SDL_GetNumDisplayModes(index);
@@ -300,7 +300,7 @@ std::vector<std::pair<int, int>> graphics_get_resolution_list()
     return res;
 }
 
-void graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE mode)
+void lunaticvibes::window::graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE mode)
 {
     LOG_INFO << "[SDL2] Setting window mode to " << mode;
     switch (static_cast<int>(mode)) // TODO: remove the cast after adding 'case 3' to the enum
@@ -322,7 +322,7 @@ void graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE mode)
     }
 }
 
-void graphics_resize_window(int x, int y)
+void lunaticvibes::window::graphics_resize_window(int x, int y)
 {
     LOG_INFO << "[SDL2] Resizing window mode to " << x << 'x' << y;
     lunaticvibes::graphics::save_new_window_size(x, y);
@@ -341,25 +341,25 @@ void lunaticvibes::graphics::save_new_window_size(int width, int height)
     ConfigMgr::General()->set(cfg::V_DISPLAY_RES_Y, height);
 }
 
-void graphics_change_vsync(lunaticvibes::GRAPHICS_VSYNC_MODE mode)
+void lunaticvibes::window::graphics_change_vsync(lunaticvibes::GRAPHICS_VSYNC_MODE mode)
 {
     LOG_INFO << "[SDL2] Setting vsync mode to " << mode;
     SDL_RenderSetVSync(gFrameRenderer, mode);
 }
 
 static int superSampleLevel = 1;
-void graphics_set_supersample_level(int level)
+void lunaticvibes::window::graphics_set_supersample_level(int level)
 {
     LOG_INFO << "[SDL2] Setting supersample level to " << level;
     // assert(s_canvas_rect_x * level <= 3840);
     superSampleLevel = level;
 }
-int graphics_get_supersample_level()
+int lunaticvibes::window::graphics_get_supersample_level()
 {
     return superSampleLevel;
 }
 
-void graphics_resize_canvas(int x, int y)
+void lunaticvibes::window::graphics_resize_canvas(int x, int y)
 {
     LOG_INFO << "[SDL2] Resizing canvas to " << x << 'x' << y;
     s_canvas_rect_w = x;
@@ -367,16 +367,16 @@ void graphics_resize_canvas(int x, int y)
     s_canvas_scale_x = static_cast<double>(s_window_rect_w.load()) / x;
     s_canvas_scale_y = static_cast<double>(s_window_rect_h.load()) / y;
 }
-double graphics_get_canvas_scale_x()
+double lunaticvibes::window::graphics_get_canvas_scale_x()
 {
     return s_canvas_scale_x;
 }
-double graphics_get_canvas_scale_y()
+double lunaticvibes::window::graphics_get_canvas_scale_y()
 {
     return s_canvas_scale_y;
 }
 
-void graphics_set_maxfps(int fps)
+void lunaticvibes::window::graphics_set_maxfps(int fps)
 {
     LOG_INFO << "[SDL2] Setting max fps to " << fps;
     maxFPS = fps;
@@ -523,7 +523,7 @@ bool lunaticvibes::event_handle()
     return quit;
 }
 
-void ImGuiNewFrame()
+void lunaticvibes::window::ImGuiNewFrame()
 {
     SDL_SetRenderTarget(gFrameRenderer, nullptr);
     ImGui_ImplSDLRenderer2_NewFrame();
@@ -535,8 +535,8 @@ void ImGuiNewFrame()
 }
 
 static std::function<void(const std::string&)> funUpdateText;
-void startTextInput(const RectF& textBox, const std::string& oldText,
-                    std::function<void(const std::string&)> funUpdateText)
+void lunaticvibes::window::startTextInput(const RectF& textBox, const std::string& oldText,
+                                          std::function<void(const std::string&)> funUpdateText)
 {
     LOG_DEBUG << "Start Text Input";
 
@@ -566,7 +566,7 @@ void startTextInput(const RectF& textBox, const std::string& oldText,
     ::funUpdateText(textBuf);
 }
 
-void stopTextInput()
+void lunaticvibes::window::stopTextInput()
 {
     LOG_DEBUG << "Stop Text Input";
 
