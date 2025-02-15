@@ -1,7 +1,8 @@
-#include "graphics_SDL2.h"
+#include "game/graphics/SDL2/image_SDL2.h"
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/sysutil.h>
 #include <common/u8.h>
 #include <common/utils.h>
 #include <game/graphics/color.h>
@@ -41,6 +42,31 @@ static void close_rwops(SDL_RWops* s)
     ensure_tls_cleanup();
 }
 
+struct ImgInitQuit
+{
+    ImgInitQuit()
+    {
+        LOG_INFO << "[Image] Initializing SDL_image...";
+        constexpr auto flags = IMG_INIT_JPG | IMG_INIT_PNG;
+        if (IMG_Init(flags) != flags)
+            panic("SDL_image init failed", IMG_GetError());
+        LOG_INFO << "[Image] Initialized SDL_Image " << SDL_IMAGE_MAJOR_VERSION << '.' << SDL_IMAGE_MINOR_VERSION << "."
+                 << SDL_IMAGE_PATCHLEVEL;
+    }
+
+    ~ImgInitQuit()
+    {
+        LOG_INFO << "[Image] De-initializing SDL_image...";
+        IMG_Quit();
+    };
+};
+
+static void maybe_init_image()
+{
+    static ImgInitQuit _;
+    (void)_;
+}
+
 Image::Image(const std::filesystem::path& path) : Image(lunaticvibes::cs(path.u8string())) {}
 
 Image::Image(const char* filePath)
@@ -61,6 +87,8 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _
     if (_path.empty())
         return;
     LVF_DEBUG_ASSERT(_pRWop);
+
+    maybe_init_image();
 
     const std::string_view pathView{path};
     static constexpr int LEAVE_RWOP_OPEN = 0;
@@ -104,4 +132,16 @@ Rect Image::getRect() const
     if (_pSurface == nullptr)
         return {};
     return {0, 0, _pSurface->w, _pSurface->h};
+}
+
+bool lunaticvibes::save_into_png(SDL_Surface* surface, const std::filesystem::path& path)
+{
+    maybe_init_image();
+    int ret = IMG_SavePNG(surface, lunaticvibes::cs(path.u8string()));
+    if (ret < 0)
+    {
+        LOG_ERROR << "[SDL2] IMG_SavePNG error: " << IMG_GetError();
+        return false;
+    }
+    return true;
 }

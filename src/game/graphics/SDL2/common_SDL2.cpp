@@ -3,7 +3,6 @@
 #include <bit>
 #include <cmath>
 #include <memory>
-#include <string_view>
 
 #include <common/assert.h>
 #include <common/log.h>

@@ -11,7 +11,6 @@
 #include <utility>
 
 #include <SDL.h>
-#include <SDL_image.h>
 #include <SDL_syswm.h>
 
 #include <imgui.h>
@@ -26,6 +25,7 @@
 #include <common/u8.h>
 #include <config/config_mgr.h>
 #include <game/graphics/SDL2/graphics_SDL2.h>
+#include <game/graphics/SDL2/image_SDL2.h>
 #include <game/graphics/SDL2/input_SDL2.h>
 #include <game/graphics/graphics.h>
 #include <game/graphics/video.h>
@@ -157,21 +157,6 @@ int graphics_init()
         LOG_INFO << "[SDL2] SDL2 init finished";
     }
 
-    // SDL_Image
-    {
-        LOG_INFO << "[SDL2] Initializing SDL2_Image...";
-
-        auto flags = IMG_INIT_JPG | IMG_INIT_PNG;
-        if (flags != IMG_Init(flags))
-        {
-            // error handling
-            LOG_FATAL << "[SDL2] SDL2_Image init failed: " << IMG_GetError();
-            return 1;
-        }
-        LOG_INFO << "[SDL2] SDL2_Image init finished. Version " << SDL_IMAGE_MAJOR_VERSION << '.'
-                 << SDL_IMAGE_MINOR_VERSION << "." << SDL_IMAGE_PATCHLEVEL;
-    }
-
     // libav
     video_init();
 
@@ -240,11 +225,7 @@ void graphics_flush()
             {
                 LOG_ERROR << "[SDL2] SDL_RenderReadPixels error: " << SDL_GetError();
             }
-            ret = IMG_SavePNG(sshot, lunaticvibes::cs(screenshotPath.u8string()));
-            if (ret < 0)
-            {
-                LOG_ERROR << "[SDL2] IMG_SavePNG error: " << IMG_GetError();
-            }
+            (void)lunaticvibes::save_into_png(sshot, screenshotPath);
             SDL_FreeSurface(sshot);
             screenshotPath.clear();
         }
@@ -277,8 +258,6 @@ int graphics_free()
     SDL_DestroyWindow(gFrameWindow);
     gFrameWindow = nullptr;
 
-    LOG_INFO << "[SDL2] De-initializing Image module...";
-    IMG_Quit();
     LOG_INFO << "[SDL2] De-initializing SDL2...";
     SDL_Quit();
 
