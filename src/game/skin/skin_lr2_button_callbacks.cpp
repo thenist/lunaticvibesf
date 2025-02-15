@@ -1041,11 +1041,7 @@ static void window_mode(int plus)
 // 82
 static void vsync(int plus)
 {
-#ifdef _WIN32
-    unsigned val = (State::get(IndexOption::SYS_VSYNC) + 2 + plus) % 2;
-#else
-    unsigned val = (State::get(IndexOption::SYS_VSYNC) + 3 + plus) % 3;
-#endif
+    const unsigned val = (State::get(IndexOption::SYS_VSYNC) + 2 + plus) % 2;
 
     State::set(IndexOption::SYS_VSYNC, val);
     State::set(IndexText::VSYNC, Option::s_vsync_mode[val]);

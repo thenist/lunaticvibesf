@@ -31,7 +31,6 @@ enum GRAPHICS_VSYNC_MODE : int
 {
     GRAPHICS_VSYNC_MODE_OFF = 0,
     GRAPHICS_VSYNC_MODE_VSYNC = 1,
-    GRAPHICS_VSYNC_MODE_ADAPTIVE = 2,
 };
 } // namespace lunaticvibes
 

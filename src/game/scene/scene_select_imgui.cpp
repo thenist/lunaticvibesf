@@ -99,10 +99,6 @@ void SceneSelect::imguiInit()
     old_video_display_resolution_index = imgui_video_display_resolution_index;
 
     imgui_video_vsync_index = ConfigMgr::General()->get(cfg::V_VSYNC, 0);
-#ifdef _WIN32
-    if (imgui_video_vsync_index >= 2)
-        imgui_video_vsync_index = 1;
-#endif
 
     imgui_video_maxFPS = ConfigMgr::General()->get(cfg::V_MAXFPS, 240);
 
@@ -744,14 +740,7 @@ void SceneSelect::imguiPageOptionsVideo()
 
         ImGui::TextUnformatted(i18n::c(VIDEO_VSYNC));
         ImGui::SameLine(infoRowWidth);
-        const char* imgui_vsync_mode_display[] = {
-            i18n::c(OFF),
-            i18n::c(ON),
-#ifdef _WIN32
-#else
-            i18n::c(VIDEO_ADAPTIVE)
-#endif
-        };
+        const char* imgui_vsync_mode_display[] = {i18n::c(OFF), i18n::c(ON)};
         ImGui::Combo("##vsync", &imgui_video_vsync_index, imgui_vsync_mode_display,
                      sizeof(imgui_vsync_mode_display) / sizeof(char*));
 
@@ -1631,13 +1620,9 @@ bool SceneSelect::imguiApplyResolution()
     {
         State::set(IndexOption::SYS_VSYNC, imgui_video_vsync_index == 0 ? 0 : 1);
 
-        static const std::map<int, std::string> smap = {{0, "OFF"},
-                                                        {1, "ON"},
-#ifdef _WIN32
-                                                        {2, "ON"}
-#else
-                                                        {2, "ADAPTIVE"}
-#endif
+        static const std::map<int, std::string> smap = {
+            {0, "OFF"},
+            {1, "ON"},
         };
 
         auto&& s = imgui_video_vsync_index;
