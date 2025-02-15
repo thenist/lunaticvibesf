@@ -15,6 +15,7 @@
 #include <game/arena/arena_client.h>
 #include <game/arena/arena_data.h>
 #include <game/arena/arena_host.h>
+#include <game/graphics/graphics.h>
 #include <game/runtime/i18n.h>
 #include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
@@ -1582,7 +1583,7 @@ bool SceneSelect::imguiApplyResolution()
 
     if (imgui_video_mode == 2 && windowW == desktopW && windowH == desktopH)
     {
-        lunaticvibes::window::graphics_change_window_mode(static_cast<lunaticvibes::GRAPHICS_WINDOW_MODE>(3));
+        lunaticvibes::window::graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE_FAKE_FULLSCREEN);
         lunaticvibes::window::graphics_resize_window(windowW, windowH);
     }
     else

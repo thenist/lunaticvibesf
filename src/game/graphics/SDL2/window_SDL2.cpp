@@ -303,23 +303,23 @@ std::vector<std::pair<int, int>> lunaticvibes::window::graphics_get_resolution_l
 void lunaticvibes::window::graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE mode)
 {
     LOG_INFO << "[SDL2] Setting window mode to " << mode;
-    switch (static_cast<int>(mode)) // TODO: remove the cast after adding 'case 3' to the enum
+    switch (mode)
     {
-    case 0:
+    case GRAPHICS_WINDOW_MODE_WINDOWED:
         SDL_SetWindowFullscreen(gFrameWindow, 0);
         SDL_SetWindowBordered(gFrameWindow, SDL_TRUE);
-        break;
-    case 1: SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN); break;
-    case 2:
+        return;
+    case GRAPHICS_WINDOW_MODE_BORDERLESS: SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN); return;
+    case GRAPHICS_WINDOW_MODE_FULLSCREEN:
         SDL_SetWindowFullscreen(gFrameWindow, 0);
         SDL_SetWindowBordered(gFrameWindow, SDL_FALSE);
-        break;
-    case 3:
+        return;
+    case GRAPHICS_WINDOW_MODE_FAKE_FULLSCREEN:
         SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
         SDL_SetWindowBordered(gFrameWindow, SDL_FALSE);
-        break;
-    default: lunaticvibes::assert_failed("graphics_change_window_mode");
+        return;
     }
+    lunaticvibes::assert_failed("graphics_change_window_mode");
 }
 
 void lunaticvibes::window::graphics_resize_window(int x, int y)
