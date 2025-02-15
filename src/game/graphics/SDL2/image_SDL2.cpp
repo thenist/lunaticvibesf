@@ -14,23 +14,11 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-static bool isTGA(const std::string_view filePath)
+static bool is_file_extension(const std::string_view filePath, const std::string_view extension)
 {
-    if (filePath.length() < 4)
+    if (filePath.length() < extension.length() + 1)
         return false;
-    return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "tga");
-}
-static bool isPNG(const std::string_view filePath)
-{
-    if (filePath.length() < 4)
-        return false;
-    return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "png");
-}
-static bool isGIF(const std::string_view filePath)
-{
-    if (filePath.length() < 4)
-        return false;
-    return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "gif");
+    return lunaticvibes::iequals(filePath.substr(filePath.length() - extension.length()), extension);
 }
 
 // SDL2 leaks memory on non-main threads otherwise:
@@ -76,11 +64,11 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _
 
     const std::string_view pathView{path};
     static constexpr int LEAVE_RWOP_OPEN = 0;
-    if (isTGA(pathView))
+    if (is_file_extension(pathView, "tga"))
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_LoadTGA_RW(_pRWop.get()), SDL_FreeSurface);
-    else if (isPNG(pathView))
+    else if (is_file_extension(pathView, "png"))
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_LoadPNG_RW(_pRWop.get()), SDL_FreeSurface);
-    else if (isGIF(pathView))
+    else if (is_file_extension(pathView, "gif"))
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_LoadGIF_RW(_pRWop.get()), SDL_FreeSurface);
     else
         _pSurface = std::shared_ptr<SDL_Surface>(IMG_Load_RW(_pRWop.get(), LEAVE_RWOP_OPEN), SDL_FreeSurface);
@@ -91,7 +79,7 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _
         return;
     }
 
-    _haveAlphaLayer = !(_pSurface->format->Amask == 0 || isTGA(pathView));
+    _haveAlphaLayer = !(_pSurface->format->Amask == 0 || is_file_extension(pathView, "tga"));
     loaded = true;
     LOG_VERBOSE << "[Image] Load image file finished " << _path;
 }
