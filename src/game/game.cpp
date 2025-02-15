@@ -372,7 +372,7 @@ void mainLoop()
         const auto t = lunaticvibes::Time::now();
 
         // Event handling
-        const bool quit = lunaticvibes::event_handle();
+        const bool quit = lunaticvibes::window::event_handle();
         if (quit)
             gAppIsExiting = true;
 

@@ -325,12 +325,12 @@ void lunaticvibes::window::graphics_change_window_mode(lunaticvibes::GRAPHICS_WI
 void lunaticvibes::window::graphics_resize_window(int x, int y)
 {
     LOG_INFO << "[SDL2] Resizing window mode to " << x << 'x' << y;
-    lunaticvibes::graphics::save_new_window_size(x, y);
+    lunaticvibes::window::save_new_window_size(x, y);
     SDL_SetWindowSize(gFrameWindow, s_window_rect_w, s_window_rect_h);
     SDL_SetWindowPosition(gFrameWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 }
 
-void lunaticvibes::graphics::save_new_window_size(int width, int height)
+void lunaticvibes::window::save_new_window_size(int width, int height)
 {
     LOG_DEBUG << "[SDL2] Saving new window size " << width << 'x' << height;
     s_window_rect_w = width;
@@ -394,7 +394,7 @@ static void funEditing(const SDL_TextEditingEvent& e);
 static void funInput(const SDL_TextInputEvent& e);
 static void funKeyDown(const SDL_KeyboardEvent& e);
 
-bool lunaticvibes::event_handle()
+bool lunaticvibes::window::event_handle()
 {
     auto i16_from_i32 = [](std::int32_t value) {
         return static_cast<std::int16_t>(std::clamp(value, SHRT_MIN, SHRT_MAX));
@@ -422,7 +422,7 @@ bool lunaticvibes::event_handle()
             case SDL_WINDOWEVENT_RESIZED: {
                 const auto height = static_cast<unsigned>(e.window.data2);
                 const auto width = static_cast<unsigned>(e.window.data1);
-                lunaticvibes::graphics::save_new_window_size(width, height);
+                lunaticvibes::window::save_new_window_size(width, height);
                 break;
             }
             default: break;
@@ -662,13 +662,13 @@ void funKeyDown(const SDL_KeyboardEvent& e)
 
 #endif
 
-void lunaticvibes::graphics::queue_screenshot(Path png)
+void lunaticvibes::window::queue_screenshot(Path png)
 {
     LOG_INFO << "[SDL2] Screenshot: " << png;
     screenshotPath = std::move(png);
 }
 
-std::pair<int, int> lunaticvibes::graphics::get_mouse_pos()
+std::pair<int, int> lunaticvibes::window::get_mouse_pos()
 {
     std::shared_lock l{sdl::state::g_input_mutex};
     return {sdl::state::g_mouse_x, sdl::state::g_mouse_y};

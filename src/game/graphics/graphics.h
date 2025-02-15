@@ -34,12 +34,6 @@ enum GRAPHICS_VSYNC_MODE : int
 };
 } // namespace lunaticvibes
 
-namespace lunaticvibes::graphics
-{
-// save passed windows size as the new one, without applying it (for that refer to graphics_resize_window)
-void save_new_window_size(int x, int y);
-} // namespace lunaticvibes::graphics
-
 namespace lunaticvibes::window
 {
 
@@ -56,6 +50,9 @@ std::pair<int, int> graphics_get_desktop_resolution();
 std::vector<std::pair<int, int>> graphics_get_resolution_list();
 void graphics_change_window_mode(lunaticvibes::GRAPHICS_WINDOW_MODE mode);
 void graphics_resize_window(int x, int y);
+
+// save passed windows size as the new one, without applying it (for that refer to graphics_resize_window)
+void save_new_window_size(int x, int y);
 
 void graphics_change_vsync(lunaticvibes::GRAPHICS_VSYNC_MODE mode);
 
@@ -75,6 +72,12 @@ void startTextInput(const RectF& textBox, const std::string& oldText,
 void stopTextInput();
 
 void ImGuiNewFrame();
+
+std::pair<int, int> get_mouse_pos();
+void queue_screenshot(Path png);
+
+// Returns true if quit event received.
+bool event_handle();
 
 } // namespace lunaticvibes::window
 
@@ -97,15 +100,3 @@ using lunaticvibes::window::graphics_set_supersample_level;
 using lunaticvibes::window::ImGuiNewFrame;
 using lunaticvibes::window::startTextInput;
 using lunaticvibes::window::stopTextInput;
-
-namespace lunaticvibes
-{
-// Returns true if quit event received.
-bool event_handle();
-} // namespace lunaticvibes
-
-namespace lunaticvibes::graphics
-{
-void queue_screenshot(Path png);
-std::pair<int, int> get_mouse_pos();
-} // namespace lunaticvibes::graphics

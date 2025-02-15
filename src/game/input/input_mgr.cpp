@@ -196,7 +196,7 @@ std::pair<std::bitset<Input::KEY_COUNT>, InputMgr::ScratchData> InputMgr::detect
 
 bool InputMgr::getMousePos(int& x, int& y)
 {
-    std::tie(x, y) = lunaticvibes::graphics::get_mouse_pos();
+    std::tie(x, y) = lunaticvibes::window::get_mouse_pos();
     {
         double canvasScaleX = graphics_get_canvas_scale_x();
         double canvasScaleY = graphics_get_canvas_scale_y();

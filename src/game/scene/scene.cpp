@@ -255,7 +255,7 @@ void SceneBase::draw() const
                          State::get(IndexNumber::DATE_HOUR), State::get(IndexNumber::DATE_MIN),
                          State::get(IndexNumber::DATE_SEC));
 
-        lunaticvibes::graphics::queue_screenshot(std::move(p));
+        lunaticvibes::window::queue_screenshot(std::move(p));
 
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_SCREENSHOT);
         queuedScreenshot = false;
