@@ -39,9 +39,13 @@ TTFFont::TTFFont(const Path& filePath, int ptsize, int faceIndex) : _filePath(lu
     maybe_init_ttf_font();
     pushAndWaitMainThreadTask<void>([&]() { _pFont = TTF_OpenFontIndex(_filePath.c_str(), ptsize, faceIndex); });
     if (!_pFont)
+    {
         LOG_WARNING << "[TTF] " << filePath << ": " << TTF_GetError();
+    }
     else
+    {
         loaded = true;
+    }
 }
 
 TTFFont::~TTFFont()
