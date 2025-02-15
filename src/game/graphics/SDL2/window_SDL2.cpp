@@ -40,6 +40,7 @@ static std::atomic<int> s_canvas_rect_w;
 static std::atomic<int> s_window_rect_h;
 static std::atomic<int> s_window_rect_w;
 
+static SDL_Texture* gInternalRenderTarget;
 static SDL_Window* gFrameWindow;
 
 int graphics_init()

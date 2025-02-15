@@ -19,7 +19,6 @@ struct SDL_Texture;
 
 // global control pointer, do not modify
 inline SDL_Renderer* gFrameRenderer;
-inline SDL_Texture* gInternalRenderTarget;
 
 ////////////////////////////////////////////////////////////////////////////////
 // SDL_Image loads pictures into SDL_Surface instances
