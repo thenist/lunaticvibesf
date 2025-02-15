@@ -1,11 +1,12 @@
 #include "skin_lr2_slider_callbacks.h"
 
-#include "config/config_mgr.h"
-#include "game/runtime/state.h"
-#include "game/scene/scene_context.h"
-#include "game/scene/scene_context_customize.h"
-#include "game/sound/sound_mgr.h"
 #include <common/assert.h>
+#include <config/cfg_input.h>
+#include <config/config_mgr.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
+#include <game/scene/scene_context_customize.h>
+#include <game/sound/sound_mgr.h>
 
 namespace lr2skin::slider
 {

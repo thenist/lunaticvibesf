@@ -2,8 +2,11 @@
 
 #include <common/log.h>
 #include <common/types.h>
+#include <config/cfg_input.h>
+#include <config/cfg_profile.h>
 #include <config/config_mgr.h>
 #include <game/graphics/graphics.h>
+
 #include <tuple>
 
 InputMgr InputMgr::_inst;

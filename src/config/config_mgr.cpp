@@ -9,6 +9,10 @@
 #include <common/meta.h>
 #include <common/u8.h>
 #include <common/utils.h>
+#include <config/cfg_general.h>
+#include <config/cfg_input.h>
+#include <config/cfg_profile.h>
+#include <config/cfg_skin.h>
 #include <game/runtime/state.h>
 
 static void setNumbers()

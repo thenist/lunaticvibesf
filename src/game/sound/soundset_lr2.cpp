@@ -12,6 +12,9 @@
 #include <common/str_utils.h>
 #include <common/u8.h>
 #include <common/utils.h>
+#include <config/cfg_general.h>
+#include <config/cfg_profile.h>
+#include <config/cfg_skin.h>
 #include <config/config_mgr.h>
 #include <game/scene/scene_customize.h>
 

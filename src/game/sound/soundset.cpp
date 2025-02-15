@@ -1,6 +1,8 @@
 #include "soundset.h"
-#include "common/utils.h"
-#include "config/config_mgr.h"
+
+#include <common/utils.h>
+#include <config/cfg_general.h>
+#include <config/config_mgr.h>
 
 Path vSoundSet::getPathBGMSelect() const
 {

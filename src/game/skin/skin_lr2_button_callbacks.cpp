@@ -13,6 +13,7 @@
 #include <common/log.h>
 #include <common/play_modifiers.h>
 #include <common/sysutil.h>
+#include <config/cfg_profile.h>
 #include <config/config_mgr.h>
 #include <game/arena/arena_data.h>
 #include <game/runtime/state.h>

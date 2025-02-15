@@ -9,6 +9,7 @@
 #include <common/beat.h>
 #include <common/log.h>
 #include <common/sysutil.h>
+#include <config/cfg_profile.h>
 #include <config/config_mgr.h>
 #include <game/graphics/graphics.h>
 #include <game/graphics/sprite.h>

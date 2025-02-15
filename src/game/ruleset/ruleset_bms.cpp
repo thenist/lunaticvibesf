@@ -14,6 +14,7 @@
 #include <common/play_modifiers.h>
 #include <common/sysutil.h>
 #include <common/types.h>
+#include <config/cfg_profile.h>
 #include <config/config_mgr.h>
 #include <game/chart/chart_bms.h>
 #include <game/runtime/index/timer.h>

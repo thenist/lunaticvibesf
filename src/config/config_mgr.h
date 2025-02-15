@@ -5,10 +5,12 @@
 #include <string>
 
 #include <common/assert.h>
-#include <config/cfg_general.h>
-#include <config/cfg_input.h>
-#include <config/cfg_profile.h>
-#include <config/cfg_skin.h>
+#include <common/types.h>
+
+class ConfigGeneral;
+class ConfigSkin;
+class ConfigInput;
+class ConfigProfile;
 
 class ConfigMgr
 {

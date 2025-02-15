@@ -23,6 +23,8 @@
 #include <common/meta.h>
 #include <common/sysutil.h>
 #include <common/u8.h>
+#include <common/utils.h>
+#include <config/cfg_general.h>
 #include <config/config_mgr.h>
 #include <game/graphics/SDL2/graphics_SDL2.h>
 #include <game/graphics/SDL2/image_SDL2.h>

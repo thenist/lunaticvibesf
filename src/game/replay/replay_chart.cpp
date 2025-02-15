@@ -4,6 +4,7 @@
 #include <common/play_modifiers.h>
 #include <common/types.h>
 #include <common/utils.h>
+#include <config/cfg_profile.h>
 #include <config/config_mgr.h>
 
 #include <cereal/archives/portable_binary.hpp>

@@ -7,6 +7,7 @@
 #include <common/sysutil.h>
 #include <common/thread_pool.h>
 #include <common/types.h>
+#include <config/cfg_profile.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
 #include <game/arena/arena_client.h>

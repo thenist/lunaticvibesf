@@ -1,6 +1,7 @@
 #include "scene_keyconfig.h"
 
 #include <common/log.h>
+#include <config/cfg_input.h>
 #include <config/config_mgr.h>
 #include <game/runtime/i18n.h>
 #include <game/runtime/index/slider.h>

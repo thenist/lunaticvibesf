@@ -20,6 +20,8 @@
 #include <common/str_utils.h>
 #include <common/thread_pool.h>
 #include <common/utils.h>
+#include <config/cfg_general.h>
+#include <config/cfg_profile.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
 #include <db/db_song.h>

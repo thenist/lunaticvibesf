@@ -1,8 +1,12 @@
 #include "skin_mgr.h"
-#include "common/utils.h"
-#include "config/config_mgr.h"
-#include "game/skin/skin.h"
-#include "game/skin/skin_lr2.h"
+
+#include <common/utils.h>
+#include <config/cfg_general.h>
+#include <config/cfg_skin.h>
+#include <config/config_mgr.h>
+#include <game/skin/skin.h>
+#include <game/skin/skin_lr2.h>
+
 #include <memory>
 
 SkinMgr::SkinMgr() : _sharedData(std::make_shared<lunaticvibes::SkinLr2SharedData>()) {}

@@ -1,6 +1,7 @@
 #include <common/in_test_mode.h>
 #include <common/log.h>
 #include <common/sysutil.h>
+#include <common/utils.h>
 #include <config/config_mgr.h>
 
 #include <gmock/gmock.h>

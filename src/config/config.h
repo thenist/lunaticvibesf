@@ -1,7 +1,10 @@
 #pragma once
 
-#include "common/types.h"
+#include <common/types.h>
+
 #include <yaml-cpp/yaml.h>
+
+#include <string>
 
 class vConfig
 {
