@@ -34,31 +34,10 @@ public:
         return get(key, std::string(fallback));
     }
 
-    template <class Ty_v> inline Ty_v get(const std::string& key, unsigned idx, const Ty_v& fallback) const
-    {
-        return _yaml[key][idx].as<Ty_v>(fallback);
-    }
-    inline std::string get(const std::string& key, unsigned idx, const char* fallback) const
-    {
-        return get(key, idx, std::string(fallback));
-    }
-
     template <class Ty_v> inline void set(const std::string& key, const Ty_v& value) noexcept
     {
         static_assert(!std::is_same_v<Ty_v, std::string_view>, "string_view isn't supported by YAML-cpp");
         _yaml[key] = value;
     } // untested when type mismatch
     inline void set(const std::string& key, const char* value) noexcept { set(key, std::string(value)); }
-
-    template <class Ty_v> inline void set(const std::string& key, unsigned idx, const Ty_v& value) noexcept
-    {
-        if (_yaml[key].IsSequence())
-            _yaml[key][idx] = value;
-    } // untested when type mismatch
-    inline void set(const std::string& key, unsigned idx, const char* value) noexcept
-    {
-        set(key, idx, std::string(value));
-    }
-
-protected:
 };
