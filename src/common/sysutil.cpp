@@ -4,6 +4,8 @@
 #include <functional>
 #include <queue>
 #include <shared_mutex>
+#include <stdexcept>
+#include <string>
 
 #include <common/assert.h>
 #include <common/in_test_mode.h>
@@ -174,8 +176,10 @@ time_t lunaticvibes::localtime_utc_offset()
 
 void panic(const char* title, const char* msg)
 {
+    // Avoid SIGABRT when running tests, Google Test doesn't catch it.
+    if (lunaticvibes::in_test_mode())
+        throw std::runtime_error{title + std::string{" "} + msg};
     (void)fprintf(stderr, "PANIC! [%s] %s\n", title, msg);
-    if (!lunaticvibes::in_test_mode())
-        tinyfd_messageBox(title, msg, "ok", "error", 0);
+    tinyfd_messageBox(title, msg, "ok", "error", 0);
     abort();
 }
