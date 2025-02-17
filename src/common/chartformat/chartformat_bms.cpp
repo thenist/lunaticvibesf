@@ -213,6 +213,8 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                         }
 
                         ifValue.push(ifBlockValue);
+
+                        continue;
                     }
                     else if (lunaticvibes::iequals(key, "ENDIF"))
                     {
@@ -225,6 +227,8 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                         {
                             LOG_WARNING << "[BMS] unexpected #ENDIF found. " << absolutePath << "@" << srcLine;
                         }
+
+                        continue;
                     }
                     else if (lunaticvibes::iequals(key, "ENDRANDOM"))
                     {
