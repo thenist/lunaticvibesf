@@ -385,10 +385,8 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 else if (lunaticvibes::iequals(key, "COMMENT"))
                 {
                     // https://hitkey.nekokan.dyndns.info/cmds.htm#COMMENT
-                    // TODO: save and use in addition to txt files.
                     // Usually surrounded by quotes, sometimes not.
-                    value = lunaticvibes::trim(value, "\"");
-                    LOG_VERBOSE << "[BMS] COMMENT '" << value << "' ignored";
+                    _comments.emplace_back(lunaticvibes::trim(value, "\""));
                 }
                 else if (lunaticvibes::iequals(key, "LNTYPE"))
                 {

@@ -72,6 +72,7 @@ TEST(tBMS, MetaBasic)
 TEST(tBMS, MetaReadme)
 {
     std::stringstream ss;
+    ss << "#COMMENT Abra Cadabra\n#COMMENT コメント";
     ChartFormatBMS bms{ss, eFileEncoding::UTF8, 0};
     bms.fileName = "bms/__whatever.bms";
     bms.absolutePath = u8"bms/__whatever.bms"_p;
@@ -79,6 +80,8 @@ TEST(tBMS, MetaReadme)
 
     EXPECT_TRUE(bms.checkHasReadme());
     static const std::vector<std::pair<std::string, std::string>> expected_readme_files{
+        {"", "Abra Cadabra"},
+        {"", "コメント"},
         {"readme_euckr.crlf.txt", "안녕\n불고기\n"},
         {"readme_sjis.crlf.txt", "桃太郎は桃を食べた。\nと少年が思った、\n"},
         {"readme_utf8.crlf.txt", "Матрёшка.\nВодка.\n"},

@@ -36,6 +36,7 @@ public:
 
 protected:
     bool loaded = false;
+    std::vector<StringContent> _comments;
 
 public:
     [[nodiscard]] constexpr bool isLoaded() const { return loaded; }

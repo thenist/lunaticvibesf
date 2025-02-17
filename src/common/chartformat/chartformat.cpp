@@ -102,6 +102,9 @@ try
 {
     using Pair = std::pair<std::string, std::string>;
     std::vector<Pair> out;
+    out.reserve(_comments.size());
+    for (const auto& comment : _comments)
+        out.emplace_back("", comment);
     std::string line;
     for (const auto& entry : fs::directory_iterator(getDirectory()))
     {
