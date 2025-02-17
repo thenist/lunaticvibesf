@@ -127,7 +127,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
 
     // implicit parameters
     bool hasDifficulty = false;
-    bool only_check_note_existence = false;
+    bool only_check_note_existence = false; // TODO: check if it works when RANDOM is nested. It probably doesn't.
 
     for (StringContent lineBuf, lineBuf_; std::getline(bmsFile, lineBuf_);)
     {
@@ -222,6 +222,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                         {
                             randomUsedValues.top().emplace(ifValue.top());
                             ifValue.pop();
+                            only_check_note_existence = false;
                         }
                         else
                         {

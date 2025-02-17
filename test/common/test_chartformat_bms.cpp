@@ -461,3 +461,12 @@ TEST(tBMS, ImplicitDifficulty)
     EXPECT_EQ(get_difficulty("#SUBTITLE testINSANEtest"), 4);
     EXPECT_EQ(get_difficulty("#TITLE test [InSaNe]"), 4);
 }
+
+TEST(tBMS, RandomInHeader)
+{
+    ChartFormatBMS bms("bms/random_in_header.bms");
+    ASSERT_EQ(bms.isLoaded(), true);
+
+    EXPECT_TRUE(bms.haveRandom);
+    EXPECT_EQ(bms.notes_total, 1);
+}

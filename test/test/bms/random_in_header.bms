@@ -1,0 +1,20 @@
+// https://github.com/chown2/lunaticvibesf/issues/219
+// https://venue.bmssearch.net/letsbmsedit3/10
+
+*---------------------- HEADER FIELD
+
+#BMP02 misslayer.png
+
+*---------------------- EXPANSION FIELD
+#RANDOM 2
+#IF 1
+#BMP01 BGA dark.wmv
+#ENDIF
+#IF 2
+#BMP01 BGA light.wmv
+#ENDIF
+
+*---------------------- MAIN DATA FIELD
+
+#00111:01
+
