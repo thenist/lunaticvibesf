@@ -13,9 +13,9 @@
 
 #include <tinyfiledialogs.h>
 
-static std::shared_mutex mainThreadTaskQueueMutex;
-static std::queue<std::move_only_function<void()>> mainThreadTaskQueue;
-static bool handleMainThreadTask = true;
+static std::shared_mutex s_main_thread_task_mutex;
+static std::queue<std::move_only_function<void()>> s_main_thread_task_queue;
+static bool s_main_thread_task_do_handle = true;
 
 static std::atomic<bool> s_foreground = true;
 bool IsWindowForeground()
@@ -30,31 +30,31 @@ void SetWindowForeground(bool f)
 void lunaticvibes::details::doPushMainThreadTask(std::move_only_function<void()> f)
 {
     LVF_DEBUG_ASSERT(!IsMainThread());
-    if (handleMainThreadTask)
+    if (s_main_thread_task_do_handle)
     {
-        std::unique_lock l(mainThreadTaskQueueMutex);
-        mainThreadTaskQueue.emplace(std::move(f));
+        std::unique_lock l(s_main_thread_task_mutex);
+        s_main_thread_task_queue.emplace(std::move(f));
     }
 }
 
 void doMainThreadTask()
 {
-    std::shared_lock l(mainThreadTaskQueueMutex);
-    while (!mainThreadTaskQueue.empty())
+    std::shared_lock l(s_main_thread_task_mutex);
+    while (!s_main_thread_task_queue.empty())
     {
-        mainThreadTaskQueue.front()();
-        mainThreadTaskQueue.pop();
+        s_main_thread_task_queue.front()();
+        s_main_thread_task_queue.pop();
     }
 }
 
 void StopHandleMainThreadTask()
 {
-    handleMainThreadTask = false;
+    s_main_thread_task_do_handle = false;
 }
 
 bool CanHandleMainThreadTask()
 {
-    return handleMainThreadTask;
+    return s_main_thread_task_do_handle;
 }
 
 static thread_local bool s_is_main_thread = false;
