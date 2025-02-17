@@ -438,7 +438,13 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 }
                 else
                 {
-                    LOG_DEBUG << "[BMS] Unknown command key='" << key << "' value='" << value << "'";
+                    std::string msg;
+                    msg += "[BMS] Unknown command key='";
+                    msg += key;
+                    msg += "' value='";
+                    msg += value;
+                    msg += "'";
+                    lunaticvibes::verify_failed(msg.c_str());
                 }
             }
             else // #zzzxy:......
