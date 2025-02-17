@@ -8,9 +8,6 @@
 
 namespace
 {
-static std::shared_mutex _mutex;
-static std::bitset<900> _op;
-static std::bitset<900> _opIsCached;
 static std::shared_mutex s_customOpMutex;
 static std::bitset<100> _customOp;
 } // namespace
@@ -778,18 +775,7 @@ bool getDstOpt(int d)
 {
     const bool invert_result = d < 0;
     auto op = (dst_option)std::abs(d);
-
-    if (d < static_cast<int>(_opIsCached.size()))
-        if (std::shared_lock l{_mutex}; _opIsCached[op])
-            return invert_result ? !_op[op] : _op[op];
-
     const bool result = getDstOptAbs(op);
-    if (op < static_cast<int>(_op.size()))
-    {
-        std::unique_lock l{_mutex};
-        _op[op] = result;
-        _opIsCached[op] = true;
-    }
     return invert_result ? !result : result;
 }
 
@@ -807,8 +793,4 @@ void clearCustomDstOpt()
     _customOp.reset();
 }
 
-void updateDstOpt()
-{
-    std::unique_lock l(_mutex);
-    _opIsCached.reset();
-}
+void updateDstOpt() {}
