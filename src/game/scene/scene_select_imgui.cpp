@@ -4,6 +4,8 @@
 #include <format>
 #include <fstream>
 #include <string>
+#include <string_view>
+#include <utility>
 
 #include <common/assert.h>
 #include <common/log.h>
@@ -112,9 +114,6 @@ void SceneSelect::imguiInit()
 
     imgui_adv_scrollSpeed[0] = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
     imgui_adv_scrollSpeed[1] = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
-    imgui_adv_missBGATime = ConfigMgr::Profile()->get(cfg::P_MISSBGA_LENGTH, 500);
-    imgui_adv_minInputInterval = ConfigMgr::Profile()->get(cfg::P_MIN_INPUT_INTERVAL, 16);
-    imgui_adv_newSongDuration = ConfigMgr::Profile()->get(cfg::P_NEW_SONG_DURATION, 24);
 
     imgui_play_inputPollingRate = 0;
     switch (ConfigMgr::Profile()->get(cfg::P_INPUT_POLLING_RATE, 1000))
@@ -144,10 +143,6 @@ void SceneSelect::imguiInit()
         }
     }
 
-    imgui_adv_enableNewRandom = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_RANDOM, false);
-    imgui_adv_enableNewGauge = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_GAUGE, false);
-    imgui_adv_enableNewLaneOption = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_LANE_OPTION, false);
-
     imgui_sel_onlyDisplayMainTitleOnBars = ConfigMgr::Profile()->get(cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, false);
     imgui_sel_disablePlaymodeAll = ConfigMgr::Profile()->get(cfg::P_DISABLE_PLAYMODE_ALL, false);
     imgui_sel_disableDifficultyAll = ConfigMgr::Profile()->get(cfg::P_DISABLE_DIFFICULTY_ALL, false);
@@ -163,6 +158,17 @@ void SceneSelect::imguiInit()
     imgui_play_adjustLanecoverWithMousewheel =
         ConfigMgr::Profile()->get(cfg::P_ADJUST_LANECOVER_WITH_MOUSEWHEEL, false);
     imgui_play_adjustLanecoverWithLeftRight = ConfigMgr::Profile()->get(cfg::P_ADJUST_LANECOVER_WITH_ARROWKEYS, false);
+
+    _config_missbga_length = ConfigMgr::Profile()->get(cfg::P_MISSBGA_LENGTH, 500);
+    _config_min_input_interval = ConfigMgr::Profile()->get(cfg::P_MIN_INPUT_INTERVAL, 16);
+    _config_new_song_duration = ConfigMgr::Profile()->get(cfg::P_NEW_SONG_DURATION, 24);
+
+    imgui_adv_enableNewGauge = _config_enable_new_gauge;
+    imgui_adv_enableNewLaneOption = _config_enable_new_lane_option;
+    imgui_adv_enableNewRandom = _config_enable_new_random;
+    imgui_adv_minInputInterval = _config_min_input_interval;
+    imgui_adv_missBGATime = _config_missbga_length;
+    imgui_adv_newSongDuration = _config_new_song_duration;
 
     // auto popup settings for first runs
     if (imgui_folders.empty())
@@ -1042,7 +1048,7 @@ void SceneSelect::imguiPageDebugMain()
     if (ImGui::Button("Import"))
     {
         // FIXME: handle SQLite db opening error. Important since path is user-supplied.
-        // TODO: check path encoding on Windows. Works on Linux.
+        // TODO: check path encoding on Windows. Works on Linux. #win
         lunaticvibes::Lr2ScoreDb lr2_db{_lr2_db_import_path.data()};
         g_pScoreDB->importScores(lr2_db);
         for (size_t idx = 0; idx < gSelectContext.entries.size(); ++idx)
@@ -1395,23 +1401,27 @@ void SceneSelect::imguiCheckSettings()
         _config_list_scroll_time_initial = imgui_adv_scrollSpeed[0];
         ConfigMgr::Profile()->set(cfg::P_LIST_SCROLL_TIME_INITIAL, imgui_adv_scrollSpeed[0]);
     }
-    if (imgui_adv_scrollSpeed[1] != ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150))
+    if (imgui_adv_scrollSpeed[1] != static_cast<int>(_config_scroll_time_length))
     {
+        _config_scroll_time_length = imgui_adv_scrollSpeed[1];
         ConfigMgr::Profile()->set(cfg::P_LIST_SCROLL_TIME_HOLD, imgui_adv_scrollSpeed[1]);
     }
-    if (imgui_adv_missBGATime != ConfigMgr::Profile()->get(cfg::P_MISSBGA_LENGTH, 500))
+    if (imgui_adv_missBGATime != _config_missbga_length)
     {
+        _config_missbga_length = imgui_adv_missBGATime;
         ConfigMgr::Profile()->set(cfg::P_MISSBGA_LENGTH, imgui_adv_missBGATime);
     }
-    if (imgui_adv_minInputInterval != ConfigMgr::Profile()->get(cfg::P_MIN_INPUT_INTERVAL, 16))
+    if (imgui_adv_minInputInterval != _config_min_input_interval)
     {
+        _config_min_input_interval = imgui_adv_minInputInterval;
         ConfigMgr::Profile()->set(cfg::P_MIN_INPUT_INTERVAL, imgui_adv_minInputInterval);
         InputMgr::setDebounceTime(imgui_adv_minInputInterval);
     }
-    if (imgui_adv_newSongDuration != ConfigMgr::Profile()->get(cfg::P_NEW_SONG_DURATION, 24))
+    if (imgui_adv_newSongDuration != _config_new_song_duration)
     {
+        _config_new_song_duration = imgui_adv_newSongDuration;
         ConfigMgr::Profile()->set(cfg::P_NEW_SONG_DURATION, imgui_adv_newSongDuration);
-        State::set(IndexNumber::NEW_ENTRY_SECONDS, ConfigMgr::Profile()->get(cfg::P_NEW_SONG_DURATION, 0) * 60 * 60);
+        State::set(IndexNumber::NEW_ENTRY_SECONDS, imgui_adv_newSongDuration * 60 * 60);
     }
 
     if (imgui_adv_previewDedicated != _config_enable_preview_dedicated)
@@ -1426,6 +1436,8 @@ void SceneSelect::imguiCheckSettings()
     }
     if (imgui_adv_selectKeyBindings != old_adv_selectKeyBindings)
     {
+        // TODO: could use this, but YAML-cpp hates string_view
+        // static constexpr std::pair<GameModeKeys, std::string_view> imgui_select_keybindings_str[] = {
         static const std::pair<GameModeKeys, std::string> imgui_select_keybindings_str[] = {
             {7, cfg::P_SELECT_KEYBINDINGS_7K},
             {5, cfg::P_SELECT_KEYBINDINGS_5K},
@@ -1437,16 +1449,19 @@ void SceneSelect::imguiCheckSettings()
         bindings9K = (keys == 9);
         InputMgr::updateBindings(keys);
     }
-    if (imgui_adv_enableNewRandom != ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_RANDOM, false))
+    if (imgui_adv_enableNewRandom != _config_enable_new_random)
     {
+        _config_enable_new_random = imgui_adv_enableNewRandom;
         ConfigMgr::Profile()->set(cfg::P_ENABLE_NEW_RANDOM, imgui_adv_enableNewRandom);
     }
-    if (imgui_adv_enableNewGauge != ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_GAUGE, false))
+    if (imgui_adv_enableNewGauge != _config_enable_new_gauge)
     {
+        _config_enable_new_gauge = imgui_adv_enableNewGauge;
         ConfigMgr::Profile()->set(cfg::P_ENABLE_NEW_GAUGE, imgui_adv_enableNewGauge);
     }
-    if (imgui_adv_enableNewLaneOption != ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_LANE_OPTION, false))
+    if (imgui_adv_enableNewLaneOption != _config_enable_new_lane_option)
     {
+        _config_enable_new_lane_option = imgui_adv_enableNewLaneOption;
         ConfigMgr::Profile()->set(cfg::P_ENABLE_NEW_LANE_OPTION, imgui_adv_enableNewLaneOption);
     }
 

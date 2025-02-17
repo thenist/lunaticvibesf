@@ -307,6 +307,13 @@ private:
 
     bool _imgui_show_demo_window = false;
 
+    int _config_min_input_interval;
+    int _config_missbga_length;
+    int _config_new_song_duration;
+    unsigned _config_scroll_time_length;
+    bool _config_enable_new_gauge;
+    bool _config_enable_new_lane_option;
+    bool _config_enable_new_random;
     bool _config_enable_preview_dedicated;
     bool _config_enable_preview_direct;
     bool _show_random_any;

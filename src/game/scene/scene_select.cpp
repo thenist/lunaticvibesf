@@ -517,11 +517,13 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     if (gArenaData.isOnline())
         State::set(IndexTimer::ARENA_SHOW_LOBBY, lunaticvibes::Time::now().norm());
 
-    imguiInit();
-
+    _config_enable_new_gauge = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_GAUGE, false);
+    _config_enable_new_lane_option = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_LANE_OPTION, false);
+    _config_enable_new_random = ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_RANDOM, false);
     _config_enable_preview_dedicated = ConfigMgr::Profile()->get(cfg::P_PREVIEW_DEDICATED, false);
     _config_enable_preview_direct = ConfigMgr::Profile()->get(cfg::P_PREVIEW_DIRECT, false);
     _config_list_scroll_time_initial = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
+    _config_scroll_time_length = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
     lunaticvibes::assign(_lr2_db_import_path, ConfigMgr::Profile()->get(cfg::P_LR2_DB_IMPORT_PATH, ""));
     lunaticvibes::assign(_preview_chart_10k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_10K, ""));
     lunaticvibes::assign(_preview_chart_14k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_14K, ""));
@@ -529,6 +531,8 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     lunaticvibes::assign(_preview_chart_7k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_7K, ""));
     lunaticvibes::assign(_preview_chart_9k, ConfigMgr::Profile()->get(cfg::P_PREVIEW_CHART_9K, ""));
     _gas_gauge = ConfigMgr::Profile()->get(cfg::P::ENABLE_GAS, false);
+
+    imguiInit();
 
     _input.register_p("SCENE_PRESS", std::bind_front(&SceneSelect::inputGamePress, this));
     _input.register_h("SCENE_HOLD", std::bind_front(&SceneSelect::inputGameHold, this));
@@ -1134,7 +1138,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                     State::set((IndexText)line++, ss.str());
                 }
             }
-            if (!pSkin->isSupportNewRandom && ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_RANDOM, false))
+            if (!pSkin->isSupportNewRandom && _config_enable_new_random)
             {
                 std::stringstream ss;
                 int lane1 = State::get(IndexOption::PLAY_RANDOM_TYPE_1P);
@@ -1176,7 +1180,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                     State::set((IndexText)line++, ss.str());
                 }
             }
-            if (!pSkin->isSupportExHardAndAssistEasy && ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_GAUGE, false))
+            if (!pSkin->isSupportExHardAndAssistEasy && _config_enable_new_gauge)
             {
                 std::stringstream ss;
                 int lane1 = State::get(IndexOption::PLAY_GAUGE_TYPE_1P);
@@ -1210,7 +1214,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                     State::set((IndexText)line++, ss.str());
                 }
             }
-            if (!pSkin->isSupportLift && ConfigMgr::Profile()->get(cfg::P_ENABLE_NEW_LANE_OPTION, false))
+            if (!pSkin->isSupportLift && _config_enable_new_lane_option)
             {
                 std::stringstream ss;
                 int lane1 = State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_1P);
@@ -1661,9 +1665,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
         if (input[Input::MWHEELUP])
         {
             if (scrollAccumulator != 0.0)
-            {
-                gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
-            }
+                gSelectContext.scrollTimeLength = _config_scroll_time_length;
             scrollAccumulator -= 1.0;
             scrollButtonTimestamp = t;
             scrollAccumulatorAddUnit = scrollAccumulator / gSelectContext.scrollTimeLength * (1000.0 / getRate());
@@ -1671,9 +1673,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
         if (input[Input::MWHEELDOWN])
         {
             if (scrollAccumulator != 0.0)
-            {
-                gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
-            }
+                gSelectContext.scrollTimeLength = _config_scroll_time_length;
             scrollAccumulator += 1.0;
             scrollButtonTimestamp = t;
             scrollAccumulatorAddUnit = scrollAccumulator / gSelectContext.scrollTimeLength * (1000.0 / getRate());
@@ -1691,14 +1691,14 @@ void SceneSelect::inputGameHoldSelect(InputMask& input, const lunaticvibes::Time
     // navigate
     if (isHoldingUp && (t - scrollButtonTimestamp).norm() >= gSelectContext.scrollTimeLength)
     {
-        gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+        gSelectContext.scrollTimeLength = _config_scroll_time_length;
         scrollButtonTimestamp = t;
         scrollAccumulator -= 1.0;
         scrollAccumulatorAddUnit = scrollAccumulator / gSelectContext.scrollTimeLength * (1000.0 / getRate());
     }
     if (isHoldingDown && (t - scrollButtonTimestamp).norm() >= gSelectContext.scrollTimeLength)
     {
-        gSelectContext.scrollTimeLength = ConfigMgr::Profile()->get(cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+        gSelectContext.scrollTimeLength = _config_scroll_time_length;
         scrollButtonTimestamp = t;
         scrollAccumulator += 1.0;
         scrollAccumulatorAddUnit = scrollAccumulator / gSelectContext.scrollTimeLength * (1000.0 / getRate());
