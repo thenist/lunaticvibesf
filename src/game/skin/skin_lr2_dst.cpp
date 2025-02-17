@@ -11,6 +11,7 @@ namespace
 static std::shared_mutex _mutex;
 static std::bitset<900> _op;
 static std::bitset<900> _opIsCached;
+static std::shared_mutex s_customOpMutex;
 static std::bitset<100> _customOp;
 } // namespace
 
@@ -754,7 +755,7 @@ static bool getDstOptAbs(unsigned d)
     case 996:
     case 997:
     case 998: {
-        std::shared_lock l(_mutex);
+        std::shared_lock l{s_customOpMutex};
         return _customOp[d - 900];
     }
     case 999: return false;
@@ -796,13 +797,13 @@ void setCustomDstOpt(unsigned base, size_t offset, bool val)
 {
     if (base + offset < 900 || base + offset > 999)
         return;
-    std::unique_lock l(_mutex);
+    std::unique_lock l{s_customOpMutex};
     _customOp[base + offset - 900] = val;
 }
 
 void clearCustomDstOpt()
 {
-    std::unique_lock l(_mutex);
+    std::unique_lock l{s_customOpMutex};
     _customOp.reset();
 }
 
