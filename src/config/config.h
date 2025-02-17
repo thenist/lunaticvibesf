@@ -42,6 +42,7 @@ public:
 
     template <class Ty_v> inline void set(const std::string& key, const Ty_v& value) noexcept
     {
+        static_assert(!std::is_same_v<Ty_v, std::string_view>, "string_view isn't supported by YAML-cpp");
         _yaml[key] = value;
     } // untested when type mismatch
     inline void set(const std::string& key, const char* value) noexcept { set(key, std::string(value)); }
