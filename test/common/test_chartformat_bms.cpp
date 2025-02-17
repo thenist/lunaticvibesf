@@ -16,8 +16,8 @@
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
 
-bool ExpectNotePosition(const ChartFormatBMS& bms, LaneCode area, int ch, int bar, int res,
-                        const std::vector<int>& segments)
+static bool ExpectNotePosition(const ChartFormatBMS& bms, LaneCode area, int ch, int bar, int res,
+                               const std::vector<int>& segments)
 {
     const auto& lane = bms.getLane(area, ch, bar);
     unsigned maxres = lane.resolution * res;

@@ -21,13 +21,13 @@ enum class eChartFormat
 };
 eChartFormat analyzeChartType(const Path& p);
 
-class ChartFormatBase : public std::enable_shared_from_this<ChartFormatBase>
+class ChartFormatBase
 {
 protected:
     eChartFormat _type = eChartFormat::UNKNOWN;
 
 public:
-    constexpr eChartFormat type() const { return _type; }
+    [[nodiscard]] constexpr eChartFormat type() const { return _type; }
 
 public:
     ChartFormatBase() = default;
@@ -38,7 +38,7 @@ protected:
     bool loaded = false;
 
 public:
-    constexpr bool isLoaded() const { return loaded; }
+    [[nodiscard]] constexpr bool isLoaded() const { return loaded; }
 
     // following fields are generic info, which are stored in db
 public:
@@ -69,10 +69,10 @@ public:
     static std::string formatReadmeText(const std::vector<std::pair<std::string, std::string>>&);
     // Are there readme files in chart directory.
     // NOTE: expensive to call.
-    bool checkHasReadme() const;
+    [[nodiscard]] bool checkHasReadme() const;
     // Pair of file names and their contents.
     // NOTE: expensive to call.
-    std::vector<std::pair<std::string, std::string>> getReadmeFiles() const;
+    [[nodiscard]] std::vector<std::pair<std::string, std::string>> getReadmeFiles() const;
 
     BPM minBPM = INFINITY;
     BPM maxBPM = 0.0;
@@ -90,5 +90,5 @@ public:
                                 // to prevent incorrect caching.
 
 public:
-    Path getDirectory() const;
+    [[nodiscard]] Path getDirectory() const;
 };

@@ -915,8 +915,7 @@ int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned fla
     for (unsigned i = 0; i < resolution; i++)
     {
         const unsigned segment = i * scale;
-        // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result) TODO
-        const unsigned value = base36(str[i * 2], str[i * 2 + 1]);
+        const unsigned value = base36(str[i + i], str[i + i + 1]);
         if (value == 0)
             continue;
         ch.notes.push_back({segment, value, flags});
@@ -948,8 +947,7 @@ int ChartFormatBMS::seqToLane16(channel& ch, StringContentView str)
     for (unsigned i = 0; i < resolution; i++)
     {
         const unsigned segment = i * scale;
-        // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result) TODO
-        const unsigned value = base16(str[i * 2], str[i * 2 + 1]);
+        const unsigned value = base16(str[i + i], str[i + i + 1]);
         if (value == 0)
             continue;
         ch.notes.push_back({segment, value});

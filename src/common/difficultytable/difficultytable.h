@@ -22,8 +22,8 @@ protected:
     std::unordered_map<std::string, int> _levelOrder;
 
 public:
-    const std::string& getName() const { return name; }
-    const std::string& getUrl() const { return url; }
+    [[nodiscard]] const std::string& getName() const { return name; }
+    [[nodiscard]] const std::string& getUrl() const { return url; }
     void setUrl(const std::string& u) { url = u; }
 
     enum class UpdateResult
@@ -47,6 +47,6 @@ public:
 
     virtual bool loadFromFile() = 0;
 
-    std::vector<std::string> getLevelList() const;
-    std::vector<std::shared_ptr<EntryBase>> getEntryList(const std::string& level);
+    [[nodiscard]] std::vector<std::string> getLevelList() const;
+    [[nodiscard]] std::vector<std::shared_ptr<EntryBase>> getEntryList(const std::string& level);
 };

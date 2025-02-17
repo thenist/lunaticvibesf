@@ -1,8 +1,7 @@
 #pragma once
-#include "common/hash.h"
-#include "common/types.h"
-#include "entry_folder.h"
-#include "entry_song.h"
+#include <common/entry/entry_song.h>
+#include <common/hash.h>
+#include <common/types.h>
 
 class EntryFolderTable : public EntryFolderRegular
 {

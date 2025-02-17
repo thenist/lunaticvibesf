@@ -47,6 +47,6 @@ public:
     unsigned long long _addTime = 0; // from epoch time
 
 public:
-    virtual Path getPath() { return Path(); }
-    constexpr eEntryType type() const { return _type; }
+    virtual Path getPath() { return {}; }
+    [[nodiscard]] constexpr eEntryType type() const { return _type; }
 };

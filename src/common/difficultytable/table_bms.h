@@ -16,9 +16,8 @@ public:
 
     bool loadFromFile() override;
 
-    Path getFolderPath() const;
-
-    std::string getSymbol() const;
+    [[nodiscard]] Path getFolderPath() const;
+    [[nodiscard]] std::string getSymbol() const;
 
     void parseHeader(const std::string& content);
     void parseBody(const std::string& content);

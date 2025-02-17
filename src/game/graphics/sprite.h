@@ -93,7 +93,7 @@ struct MotionKeyFrame
 
 class SpriteGlobal;
 class SpriteBarEntry;
-class SpriteBase : public std::enable_shared_from_this<SpriteBase>
+class SpriteBase
 {
     friend class SkinBase;
     friend class SkinLR2;
@@ -140,7 +140,7 @@ public:
     virtual void appendMotionKeyFrame(const MotionKeyFrame& f);
     virtual void setMotionLoopTo(int time);
     virtual void setMotionStartTimer(IndexTimer t);
-    bool isMotionKeyFramesEmpty() const { return motionKeyFrames.empty(); }
+    [[nodiscard]] bool isMotionKeyFramesEmpty() const { return motionKeyFrames.empty(); }
     void clearMotionKeyFrames() { motionKeyFrames.clear(); }
 
     bool updateMotion(const lunaticvibes::Time& time);
@@ -158,8 +158,8 @@ public:
     void setHideExternal(bool hide) { hideExternal = hide; }
 
 public:
-    bool isHidden() const { return hideInternal || hideExternal; }
-    bool isDraw() const { return _draw; }
+    [[nodiscard]] bool isHidden() const { return hideInternal || hideExternal; }
+    [[nodiscard]] bool isDraw() const { return _draw; }
     virtual void draw() const = 0;
 };
 
@@ -397,10 +397,10 @@ public:
     bool OnClick(int x, int y) override;
     bool OnDrag(int x, int y) override { return false; }
 
-    bool isEditing() const { return editing; }
+    [[nodiscard]] bool isEditing() const { return editing; }
     void startEditing(bool clear);
     void stopEditing(bool modify);
-    IndexText getInd() const { return textInd; }
+    [[nodiscard]] IndexText getInd() const { return textInd; }
     virtual void updateTextWhileEditing(const std::string& text);
 };
 

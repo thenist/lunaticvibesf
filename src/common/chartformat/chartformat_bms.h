@@ -190,5 +190,5 @@ public:
     std::array<unsigned, MAXBARIDX + 1> bgmLayersCount{};
 
 public:
-    auto getLane(LaneCode, unsigned chIdx, unsigned measureIdx) const -> const channel&;
+    [[nodiscard]] auto getLane(LaneCode, unsigned chIdx, unsigned measureIdx) const -> const channel&;
 };
