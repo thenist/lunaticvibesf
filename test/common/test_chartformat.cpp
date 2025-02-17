@@ -15,3 +15,11 @@ TEST(chartformat, FileFormat)
     EXPECT_EQ(analyzeChartType(u8"bms/file.テスト"_p), eChartFormat::UNKNOWN);
     EXPECT_EQ(analyzeChartType(u8"bms/.bms"_p), eChartFormat::UNKNOWN);
 }
+
+TEST(chartformat, FormatReadme)
+{
+    EXPECT_EQ(ChartFormatBase::formatReadmeText({{"important.txt", "sobaudonramen"}}),
+              "important.txt\n\nsobaudonramen\n");
+    EXPECT_EQ(ChartFormatBase::formatReadmeText({{"", "a"}, {"あ.txt", "あ\nｗ"}}),
+              "1/2 \n\na\n2/2 あ.txt\n\nあ\nｗ\n");
+}

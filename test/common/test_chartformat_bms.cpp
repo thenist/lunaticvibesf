@@ -2,7 +2,9 @@
 // =======================================================================================
 
 #include <common/chartformat/chartformat_bms.h>
+#include <common/encoding.h>
 #include <common/hash.h>
+#include <common/types.h>
 #include <common/utils.h>
 
 #include <optional>
@@ -65,46 +67,24 @@ TEST(tBMS, MetaBasic)
     EXPECT_EQ(bms->notes_key_ln, 0);
     EXPECT_EQ(bms->raw_rank, -1);
     EXPECT_EQ(bms->rank, std::nullopt);
+}
 
-    {
-        EXPECT_TRUE(bms->checkHasReadme());
-        static const std::vector<std::pair<std::string, std::string>> expected_readme_files{
-            {"readme_euckr.crlf.txt", "안녕\n불고기\n"},
-            {"readme_sjis.crlf.txt", "桃太郎は桃を食べた。\nと少年が思った、\n"},
-            {"readme_utf8.crlf.txt", "Матрёшка.\nВодка.\n"},
-        };
-        std::vector<std::pair<std::string, std::string>> files;
-        EXPECT_EQ((files = bms->getReadmeFiles()), expected_readme_files);
-        static constexpr std::string_view expected_readme_text = R"(1/3 readme_euckr.crlf.txt
+TEST(tBMS, MetaReadme)
+{
+    std::stringstream ss;
+    ChartFormatBMS bms{ss, eFileEncoding::UTF8, 0};
+    bms.fileName = "bms/__whatever.bms";
+    bms.absolutePath = u8"bms/__whatever.bms"_p;
+    ASSERT_EQ(bms.isLoaded(), true);
 
-안녕
-불고기
-
-2/3 readme_sjis.crlf.txt
-
-桃太郎は桃を食べた。
-と少年が思った、
-
-3/3 readme_utf8.crlf.txt
-
-Матрёшка.
-Водка.
-
-)";
-        EXPECT_EQ(ChartFormatBase::formatReadmeText(files), expected_readme_text);
-    }
-
-    {
-        static const std::vector<std::pair<std::string, std::string>> files{
-            {"important.txt", "sobaudonramen"},
-        };
-
-        static constexpr std::string_view expected_readme_text = R"(important.txt
-
-sobaudonramen
-)";
-        EXPECT_EQ(ChartFormatBase::formatReadmeText(files), expected_readme_text);
-    }
+    EXPECT_TRUE(bms.checkHasReadme());
+    static const std::vector<std::pair<std::string, std::string>> expected_readme_files{
+        {"readme_euckr.crlf.txt", "안녕\n불고기\n"},
+        {"readme_sjis.crlf.txt", "桃太郎は桃を食べた。\nと少年が思った、\n"},
+        {"readme_utf8.crlf.txt", "Матрёшка.\nВодка.\n"},
+    };
+    std::vector<std::pair<std::string, std::string>> files;
+    EXPECT_EQ((files = bms.getReadmeFiles()), expected_readme_files);
 }
 
 TEST(tBMS, MetaNoFile)
