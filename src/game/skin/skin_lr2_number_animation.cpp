@@ -8,15 +8,7 @@
 // Keyword: gradient.
 double lunaticvibes::NumberAnimation::animate(const lunaticvibes::Time& now) const
 {
-    if (from == to)
-        return from;
-
-    if (end >= now && start <= now && end > start)
-        return grad(to, from,
-                    calc_animation_multiplier(start.norm(), end.norm(), now.norm(), MotionKeyFrameParams::CONSTANT));
-
-    if (start < now)
-        return to;
-
-    return from;
+    return ::lunaticvibes::animate(
+        from, to, start.norm(), end.norm(), now.norm(),
+        calc_animation_multiplier(start.norm(), end.norm(), now.norm(), MotionKeyFrameParams::CONSTANT));
 }

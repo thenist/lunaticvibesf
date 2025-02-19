@@ -11,7 +11,6 @@
 #include <cstdint>
 
 using uint8_t = std::uint8_t;
-using lunaticvibes::grad;
 
 bool lunaticvibes::isPanelOpen(int panelIdx)
 {
@@ -146,21 +145,23 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
         }
         else
         {
-            // normalize time
-            const double prog = lunaticvibes::calc_animation_multiplier(keyFrameCurr->time, keyFrameNext->time,
-                                                                        time.norm(), keyFrameCurr->param.accel);
+            auto animate = [multiplier = lunaticvibes::calc_animation_multiplier(
+                                keyFrameCurr->time, keyFrameNext->time, time.norm(), keyFrameCurr->param.accel),
+                            start = keyFrameCurr->time, end = keyFrameNext->time,
+                            now = time.norm()](double to, double from) {
+                return lunaticvibes::animate(from, to, start, end, now, multiplier);
+            };
 
-            // calculate parameters
-            _current.rect.x = (float)grad(keyFrameNext->param.rect.x, keyFrameCurr->param.rect.x, prog);
-            _current.rect.y = (float)grad(keyFrameNext->param.rect.y, keyFrameCurr->param.rect.y, prog);
-            _current.rect.w = (float)grad(keyFrameNext->param.rect.w, keyFrameCurr->param.rect.w, prog);
-            _current.rect.h = (float)grad(keyFrameNext->param.rect.h, keyFrameCurr->param.rect.h, prog);
-            _current.color.r = (uint8_t)grad(keyFrameNext->param.color.r, keyFrameCurr->param.color.r, prog);
-            _current.color.g = (uint8_t)grad(keyFrameNext->param.color.g, keyFrameCurr->param.color.g, prog);
-            _current.color.b = (uint8_t)grad(keyFrameNext->param.color.b, keyFrameCurr->param.color.b, prog);
-            _current.color.a = (uint8_t)grad(keyFrameNext->param.color.a, keyFrameCurr->param.color.a, prog);
-            _current.angle = grad(static_cast<int>(std::round(keyFrameNext->param.angle)),
-                                  static_cast<int>(std::round(keyFrameCurr->param.angle)), prog);
+            _current.rect.x = (float)animate(keyFrameNext->param.rect.x, keyFrameCurr->param.rect.x);
+            _current.rect.y = (float)animate(keyFrameNext->param.rect.y, keyFrameCurr->param.rect.y);
+            _current.rect.w = (float)animate(keyFrameNext->param.rect.w, keyFrameCurr->param.rect.w);
+            _current.rect.h = (float)animate(keyFrameNext->param.rect.h, keyFrameCurr->param.rect.h);
+            _current.color.r = (uint8_t)animate(keyFrameNext->param.color.r, keyFrameCurr->param.color.r);
+            _current.color.g = (uint8_t)animate(keyFrameNext->param.color.g, keyFrameCurr->param.color.g);
+            _current.color.b = (uint8_t)animate(keyFrameNext->param.color.b, keyFrameCurr->param.color.b);
+            _current.color.a = (uint8_t)animate(keyFrameNext->param.color.a, keyFrameCurr->param.color.a);
+            _current.angle = animate(static_cast<int>(std::round(keyFrameNext->param.angle)),
+                                     static_cast<int>(std::round(keyFrameCurr->param.angle)));
             _current.center = keyFrameCurr->param.center;
             _current.blend = keyFrameCurr->param.blend;
             _current.filter = keyFrameCurr->param.filter;
