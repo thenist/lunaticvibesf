@@ -77,7 +77,6 @@ int main(int argc, char* argv[])
 
     LOG_INFO << "Starting Lunatic Vibes F " << PROJECT_VERSION << " (" << GIT_REVISION << ")";
 
-    // load configs
     ConfigMgr::init();
     ConfigMgr::load();
     ConfigMgr::selectProfile(ConfigMgr::General()->get(cfg::E_PROFILE, cfg::PROFILE_DEFAULT));
@@ -92,7 +91,6 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // init curl
     LOG_INFO << "Initializing libcurl...";
     if (CURLcode ret = curl_global_init(CURL_GLOBAL_DEFAULT); ret != CURLE_OK)
     {
@@ -104,7 +102,6 @@ int main(int argc, char* argv[])
     }
     LOG_INFO << "libcurl version: " << curl_version();
 
-    // init imgui
     LOG_INFO << "Initializing ImGui...";
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -143,13 +140,9 @@ int main(int argc, char* argv[])
         c[ImGuiCol_TabUnfocusedActive] = {0.5f, 0.5f, 0.5f, 0.8f};
     }
 
-    // further operations present in graphics_init()
-
-    // init graphics
     if (auto ginit = lunaticvibes::window::graphics_init())
         return ginit;
 
-    // init sound
     if (auto sinit = SoundMgr::initFMOD())
         return sinit;
     SoundMgr::startUpdate();
@@ -158,18 +151,14 @@ int main(int argc, char* argv[])
         ~BbSoundMgr() { SoundMgr::stopUpdate(); }
     } _bbsoundmgr;
 
-    // load input bindings
     InputMgr::init();
     InputMgr::updateDevices();
 
-    // reset globals
     ConfigMgr::setGlobals();
 
-    // language
     i18n::init();
     i18n::setLanguage(ConfigMgr::Profile()->get(cfg::P_LANGUAGE, "English"));
 
-    // imgui font
     int fontIndex = 0;
     Path imguiFontPath = getSysFontPath(nullptr, &fontIndex, i18n::getCurrentLanguage());
     if (!fs::exists(imguiFontPath))
@@ -185,7 +174,6 @@ int main(int argc, char* argv[])
     fontAtlas.AddFontFromFileTTF(lunaticvibes::cs(imguiFontPath.u8string()), 24, &fontConfig,
                                  fontAtlas.GetGlyphRangesChineseFull());
 
-    // etc
     SoundMgr::setVolume(SampleChannel::MASTER, (float)State::get(IndexSlider::VOLUME_MASTER));
     SoundMgr::setVolume(SampleChannel::KEY, (float)State::get(IndexSlider::VOLUME_KEY));
     SoundMgr::setVolume(SampleChannel::BGM, (float)State::get(IndexSlider::VOLUME_BGM));
@@ -215,7 +203,6 @@ int main(int argc, char* argv[])
 
     // load songs / tables at ScenePreSelect
 
-    // arg parsing
     if (argc >= 2)
     {
         const Path bmsFile{argc >= 3 ? argv[2] : argv[1]};
