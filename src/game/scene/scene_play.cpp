@@ -2722,11 +2722,11 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
 
 void ScenePlay::spinTurntable(bool startedPlaying)
 {
-    auto rt = startedPlaying ? lunaticvibes::Time::now().norm() - State::get(IndexTimer::PLAY_START) : 0;
-    auto angle = rt * 360 / 1000; // This matches LR2.
-                                  // This doesn't match LR2:
-    State::set(IndexNumber::_ANGLE_TT_1P, (angle + (int)playerState[0].turntableAngleAdd) % 180);
-    State::set(IndexNumber::_ANGLE_TT_2P, (angle + (int)playerState[1].turntableAngleAdd) % 180);
+    const auto rt = startedPlaying ? lunaticvibes::Time::now().norm() - State::get(IndexTimer::PLAY_START) : 0;
+    const auto angle = rt * 360 / 1000; // This matches LR2 on static spin.
+                                        // TODO: spin twice as fast when player is spinning turntable.
+    State::set(IndexNumber::_ANGLE_TT_1P, (angle + (int)playerState[0].turntableAngleAdd) % 360);
+    State::set(IndexNumber::_ANGLE_TT_2P, (angle + (int)playerState[1].turntableAngleAdd) % 360);
 }
 
 void ScenePlay::requestExit()
@@ -3220,8 +3220,7 @@ void ScenePlay::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
         if (input[ttDn])
             val++; // +1 per tick
 
-        // turntable spin
-        playerState[slot].turntableAngleAdd += val * 0.25;
+        playerState[slot].turntableAngleAdd += val * 0.25; // TODO: this shouldn't add anything, see spinTurntable()
 
         if (lanecover && fnLanecover)
         {
