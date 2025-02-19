@@ -83,7 +83,7 @@ static int seqToLaneImpl(ChartFormatBMS::channel& ch, StringContentView str, uns
         const unsigned value = convert(str[i + i], str[i + i + 1]);
         if (value == 0)
             continue;
-        ch.notes.push_back({segment, value, flags});
+        ch.notes.emplace_back(segment, value, flags);
     }
     ch.sortNotes();
 
@@ -797,8 +797,8 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                         unsigned segment2 =
                             itNote->segment * chNotesLN[chIdx][bar_curr].relax(resolution_tail) / resolution_tail;
                         unsigned value2 = itNote->value;
-                        chNotesLN[chIdx][bar_head].notes.push_back({segment, value});
-                        chNotesLN[chIdx][bar_curr].notes.push_back({segment2, value2});
+                        chNotesLN[chIdx][bar_head].notes.emplace_back(segment, value);
+                        chNotesLN[chIdx][bar_curr].notes.emplace_back(segment2, value2);
 
                         haveLN = true;
 
@@ -1121,9 +1121,7 @@ void ChartFormatBMS::channel::imbue(channel& c)
     }
     relax(c.resolution);
     for (const auto& note : c.notes)
-    {
         notes.push_back(note);
-    }
     c.notes.clear();
     c.resolution = 1;
     sortNotes();
