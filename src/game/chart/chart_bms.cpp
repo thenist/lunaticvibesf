@@ -3,12 +3,15 @@
 #include <algorithm>
 #include <bitset>
 #include <random>
+#include <ranges>
 
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/play_modifiers.h>
 #include <game/runtime/state.h>
 #include <game/scene/scene_context.h>
+
+namespace r = std::ranges;
 
 using namespace chart;
 
@@ -424,12 +427,8 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
         }
 
         // Sort by time / lane value
-        std::stable_sort(notes.begin(), notes.end(),
-                         [](const std::pair<Segment, std::pair<Lane, unsigned>>& lhs,
-                            const std::pair<Segment, std::pair<Lane, unsigned>>& rhs) {
-                             // only compare Segment; Lane and sample must keep original order
-                             return lhs.first < rhs.first;
-                         });
+        // only compare Segment; Lane and sample must keep original order
+        r::stable_sort(notes, {}, &std::pair<Segment, std::pair<Lane, unsigned>>::first);
 
         ///////////////////////////////////////////////////////////////////////
 
@@ -460,6 +459,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             case 0: flags |= Note::SCRATCH; break;
             case 6:
             case 7: flags |= Note::KEY_6_7; break;
+            default: break;
             }
 
             if (lane.type >= eLanePriority::NOTE && lane.type <= eLanePriority::MINE)
@@ -896,7 +896,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             _playMaxBPM = std::max(_playMaxBPM, bpm);
             _playMinBPM = std::min(_playMinBPM, bpm);
         }
-        std::sort(noteBpmCount.begin(), noteBpmCount.end());
+        r::sort(noteBpmCount);
         _mainBPM = noteBpmCount.back().second;
     }
     else
