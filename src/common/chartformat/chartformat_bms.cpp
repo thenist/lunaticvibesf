@@ -1105,7 +1105,6 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
         case eC::NOTELN2: return getNoteLane(chNotesLN, chIdx + 10, barIdx);
         case eC::NOTEMINE1: return getNoteLane(chMines, chIdx, barIdx);
         case eC::NOTEMINE2: return getNoteLane(chMines, chIdx + 10, barIdx);
-        default: break;
         }
     }
 
