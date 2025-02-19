@@ -114,7 +114,7 @@ int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* 
 }
 
 static void do_draw(SDL_Texture* pTex, const Rect* srcRect_, const RectF dstRectF_, const Color c, const BlendMode b,
-                    const bool filter, const double angle, const Point* center)
+                    const double angle, const Point* center)
 {
     const auto srcRect_val = srcRect_ ? std::bit_cast<SDL_Rect>(*srcRect_) : SDL_Rect{};
     const auto* srcRect = srcRect_ ? &srcRect_val : nullptr;
@@ -132,15 +132,6 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect_, const RectF dstRect
     }
 
     SDL_SetTextureColorMod(pTex, c.r, c.g, c.b);
-
-    // FIXME: only the last call to SDL_SetTextureScaleMode within a rendering cycle applies.
-    // Hence right now this takes FPS but doesn't actually do any help.
-    const SDL_ScaleMode mode = filter ? SDL_ScaleModeLinear : SDL_ScaleModeNearest;
-    SDL_ScaleMode current_mode;
-    SDL_GetTextureScaleMode(pTex, &current_mode);
-    // SDL_SetTextureScaleMode is very expensive, while SDL_GetTextureScaleMode is practically free.
-    if (mode != current_mode)
-        SDL_SetTextureScaleMode(pTex, mode);
 
     int ssLevel = lunaticvibes::window::graphics_get_supersample_level();
     dstRectF.x *= ssLevel;
@@ -243,15 +234,32 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect_, const RectF dstRect
     // #endif
 }
 
+void Texture::maybe_set_filtering(bool filter) const
+{
+    // NOTE: only the last call to SDL_SetTextureScaleMode within a rendering cycle applies.
+    if (_filtering_set)
+        return;
+    _filtering_set = true;
+
+    const SDL_ScaleMode mode = filter ? SDL_ScaleModeLinear : SDL_ScaleModeNearest;
+    SDL_ScaleMode current_mode;
+    SDL_GetTextureScaleMode(_texture.get(), &current_mode);
+    // SDL_SetTextureScaleMode is very expensive, while SDL_GetTextureScaleMode is practically free.
+    if (mode != current_mode)
+        SDL_SetTextureScaleMode(_texture.get(), mode);
+}
+
 void Texture::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle) const
 {
-    do_draw(_texture.get(), nullptr, dstRect, c, b, filter, angle, nullptr);
+    maybe_set_filtering(filter);
+    do_draw(_texture.get(), nullptr, dstRect, c, b, angle, nullptr);
 }
 
 void Texture::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle,
                    const Point& center) const
 {
-    do_draw(_texture.get(), nullptr, dstRect, c, b, filter, angle, &center);
+    maybe_set_filtering(filter);
+    do_draw(_texture.get(), nullptr, dstRect, c, b, angle, &center);
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
@@ -262,7 +270,8 @@ void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const Blen
         srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h)
         srcRectTmp.h = textureRect.h;
-    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, filter, angle, nullptr);
+    maybe_set_filtering(filter);
+    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, angle, nullptr);
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
@@ -273,7 +282,8 @@ void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const Blen
         srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h)
         srcRectTmp.h = textureRect.h;
-    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, filter, angle, &center);
+    maybe_set_filtering(filter);
+    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, angle, &center);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -297,5 +307,6 @@ void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const 
                        const double angle) const
 {
     (void)ignored;
-    do_draw(_texture.get(), nullptr, dstRect, c, b, filter, angle, nullptr);
+    (void)filter;
+    do_draw(_texture.get(), nullptr, dstRect, c, b, angle, nullptr);
 }

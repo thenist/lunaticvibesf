@@ -26,8 +26,11 @@ class Texture
 {
 protected:
     std::shared_ptr<SDL_Texture> _texture;
-    bool loaded = false;
     Rect textureRect;
+    bool loaded = false;
+    mutable bool _filtering_set = false; // Set on first 'draw' call.
+
+    void maybe_set_filtering(bool) const;
 
 public:
     // Inner draw function.
