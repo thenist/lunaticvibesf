@@ -1,7 +1,3 @@
-#include <gmock/gmock.h>
-
-#include <optional>
-
 #include <common/entry/entry_course.h>
 #include <common/entry/entry_song.h>
 #include <common/entry/entry_table.h>
@@ -11,6 +7,10 @@
 #include <db/db_song.h>
 #include <game/scene/scene_context.h>
 #include <game/scene/scene_select.h>
+
+#include <gtest/gtest.h>
+
+#include <optional>
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 

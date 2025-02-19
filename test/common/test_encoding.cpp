@@ -1,10 +1,10 @@
-#include <fstream>
-
-#include <gmock/gmock.h>
-
 #include <common/encoding.h>
 #include <common/types.h>
 #include <common/utils.h>
+
+#include <gtest/gtest.h>
+
+#include <fstream>
 
 TEST(Encoding, CanDetermineFileEncoding)
 {

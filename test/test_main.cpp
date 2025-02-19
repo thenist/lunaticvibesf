@@ -5,6 +5,7 @@
 #include <config/config_mgr.h>
 
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 bool lunaticvibes::in_test_mode()
 {

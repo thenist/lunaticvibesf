@@ -1,7 +1,7 @@
 #include <sstream>
 #include <utility>
 
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "common/coursefile/lr2crs.h"
 #include "common/hash.h"

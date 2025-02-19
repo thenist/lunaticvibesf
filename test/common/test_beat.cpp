@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <limits>
 
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 using uint32_t = std::uint32_t;
 

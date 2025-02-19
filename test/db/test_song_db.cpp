@@ -1,5 +1,5 @@
 #include "common/hash.h"
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <db/db_song.h>
 

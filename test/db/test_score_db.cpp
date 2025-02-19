@@ -1,4 +1,4 @@
-#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <db/db_lr2_score.h>
 #include <db/db_score.h>

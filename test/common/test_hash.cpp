@@ -1,9 +1,9 @@
+#include <common/hash.h>
+
+#include <gtest/gtest.h>
+
 #include <functional>
 #include <string_view>
-
-#include <gmock/gmock.h>
-
-#include <common/hash.h>
 
 TEST(Hash, HashesMd5Correctly)
 {

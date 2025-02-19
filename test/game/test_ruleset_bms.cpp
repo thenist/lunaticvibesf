@@ -1,11 +1,11 @@
-#include <gmock/gmock.h>
+#include <common/chartformat/chartformat_bms.h>
+#include <game/replay/replay_chart.h>
+#include <game/ruleset/ruleset.h>
+#include <game/ruleset/ruleset_bms_replay.h>
+
+#include <gtest/gtest.h>
 
 #include <memory>
-
-#include "common/chartformat/chartformat_bms.h"
-#include "game/replay/replay_chart.h"
-#include "game/ruleset/ruleset.h"
-#include "game/ruleset/ruleset_bms_replay.h"
 
 TEST(RulesetBmsReplay, SkipToEndWorks)
 {

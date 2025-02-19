@@ -1,11 +1,11 @@
-#include "game/skin/skin_lr2.h"
-#include "gmock/gmock.h"
+#include <common/str_utils.h>
+#include <game/skin/skin_lr2.h>
+
+#include <gtest/gtest.h>
 
 #include <string>
 #include <utility>
 #include <vector>
-
-#include <common/str_utils.h>
 
 class mock_SkinLR2 : public SkinLR2
 {

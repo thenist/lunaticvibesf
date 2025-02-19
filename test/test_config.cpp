@@ -1,7 +1,10 @@
-#include "config/config.h"
-#include "gmock/gmock.h"
+#include <config/config.h>
+
+#include <gtest/gtest.h>
+
 #include <filesystem>
 #include <string>
+
 namespace fs = std::filesystem;
 
 class tConfig : public vConfig
