@@ -371,7 +371,7 @@ void mainLoop()
                 return true;
             if (gInCustomize && (gCustomizeSceneChanged || sceneCustomize == nullptr))
                 return true;
-            return gExitingCustomize;
+            return gExitingCustomize.load();
         };
         if (wantSceneChange())
         {

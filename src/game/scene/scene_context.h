@@ -17,10 +17,11 @@ class SongDB;
 inline std::atomic<bool> gAppIsExiting;
 inline std::atomic<bool> gQuitOnFinish;
 
-inline SceneType gNextScene = SceneType::SELECT;
-inline bool gCustomizeSceneChanged = false;
-inline bool gExitingCustomize = false;
-inline bool gInCustomize = false;
+inline std::atomic<SceneType> gNextScene = SceneType::SELECT;
+
+inline std::atomic<bool> gCustomizeSceneChanged = false;
+inline std::atomic<bool> gExitingCustomize = false;
+inline std::atomic<bool> gInCustomize = false;
 
 inline ChartContextParams gChartContext;
 inline CustomizeContextParams gCustomizeContext;
