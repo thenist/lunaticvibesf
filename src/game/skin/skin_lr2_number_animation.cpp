@@ -1,6 +1,7 @@
 #include "skin_lr2_number_animation.h"
 
 #include <common/beat.h>
+#include <game/graphics/sprite.h>
 #include <game/skin/skin_lr2_animation.h>
 
 // Formula matches LR2.
@@ -11,10 +12,8 @@ double lunaticvibes::NumberAnimation::animate(const lunaticvibes::Time& now) con
         return from;
 
     if (!((end < now) || (start > now) || (end <= start)))
-    {
-        const auto tmp = static_cast<double>((now - start).norm()) / (end - start).norm();
-        return grad(to, from, tmp);
-    }
+        return grad(to, from,
+                    calc_animation_multiplier(start.norm(), end.norm(), now.norm(), MotionKeyFrameParams::CONSTANT));
 
     if (start < now)
         return to;

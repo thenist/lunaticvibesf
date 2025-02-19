@@ -147,15 +147,8 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
         else
         {
             // normalize time
-            double prog = static_cast<double>(time.norm() - keyFrameCurr->time) /
-                          static_cast<double>(keyFrameNext->time - keyFrameCurr->time);
-            switch (keyFrameCurr->param.accel)
-            {
-            case MotionKeyFrameParams::CONSTANT: break;
-            case MotionKeyFrameParams::ACCEL: prog = prog * prog * prog; break;
-            case MotionKeyFrameParams::DECEL: prog = 1.0 - ((1.0 - prog) * (1.0 - prog) * (1.0 - prog)); break;
-            case MotionKeyFrameParams::DISCONTINUOUS: prog = 0.0;
-            }
+            const double prog = lunaticvibes::calc_animation_multiplier(keyFrameCurr->time, keyFrameNext->time,
+                                                                        time.norm(), keyFrameCurr->param.accel);
 
             // calculate parameters
             _current.rect.x = (float)grad(keyFrameNext->param.rect.x, keyFrameCurr->param.rect.x, prog);
