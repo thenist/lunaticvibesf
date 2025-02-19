@@ -102,9 +102,7 @@ void refreshInputDevices()
 
 void pollInput()
 {
-    // No-op.
-    // We don't need to do anything, since all the updating is done by
-    // window events.
+    // Polling is done on main thread by SDL_PollEvent.
 }
 
 bool isKeyPressed(Input::Keyboard key)
