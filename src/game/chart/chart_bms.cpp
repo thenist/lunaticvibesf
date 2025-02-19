@@ -814,9 +814,6 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     lunaticvibes::Time noteStopTime{(long long)std::floor(beatLength.hres() * noteStopMetre * 4), true};
                     _specialNoteLists[(size_t)eNoteExt::STOP].emplace_back(m, notemetre, notetime, 0,
                                                                            noteStopTime.hres(), noteStopMetre);
-                    //_chartingSpeedList.push_back({ m, notemetre, noteht, 0.0 });
-                    //_chartingSpeedList.push_back({ m, notemetre + d2fr(noteStopBeat), noteht + noteStopTime,
-                    // currentSpd });
                     stopMetre += noteStopMetre;
                     basetime += noteStopTime;
                     break;
