@@ -103,8 +103,7 @@ bool ArenaClient::joinLobby(const std::string& address)
         }
         else
         {
-            LOG_WARNING << "[Arena] ???";
-            LVF_DEBUG_ASSERT(false);
+            lunaticvibes::verify_failed("[Arena] ???");
             return false;
         }
     }

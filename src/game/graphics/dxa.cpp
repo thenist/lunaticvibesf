@@ -304,7 +304,7 @@ int Decompress(void* Src, void* Dest)
 
         default:
             LOG_ERROR << "[dxa] Invalid indexsize " << indexsize;
-            LVF_DEBUG_ASSERT(false && "Invalid indexsize");
+            lunaticvibes::verify_failed("Invalid indexsize");
             return 0;
         }
         index++; // 保存時に－１しているので＋１する

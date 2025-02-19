@@ -20,7 +20,7 @@ AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsi
 
 #ifdef _WIN32
     handler = CreateWaitableTimerExA(nullptr, nullptr, 0, TIMER_ALL_ACCESS);
-    LVF_DEBUG_ASSERT(handler != nullptr);
+    LVF_ASSERT(handler != nullptr);
 #endif
 }
 
@@ -146,7 +146,7 @@ void AsyncLooper::loopEnd()
                 {
                     dwError = GetLastError();
                 }
-                LVF_DEBUG_ASSERT(dwError == 0);
+                LVF_ASSERT(dwError == 0);
             }
         }
         LOG_DEBUG << "[Looper] " << _tag << ": Ended " << _rate << "/s";

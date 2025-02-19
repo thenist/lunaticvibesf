@@ -1387,7 +1387,11 @@ void open_ir_page()
     // TODO: dans
 
     const EntryList& e = gSelectContext.entries;
-    LVF_DEBUG_ASSERT(!e.empty());
+    if (e.empty())
+    {
+        LOG_DEBUG << "[SkinLR2] Empty entry list";
+        return;
+    }
     const size_t idx = gSelectContext.selectedEntryIndex;
     if (e[idx].first->type() != eEntryType::CHART && e[idx].first->type() != eEntryType::RIVAL_CHART)
     {

@@ -367,7 +367,7 @@ static void config_fx()
 SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::MUSIC_SELECT, 250), _skinMgr(skinMgr)
 {
-    LVF_DEBUG_ASSERT(pSkin != nullptr);
+    LVF_ASSERT(pSkin != nullptr);
     _type = SceneType::SELECT;
 
     _inputAvailable = INPUT_MASK_FUNC | INPUT_MASK_MOUSE;
@@ -3295,7 +3295,7 @@ void SceneSelect::updatePreview()
         }
 
         case eChartFormat::UNKNOWN:
-        case eChartFormat::BMSON: LVF_DEBUG_ASSERT(false);
+        case eChartFormat::BMSON: lunaticvibes::verify_failed("PREVIEW_START_SAMPLE_LOADING"); break;
         }
 
         break;

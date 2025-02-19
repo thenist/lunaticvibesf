@@ -311,8 +311,8 @@ bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& 
     int ret = exec("CREATE TABLE IF NOT EXISTS __lvf_schema_migrations (name TEXT, date TEXT);");
     if (ret != SQLITE_OK)
     {
-        LOG_FATAL << "[sqlite3] Creation of __lvf_schema_migrations failed: " << errmsg();
-        LVF_DEBUG_ASSERT(false && "Creation of __lvf_schema_migrations failed");
+        lunaticvibes::verify_failed(
+            (std::string{"[sqlite3] Creation of __lvf_schema_migrations failed: "} + errmsg()).c_str());
         return false;
     }
 

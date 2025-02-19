@@ -439,8 +439,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
             size_t length = ss.tellp();
             if (length == 0)
             {
-                LOG_WARNING << "[Arena] Pack SEEK_LOBBY resp payload failed";
-                LVF_DEBUG_ASSERT(false);
+                lunaticvibes::verify_failed("[Arena] Pack SEEK_LOBBY resp payload failed");
                 return;
             }
 
@@ -615,8 +614,7 @@ void ArenaHost::handleJoinLobby(const std::string& clientKey, const std::shared_
     size_t length = ss.tellp();
     if (length == 0)
     {
-        LOG_WARNING << "[Arena] Pack JOIN_LOBBY resp payload failed";
-        LVF_DEBUG_ASSERT(false);
+        lunaticvibes::verify_failed("[Arena] Pack JOIN_LOBBY resp payload failed");
         return;
     }
     resp.payload.resize(length);

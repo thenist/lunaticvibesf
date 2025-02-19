@@ -157,8 +157,7 @@ void KeyMap::loadFromStringM(const std::string_view name)
 {
     if (name.substr(0, 2) != "M_")
         return;
-    type = DeviceType::MOUSE;
-    LVF_DEBUG_ASSERT(false);
+    lunaticvibes::assert_failed("loadFromStringM");
 }
 
 std::string KeyMap::toStringK() const
@@ -197,6 +196,5 @@ std::string KeyMap::toStringJ() const
 
 std::string KeyMap::toStringM() const
 {
-    LVF_DEBUG_ASSERT(false);
-    return "M_"s + "NULL";
+    lunaticvibes::assert_failed("toStringM");
 }

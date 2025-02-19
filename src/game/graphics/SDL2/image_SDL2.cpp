@@ -86,7 +86,7 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _
     }
     if (_path.empty())
         return;
-    LVF_DEBUG_ASSERT(_pRWop);
+    LVF_ASSERT(_pRWop);
 
     maybe_init_image();
 

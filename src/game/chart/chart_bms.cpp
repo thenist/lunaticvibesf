@@ -500,7 +500,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         chartLane = idxToChannel(channelToIdx(NoteLaneCategory::Mine, lane.index));
                         flags |= Note::Flags::MINE;
                         break;
-                    default: LVF_DEBUG_ASSERT(false); break;
+                    default: lunaticvibes::verify_failed("lane.type"); break;
                     }
                     size_t gameLaneIdx = gameLaneMap[chartLane.second];
                     size_t gameLaneIdxMod = gameLaneIdx;
@@ -520,7 +520,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     }
                     else
                     {
-                        LVF_DEBUG_ASSERT(false);
+                        lunaticvibes::verify_failed("else");
                         break;
                     }
 

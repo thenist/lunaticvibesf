@@ -97,17 +97,11 @@ void RulesetBMSAuto::setTargetRate(double rate)
         }
     }
     while (count0--)
-    {
         noteJudges.push_back(JudgeArea::EARLY_GOOD);
-    }
     while (count1--)
-    {
         noteJudges.push_back(JudgeArea::EARLY_GREAT);
-    }
     while (count2--)
-    {
         noteJudges.push_back(JudgeArea::EXACT_PERFECT);
-    }
 
     LVF_DEBUG_ASSERT(noteJudges.size() == count);
 }

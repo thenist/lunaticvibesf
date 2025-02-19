@@ -12,7 +12,7 @@ SpriteImageText::SpriteImageText(const SpriteImageTextBuilder& builder)
       textHeight(builder.height), _firstLine(0), _margin(builder.margin)
 {
     _type = SpriteTypes::IMAGE_TEXT;
-    LVF_DEBUG_ASSERT(builder.charMappingList != nullptr);
+    LVF_ASSERT(builder.charMappingList != nullptr);
 }
 
 void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_line)
