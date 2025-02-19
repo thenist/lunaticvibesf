@@ -16,6 +16,7 @@ Please note that LVF upgrades user profiles such that they can't be used in orig
 - Built-in difficulty table support
 - Mixed skin resolution support (SD, HD, FHD, UHD)
 - ARENA Mode over LAN / VLAN
+- Base-62 BMS
 
 For LR2 feature compatibility list, check out [the wiki](https://github.com/chown2/lunaticvibesf/wiki/LR2-Features-Compatibility).
 

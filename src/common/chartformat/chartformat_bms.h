@@ -14,8 +14,15 @@
 
 namespace bms
 {
-const unsigned MAXSAMPLEIDX = 36 * 36;
+
+const unsigned WAV_NUMBER_BASE = 62;
+const unsigned MAXSAMPLEIDX = WAV_NUMBER_BASE * WAV_NUMBER_BASE;
+
+const unsigned BMP_NUMBER_BASE = 36;
+const unsigned MAX_BMP_IDX = BMP_NUMBER_BASE * BMP_NUMBER_BASE;
+
 const unsigned MAXBARIDX = 999;
+
 enum class ErrorCode
 {
     OK,
@@ -25,6 +32,7 @@ enum class ErrorCode
     TYPE_MISMATCH,
     NOTE_LINE_ERROR,
 };
+
 enum class LaneCode
 {
     BGM = 0,
@@ -43,6 +51,7 @@ enum class LaneCode
     NOTEMINE1,
     NOTEMINE2,
 };
+
 } // namespace bms
 
 using namespace bms;

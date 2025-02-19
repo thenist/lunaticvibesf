@@ -474,9 +474,6 @@ TEST(tBMS, Base36and62Bgm)
     ASSERT_EQ(bms.bgmLayersCount[bar], 4);
     EXPECT_EQ(lane_values(bms, 0, bar), "310");
     EXPECT_EQ(lane_values(bms, 1, bar), "310");
-    EXPECT_EQ(lane_values(bms, 2, bar), "310");
-    EXPECT_EQ(lane_values(bms, 3, bar), "310");
-    // TODO
-    // EXPECT_EQ(lane_values(bms, 2, bar), "544");
-    // EXPECT_EQ(lane_values(bms, 3, bar), "518");
+    EXPECT_EQ(lane_values(bms, 2, bar), "544");
+    EXPECT_EQ(lane_values(bms, 3, bar), "518");
 }

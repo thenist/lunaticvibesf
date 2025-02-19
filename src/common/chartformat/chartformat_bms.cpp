@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <exception>
 #include <filesystem>
 #include <fstream>
@@ -24,6 +25,7 @@
 namespace r = std::ranges;
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
+using std::size_t;
 
 [[nodiscard]] static unsigned char ascii_tolower(unsigned char c)
 {
@@ -90,6 +92,26 @@ static int seqToLaneImpl(ChartFormatBMS::channel& ch, StringContentView str, uns
     return 0;
 }
 
+[[nodiscard]] constexpr static unsigned base62(char c)
+{
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    if (c >= 'A' && c <= 'Z')
+        return c - 'A' + 10;
+    if (c >= 'a' && c <= 'z')
+        return c - 'a' + 36;
+    return 0;
+}
+[[nodiscard]] constexpr static unsigned base62(char first, char second)
+{
+    return 62 * base62(first) + base62(second);
+}
+
+static int seqToLane62(ChartFormatBMS::channel& ch, StringContentView str, unsigned flags = 0)
+{
+    return seqToLaneImpl(ch, str, flags, is_alnum, [](char c1, char c2) { return base62(c1, c2); });
+}
+
 static int seqToLane36(ChartFormatBMS::channel& ch, StringContentView str, unsigned flags = 0)
 {
     return seqToLaneImpl(ch, str, flags, is_alnum, [](char c1, char c2) { return base36(c1, c2); });
@@ -122,7 +144,7 @@ std::optional<JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(const int va
 ChartFormatBMS::ChartFormatBMS() : ChartFormatBMSMeta()
 {
     wavFiles.resize(MAXSAMPLEIDX + 1);
-    bgaFiles.resize(MAXSAMPLEIDX + 1);
+    bgaFiles.resize(MAX_BMP_IDX + 1);
     metres.resize(MAXBARIDX + 1);
 }
 
@@ -191,7 +213,20 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
 
     // implicit parameters
     bool hasDifficulty = false;
+    bool is_base62 = false;
     bool only_check_note_existence = false; // TODO: check if it works when RANDOM is nested. It probably doesn't.
+
+    // For us, `#BASE 62` *MUST* appear before `#WAVxx`.
+    auto base3662 = [&is_base62](char c1, char c2) {
+        if (is_base62)
+            return base62(c1, c2);
+        return base36(c1, c2);
+    };
+    auto seqToLane3662 = [&is_base62](ChartFormatBMS::channel& ch, StringContentView str, unsigned flags = 0) {
+        if (is_base62)
+            return seqToLane62(ch, str, flags);
+        return seqToLane36(ch, str, flags);
+    };
 
     for (StringContent lineBuf, lineBuf_; std::getline(bmsFile, lineBuf_);)
     {
@@ -395,7 +430,8 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                     // nekokan undocumented; not in LR2
                     if (constexpr int BASE62 = 62; toInt(value) == BASE62)
                     {
-                        LOG_ERROR << "[BMS] #BASE 62 is not supported"; // TODO
+                        LOG_DEBUG << "[BMS] #BASE 62";
+                        is_base62 = true;
                     }
                     else
                     {
@@ -496,7 +532,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 // #???xx
                 else if (matches_36_key("WAV", key))
                 {
-                    int idx = base36(key[3], key[4]);
+                    int idx = base3662(key[3], key[4]);
                     wavFiles[idx].assign(value.begin(), value.end());
                     if (!ifStack.empty())
                         resourceStable = false;
@@ -569,7 +605,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                             switch (_y)
                             {
                             case 1: // 01: BGM
-                                seqToLane36(chBGM[bgmLayersCount[bar]][bar], value);
+                                seqToLane3662(chBGM[bgmLayersCount[bar]][bar], value);
                                 ++bgmLayersCount[bar];
                                 break;
                             case 2: // 02: Bar Length
@@ -622,14 +658,14 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                                 {
                                 case 1: // 1x: 1P visible
                                 case 2: // 2x: 2P visible
-                                    seqToLane36(chNotesRegular[chIdx][bar], value);
+                                    seqToLane3662(chNotesRegular[chIdx][bar], value);
                                     haveNote = true;
                                     if (side == 1)
                                         haveAny_2 = true;
                                     break;
                                 case 3: // 3x: 1P invisible
                                 case 4: // 4x: 2P invisible
-                                    seqToLane36(chNotesInvisible[chIdx][bar], value);
+                                    seqToLane3662(chNotesInvisible[chIdx][bar], value);
                                     haveInvisible = true;
                                     if (side == 1)
                                         haveAny_2 = true;
@@ -642,7 +678,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                                         // Note: there is so many possibilities of conflicting LN definition. Add all LN
                                         // channel notes as regular notes
                                         channel noteLane;
-                                        seqToLane36(noteLane, value, channel::NoteParseValue::LN);
+                                        seqToLane3662(noteLane, value, channel::NoteParseValue::LN);
                                         channel& chTarget = chNotesRegular[chIdx][bar];
                                         const unsigned scale =
                                             chTarget.relax(noteLane.resolution) / noteLane.resolution;
@@ -659,7 +695,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                                     else
                                     {
                                         // #LNTYPE 1
-                                        seqToLane36(chNotesLN[chIdx][bar], value, channel::NoteParseValue::LN);
+                                        seqToLane3662(chNotesLN[chIdx][bar], value, channel::NoteParseValue::LN);
                                         haveLN = true;
                                         if (side == 1)
                                             haveAny_2 = true;
@@ -667,7 +703,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                                     break;
                                 case 0xD: // Dx: 1P mine
                                 case 0xE: // Ex: 2P mine
-                                    seqToLane36(chMines[chIdx][bar], value);
+                                    seqToLane3662(chMines[chIdx][bar], value);
                                     haveMine = true;
                                     break;
                                 default: LOG_VERBOSE << "[BMS] Unhandled x=" << x_ << "; y=" << _y; break;

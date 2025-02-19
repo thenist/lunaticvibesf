@@ -43,7 +43,8 @@ protected:
     std::map<SoundChannelType, FMOD::DSP*> EQFilter[2];
 
 public:
-    static constexpr size_t NOTESAMPLES = 36 * 36 + 1;
+    static constexpr size_t BMS_NUMBER_BASE = 62;
+    static constexpr size_t NOTESAMPLES = BMS_NUMBER_BASE * BMS_NUMBER_BASE + 1;
     static constexpr size_t SYSSAMPLES = 64;
     struct SoundSample
     {
