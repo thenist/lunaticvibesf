@@ -11,7 +11,7 @@ double lunaticvibes::NumberAnimation::animate(const lunaticvibes::Time& now) con
     if (from == to)
         return from;
 
-    if (!((end < now) || (start > now) || (end <= start)))
+    if (end >= now && start <= now && end > start)
         return grad(to, from,
                     calc_animation_multiplier(start.norm(), end.norm(), now.norm(), MotionKeyFrameParams::CONSTANT));
 
