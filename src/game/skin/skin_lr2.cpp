@@ -727,30 +727,27 @@ int SkinLR2::IMAGE()
         ++imageCount;
         return 1;
     }
+
+    Path pathFile = getCustomizePath(parseParamBuf[0]);
+    std::string textureMapKey = std::to_string(imageCount);
+
+    if (lunaticvibes::is_video_file_path(pathFile))
+    {
+        videoNameMap[textureMapKey] = std::make_shared<sVideo>(pathFile, 1.0, true);
+        _base_shared_data->textureNameMap[textureMapKey] = _base_shared_data->textureNameMap["White"];
+    }
     else
     {
-        Path pathFile = getCustomizePath(parseParamBuf[0]);
-        std::string textureMapKey = std::to_string(imageCount);
-
-        if (lunaticvibes::is_video_file_path(pathFile))
-        {
-            videoNameMap[textureMapKey] = std::make_shared<sVideo>(pathFile, 1.0, true);
-            _base_shared_data->textureNameMap[textureMapKey] = _base_shared_data->textureNameMap["White"];
-        }
-        else
-        {
-            Image img{pathFile};
-            if (!img.hasAlphaLayer() && info.hasTransparentColor)
-                img.setTransparentColorRGB(info.transparentColor);
-            _base_shared_data->textureNameMap[textureMapKey] = std::make_shared<Texture>(img);
-        }
-
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added IMAGE[" << imageCount << "]: " << pathFile;
-
-        ++imageCount;
-        return 1;
+        Image img{pathFile};
+        if (!img.hasAlphaLayer() && info.hasTransparentColor)
+            img.setTransparentColorRGB(info.transparentColor);
+        _base_shared_data->textureNameMap[textureMapKey] = std::make_shared<Texture>(img);
     }
-    return 0;
+
+    LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added IMAGE[" << imageCount << "]: " << pathFile;
+
+    ++imageCount;
+    return 1;
 }
 
 int SkinLR2::LR2FONT()
@@ -774,136 +771,134 @@ int SkinLR2::LR2FONT()
             _sharedData->font_name_map.erase(fontNameKey);
         return 1;
     }
-    else
-    {
-        Path path = std::filesystem::absolute(getCustomizePath(parseParamBuf[0]));
+
+    Path path = std::filesystem::absolute(getCustomizePath(parseParamBuf[0]));
 #ifndef _WIN32
-        path = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(path));
+    path = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(path));
 #endif // _WIN32
-        std::string fontNameKey = std::to_string(_sharedData->font_name_map.size());
+    std::string fontNameKey = std::to_string(_sharedData->font_name_map.size());
 
-        if (auto it = _sharedData->font_cache.find(path); it != _sharedData->font_cache.end())
-        {
-            _sharedData->font_name_map.insert_or_assign(fontNameKey, it->second);
-            _sharedData->font_path_cache.insert_or_assign(fontNameKey, path);
-            return 1;
-        }
-
-        findAndExtractDXA(path);
-
-        if (!fs::is_regular_file(path))
-        {
-            _sharedData->font_name_map.erase(fontNameKey);
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": LR2FONT file not found: " << path;
-            return 1;
-        }
-
-        std::ifstream ifsFile(path, std::ios::binary);
-        if (ifsFile.fail())
-        {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": LR2FONT file open failed: " << path;
-            return 1;
-        }
-
-        // copy the whole file into ram, once for all
-        std::stringstream lr2font;
-        lr2font << ifsFile.rdbuf();
-        lr2font.seekg(0);
-        const auto encoding = getFileEncoding(lr2font);
-        ifsFile.close();
-
-        std::string strbuf;
-        std::u32string u32strbuf;
-
-        auto pf = std::make_shared<lunaticvibes::details::LR2Font>();
-
-        Tokens tokens;
-        for (std::string rawUTF8, raw_; std::getline(lr2font, raw_);)
-        {
-            lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
-
-            csvLineTokenize(csvLineNumber, rawUTF8, tokens);
-            if (tokens.empty())
-                continue;
-            const auto& key = tokens[0];
-
-            if (matchToken(key, "#S"))
-            {
-                pf->S = toInt(tokens[1]);
-            }
-            else if (matchToken(key, "#M"))
-            {
-                pf->M = toInt(tokens[1]);
-            }
-            else if (matchToken(key, "#T"))
-            {
-                size_t idx = pf->T_id.size();
-                pf->T_id[toInt(tokens[1])] = idx;
-
-                // スキンcsvとは違って「lr2fontファイルからの相対参照」で画像ファイルを指定します。
-                Path p = path.parent_path() / PathFromUTF8(tokens[2]);
-                findAndExtractDXA(p);
-                pf->T_texture.push_back(std::make_shared<Texture>(Image{p}));
-            }
-            else if (matchToken(key, "#R"))
-            {
-                int imgId = toInt(tokens[2]);
-                if (!pf->T_id.contains(imgId))
-                    continue;
-
-                int chrId = toInt(tokens[1]);
-                char s_sjis[3]{0};
-                char32_t c_utf32 = '\0';
-                if (chrId >= 0 && chrId <= 255)
-                {
-                    // ID = ASCII
-                    s_sjis[0] = chrId & 0xFF;
-                }
-                else if (chrId >= 256 && chrId <= 8126)
-                {
-                    // ID = Shift-JIS文字コードを10進数に変換して32832を引いた値
-                    int i = chrId + 32832;
-                    s_sjis[0] = (i >> 8) & 0xFF;
-                    s_sjis[1] = i & 0xFF;
-                }
-                else if (chrId >= 8127 && chrId <= 15306)
-                {
-                    // ID = Shift-JIS文字コードを10進数に変換して49281を引いてた値
-                    int i = chrId + 49281;
-                    s_sjis[0] = (i >> 8) & 0xFF;
-                    s_sjis[1] = i & 0xFF;
-                }
-                else
-                    continue;
-
-                lunaticvibes::to_utf8(s_sjis, eFileEncoding::SHIFT_JIS, strbuf);
-                lunaticvibes::utf8_to_utf32(strbuf, u32strbuf);
-                c_utf32 = u32strbuf.front();
-
-                Rect r;
-                r.x = toInt(tokens[3]);
-                r.y = toInt(tokens[4]);
-                r.w = toInt(tokens[5]);
-                r.h = toInt(tokens[6]);
-
-                if (c_utf32 == U' ')
-                {
-                    // ID = space, LR2 displays a blank texture instead of actually texture file for spaces
-                    pf->R[c_utf32] = {size_t(-1), r};
-                }
-                else
-                {
-                    pf->R[c_utf32] = {pf->T_id.at(imgId), r};
-                }
-            }
-        }
-
-        _sharedData->font_cache.insert_or_assign(path, pf);
-        _sharedData->font_name_map.insert_or_assign(fontNameKey, pf);
+    if (auto it = _sharedData->font_cache.find(path); it != _sharedData->font_cache.end())
+    {
+        _sharedData->font_name_map.insert_or_assign(fontNameKey, it->second);
         _sharedData->font_path_cache.insert_or_assign(fontNameKey, path);
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added LR2FONT[" << fontNameKey << "]: " << path;
         return 1;
     }
+
+    findAndExtractDXA(path);
+
+    if (!fs::is_regular_file(path))
+    {
+        _sharedData->font_name_map.erase(fontNameKey);
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": LR2FONT file not found: " << path;
+        return 1;
+    }
+
+    std::ifstream ifsFile(path, std::ios::binary);
+    if (ifsFile.fail())
+    {
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": LR2FONT file open failed: " << path;
+        return 1;
+    }
+
+    // copy the whole file into ram, once for all
+    std::stringstream lr2font;
+    lr2font << ifsFile.rdbuf();
+    lr2font.seekg(0);
+    const auto encoding = getFileEncoding(lr2font);
+    ifsFile.close();
+
+    std::string strbuf;
+    std::u32string u32strbuf;
+
+    auto pf = std::make_shared<lunaticvibes::details::LR2Font>();
+
+    Tokens tokens;
+    for (std::string rawUTF8, raw_; std::getline(lr2font, raw_);)
+    {
+        lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
+
+        csvLineTokenize(csvLineNumber, rawUTF8, tokens);
+        if (tokens.empty())
+            continue;
+        const auto& key = tokens[0];
+
+        if (matchToken(key, "#S"))
+        {
+            pf->S = toInt(tokens[1]);
+        }
+        else if (matchToken(key, "#M"))
+        {
+            pf->M = toInt(tokens[1]);
+        }
+        else if (matchToken(key, "#T"))
+        {
+            size_t idx = pf->T_id.size();
+            pf->T_id[toInt(tokens[1])] = idx;
+
+            // スキンcsvとは違って「lr2fontファイルからの相対参照」で画像ファイルを指定します。
+            Path p = path.parent_path() / PathFromUTF8(tokens[2]);
+            findAndExtractDXA(p);
+            pf->T_texture.push_back(std::make_shared<Texture>(Image{p}));
+        }
+        else if (matchToken(key, "#R"))
+        {
+            int imgId = toInt(tokens[2]);
+            if (!pf->T_id.contains(imgId))
+                continue;
+
+            int chrId = toInt(tokens[1]);
+            char s_sjis[3]{0};
+            char32_t c_utf32 = '\0';
+            if (chrId >= 0 && chrId <= 255)
+            {
+                // ID = ASCII
+                s_sjis[0] = chrId & 0xFF;
+            }
+            else if (chrId >= 256 && chrId <= 8126)
+            {
+                // ID = Shift-JIS文字コードを10進数に変換して32832を引いた値
+                int i = chrId + 32832;
+                s_sjis[0] = (i >> 8) & 0xFF;
+                s_sjis[1] = i & 0xFF;
+            }
+            else if (chrId >= 8127 && chrId <= 15306)
+            {
+                // ID = Shift-JIS文字コードを10進数に変換して49281を引いてた値
+                int i = chrId + 49281;
+                s_sjis[0] = (i >> 8) & 0xFF;
+                s_sjis[1] = i & 0xFF;
+            }
+            else
+                continue;
+
+            lunaticvibes::to_utf8(s_sjis, eFileEncoding::SHIFT_JIS, strbuf);
+            lunaticvibes::utf8_to_utf32(strbuf, u32strbuf);
+            c_utf32 = u32strbuf.front();
+
+            Rect r;
+            r.x = toInt(tokens[3]);
+            r.y = toInt(tokens[4]);
+            r.w = toInt(tokens[5]);
+            r.h = toInt(tokens[6]);
+
+            if (c_utf32 == U' ')
+            {
+                // ID = space, LR2 displays a blank texture instead of actually texture file for spaces
+                pf->R[c_utf32] = {size_t(-1), r};
+            }
+            else
+            {
+                pf->R[c_utf32] = {pf->T_id.at(imgId), r};
+            }
+        }
+    }
+
+    _sharedData->font_cache.insert_or_assign(path, pf);
+    _sharedData->font_name_map.insert_or_assign(fontNameKey, pf);
+    _sharedData->font_path_cache.insert_or_assign(fontNameKey, path);
+    LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added LR2FONT[" << fontNameKey << "]: " << path;
+    return 1;
 }
 
 int SkinLR2::SYSTEMFONT()
