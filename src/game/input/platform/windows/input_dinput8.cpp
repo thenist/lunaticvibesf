@@ -180,7 +180,6 @@ BOOL InputDirectInput8::DIEnumDevicesCallbackJoystick(LPCDIDEVICEINSTANCE lpddi)
 
 BOOL InputDirectInput8::DIEnumDeviceObjectsCallback(LPCDIDEVICEOBJECTINSTANCE lpddoi)
 {
-
     return DIENUM_CONTINUE;
 }
 
