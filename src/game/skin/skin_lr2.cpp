@@ -1498,7 +1498,7 @@ ParseRet SkinLR2::SRC_BUTTON()
 
     if (d.click)
     {
-        builder.callOnClick = lr2skin::button::getButtonCallback(d.type);
+        builder.buttonInd = d.type;
         builder.clickableOnPanel = d.panel;
         builder.plusonlyDelta = d.plusonly;
         _sprites.push_back(builder.build());

@@ -1,11 +1,11 @@
 #pragma once
-#include "common/keymap.h"
-#include <functional>
+
+#include <common/keymap.h>
 
 namespace lr2skin::button
 {
 
-std::function<void(int)> getButtonCallback(int type);
+void invoke(int type, int plus);
 
 void select_difficulty_filter(int iterateCount, int plus);
 void select_keys_filter(int iterateCount, int plus);

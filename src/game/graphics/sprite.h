@@ -612,20 +612,19 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // Button sprite (clickable):
 
-class SpriteButton : public SpriteOption, public iSpriteMouse
+class SpriteButton final : public SpriteOption, public iSpriteMouse
 {
-protected:
-    std::function<void(int)> callOnClick;
+private:
+    int _buttonInd;
     int clickableOnPanel;
     int plusonlyDelta;
 
 public:
     struct SpriteButtonBuilder : SpriteOptionBuilder
     {
+        int buttonInd = -1;
         int clickableOnPanel = -1;
         int plusonlyDelta = 0;
-        std::function<void(int)> callOnClick;
-
         [[nodiscard]] std::shared_ptr<SpriteButton> build() const { return std::make_shared<SpriteButton>(*this); }
     };
 

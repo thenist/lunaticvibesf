@@ -1427,16 +1427,11 @@ static void requestOpenChartReadme()
 
 #pragma endregion
 
-std::function<void(int)> getButtonCallback(int type)
+void invoke(int type, int plus)
 {
-    auto createUnsupportedCb = [type](const std::string_view description) {
-        LOG_DEBUG << "[SkinLR2] Unsupported button [" << type << "] '" << description << "'";
-        return [type, description](int value) {
-            LOG_DEBUG << "[SkinLR2] Pressed unsupported button [" << type << "] '" << description << ": " << value;
-        };
+    auto unsup = [type, plus](const std::string_view description) {
+        LOG_DEBUG << "[SkinLR2] Pressed unsupported button [" << type << "] '" << description << ": " << plus;
     };
-
-    auto noarg = [](auto cb) { return [cb = std::move(cb)](int /*ignored*/) { return cb(); }; };
 
     using namespace lr2skin::button;
     switch (type)
@@ -1449,67 +1444,67 @@ std::function<void(int)> getButtonCallback(int type)
     case 6:
     case 7:
     case 8:
-    case 9: return std::bind_front(panel_switch, type);
-    case 10: return std::bind_front(select_difficulty_filter, 0);
-    case 11: return std::bind_front(select_keys_filter, 0);
-    case 12: return std::bind_front(select_sort_type);
-    case 13: return [](auto) { enter_key_config(); };
-    case 14: return [](auto) { enter_skin_config(); };
-    case 15: return createUnsupportedCb("プレイ開始");
-    case 16: return [](auto) { autoplay(); };
-    case 17: return [](auto) { requestOpenChartReadme(); };
-    case 18: return createUnsupportedCb("タグのリセット");
-    case 19: return [](auto) { replay(); };
+    case 9: panel_switch(type, plus); break;
+    case 10: select_difficulty_filter(0, plus); break;
+    case 11: select_keys_filter(0, plus); break;
+    case 12: select_sort_type(plus); break;
+    case 13: enter_key_config(); break;
+    case 14: enter_skin_config(); break;
+    case 15: unsup("プレイ開始"); break;
+    case 16: autoplay(); break;
+    case 17: requestOpenChartReadme(); break;
+    case 18: unsup("タグのリセット"); break;
+    case 19: replay(); break;
     case 20:
     case 21:
-    case 22: return std::bind_front(fx_type, type - 20);
+    case 22: fx_type(type - 20, plus); break;
     case 23:
     case 24:
-    case 25: return std::bind_front(fx_switch, type - 23);
+    case 25: fx_switch(type - 23, plus); break;
     case 26:
     case 27:
-    case 28: return std::bind_front(fx_target, type - 26);
-    case 29: return std::bind_front(eq_switch);
-    case 31: return std::bind_front(vol_switch);
-    case 32: return std::bind_front(pitch_switch);
-    case 33: return std::bind_front(pitch_type);
-    case 40: return std::bind_front(gauge_type, 0);
-    case 41: return std::bind_front(gauge_type, 1);
-    case 42: return std::bind_front(random_type, 0);
-    case 43: return std::bind_front(random_type, 1);
-    case 44: return std::bind_front(autoscr, 0);
-    case 45: return std::bind_front(autoscr, 1);
-    case 46: return std::bind_front(shutter);
-    case 47: return std::bind_front(lock_speed_value, 0); // LV extension
-    case 48: return std::bind_front(lock_speed_value, 1); // LR2 unused and reserved but LV extension ;)
-    case 49: return [](auto) {};                          // LR2 unused and reserved
-    case 50: return std::bind_front(lane_effect, 0);
-    case 51: return std::bind_front(lane_effect, 1);
+    case 28: fx_target(type - 26, plus); break;
+    case 29: eq_switch(plus); break;
+    case 31: vol_switch(plus); break;
+    case 32: pitch_switch(plus); break;
+    case 33: pitch_type(plus); break;
+    case 40: gauge_type(0, plus); break;
+    case 41: gauge_type(1, plus); break;
+    case 42: random_type(0, plus); break;
+    case 43: random_type(1, plus); break;
+    case 44: autoscr(0, plus); break;
+    case 45: autoscr(1, plus); break;
+    case 46: shutter(plus); break;
+    case 47: lock_speed_value(0, plus); break; // LV extension
+    case 48: lock_speed_value(1, plus); break; // LR2 unused and reserved but LV extension ;)
+    case 49: break;                            // LR2 unused and reserved
+    case 50: lane_effect(0, plus); break;
+    case 51: lane_effect(1, plus); break;
     case 52:
-    case 53: return [](auto) {}; // LR2 unused and reserved
-    case 54: return std::bind_front(flip);
-    case 55: return std::bind_front(hs_fix);
-    case 56: return std::bind_front(battle);
-    case 57: return std::bind_front(hs, 0);
-    case 58: return std::bind_front(hs, 1);
-    case 70: return std::bind_front(score_graph);
-    case 71: return std::bind_front(ghost_type);
-    case 72: return std::bind_front(bga);
-    case 73: return std::bind_front(bga_size);
-    case 74: return std::bind_front(number_change_clamp, IndexNumber::TIMING_ADJUST_VISUAL, -99, 99);
-    case 75: return std::bind_front(judge_auto_adjust);
-    case 76: return std::bind_front(default_target_rate);
-    case 77: return std::bind_front(target_type);
-    case 80: return std::bind_front(window_mode);
-    case 82: return std::bind_front(vsync);
-    case 83: return std::bind_front(save_replay_type);
-    case 90: return std::bind_front(favorite_ignore);
+    case 53: break; // LR2 unused and reserved
+    case 54: flip(plus); break;
+    case 55: hs_fix(plus); break;
+    case 56: battle(plus); break;
+    case 57: hs(0, plus); break;
+    case 58: hs(1, plus); break;
+    case 70: score_graph(plus); break;
+    case 71: ghost_type(plus); break;
+    case 72: bga(plus); break;
+    case 73: bga_size(plus); break;
+    case 74: number_change_clamp(IndexNumber::TIMING_ADJUST_VISUAL, -99, 99, plus); break;
+    case 75: judge_auto_adjust(plus); break;
+    case 76: default_target_rate(plus); break;
+    case 77: target_type(plus); break;
+    case 80: window_mode(plus); break;
+    case 82: vsync(plus); break;
+    case 83: save_replay_type(plus); break;
+    case 90: favorite_ignore(plus); break;
     case 91:
     case 92:
     case 93:
     case 94:
     case 95:
-    case 96: return std::bind_front(difficulty, type - 91);
+    case 96: difficulty(type - 91, plus); break;
     case 101:
     case 102:
     case 103:
@@ -1518,14 +1513,12 @@ std::function<void(int)> getButtonCallback(int type)
     case 106:
     case 107:
     case 108:
-    case 109:
-        return noarg(
-            std::bind_front(key_config_pad, Input::Pad(static_cast<unsigned>(Input::Pad::K11) + type - 101), false));
-    case 110: return noarg(std::bind_front(key_config_pad, Input::Pad::S1L, false));
-    case 111: return noarg(std::bind_front(key_config_pad, Input::Pad::S1R, false));
-    case 112: return noarg(std::bind_front(key_config_pad, Input::Pad::K1START, false));
-    case 113: return noarg(std::bind_front(key_config_pad, Input::Pad::K1SELECT, false));
-    case 116: return noarg(std::bind_front(key_config_pad, Input::Pad::S1A, false));
+    case 109: key_config_pad(Input::Pad(static_cast<unsigned>(Input::Pad::K11) + type - 101), false); break;
+    case 110: key_config_pad(Input::Pad::S1L, false); break;
+    case 111: key_config_pad(Input::Pad::S1R, false); break;
+    case 112: key_config_pad(Input::Pad::K1START, false); break;
+    case 113: key_config_pad(Input::Pad::K1SELECT, false); break;
+    case 116: key_config_pad(Input::Pad::S1A, false); break;
     case 121:
     case 122:
     case 123:
@@ -1534,18 +1527,16 @@ std::function<void(int)> getButtonCallback(int type)
     case 126:
     case 127:
     case 128:
-    case 129:
-        return noarg(
-            std::bind_front(key_config_pad, Input::Pad(static_cast<unsigned>(Input::Pad::K21) + type - 121), false));
-    case 130: return noarg(std::bind_front(key_config_pad, Input::Pad::S2L, false));
-    case 131: return noarg(std::bind_front(key_config_pad, Input::Pad::S2R, false));
-    case 132: return noarg(std::bind_front(key_config_pad, Input::Pad::K2START, false));
-    case 133: return noarg(std::bind_front(key_config_pad, Input::Pad::K2SELECT, false));
-    case 136: return noarg(std::bind_front(key_config_pad, Input::Pad::S2A, false));
-    case 140: return createUnsupportedCb("鍵盤変更ボタン(7鍵用)");
-    case 141: return createUnsupportedCb("鍵盤変更ボタン(9鍵用)");
-    case 142: return createUnsupportedCb("鍵盤変更ボタン(5鍵用)");
-    case 143: return [](auto) { key_config_mode_rotate(); };
+    case 129: key_config_pad(Input::Pad(static_cast<unsigned>(Input::Pad::K21) + type - 121), false); break;
+    case 130: key_config_pad(Input::Pad::S2L, false); break;
+    case 131: key_config_pad(Input::Pad::S2R, false); break;
+    case 132: key_config_pad(Input::Pad::K2START, false); break;
+    case 133: key_config_pad(Input::Pad::K2SELECT, false); break;
+    case 136: key_config_pad(Input::Pad::S2A, false); break;
+    case 140: unsup("鍵盤変更ボタン(7鍵用)"); break;
+    case 141: unsup("鍵盤変更ボタン(9鍵用)"); break;
+    case 142: unsup("鍵盤変更ボタン(5鍵用)"); break;
+    case 143: key_config_mode_rotate(); break;
     case 150:
     case 151:
     case 152:
@@ -1555,7 +1546,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 156:
     case 157:
     case 158:
-    case 159: return noarg(std::bind_front(key_config_slot, type - 150));
+    case 159: key_config_slot(type - 150); break;
     case 170:
     case 171:
     case 172:
@@ -1571,8 +1562,8 @@ std::function<void(int)> getButtonCallback(int type)
     case 182:
     case 183:
     case 184:
-    case 185: return noarg(std::bind_front(skinselect_mode, type - 170));
-    case 190: return std::bind_front(skinselect_skin);
+    case 185: skinselect_mode(type - 170); break;
+    case 190: skinselect_skin(plus); break;
     case 200:
     case 201:
     case 202:
@@ -1582,8 +1573,8 @@ std::function<void(int)> getButtonCallback(int type)
     case 206:
     case 207:
     case 208:
-    case 209: return noarg(std::bind_front(requestOpenHelpFile, type - 200));
-    case 210: return [](auto) { lr2skin::button::open_ir_page(); };
+    case 209: requestOpenHelpFile(type - 200); break;
+    case 210: open_ir_page(); break;
     case 220:
     case 221:
     case 222:
@@ -1593,11 +1584,11 @@ std::function<void(int)> getButtonCallback(int type)
     case 226:
     case 227:
     case 228:
-    case 229: return std::bind_front(skinselect_option, type - 220);
-    case 230: return createUnsupportedCb("コースセレクト　決定");
-    case 231: return createUnsupportedCb("コースセレクト　キャンセル");
-    case 232: return createUnsupportedCb("コースビュー　コース編集開始");
-    case 233: return createUnsupportedCb("コースビュー　コース削除");
+    case 229: skinselect_option(type - 220, plus); break;
+    case 230: unsup("コースセレクト　決定"); break;
+    case 231: unsup("コースセレクト　キャンセル"); break;
+    case 232: unsup("コースビュー　コース編集開始"); break;
+    case 233: unsup("コースビュー　コース削除"); break;
     case 240:
     case 241:
     case 242:
@@ -1607,22 +1598,22 @@ std::function<void(int)> getButtonCallback(int type)
     case 246:
     case 247:
     case 248:
-    case 249: return createUnsupportedCb("コースオプション　つなぎタイプstage1-2変更");
-    case 250: return createUnsupportedCb("コースオプション　ソフランの有無変更");
-    case 251: return createUnsupportedCb("コースオプション　コースゲージの変更");
-    case 252: return createUnsupportedCb("コースオプション　オプション有効・無効の変更");
-    case 253: return createUnsupportedCb("コースオプション IR有効・無効の変更");
-    case 260: return createUnsupportedCb("ランダムコースオプション　最適レベル変更");
-    case 261: return createUnsupportedCb("ランダムコースオプション　レベル上限の変更");
-    case 262: return createUnsupportedCb("ランダムコースオプション　レベル下限の変更");
-    case 263: return createUnsupportedCb("ランダムコースオプション　bpm変動幅の変更");
-    case 264: return createUnsupportedCb("ランダムコースオプション　bpm上限の変更");
-    case 265: return createUnsupportedCb("ランダムコースオプション　bpm下限の変更");
-    case 266: return createUnsupportedCb("ランダムコースオプション　ステージ数の変更");
-    case 267: return createUnsupportedCb("(empty)");
-    case 268: return createUnsupportedCb("全体コースオプション　デフォルトつなぎタイプの変更");
-    case 269: return createUnsupportedCb("全体コースオプション　デフォルトゲージの変更");
-    default: return createUnsupportedCb("(undocumented)");
+    case 249: unsup("コースオプション　つなぎタイプstage1-2変更"); break;
+    case 250: unsup("コースオプション　ソフランの有無変更"); break;
+    case 251: unsup("コースオプション　コースゲージの変更"); break;
+    case 252: unsup("コースオプション　オプション有効・無効の変更"); break;
+    case 253: unsup("コースオプション IR有効・無効の変更"); break;
+    case 260: unsup("ランダムコースオプション　最適レベル変更"); break;
+    case 261: unsup("ランダムコースオプション　レベル上限の変更"); break;
+    case 262: unsup("ランダムコースオプション　レベル下限の変更"); break;
+    case 263: unsup("ランダムコースオプション　bpm変動幅の変更"); break;
+    case 264: unsup("ランダムコースオプション　bpm上限の変更"); break;
+    case 265: unsup("ランダムコースオプション　bpm下限の変更"); break;
+    case 266: unsup("ランダムコースオプション　ステージ数の変更"); break;
+    case 267: unsup("(empty)"); break;
+    case 268: unsup("全体コースオプション　デフォルトつなぎタイプの変更"); break;
+    case 269: unsup("全体コースオプション　デフォルトゲージの変更"); break;
+    default: unsup("(undocumented)"); break;
     }
 }
 
