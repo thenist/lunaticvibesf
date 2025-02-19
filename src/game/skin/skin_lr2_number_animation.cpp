@@ -1,6 +1,7 @@
 #include "skin_lr2_number_animation.h"
 
 #include <common/beat.h>
+#include <game/skin/skin_lr2_animation.h>
 
 // Formula matches LR2.
 // Keyword: gradient.
@@ -12,7 +13,7 @@ double lunaticvibes::NumberAnimation::animate(const lunaticvibes::Time& now) con
     if (!((end < now) || (start > now) || (end <= start)))
     {
         const auto tmp = static_cast<double>((now - start).norm()) / (end - start).norm();
-        return (1.0 - tmp) * from + tmp * to;
+        return grad(to, from, tmp);
     }
 
     if (start < now)

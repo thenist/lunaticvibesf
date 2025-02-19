@@ -3,6 +3,7 @@
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/sysutil.h>
+#include <game/skin/skin_lr2_animation.h>
 #include <game/skin/skin_lr2_bargraph.h>
 #include <game/skin/skin_lr2_number.h>
 
@@ -10,11 +11,7 @@
 #include <cstdint>
 
 using uint8_t = std::uint8_t;
-
-[[nodiscard]] static constexpr double grad(int dst, int src, double t)
-{
-    return (src == dst) ? src : (dst * t + src * (1.0 - t));
-}
+using lunaticvibes::grad;
 
 bool lunaticvibes::isPanelOpen(int panelIdx)
 {
