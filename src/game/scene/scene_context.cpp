@@ -1564,10 +1564,13 @@ void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battl
 
     // only reload resources if selected chart is different
     gChartContext.hash = chart.fileHash;
-    if (gChartContext.hash != gChartContext.sampleLoadedHash)
-        gChartContext.sampleLoadedHash.reset();
-    if (gChartContext.hash != gChartContext.bgaLoadedHash)
-        gChartContext.bgaLoadedHash.reset();
+    {
+        std::unique_lock l{gChartContext.concurrent.mutex};
+        if (gChartContext.hash != gChartContext.concurrent.sampleLoadedHash)
+            gChartContext.concurrent.sampleLoadedHash.reset();
+        if (gChartContext.hash != gChartContext.concurrent.bgaLoadedHash)
+            gChartContext.concurrent.bgaLoadedHash.reset();
+    }
 
     // set metadata
     gChartContext.title = chart.title;
@@ -1640,13 +1643,19 @@ double lunaticvibes::getSysLoadProgress()
 }
 double lunaticvibes::getWavLoadProgress()
 {
+    const bool loaded = [] {
+        std::unique_lock l{gChartContext.concurrent.mutex};
+        return !gChartContext.concurrent.sampleLoadedHash.empty();
+    }();
     std::shared_lock l{gPlayContext._mutex};
-    return (gPlayContext.wavTotal == 0) ? (gChartContext.sampleLoadedHash.empty() ? 0.0 : 1.0)
-                                        : (double)gPlayContext.wavLoaded / gPlayContext.wavTotal;
+    return (gPlayContext.wavTotal == 0) ? (loaded ? 1.0 : 0.0) : (double)gPlayContext.wavLoaded / gPlayContext.wavTotal;
 }
 double lunaticvibes::getBgaLoadProgress()
 {
+    const bool loaded = [] {
+        std::unique_lock l{gChartContext.concurrent.mutex};
+        return !gChartContext.concurrent.bgaLoadedHash.empty();
+    }();
     std::shared_lock l{gPlayContext._mutex};
-    return (gPlayContext.bmpTotal == 0) ? (gChartContext.bgaLoadedHash.empty() ? 0.0 : 1.0)
-                                        : (double)gPlayContext.bmpLoaded / gPlayContext.bmpTotal;
+    return (gPlayContext.bmpTotal == 0) ? (loaded ? 1.0 : 0.0) : (double)gPlayContext.bmpLoaded / gPlayContext.bmpTotal;
 }

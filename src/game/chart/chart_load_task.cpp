@@ -21,9 +21,11 @@ namespace v = std::views;
 void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()>& should_discard)
 {
     LVF_ASSERT(!IsMainThread());
-    // FIXME: synchronize gChartContext access between threads
 
-    gChartContext.sampleLoadedHash.reset();
+    {
+        std::unique_lock l{gChartContext.concurrent.mutex};
+        gChartContext.concurrent.sampleLoadedHash.reset();
+    }
     SoundMgr::freeNoteSamples();
     auto chartDir = chart.getDirectory();
 
@@ -32,10 +34,15 @@ void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()
     if (total == 0)
     {
         LOG_VERBOSE << "[ChartLoadTask] No audio files in " << chartDir;
-        gChartContext.sampleLoadedHash = gChartContext.hash;
-        std::unique_lock l{gPlayContext._mutex};
-        gPlayContext.wavTotal = 0;
-        gPlayContext.wavLoaded = 1;
+        {
+            std::unique_lock l{gChartContext.concurrent.mutex};
+            gChartContext.concurrent.sampleLoadedHash = gChartContext.hash;
+        }
+        {
+            std::unique_lock l{gPlayContext._mutex};
+            gPlayContext.wavTotal = 0;
+            gPlayContext.wavLoaded = 1;
+        }
         return;
     }
 
@@ -80,17 +87,22 @@ void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()
         return;
     }
 
-    gChartContext.sampleLoadedHash = chart.fileHash;
+    {
+        std::unique_lock l{gChartContext.concurrent.mutex};
+        gChartContext.concurrent.sampleLoadedHash = chart.fileHash;
+    }
 }
 
 void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()>& should_discard)
 {
     LVF_ASSERT(!IsMainThread());
-    // FIXME: synchronize gChartContext access between threads
 
     pushAndWaitMainThreadTask<void>([]() { gPlayContext.bgaTexture->clear(); });
 
-    gChartContext.bgaLoadedHash.reset();
+    {
+        std::unique_lock l{gChartContext.concurrent.mutex};
+        gChartContext.concurrent.bgaLoadedHash.reset();
+    }
 
     auto chartDir = chart.getDirectory();
     const auto file_cond = std::not_fn(&std::string::empty);
@@ -98,7 +110,10 @@ void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()
     if (total == 0)
     {
         LOG_VERBOSE << "[ChartLoadTask] No BGA files in " << chartDir;
-        gChartContext.bgaLoadedHash = gChartContext.hash;
+        {
+            std::unique_lock l{gChartContext.concurrent.mutex};
+            gChartContext.concurrent.bgaLoadedHash = gChartContext.hash;
+        }
         std::unique_lock l{gPlayContext._mutex};
         gPlayContext.bmpTotal = 0;
         gPlayContext.bmpLoaded = 1;
@@ -141,5 +156,8 @@ void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()
         gPlayContext.bgaTexture->setLoaded();
     gPlayContext.bgaTexture->setSlotFromBMS(
         *std::reinterpret_pointer_cast<ChartObjectBMS>(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]));
-    gChartContext.bgaLoadedHash = gChartContext.hash;
+    {
+        std::unique_lock l{gChartContext.concurrent.mutex};
+        gChartContext.concurrent.bgaLoadedHash = gChartContext.hash;
+    }
 }

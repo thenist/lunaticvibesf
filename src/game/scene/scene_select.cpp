@@ -2208,10 +2208,10 @@ void SceneSelect::decide()
 
         // only reload resources if selected chart is different
         gChartContext.hash = chart.fileHash;
-        if (gChartContext.hash != gChartContext.sampleLoadedHash)
-            gChartContext.sampleLoadedHash.reset();
-        if (gChartContext.hash != gChartContext.bgaLoadedHash)
-            gChartContext.bgaLoadedHash.reset();
+        if (gChartContext.hash != gChartContext.concurrent.sampleLoadedHash)
+            gChartContext.concurrent.sampleLoadedHash.reset();
+        if (gChartContext.hash != gChartContext.concurrent.bgaLoadedHash)
+            gChartContext.concurrent.bgaLoadedHash.reset();
 
         // gChartContext.chart = std::make_shared<ChartFormatBase>(chart);
         gChartContext.title = chart.title;
@@ -3304,6 +3304,10 @@ void SceneSelect::updatePreview()
     case PREVIEW_LOADING_SAMPLES: break;
 
     case PREVIEW_READY: {
+        const bool sample_loaded = []() {
+            std::unique_lock l{gChartContext.concurrent.mutex};
+            return !gChartContext.concurrent.sampleLoadedHash.empty();
+        }();
         if (previewStandalone)
         {
             LOG_DEBUG << "[Select] Standalone preview ready -> PREVIEW_PLAY";
@@ -3316,7 +3320,7 @@ void SceneSelect::updatePreview()
             previewStandaloneLength = len;
             previewState = PREVIEW_PLAY;
         }
-        else if (!gChartContext.sampleLoadedHash.empty())
+        else if (sample_loaded)
         {
             LOG_DEBUG << "[Select] Direct preview ready -> PREVIEW_PLAY";
 

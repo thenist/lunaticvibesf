@@ -7,6 +7,7 @@
 #include <game/graphics/texture_extra.h>
 
 #include <memory>
+#include <mutex>
 
 struct ChartContextParams
 {
@@ -15,8 +16,13 @@ struct ChartContextParams
     std::shared_ptr<ChartFormatBase> chart;
     std::shared_ptr<ChartFormatBase> chartMybest; // mybest obj is loaded with a different random seed
 
-    HashMD5 sampleLoadedHash;
-    HashMD5 bgaLoadedHash;
+    // Fields may be modified by non-main thread.
+    struct Concurrent_
+    {
+        std::mutex mutex;
+        HashMD5 sampleLoadedHash;
+        HashMD5 bgaLoadedHash;
+    } concurrent;
     bool started = false;
 
     // DP flags

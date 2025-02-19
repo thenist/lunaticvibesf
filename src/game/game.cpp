@@ -246,8 +246,8 @@ int main(int argc, char* argv[])
         gChartContext.chart = bms;
         gChartContext.chartMybest = nullptr;
 
-        gChartContext.sampleLoadedHash = HashMD5{};
-        gChartContext.bgaLoadedHash = HashMD5{};
+        gChartContext.concurrent.sampleLoadedHash = HashMD5{};
+        gChartContext.concurrent.bgaLoadedHash = HashMD5{};
         gChartContext.started = false;
 
         gChartContext.isDoubleBattle = false;

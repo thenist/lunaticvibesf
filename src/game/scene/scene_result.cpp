@@ -406,8 +406,8 @@ void SceneResult::updateRecord(const lunaticvibes::Time& t)
     // only reload resources if selected chart is different
     if (gChartContext.hash != nextChart.fileHash)
     {
-        gChartContext.sampleLoadedHash.reset();
-        gChartContext.bgaLoadedHash.reset();
+        gChartContext.concurrent.sampleLoadedHash.reset();
+        gChartContext.concurrent.bgaLoadedHash.reset();
     }
     gChartContext.hash = nextChart.fileHash;
 

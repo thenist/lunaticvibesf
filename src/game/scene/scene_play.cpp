@@ -37,6 +37,7 @@
 #include <shared_mutex>
 #include <sstream>
 #include <string>
+#include <utility>
 
 namespace r = std::ranges;
 
@@ -1169,8 +1170,8 @@ void ScenePlay::asyncLoadChart()
     // always reload unstable resources
     if (!gChartContext.chart->resourceStable)
     {
-        gChartContext.sampleLoadedHash.reset();
-        gChartContext.bgaLoadedHash.reset();
+        gChartContext.concurrent.sampleLoadedHash.reset();
+        gChartContext.concurrent.bgaLoadedHash.reset();
     }
 
     auto shouldDiscard = [this]() {
@@ -1178,7 +1179,7 @@ void ScenePlay::asyncLoadChart()
                this->state != ePlayState::LOADING;
     };
 
-    if ((gChartContext.sampleLoadedHash != gChartContext.hash) && !sceneEnding)
+    if ((gChartContext.concurrent.sampleLoadedHash != gChartContext.hash) && !sceneEnding)
     {
         _samplesFuture = std::async(std::launch::async, [shouldDiscard]() {
             SetThreadName("ChartSampleLoad");
@@ -1188,7 +1189,7 @@ void ScenePlay::asyncLoadChart()
 
     if (State::get(IndexSwitch::_LOAD_BGA) && !sceneEnding)
     {
-        if (gChartContext.bgaLoadedHash != gChartContext.hash)
+        if (gChartContext.concurrent.bgaLoadedHash != gChartContext.hash)
         {
             _bgaFuture = std::async(std::launch::async, [shouldDiscard]() {
                 SetThreadName("ChartBgaLoad");
@@ -1796,9 +1797,14 @@ void ScenePlay::updateLoading(const lunaticvibes::Time& t)
                int(lunaticvibes::getWavLoadProgress() * 100 + lunaticvibes::getBgaLoadProgress() * 100) / 2);
 
     const bool chart_loaded = [&]() {
+        const auto [sample, bga] = [] {
+            std::unique_lock l{gChartContext.concurrent.mutex};
+            return std::pair{!gChartContext.concurrent.sampleLoadedHash.empty(),
+                             !gChartContext.concurrent.bgaLoadedHash.empty()};
+        }();
         std::shared_lock l{gPlayContext._mutex};
-        return gPlayContext.chartObjLoaded && gPlayContext.rulesetLoaded && !gChartContext.sampleLoadedHash.empty() &&
-               (!State::get(IndexSwitch::_LOAD_BGA) || !gChartContext.bgaLoadedHash.empty());
+        return gPlayContext.chartObjLoaded && gPlayContext.rulesetLoaded && sample &&
+               (!State::get(IndexSwitch::_LOAD_BGA) || bga);
     }();
     if (chart_loaded && (t - delayedReadyTime) > 1000 && rt > pSkin->info.timeMinimumLoad)
     {
