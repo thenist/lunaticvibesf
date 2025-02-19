@@ -4,6 +4,7 @@
 #include <common/chartformat/chartformat_bms.h>
 #include <common/encoding.h>
 #include <common/hash.h>
+#include <common/str_utils.h>
 #include <common/types.h>
 #include <common/utils.h>
 
@@ -452,4 +453,30 @@ TEST(tBMS, RandomInHeader)
 
     EXPECT_TRUE(bms.haveRandom);
     EXPECT_EQ(bms.notes_total, 1);
+}
+
+TEST(tBMS, Base36and62Bgm)
+{
+    std::stringstream ss;
+    ss << "#00001:8m\n#00001:8M\n"
+       << "#BASE 62\n"
+       << "#00001:8m\n#00001:8M\n";
+    const ChartFormatBMS bms{ss, eFileEncoding::UTF8, 0};
+    ASSERT_EQ(bms.isLoaded(), true);
+
+    auto lane_values = [](const ChartFormatBMS& bms, int layer, int bar) {
+        return lunaticvibes::join(',', bms.getLane(LaneCode::BGM, layer, bar).notes,
+                                  &ChartFormatBMS::channel::NoteParseValue::value);
+    };
+
+    ASSERT_EQ(bms.lastBarIdx, 0);
+    constexpr auto bar = 0;
+    ASSERT_EQ(bms.bgmLayersCount[bar], 4);
+    EXPECT_EQ(lane_values(bms, 0, bar), "310");
+    EXPECT_EQ(lane_values(bms, 1, bar), "310");
+    EXPECT_EQ(lane_values(bms, 2, bar), "310");
+    EXPECT_EQ(lane_values(bms, 3, bar), "310");
+    // TODO
+    // EXPECT_EQ(lane_values(bms, 2, bar), "544");
+    // EXPECT_EQ(lane_values(bms, 3, bar), "518");
 }
