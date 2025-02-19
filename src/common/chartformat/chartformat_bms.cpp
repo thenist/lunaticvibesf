@@ -37,6 +37,71 @@ using lunaticvibes::parser_bms::JudgeDifficulty;
     return r::contains_subrange(lhs, rhs, {}, ascii_tolower);
 }
 
+[[nodiscard]] constexpr static bool is_digit(char c)
+{
+    return c >= '0' && c <= '9';
+}
+[[nodiscard]] constexpr static bool is_upper(char c)
+{
+    return c >= 'A' && c <= 'Z';
+}
+[[nodiscard]] constexpr static bool is_lower(char c)
+{
+    return c >= 'a' && c <= 'z';
+}
+// std::isalnum can be affected by locale. We only need 0-9A-Za-z.
+[[nodiscard]] constexpr static bool is_alnum(char c)
+{
+    return is_digit(c) || is_upper(c) || is_lower(c);
+}
+
+// requires std::is_invocable_r_v<bool, Validator, char> && std::is_invocable_r_v<unsigned, Converter, char, char>
+template <typename Validator, typename Converter>
+static int seqToLaneImpl(ChartFormatBMS::channel& ch, StringContentView str, unsigned flags, Validator&& validate,
+                         Converter&& convert)
+{
+    const size_t length = str.length();
+    if (length / 2 == 0)
+    {
+        LOG_VERBOSE << "[BMS] Invalid string length " << str;
+        return 1;
+    }
+    for (auto c : str)
+    {
+        if (!validate(c))
+        {
+            LOG_VERBOSE << "[BMS] Invalid symbol in string " << str;
+            break;
+        }
+    }
+
+    const auto resolution = static_cast<unsigned>(length / 2);
+    const unsigned scale = ch.relax(resolution) / resolution;
+    for (unsigned i = 0; i < resolution; i++)
+    {
+        const unsigned segment = i * scale;
+        const unsigned value = convert(str[i + i], str[i + i + 1]);
+        if (value == 0)
+            continue;
+        ch.notes.push_back({segment, value, flags});
+    }
+    ch.sortNotes();
+
+    return 0;
+}
+
+static int seqToLane36(ChartFormatBMS::channel& ch, StringContentView str, unsigned flags = 0)
+{
+    return seqToLaneImpl(ch, str, flags, is_alnum, [](char c1, char c2) { return base36(c1, c2); });
+}
+
+static int seqToLane16(ChartFormatBMS::channel& ch, StringContentView str)
+{
+    return seqToLaneImpl(
+        ch, str, 0 /*flags*/, [](char c) { return is_digit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'); },
+        [](char c1, char c2) { return base16(c1, c2); });
+}
+
 // https://hitkey.nekokan.dyndns.info/cmds.htm#RANK
 std::optional<JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(const int value)
 {
@@ -282,17 +347,12 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 }
             }
 
-            static constexpr auto is09az = [](const char c) {
-                // std::isalnum can be affected by locale. We only need 0-9A-Za-z.
-                return std::isupper(c) || std::islower(c) || std::isdigit(c);
-            };
-
             static constexpr auto is_note_cmd = [](std::string_view cmd) {
                 // (#[\d]{3}[0-9A-Za-z]{2}:.*)
                 if (cmd.size() <= std::string_view{"#000AA:"}.size())
                     return false;
-                return cmd[0] == '#' && std::isdigit(cmd[1]) && std::isdigit(cmd[2]) && std::isdigit(cmd[3]) &&
-                       is09az(cmd[4]) && is09az(cmd[5]);
+                return cmd[0] == '#' && is_digit(cmd[1]) && is_digit(cmd[2]) && is_digit(cmd[3]) && is_alnum(cmd[4]) &&
+                       is_alnum(cmd[5]);
             };
 
             if (!is_note_cmd(buf))
@@ -309,7 +369,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                         return false;
                     if (!lunaticvibes::iequals(key.substr(0, xx.length()), xx))
                         return false;
-                    return is09az(key[key.length() - 1]) && is09az(key[key.length() - 2]);
+                    return is_alnum(key[key.length() - 1]) && is_alnum(key[key.length() - 2]);
                 };
 
                 if (key.empty())
@@ -920,70 +980,6 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
              << " MD5: " << fileHash.hexdigest();
 
     loaded = true;
-
-    return 0;
-}
-
-int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned flags)
-{
-    const size_t length = str.length();
-    if (length / 2 == 0)
-    {
-        LOG_VERBOSE << "[BMS] Invalid string length " << str;
-        return 1;
-    }
-    for (auto c : str)
-    {
-        if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')))
-        {
-            LOG_VERBOSE << "[BMS] Invalid symbol in string " << str;
-            break;
-        }
-    }
-
-    const auto resolution = static_cast<unsigned>(length / 2);
-    const unsigned scale = ch.relax(resolution) / resolution;
-    for (unsigned i = 0; i < resolution; i++)
-    {
-        const unsigned segment = i * scale;
-        const unsigned value = base36(str[i + i], str[i + i + 1]);
-        if (value == 0)
-            continue;
-        ch.notes.push_back({segment, value, flags});
-    }
-    ch.sortNotes();
-
-    return 0;
-}
-
-int ChartFormatBMS::seqToLane16(channel& ch, StringContentView str)
-{
-    const size_t length = str.length();
-    if (length / 2 == 0)
-    {
-        LOG_VERBOSE << "[BMS] Invalid string length " << str;
-        return 1;
-    }
-    for (auto c : str)
-    {
-        if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')))
-        {
-            LOG_VERBOSE << "[BMS] Invalid symbol in string " << str;
-            break;
-        }
-    }
-
-    const auto resolution = static_cast<unsigned>(length / 2);
-    const unsigned scale = ch.relax(resolution) / resolution;
-    for (unsigned i = 0; i < resolution; i++)
-    {
-        const unsigned segment = i * scale;
-        const unsigned value = base16(str[i + i], str[i + i + 1]);
-        if (value == 0)
-            continue;
-        ch.notes.push_back({segment, value});
-    }
-    ch.sortNotes();
 
     return 0;
 }

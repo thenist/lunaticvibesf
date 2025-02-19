@@ -158,10 +158,6 @@ public:
     using LaneMap = std::map<unsigned int, channel>; // bar -> channel
 
 protected:
-    // Lanes.
-    int seqToLane36(channel&, StringContentView str, unsigned flags = 0);
-    int seqToLane16(channel&, StringContentView str);
-
     std::map<unsigned, LaneMap> chBGM{}; // lane -> [bar -> channel]
     LaneMap chStop{};
     LaneMap chBPMChange{};
