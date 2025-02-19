@@ -12,16 +12,18 @@
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_debug.h>
 
-// FIXME: get rid of preDefinedTextures.
-std::map<std::string, std::shared_ptr<Texture>> SkinBase::preDefinedTextures;
+// TODO: move to skin shared data
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::textureNameMap;
 
 namespace v = std::views;
 
-SkinBase::SkinBase()
+SkinBase::SkinBase(std::shared_ptr<SharedData> data_)
 {
     _version = SkinVersion::UNDEF;
-    if (preDefinedTextures.empty())
+
+    _base_shared_data = std::move(data_);
+    LVF_ASSERT(_base_shared_data != nullptr);
+    if (auto& preDefinedTextures = _base_shared_data->preDefinedTextures; preDefinedTextures.empty())
     {
         preDefinedTextures["Black"] = std::make_shared<TextureFull>(0x000000ff);
         preDefinedTextures["White"] = std::make_shared<TextureFull>(0xffffffff);
@@ -31,10 +33,9 @@ SkinBase::SkinBase()
         preDefinedTextures["BANNER"] = std::shared_ptr<Texture>(&gChartContext.texBanner, [](Texture*) {});
         preDefinedTextures["THUMBNAIL"] = std::make_shared<Texture>(1920, 1080, Texture::PixelFormat::RGB24, true);
     }
-    for (auto& [key, texture] : preDefinedTextures)
-    {
+
+    for (auto& [key, texture] : _base_shared_data->preDefinedTextures)
         textureNameMap[key] = texture;
-    }
 }
 
 SkinBase::~SkinBase()

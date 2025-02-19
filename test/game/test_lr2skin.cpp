@@ -11,7 +11,8 @@ class mock_SkinLR2 : public SkinLR2
 {
 public:
     mock_SkinLR2(Path p, int loadMode = 0)
-        : SkinLR2(std::make_shared<lunaticvibes::SkinLr2SharedData>(), std::move(p), loadMode)
+        : SkinLR2(std::make_shared<SkinBase::SharedData>(), std::make_shared<lunaticvibes::SkinLr2SharedData>(),
+                  std::move(p), loadMode)
     {
     }
     ~mock_SkinLR2() override = default;

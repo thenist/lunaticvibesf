@@ -73,7 +73,8 @@ class SkinLR2 : public SkinBase
 {
 public:
     SkinLR2() = delete;
-    SkinLR2(std::shared_ptr<lunaticvibes::SkinLr2SharedData> data, Path p, int loadMode = 0);
+    SkinLR2(std::shared_ptr<SharedData> baseSharedData, std::shared_ptr<lunaticvibes::SkinLr2SharedData> sharedData,
+            Path p, int loadMode);
     ~SkinLR2() override;
 
 public:

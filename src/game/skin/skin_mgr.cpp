@@ -9,7 +9,11 @@
 
 #include <memory>
 
-SkinMgr::SkinMgr() : _sharedData(std::make_shared<lunaticvibes::SkinLr2SharedData>()) {}
+SkinMgr::SkinMgr()
+    : _sharedData(std::make_shared<lunaticvibes::SkinLr2SharedData>()),
+      _baseSharedData(std::make_shared<SkinBase::SharedData>())
+{
+}
 
 void SkinMgr::reload(SkinType e, bool simple)
 {
@@ -94,9 +98,9 @@ void SkinMgr::reload(SkinType e, bool simple)
     switch (version)
     {
     case SkinVersion::LR2beta3:
-        skinObj = std::make_shared<SkinLR2>(_sharedData, skinFilePath, simple ? 1 : 0);
+        skinObj = std::make_shared<SkinLR2>(_baseSharedData, _sharedData, skinFilePath, simple ? 1 : 0);
         if (!skinObj->isLoaded())
-            skinObj = std::make_shared<SkinLR2>(_sharedData, skinFilePathDefault, simple ? 1 : 0);
+            skinObj = std::make_shared<SkinLR2>(_baseSharedData, _sharedData, skinFilePathDefault, simple ? 1 : 0);
         break;
     case SkinVersion::UNDEF: break;
     }

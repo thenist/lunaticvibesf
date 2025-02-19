@@ -3606,15 +3606,16 @@ void SkinLR2::IF(const Tokens& t, std::istream& lr2skin, eFileEncoding enc, bool
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SkinLR2::SkinLR2(std::shared_ptr<lunaticvibes::SkinLr2SharedData> sharedData, Path p, int loadMode)
-    : loadMode(loadMode), _sharedData(std::move(sharedData))
+SkinLR2::SkinLR2(std::shared_ptr<SharedData> baseSharedData_,
+                 std::shared_ptr<lunaticvibes::SkinLr2SharedData> sharedData_, Path p, int loadMode)
+    : SkinBase(std::move(baseSharedData_)), loadMode(loadMode), _sharedData(std::move(sharedData_))
 {
-    LVF_DEBUG_ASSERT(_sharedData != nullptr);
+    LVF_ASSERT(_sharedData != nullptr);
     _version = SkinVersion::LR2beta3;
 
     // load images from last skin
     prevSkinTextureNameMap = textureNameMap;
-    textureNameMap = preDefinedTextures;
+    textureNameMap = _base_shared_data->preDefinedTextures;
     prevSkinLR2FontNameMap = LR2FontNameMap;
     LR2FontNameMap.clear();
 

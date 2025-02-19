@@ -146,10 +146,11 @@ SceneCustomize::SceneCustomize(std::shared_ptr<SkinMgr> skinMgr_, std::optional<
     auto skinFileList = recursiveFindFiles(
         convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), "LR2files/Theme/"), ".lr2skin");
     r::sort(skinFileList);
+    auto dummyBaseSharedData = std::make_shared<SkinBase::SharedData>();
     auto dummySharedData = std::make_shared<lunaticvibes::SkinLr2SharedData>();
     for (auto& p : skinFileList)
     {
-        SkinLR2 s(dummySharedData, p, 2);
+        SkinLR2 s(dummyBaseSharedData, dummySharedData, p, 2);
         LOG_DEBUG << "[Customize] Adding skin: mode='" << s.info.mode << "' p='" << p << "'";
         skinList[s.info.mode].push_back(fs::absolute(p));
 

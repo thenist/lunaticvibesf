@@ -26,12 +26,16 @@ using Tokens = std::vector<StringContent>;
 
 class SkinBase
 {
-protected:
-    static std::map<std::string, std::shared_ptr<Texture>> preDefinedTextures;
+public:
+    struct SharedData
+    {
+        std::map<std::string, std::shared_ptr<Texture>> preDefinedTextures;
+    };
 
 protected:
     SkinVersion _version;
-    SkinBase();
+    std::shared_ptr<SharedData> _base_shared_data;
+    explicit SkinBase(std::shared_ptr<SharedData>);
 
 public:
     virtual ~SkinBase();

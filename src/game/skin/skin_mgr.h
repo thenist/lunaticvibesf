@@ -23,5 +23,6 @@ public:
 
 protected:
     std::array<std::shared_ptr<SkinBase>, static_cast<size_t>(SkinType::MODE_COUNT)> _skins{};
-    std::shared_ptr<lunaticvibes::SkinLr2SharedData> _sharedData{};
+    std::shared_ptr<lunaticvibes::SkinLr2SharedData> _sharedData;
+    std::shared_ptr<SkinBase::SharedData> _baseSharedData;
 };
