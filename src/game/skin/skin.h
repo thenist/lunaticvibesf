@@ -30,6 +30,7 @@ public:
     struct SharedData
     {
         std::map<std::string, std::shared_ptr<Texture>> preDefinedTextures;
+        std::map<std::string, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
     };
 
 protected:
@@ -54,8 +55,7 @@ protected:
 
     // Textures
 protected:
-    static std::map<std::string, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
-    std::map<std::string, std::shared_ptr<sVideo>> videoNameMap;           // Use this to get video instance from name
+    std::map<std::string, std::shared_ptr<sVideo>> videoNameMap; // Use this to get video instance from name
 
     // Sprite elements
 protected:

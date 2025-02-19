@@ -12,9 +12,6 @@
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_debug.h>
 
-// TODO: move to skin shared data
-std::map<std::string, std::shared_ptr<Texture>> SkinBase::textureNameMap;
-
 namespace v = std::views;
 
 SkinBase::SkinBase(std::shared_ptr<SharedData> data_)
@@ -35,7 +32,7 @@ SkinBase::SkinBase(std::shared_ptr<SharedData> data_)
     }
 
     for (auto& [key, texture] : _base_shared_data->preDefinedTextures)
-        textureNameMap[key] = texture;
+        _base_shared_data->textureNameMap[key] = texture;
 }
 
 SkinBase::~SkinBase()
@@ -204,10 +201,10 @@ void SkinBase::stopTextEdit(bool modify)
 
 std::shared_ptr<Texture> SkinBase::getTextureCustomizeThumbnail()
 {
-    return textureNameMap["THUMBNAIL"];
+    return _base_shared_data->textureNameMap["THUMBNAIL"];
 }
 
 void SkinBase::setThumbnailTextureSize(int w, int h)
 {
-    *textureNameMap["THUMBNAIL"] = Texture{w, h, Texture::PixelFormat::RGB24, true};
+    *_base_shared_data->textureNameMap["THUMBNAIL"] = Texture{w, h, Texture::PixelFormat::RGB24, true};
 }

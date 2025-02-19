@@ -721,9 +721,9 @@ int SkinLR2::IMAGE()
     {
         std::string textureMapKey = std::to_string(imageCount);
         if (auto it = prevSkinTextureNameMap.find(textureMapKey); it != prevSkinTextureNameMap.end())
-            textureNameMap[textureMapKey] = it->second;
+            _base_shared_data->textureNameMap[textureMapKey] = it->second;
         else
-            textureNameMap[textureMapKey] = std::make_shared<Texture>(nullptr, 0, 0);
+            _base_shared_data->textureNameMap[textureMapKey] = std::make_shared<Texture>(nullptr, 0, 0);
         ++imageCount;
         return 1;
     }
@@ -735,14 +735,14 @@ int SkinLR2::IMAGE()
         if (lunaticvibes::is_video_file_path(pathFile))
         {
             videoNameMap[textureMapKey] = std::make_shared<sVideo>(pathFile, 1.0, true);
-            textureNameMap[textureMapKey] = textureNameMap["White"];
+            _base_shared_data->textureNameMap[textureMapKey] = _base_shared_data->textureNameMap["White"];
         }
         else
         {
             Image img{pathFile};
             if (!img.hasAlphaLayer() && info.hasTransparentColor)
                 img.setTransparentColorRGB(info.transparentColor);
-            textureNameMap[textureMapKey] = std::make_shared<Texture>(img);
+            _base_shared_data->textureNameMap[textureMapKey] = std::make_shared<Texture>(img);
         }
 
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added IMAGE[" << imageCount << "]: " << pathFile;
@@ -1203,17 +1203,18 @@ bool SkinLR2::SRC()
             }
             if (auto it = videoNameMap.find(gr_key); it != videoNameMap.end())
             {
-                textureBuf = textureNameMap["White"];
+                textureBuf = _base_shared_data->textureNameMap["White"];
                 videoBuf = it->second;
             }
-            else if (auto it = textureNameMap.find(gr_key); it != textureNameMap.end())
+            else if (auto it = _base_shared_data->textureNameMap.find(gr_key);
+                     it != _base_shared_data->textureNameMap.end())
             {
                 textureBuf = it->second;
                 videoBuf = nullptr;
             }
             else
             {
-                // textureBuf = textureNameMap["Error"];
+                // textureBuf = _base_shared_data->textureNameMap["Error"];
                 textureBuf = std::make_shared<Texture>(nullptr, 0, 0);
                 videoBuf = nullptr;
             }
@@ -1996,10 +1997,10 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     // Find texture from map by gr
     std::shared_ptr<Texture> tex = nullptr;
     std::string gr_key = std::to_string(d.gr);
-    if (auto it = textureNameMap.find(gr_key); it != textureNameMap.end())
+    if (auto it = _base_shared_data->textureNameMap.find(gr_key); it != _base_shared_data->textureNameMap.end())
         tex = it->second;
     else
-        tex = textureNameMap["Error"];
+        tex = _base_shared_data->textureNameMap["Error"];
 
     // SRC
     if (d._null >= 20)
@@ -2062,7 +2063,7 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
 
     SpriteAnimated::SpriteAnimatedBuilder noteBuilder;
     noteBuilder.srcLine = csvLineNumber;
-    noteBuilder.texture = textureNameMap[gr_key];
+    noteBuilder.texture = _base_shared_data->textureNameMap[gr_key];
     noteBuilder.textureRect = Rect(d.x, d.y, d.w, d.h);
     noteBuilder.animationFrameCount = d.div_y * d.div_x;
     noteBuilder.animationDurationPerLoop = d.cycle;
@@ -3611,8 +3612,8 @@ SkinLR2::SkinLR2(std::shared_ptr<SharedData> baseSharedData_,
     _version = SkinVersion::LR2beta3;
 
     // load images from last skin
-    prevSkinTextureNameMap = textureNameMap;
-    textureNameMap = _base_shared_data->preDefinedTextures;
+    prevSkinTextureNameMap = _base_shared_data->textureNameMap;
+    _base_shared_data->textureNameMap = _base_shared_data->preDefinedTextures;
     _sharedData->prev_font_name_map = _sharedData->font_name_map;
     _sharedData->font_name_map.clear();
 
