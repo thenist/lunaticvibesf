@@ -1,0 +1,13 @@
+# TSAN_OPTIONS=suppressions=./.our-tsan-suppressions ./path/to/LunaticVibesF
+# ====================
+
+# Appears after select loads.
+# Seems like a bug in FMOD if not false positive.
+race:^FMOD_File_GetDiskBusy$
+
+# FIXME
+race:^sVideo::
+
+# FIXME
+race:^Texture::isLoaded()$
+race:^TextureBmsBga::setLoaded()$
