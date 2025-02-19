@@ -769,7 +769,7 @@ int SkinLR2::LR2FONT()
     {
         // create a blank texture if not exist
         std::string fontNameKey = std::to_string(_sharedData->font_name_map.size());
-        if (auto it = _sharedData->prev_font_name_map.find(fontNameKey); it != _sharedData->prev_font_name_map.end())
+        if (auto it = _prev_font_by_name.find(fontNameKey); it != _prev_font_by_name.end())
             _sharedData->font_name_map.insert_or_assign(fontNameKey, it->second);
         else
             _sharedData->font_name_map.erase(fontNameKey);
@@ -3614,7 +3614,7 @@ SkinLR2::SkinLR2(std::shared_ptr<SharedData> baseSharedData_,
     // load images from last skin
     prevSkinTextureNameMap = _base_shared_data->textureNameMap;
     _base_shared_data->textureNameMap = _base_shared_data->preDefinedTextures;
-    _sharedData->prev_font_name_map = _sharedData->font_name_map;
+    _prev_font_by_name = _sharedData->font_name_map;
     _sharedData->font_name_map.clear();
 
     parseParamBuf.resize(24);
@@ -3644,7 +3644,7 @@ SkinLR2::SkinLR2(std::shared_ptr<SharedData> baseSharedData_,
             _laneSprites.push_back(p);
 
     prevSkinTextureNameMap.clear();
-    _sharedData->prev_font_name_map.clear();
+    _prev_font_by_name.clear();
 }
 
 static YAML::Node load_or_empty(const Path& p)
