@@ -434,8 +434,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
         // Calculate note times and push to note list
         Segment lastBPMChangedSegment(0, 1);
-        [[maybe_unused]] double stopMetre = 0; // FIXME: unused-but-set-variable
-        Metre barMetre = objBms.metres[m];     // visual metre
+        Metre barMetre = objBms.metres[m]; // visual metre
         lunaticvibes::Time beatLength = lunaticvibes::Time::singleBeatLengthFromBPM(bpm);
 
         for (const auto& note : notes)
@@ -814,7 +813,6 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     lunaticvibes::Time noteStopTime{(long long)std::floor(beatLength.hres() * noteStopMetre * 4), true};
                     _specialNoteLists[(size_t)eNoteExt::STOP].emplace_back(m, notemetre, notetime, 0,
                                                                            noteStopTime.hres(), noteStopMetre);
-                    stopMetre += noteStopMetre;
                     basetime += noteStopTime;
                     break;
                 }
