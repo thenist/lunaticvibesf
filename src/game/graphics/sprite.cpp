@@ -1,6 +1,7 @@
 #include "sprite.h"
 
 #include <common/assert.h>
+#include <common/log.h>
 #include <common/sysutil.h>
 #include <game/skin/skin_lr2_bargraph.h>
 #include <game/skin/skin_lr2_number.h>
@@ -153,14 +154,8 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
             switch (keyFrameCurr->param.accel)
             {
             case MotionKeyFrameParams::CONSTANT: break;
-            case MotionKeyFrameParams::ACCEL:
-                // prog = -std::cos(prog * 1.57079632679) + 1.0;
-                prog = prog * prog * prog;
-                break;
-            case MotionKeyFrameParams::DECEL:
-                // prog = std::sin(prog * 1.57079632679);
-                prog = 1.0 - ((1.0 - prog) * (1.0 - prog) * (1.0 - prog));
-                break;
+            case MotionKeyFrameParams::ACCEL: prog = prog * prog * prog; break;
+            case MotionKeyFrameParams::DECEL: prog = 1.0 - ((1.0 - prog) * (1.0 - prog) * (1.0 - prog)); break;
             case MotionKeyFrameParams::DISCONTINUOUS: prog = 0.0;
             }
 
@@ -169,22 +164,13 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
             _current.rect.y = (float)grad(keyFrameNext->param.rect.y, keyFrameCurr->param.rect.y, prog);
             _current.rect.w = (float)grad(keyFrameNext->param.rect.w, keyFrameCurr->param.rect.w, prog);
             _current.rect.h = (float)grad(keyFrameNext->param.rect.h, keyFrameCurr->param.rect.h, prog);
-            //_current.rcGrid  = keyFrameNext->param.rcGrid  * prog + keyFrameCurr->param.rcGrid  * (1.0 - prog);
             _current.color.r = (uint8_t)grad(keyFrameNext->param.color.r, keyFrameCurr->param.color.r, prog);
             _current.color.g = (uint8_t)grad(keyFrameNext->param.color.g, keyFrameCurr->param.color.g, prog);
             _current.color.b = (uint8_t)grad(keyFrameNext->param.color.b, keyFrameCurr->param.color.b, prog);
             _current.color.a = (uint8_t)grad(keyFrameNext->param.color.a, keyFrameCurr->param.color.a, prog);
-            //_current.color = keyFrameNext->param.color * prog + keyFrameNext->param.color * (1.0 - prog);
             _current.angle = grad(static_cast<int>(std::round(keyFrameNext->param.angle)),
                                   static_cast<int>(std::round(keyFrameCurr->param.angle)), prog);
             _current.center = keyFrameCurr->param.center;
-            // LOG_DEBUG << "[Skin] Time: " << time <<
-            //     " @ " << _current.rcGrid.x << "," << _current.rcGrid.y << " " << _current.rcGrid.w << "x" <<
-            //     _current.rcGrid.h;
-            // LOG_DEBUG<<"[Skin] keyFrameCurr: " << keyFrameCurr->param.rcGrid.x << "," << keyFrameCurr->param.rcGrid.y
-            // << " " << keyFrameCurr->param.rcGrid.w << "x" << keyFrameCurr->param.rcGrid.h; LOG_DEBUG<<"[Skin]
-            // keyFrameNext: " << keyFrameNext->param.rcGrid.x << "," << keyFrameNext->param.rcGrid.y << " " <<
-            // keyFrameNext->param.rcGrid.w << "x" << keyFrameNext->param.rcGrid.h;
             _current.blend = keyFrameCurr->param.blend;
             _current.filter = keyFrameCurr->param.filter;
         }
