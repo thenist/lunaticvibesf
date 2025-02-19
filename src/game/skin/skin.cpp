@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <execution>
 #include <format>
+#include <ranges>
 
 #include <common/assert.h>
 #include <common/beat.h>
@@ -14,6 +15,8 @@
 // FIXME: get rid of preDefinedTextures.
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::preDefinedTextures;
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::textureNameMap;
+
+namespace v = std::views;
 
 SkinBase::SkinBase()
 {
@@ -87,49 +90,43 @@ void SkinBase::update_mouse_click(int x, int y)
         return;
 
     // sprite inserted last has priority
-    bool invoked = false;
     pSpriteLastClicked = nullptr;
 
     if (lunaticvibes::g_enable_show_clicked_sprite)
     {
-        for (auto it = _sprites.rbegin(); it != _sprites.rend() && !invoked; ++it)
+        for (const auto& s : v::reverse(_sprites))
         {
-            if ((*it)->type() != SpriteTypes::MOUSE_CURSOR && (*it)->isDraw() && !(*it)->isHidden())
+            if (s->type() != SpriteTypes::MOUSE_CURSOR && s->isDraw() && !s->isHidden())
             {
-                const RectF& rc = (*it)->_current.rect;
+                const RectF& rc = s->_current.rect;
                 if (x >= rc.x && y >= rc.y && x < rc.x + rc.w && y < rc.y + rc.h)
                 {
-                    createNotification(std::format("Clicked sprite #{} ({},{})[{}x{}] (Line:{})",
-                                                   (int)std::distance(it, _sprites.rend()), (*it)->_current.rect.x,
-                                                   (*it)->_current.rect.y, (*it)->_current.rect.w,
-                                                   (*it)->_current.rect.h, (*it)->srcLine));
+                    createNotification(std::format("Clicked sprite ({},{})[{}x{}] (Line:{})", s->_current.rect.x,
+                                                   s->_current.rect.y, s->_current.rect.w, s->_current.rect.h,
+                                                   s->srcLine));
                     break;
                 }
             }
         }
     }
 
-    for (auto it = _sprites.rbegin(); it != _sprites.rend() && !invoked; ++it)
+    for (const auto& s : v::reverse(_mouseSprites))
     {
-        if ((*it)->isDraw() && !(*it)->isHidden())
+        if (s->isDraw() && !s->isHidden())
         {
-            auto pS = std::dynamic_pointer_cast<iSpriteMouse>(*it);
-            if (pS != nullptr)
+            auto pS = std::dynamic_pointer_cast<iSpriteMouse>(s);
+            LVF_DEBUG_ASSERT(pS != nullptr);
+            if (pS->OnClick(x, y))
             {
-                if (pS->OnClick(x, y))
+                if (auto s_as_text = std::dynamic_pointer_cast<SpriteText>(s))
                 {
-                    if (std::dynamic_pointer_cast<SpriteText>(*it))
-                    {
-                        if (pSpriteTextEditing)
-                        {
-                            pSpriteTextEditing->stopEditing(false);
-                        }
-                        pSpriteTextEditing = std::reinterpret_pointer_cast<SpriteText>(*it);
-                    }
-                    invoked = true;
-                    pSpriteDragging = pS;
-                    pSpriteLastClicked = pS;
+                    if (pSpriteTextEditing)
+                        pSpriteTextEditing->stopEditing(false);
+                    pSpriteTextEditing = s_as_text;
                 }
+                pSpriteDragging = pS;
+                pSpriteLastClicked = pS;
+                break;
             }
         }
     }
@@ -141,9 +138,7 @@ void SkinBase::update_mouse_drag(int x, int y)
         return;
 
     if (pSpriteDragging != nullptr)
-    {
         pSpriteDragging->OnDrag(x, y);
-    }
 }
 
 void SkinBase::update_mouse_release()
@@ -194,9 +189,7 @@ IndexText SkinBase::textEditType() const
 void SkinBase::startTextEdit(bool clear)
 {
     if (pSpriteTextEditing)
-    {
         pSpriteTextEditing->startEditing(clear);
-    }
 }
 
 void SkinBase::stopTextEdit(bool modify)
