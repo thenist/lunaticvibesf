@@ -160,8 +160,7 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
             _current.color.g = (uint8_t)animate(keyFrameNext->param.color.g, keyFrameCurr->param.color.g);
             _current.color.b = (uint8_t)animate(keyFrameNext->param.color.b, keyFrameCurr->param.color.b);
             _current.color.a = (uint8_t)animate(keyFrameNext->param.color.a, keyFrameCurr->param.color.a);
-            _current.angle = animate(static_cast<int>(std::round(keyFrameNext->param.angle)),
-                                     static_cast<int>(std::round(keyFrameCurr->param.angle)));
+            _current.angle = animate(keyFrameNext->param.angle, keyFrameCurr->param.angle);
             _current.center = keyFrameCurr->param.center;
             _current.blend = keyFrameCurr->param.blend;
             _current.filter = keyFrameCurr->param.filter;
