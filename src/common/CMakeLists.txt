@@ -8,26 +8,26 @@ add_library(
     STATIC
     assert.cpp
     asynclooper.cpp
-    encoding.cpp
-    fraction.cpp
-    hash.cpp
-    log.cpp
-    str_utils.cpp
-    thread_pool.cpp
-    types.cpp
-    utils.cpp
-    keymap.cpp
-    sysutil.cpp
-    sysutil_win.cpp
-    sysutil_linux.cpp
     chartformat/chartformat.cpp
     chartformat/chartformat_bms.cpp
+    coursefile/lr2crs.cpp
+    difficultytable/difficultytable.cpp
+    difficultytable/table_bms.cpp
+    encoding.cpp
     entry/entry_folder.cpp
     entry/entry_random_song.cpp
     entry/entry_song.cpp
-    difficultytable/difficultytable.cpp
-    difficultytable/table_bms.cpp
-    coursefile/lr2crs.cpp
+    fraction.cpp
+    hash.cpp
+    keymap.cpp
+    log.cpp
+    str_utils.cpp
+    sysutil.cpp
+    sysutil_linux.cpp
+    sysutil_win.cpp
+    thread_pool.cpp
+    types.cpp
+    utils.cpp
 )
 
 target_include_directories(common PRIVATE ${PROJECT_INCLUDE_DIR})
