@@ -63,8 +63,21 @@ bool lunaticvibes::in_test_mode()
 
 static void mainLoop();
 
+template <class F> struct Defer
+{
+    Defer(F f) : f(f) {}
+    ~Defer() { f(); }
+    F f;
+};
+template <class F> [[nodiscard]] static Defer<F> mk_defer(F f)
+{
+    return Defer<F>(f);
+};
+
 int main(int argc, char* argv[])
 {
+    auto _bb_main = mk_defer([] { StopHandleMainThreadTask(); });
+
     boost::nowide::args _(argc, argv); // Make arguments UTF-8 encoded on Windows in-place. For CJK file paths.
 
     SetThreadName("LunaticVibesF");
@@ -80,6 +93,7 @@ int main(int argc, char* argv[])
     ConfigMgr::init();
     ConfigMgr::load();
     ConfigMgr::selectProfile(ConfigMgr::General()->get(cfg::E_PROFILE, cfg::PROFILE_DEFAULT));
+    auto _save_config_on_exit = mk_defer([] { ConfigMgr::save(); });
     lunaticvibes::SetLogLevel(static_cast<lunaticvibes::LogLevel>(ConfigMgr::General()->get(cfg::E_LOG_LEVEL, 1)));
 
     if (Path lr2path = convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."), "LR2files/");
@@ -101,13 +115,16 @@ int main(int argc, char* argv[])
         return 1;
     }
     LOG_INFO << "libcurl version: " << curl_version();
+    auto _bb_curl = mk_defer([] { curl_global_cleanup(); });
 
     LOG_INFO << "Initializing ImGui...";
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGui::StyleColorsDark();
+    auto _bb_imgui = mk_defer([] { ImGui::DestroyContext(); });
+
     LOG_INFO << "ImGui version: " << ImGui::GetVersion();
 
+    ImGui::StyleColorsDark();
     {
         ImGuiStyle& s = ImGui::GetStyle();
 
@@ -142,14 +159,12 @@ int main(int argc, char* argv[])
 
     if (auto ginit = lunaticvibes::window::graphics_init())
         return ginit;
+    auto _bbgraphics = mk_defer([] { lunaticvibes::window::graphics_free(); });
 
     if (auto sinit = SoundMgr::initFMOD())
         return sinit;
     SoundMgr::startUpdate();
-    struct BbSoundMgr
-    {
-        ~BbSoundMgr() { SoundMgr::stopUpdate(); }
-    } _bbsoundmgr;
+    auto _bbsoundmgr = mk_defer([] { SoundMgr::stopUpdate(); });
 
     InputMgr::init();
     InputMgr::updateDevices();
@@ -260,56 +275,41 @@ int main(int argc, char* argv[])
 
 #ifdef _WIN32
     timeBeginPeriod(1);
+    auto _bb_high_precision_time = mk_defer([] { timeEndPeriod(1); });
 
-    HRESULT oleInitializeResult = OleInitialize(nullptr);
+    // TODO: what is Ole needed for? If clipboard works without this, drop this #win
+    const HRESULT oleInitializeResult = OleInitialize(nullptr);
     if (oleInitializeResult < 0)
     {
         LOG_ERROR << "OleInitialize Failed";
     }
+    auto _bb_ole = mk_defer([oleInitializeResult] {
+        if (oleInitializeResult >= 0)
+            OleUninitialize();
+    });
 #endif
 
-    ///////////////////////////////////////////////////////////
+    auto _bb_arena = mk_defer([] {
+        if (gArenaData.isOnline())
+        {
+            if (gArenaData.isClient())
+            {
+                if (gArenaData.isOnline())
+                    g_pArenaClient->leaveLobby();
+                g_pArenaClient->loopEnd();
+                g_pArenaClient.reset();
+            }
+            if (gArenaData.isServer())
+            {
+                if (gArenaData.isOnline())
+                    g_pArenaHost->disbandLobby();
+                g_pArenaHost->loopEnd();
+                g_pArenaHost.reset();
+            }
+        }
+    });
 
     mainLoop();
-
-    ///////////////////////////////////////////////////////////
-
-    if (gArenaData.isOnline())
-    {
-        if (gArenaData.isClient())
-        {
-            if (gArenaData.isOnline())
-                g_pArenaClient->leaveLobby();
-            g_pArenaClient->loopEnd();
-            g_pArenaClient.reset();
-        }
-        if (gArenaData.isServer())
-        {
-            if (gArenaData.isOnline())
-                g_pArenaHost->disbandLobby();
-            g_pArenaHost->loopEnd();
-            g_pArenaHost.reset();
-        }
-    }
-
-#ifdef _WIN32
-    if (oleInitializeResult >= 0)
-    {
-        OleUninitialize();
-    }
-
-    timeEndPeriod(1);
-#endif
-
-    lunaticvibes::window::graphics_free();
-
-    ImGui::DestroyContext();
-
-    ConfigMgr::save();
-
-    StopHandleMainThreadTask();
-
-    curl_global_cleanup();
 
     return 0;
 }
