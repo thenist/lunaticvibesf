@@ -3,6 +3,7 @@
 #include <functional>
 #include <ranges>
 #include <span>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -20,14 +21,14 @@ template <class Proj = std::identity>
     auto e = end(v);
     if (it == e)
         return {};
-    std::string s;
-    s += *it++;
+    std::stringstream s;
+    s << std::invoke(proj, *it++);
     for (; it != e; ++it)
     {
-        s += sep;
-        s += proj(*it);
+        s << sep;
+        s << std::invoke(proj, *it);
     }
-    return s;
+    return s.str();
 }
 
 inline void replace_all(std::string& str, std::string_view from, std::string_view to)
