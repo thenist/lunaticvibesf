@@ -643,27 +643,17 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                                         // channel notes as regular notes
                                         channel noteLane;
                                         seqToLane36(noteLane, value, channel::NoteParseValue::LN);
-                                        unsigned scale =
-                                            chNotesRegular[chIdx][bar].relax(noteLane.resolution) / noteLane.resolution;
+                                        channel& chTarget = chNotesRegular[chIdx][bar];
+                                        const unsigned scale =
+                                            chTarget.relax(noteLane.resolution) / noteLane.resolution;
                                         for (auto& note : noteLane.notes)
                                         {
                                             note.segment *= scale;
-                                            bool noteInserted = false;
-                                            channel& chTarget = chNotesRegular[chIdx][bar];
-                                            for (auto it = chTarget.notes.begin(); it != chTarget.notes.end(); ++it)
-                                            {
-                                                if (it->segment > note.segment ||
-                                                    (it->segment == note.segment && it->value > note.value))
-                                                {
-                                                    chTarget.notes.insert(it, note);
-                                                    noteInserted = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (!noteInserted)
-                                            {
-                                                chTarget.notes.push_back(note);
-                                            }
+                                            auto pos = r::find_if(chTarget.notes, [&note](channel::NoteParseValue& it) {
+                                                return it.segment > note.segment ||
+                                                       (it.segment == note.segment && it.value > note.value);
+                                            });
+                                            chTarget.notes.insert(pos, note);
                                         }
                                     }
                                     else
