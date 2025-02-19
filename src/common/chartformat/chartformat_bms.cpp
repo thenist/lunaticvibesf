@@ -319,6 +319,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                     continue;
 
                 // https://hitkey.nekokan.dyndns.info/cmds.htm
+
                 // digits
                 if (lunaticvibes::iequals(key, "PLAYER"))
                 {
@@ -330,6 +331,18 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                                   << " is not supported, will guess either 1 or 3 from parsed channels instead";
                     }
                 }
+                else if (lunaticvibes::iequals(key, "BASE"))
+                {
+                    // nekokan undocumented; not in LR2
+                    if (constexpr int BASE62 = 62; toInt(value) == BASE62)
+                    {
+                        LOG_ERROR << "[BMS] #BASE 62 is not supported"; // TODO
+                    }
+                    else
+                    {
+                        LOG_WARNING << "[BMS] #BASE is not 62: " << value;
+                    }
+                }
                 else if (lunaticvibes::iequals(key, "RANK"))
                 {
                     raw_rank = toInt(value);
@@ -337,11 +350,11 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 }
                 else if (lunaticvibes::iequals(key, "DEFEXRANK"))
                 {
+                    // not in LR2
                     static constexpr int default_defexrank{100};
                     if (toInt(value, -1) != default_defexrank)
                     {
-                        // TODO(far future): support DEFEXRANK. Would need to support both LR2 and the new way.
-                        LOG_DEBUG << "[BMS] DEFEXRANK is not supported";
+                        LOG_DEBUG << "[BMS] DEFEXRANK is ignored";
                     }
                 }
                 else if (lunaticvibes::iequals(key, "TOTAL"))
@@ -388,11 +401,27 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                     // Usually surrounded by quotes, sometimes not.
                     _comments.emplace_back(lunaticvibes::trim(value, "\""));
                 }
+                else if (lunaticvibes::iequals(key, "LNMODE"))
+                {
+                    // nekokan undocumented; not in LR2
+                    switch (toInt(value, -1))
+                    {
+                    case 1: // ln
+                    case 2: // cn
+                    case 3: // hcn
+                        LOG_WARNING << "[BMS] LNMODE is not supported";
+                        break;
+                    default: LOG_WARNING << "[BMS] Invalid #LNMODE " << value; break;
+                    }
+                }
                 else if (lunaticvibes::iequals(key, "LNTYPE"))
                 {
-                    if (toInt(value, -1) != 1)
+                    // nekokan undocumented; not in LR2?
+                    switch (toInt(value, -1))
                     {
-                        LOG_DEBUG << "[BMS] LNTYPE '" << value << "' unhandled?";
+                    case 1: break;
+                    case 2: LOG_WARNING << "[BMS] #LNTYPE 2 is not supported"; break;
+                    default: LOG_WARNING << "[BMS] Invalid #LNTYPE " << value; break;
                     }
                 }
                 else if (lunaticvibes::iequals(key, "LNOBJ") && value.length() >= 2)
@@ -406,14 +435,14 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 }
 
                 // #???xx
-                else if (matches_36_key("wav", key))
+                else if (matches_36_key("WAV", key))
                 {
                     int idx = base36(key[3], key[4]);
                     wavFiles[idx].assign(value.begin(), value.end());
                     if (!ifStack.empty())
                         resourceStable = false;
                 }
-                else if (matches_36_key("bmp", key))
+                else if (matches_36_key("BMP", key))
                 {
                     int idx = base36(key[3], key[4]);
                     if (idx != 0)
@@ -423,17 +452,22 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                             resourceStable = false;
                     }
                 }
-                else if (matches_36_key("bpm", key))
+                else if (matches_36_key("BPM", key))
                 {
                     int idx = base36(key[3], key[4]);
                     if (idx != 0)
                         exBPM[idx] = toDouble(value);
                 }
-                else if (matches_36_key("stop", key))
+                else if (matches_36_key("STOP", key))
                 {
                     int idx = base36(key[4], key[5]);
                     if (idx != 0)
                         stop[idx] = toDouble(value);
+                }
+                else if (matches_36_key("SCROLL", key))
+                {
+                    // nekokan undocumented; not in LR2
+                    LOG_WARNING << "[BMS] SCROLLxx is not supported: " << key;
                 }
                 else
                 {
