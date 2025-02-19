@@ -280,8 +280,8 @@ bool SongDB::asyncAddChartTask(const HashMD5& folder, const Path& path)
         {
         case eChartFormat::UNKNOWN: LOG_ERROR << "eChartFormat::UNKNOWN"; break;
         case eChartFormat::BMS: {
-            auto bmsc = std::dynamic_pointer_cast<ChartFormatBMS>(c);
-            LVF_DEBUG_ASSERT(bmsc != nullptr);
+            auto bmsc = std::dynamic_pointer_cast<ChartFormatBMSMeta>(c);
+            LVF_ASSERT(bmsc != nullptr);
             if (SQLITE_OK == exec("INSERT INTO song("
                                   "md5,parent,type,file,title,title2,artist,artist2,genre,version,"
                                   "level,bpm,minbpm,maxbpm,length,totalnotes,stagefile,bannerfile,gamemode,judgerank,"
