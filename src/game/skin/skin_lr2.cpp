@@ -489,12 +489,6 @@ static BlendMode convertBlend(int blend)
 }
 } // namespace lr2skin
 
-std::map<std::string, Path> SkinLR2::LR2SkinFontPathCache;
-std::map<Path, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontCache;
-
-std::map<std::string, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::prevSkinLR2FontNameMap;
-std::map<std::string, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontNameMap;
-
 void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
 {
     auto spriteIdxForSlot = [](unsigned slot) -> size_t {
@@ -766,19 +760,19 @@ int SkinLR2::LR2FONT()
 
     if (loadMode >= 1)
     {
-        std::string fontNameKey = std::to_string(LR2FontNameMap.size());
-        LR2FontNameMap.erase(fontNameKey);
+        std::string fontNameKey = std::to_string(_sharedData->font_name_map.size());
+        _sharedData->font_name_map.erase(fontNameKey);
         return 1;
     }
 
     if (lunaticvibes::iequals(parseParamBuf[0], "CONTINUE"))
     {
         // create a blank texture if not exist
-        std::string fontNameKey = std::to_string(LR2FontNameMap.size());
-        if (auto it = prevSkinLR2FontNameMap.find(fontNameKey); it != prevSkinLR2FontNameMap.end())
-            LR2FontNameMap.insert_or_assign(fontNameKey, it->second);
+        std::string fontNameKey = std::to_string(_sharedData->font_name_map.size());
+        if (auto it = _sharedData->prev_font_name_map.find(fontNameKey); it != _sharedData->prev_font_name_map.end())
+            _sharedData->font_name_map.insert_or_assign(fontNameKey, it->second);
         else
-            LR2FontNameMap.erase(fontNameKey);
+            _sharedData->font_name_map.erase(fontNameKey);
         return 1;
     }
     else
@@ -787,12 +781,12 @@ int SkinLR2::LR2FONT()
 #ifndef _WIN32
         path = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(path));
 #endif // _WIN32
-        std::string fontNameKey = std::to_string(LR2FontNameMap.size());
+        std::string fontNameKey = std::to_string(_sharedData->font_name_map.size());
 
-        if (auto it = LR2FontCache.find(path); it != LR2FontCache.end())
+        if (auto it = _sharedData->font_cache.find(path); it != _sharedData->font_cache.end())
         {
-            LR2FontNameMap.insert_or_assign(fontNameKey, it->second);
-            LR2SkinFontPathCache.insert_or_assign(fontNameKey, path);
+            _sharedData->font_name_map.insert_or_assign(fontNameKey, it->second);
+            _sharedData->font_path_cache.insert_or_assign(fontNameKey, path);
             return 1;
         }
 
@@ -800,7 +794,7 @@ int SkinLR2::LR2FONT()
 
         if (!fs::is_regular_file(path))
         {
-            LR2FontNameMap.erase(fontNameKey);
+            _sharedData->font_name_map.erase(fontNameKey);
             LOG_DEBUG << "[Skin] " << csvLineNumber << ": LR2FONT file not found: " << path;
             return 1;
         }
@@ -822,7 +816,7 @@ int SkinLR2::LR2FONT()
         std::string strbuf;
         std::u32string u32strbuf;
 
-        auto pf = std::make_shared<LR2Font>();
+        auto pf = std::make_shared<lunaticvibes::details::LR2Font>();
 
         Tokens tokens;
         for (std::string rawUTF8, raw_; std::getline(lr2font, raw_);)
@@ -905,9 +899,9 @@ int SkinLR2::LR2FONT()
             }
         }
 
-        LR2FontCache.insert_or_assign(path, pf);
-        LR2FontNameMap.insert_or_assign(fontNameKey, pf);
-        LR2SkinFontPathCache.insert_or_assign(fontNameKey, path);
+        _sharedData->font_cache.insert_or_assign(path, pf);
+        _sharedData->font_name_map.insert_or_assign(fontNameKey, pf);
+        _sharedData->font_path_cache.insert_or_assign(fontNameKey, path);
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added LR2FONT[" << fontNameKey << "]: " << path;
         return 1;
     }
@@ -1565,7 +1559,8 @@ ParseRet SkinLR2::SRC_README()
     builder.lvf_use_readme_line = true;
 
     std::string font = std::to_string(d.font);
-    if (auto it = LR2FontNameMap.find(font); it != LR2FontNameMap.end() && it->second != nullptr)
+    if (auto it = _sharedData->font_name_map.find(font);
+        it != _sharedData->font_name_map.end() && it->second != nullptr)
     {
         auto& pf = it->second;
         builder.charTextures = pf->T_texture;
@@ -1598,7 +1593,8 @@ ParseRet SkinLR2::SRC_TEXT()
     builder.editable = d.edit;
 
     std::string font = std::to_string(d.font);
-    if (auto it = LR2FontNameMap.find(font); it != LR2FontNameMap.end() && it->second != nullptr)
+    if (auto it = _sharedData->font_name_map.find(font);
+        it != _sharedData->font_name_map.end() && it->second != nullptr)
     {
         auto& pf = it->second;
         builder.charTextures = pf->T_texture;
@@ -2343,7 +2339,8 @@ ParseRet SkinLR2::SRC_BAR_TITLE()
     for (auto& bar : barSprites)
     {
         auto font = std::to_string(d.font);
-        if (auto it = LR2FontNameMap.find(font); it != LR2FontNameMap.end() && it->second != nullptr)
+        if (auto it = _sharedData->font_name_map.find(font);
+            it != _sharedData->font_name_map.end() && it->second != nullptr)
         {
             auto& pf = it->second;
             builder.charTextures = pf->T_texture;
@@ -3616,8 +3613,8 @@ SkinLR2::SkinLR2(std::shared_ptr<SharedData> baseSharedData_,
     // load images from last skin
     prevSkinTextureNameMap = textureNameMap;
     textureNameMap = _base_shared_data->preDefinedTextures;
-    prevSkinLR2FontNameMap = LR2FontNameMap;
-    LR2FontNameMap.clear();
+    _sharedData->prev_font_name_map = _sharedData->font_name_map;
+    _sharedData->font_name_map.clear();
 
     parseParamBuf.resize(24);
 
@@ -3646,7 +3643,7 @@ SkinLR2::SkinLR2(std::shared_ptr<SharedData> baseSharedData_,
             _laneSprites.push_back(p);
 
     prevSkinTextureNameMap.clear();
-    prevSkinLR2FontNameMap.clear();
+    _sharedData->prev_font_name_map.clear();
 }
 
 static YAML::Node load_or_empty(const Path& p)

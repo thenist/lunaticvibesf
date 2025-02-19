@@ -59,12 +59,31 @@ namespace lunaticvibes
 
 inline const size_t SPRITE_GLOBAL_MAX = 32;
 
+namespace details
+{
+
+struct LR2Font
+{
+    int S = 1;
+    int M = 0;
+    std::map<int, size_t> T_id;
+    std::vector<std::shared_ptr<Texture>> T_texture;
+    CharMappingList R;
+};
+
+} // namespace details
+
 struct SkinLr2SharedData
 {
     std::atomic<bool> flipSideFlag = false;
     std::atomic<bool> flipResultFlag = false; // Set in play skin
     std::atomic<bool> flipSide = false;
     std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX> sprites;
+
+    std::map<Path, std::shared_ptr<details::LR2Font>> font_cache;
+    std::map<std::string, Path> font_path_cache;
+    std::map<std::string, std::shared_ptr<details::LR2Font>> font_name_map;
+    std::map<std::string, std::shared_ptr<details::LR2Font>> prev_font_name_map;
 };
 
 } // namespace lunaticvibes
@@ -81,7 +100,6 @@ public:
     void setGaugeDisplayType(unsigned slot, GaugeDisplayType type) override;
 
 private:
-    static std::map<std::string, Path> LR2SkinFontPathCache;
     std::map<std::string, std::shared_ptr<Texture>> prevSkinTextureNameMap;
 
     struct Customize
@@ -107,18 +125,6 @@ private:
     };
     std::vector<Customize> customize;
     std::map<size_t, size_t> customizeRandom;
-
-    struct LR2Font
-    {
-        int S = 1;
-        int M = 0;
-        std::map<int, size_t> T_id;
-        std::vector<std::shared_ptr<Texture>> T_texture;
-        CharMappingList R;
-    };
-    static std::map<Path, std::shared_ptr<LR2Font>> LR2FontCache;
-    static std::map<std::string, std::shared_ptr<LR2Font>> prevSkinLR2FontNameMap;
-    static std::map<std::string, std::shared_ptr<LR2Font>> LR2FontNameMap;
 
     Path filePath;
     int loadMode = 0; // 0: FULL / 1: No Text / 2: Header Only
