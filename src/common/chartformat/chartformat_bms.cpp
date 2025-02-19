@@ -52,7 +52,6 @@ std::optional<JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(const int va
     case 4: LOG_DEBUG << "[BMS] #RANK 4, using 2 instead"; return JudgeDifficulty::NORMAL;
     default: LOG_DEBUG << "[BMS] Invalid #RANK: " << value; return std::nullopt;
     }
-    lunaticvibes::assert_failed("lunaticvibes::parser_bms::parse_rank");
 }
 
 ChartFormatBMS::ChartFormatBMS() : ChartFormatBMSMeta()
