@@ -147,7 +147,8 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
         else
         {
             // normalize time
-            double prog = 1.0 * (time.norm() - keyFrameCurr->time) / keyFrameLength;
+            double prog = static_cast<double>(time.norm() - keyFrameCurr->time) /
+                          static_cast<double>(keyFrameNext->time - keyFrameCurr->time);
             switch (keyFrameCurr->param.accel)
             {
             case MotionKeyFrameParams::CONSTANT: break;
