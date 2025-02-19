@@ -767,7 +767,6 @@ int SkinLR2::LR2FONT()
 
     if (lunaticvibes::iequals(parseParamBuf[0], "CONTINUE"))
     {
-        // create a blank texture if not exist
         std::string fontNameKey = std::to_string(_sharedData->font_name_map.size());
         if (auto it = _prev_font_by_name.find(fontNameKey); it != _prev_font_by_name.end())
             _sharedData->font_name_map.insert_or_assign(fontNameKey, it->second);
