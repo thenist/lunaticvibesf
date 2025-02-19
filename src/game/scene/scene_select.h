@@ -24,6 +24,7 @@ class ChartFormatBase;
 class EntryFolderRegular;
 class SceneCustomize;
 class ScenePreSelect;
+class SkinMgr;
 
 class SceneSelect final : public SceneBase
 {

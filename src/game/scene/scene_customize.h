@@ -4,7 +4,6 @@
 
 #include <common/beat.h>
 #include <common/types.h>
-#include <game/skin/skin_mgr.h>
 
 #include <cstddef>
 #include <map>
@@ -13,6 +12,8 @@
 #include <vector>
 
 using std::size_t;
+
+class SkinMgr;
 
 namespace lunaticvibes
 {

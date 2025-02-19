@@ -13,7 +13,6 @@
 #include <game/scene/scene_pre_select.h>
 #include <game/scene/scene_result.h>
 #include <game/scene/scene_select.h>
-#include <game/skin/skin_mgr.h>
 
 #include <memory>
 #include <optional>

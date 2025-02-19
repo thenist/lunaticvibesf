@@ -6,11 +6,12 @@
 #include <game/input/input_callback.h>
 #include <game/scene/scene.h>
 #include <game/scene/scene_context.h>
-#include <game/skin/skin_mgr.h>
 
 #include <future>
 #include <limits>
 #include <memory>
+
+class SkinMgr;
 
 class ScenePlay final : public SceneBase
 {

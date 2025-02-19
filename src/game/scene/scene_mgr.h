@@ -1,9 +1,10 @@
 #pragma once
 
-#include "game/scene/scene.h"
-#include "game/skin/skin_mgr.h"
+#include <game/scene/scene.h>
 
 #include <memory>
+
+class SkinMgr;
 
 namespace lunaticvibes
 {

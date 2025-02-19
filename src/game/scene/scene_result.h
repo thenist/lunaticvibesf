@@ -1,9 +1,9 @@
 #pragma once
-#include "game/skin/skin_mgr.h"
 #include "scene.h"
 #include <memory>
 
 class ScoreBase;
+class SkinMgr;
 
 class SceneResult final : public SceneBase
 {

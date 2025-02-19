@@ -2,11 +2,10 @@
 
 #include "scene.h"
 
-#include <game/skin/skin_mgr.h>
-
 #include <memory>
 
 class ScoreBase;
+class SkinMgr;
 
 class SceneCourseResult final : public SceneBase
 {
