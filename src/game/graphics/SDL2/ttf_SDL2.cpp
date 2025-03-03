@@ -34,7 +34,7 @@ static void maybe_init_ttf_font()
     (void)_;
 }
 
-TTFFont::TTFFont(const std::filesystem::path& filePath, int ptsize, int faceIndex)
+lunaticvibes::Font::Font(const std::filesystem::path& filePath, int ptsize, int faceIndex)
     : _path(lunaticvibes::cs(filePath.u8string()))
 {
     maybe_init_ttf_font();
@@ -49,14 +49,14 @@ TTFFont::TTFFont(const std::filesystem::path& filePath, int ptsize, int faceInde
     }
 }
 
-TTFFont::~TTFFont()
+lunaticvibes::Font::~Font()
 {
     if (!_loaded)
         return;
     pushAndWaitMainThreadTask<void>(std::bind_front(TTF_CloseFont, static_cast<TTF_Font*>(_data)));
 }
 
-std::shared_ptr<Texture> TTFFont::build_texture(const char* text, const Color& c)
+std::shared_ptr<Texture> lunaticvibes::Font::build_texture(const char* text, const Color& c)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
     if (!_loaded)

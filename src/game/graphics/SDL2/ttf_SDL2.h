@@ -7,7 +7,10 @@
 
 class Texture;
 
-class TTFFont
+namespace lunaticvibes
+{
+
+class Font
 {
 private:
     std::string _path;
@@ -15,9 +18,13 @@ private:
     bool _loaded = false;
 
 public:
-    TTFFont(const std::filesystem::path& filePath, int ptsize, int faceIndex);
-    ~TTFFont();
+    Font(const std::filesystem::path& filePath, int ptsize, int faceIndex);
+    ~Font();
 
     [[nodiscard]] std::shared_ptr<Texture> build_texture(const char* text, const Color& c);
     [[nodiscard]] bool isLoaded() const { return _loaded; }
 };
+
+} // namespace lunaticvibes
+
+using TTFFont = lunaticvibes::Font;
