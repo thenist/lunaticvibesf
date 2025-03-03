@@ -41,8 +41,6 @@ protected:
     std::shared_ptr<ChartObjectBase> _chart;
     BasicData _basic{};
     double _minHealth;
-    double _clearHealth;
-    bool _failWhenNoHealth = false;
 
     bool _isCleared = false;
     bool _isFailed = false;
@@ -72,8 +70,8 @@ public:
 
 public:
     [[nodiscard]] BasicData getData() const { return _basic; }
-    [[nodiscard]] double getClearHealth() const { return _clearHealth; }
-    [[nodiscard]] bool failWhenNoHealth() const { return _failWhenNoHealth; }
+    [[nodiscard]] virtual double getClearHealth() const = 0;
+    [[nodiscard]] virtual bool failWhenNoHealth() const = 0;
 
     [[nodiscard]] virtual bool isNoScore() const { return false; } // for quick esc
     [[nodiscard]] virtual bool isFinished() const { return notesExpired >= getMaxCombo(); }

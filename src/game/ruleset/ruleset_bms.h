@@ -457,7 +457,10 @@ public:
     [[nodiscard]] std::string getModifierTextShort() const;
 
     [[nodiscard]] const lunaticvibes::NumberAnimation& getMoneyScoreAnimation() const { return _moneyScoreAnim; };
+
+    [[nodiscard]] bool failWhenNoHealth() const override { return _gaugeProc.get_gauge().fail_no_health; };
     [[nodiscard]] const lunaticvibes::NumberAnimation& getHealthAnimation() const { return _gaugeProc.get_health(); };
+    [[nodiscard]] double getClearHealth() const override { return _gaugeProc.get_gauge().clear_health; };
 
     [[nodiscard]] bool isNoScore() const override { return moneyScore == 0.0; }
     [[nodiscard]] bool isCleared() const override

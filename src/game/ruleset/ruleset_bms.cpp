@@ -471,8 +471,6 @@ void GaugeHolder::update_for_show(RulesetBMS& ruleset)
     // LOG_VERBOSE << "GaugeHolder update_for_show side=" << (int)ruleset._side << " gauge=" << _gauge.type;
     // >>>> copy-paste this to initGaugeParams :(
     ruleset._basic.health = _health.to;
-    ruleset._clearHealth = _gauge.clear_health;
-    ruleset._failWhenNoHealth = _gauge.fail_no_health;
     ruleset._minHealth = _gauge.min_health;
     if (_did_fail && !ruleset._isFailed)
     {
@@ -945,8 +943,6 @@ void RulesetBMS::initGaugeParams(const PlayModifiers& mods)
     // _gaugeProc.update_for_show(*this);
     // >>>> copy-paste:
     _basic.health = _gaugeProc.get_health().to;
-    _clearHealth = _gaugeProc.get_gauge().clear_health;
-    _failWhenNoHealth = _gaugeProc.get_gauge().fail_no_health;
     _minHealth = _gaugeProc.get_gauge().min_health;
 }
 
