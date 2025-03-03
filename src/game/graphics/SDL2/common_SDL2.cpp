@@ -91,11 +91,9 @@ int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* 
     return 0;
 }
 
-static void do_draw(SDL_Texture* pTex, const Rect* srcRect_, const RectF dstRectF_, const Color c, const BlendMode b,
+static void do_draw(SDL_Texture* pTex, const SDL_Rect* srcRect, const RectF dstRectF_, const Color c, const BlendMode b,
                     const double angle, const Point* center)
 {
-    const auto srcRect_val = srcRect_ ? std::bit_cast<SDL_Rect>(*srcRect_) : SDL_Rect{};
-    const auto* srcRect = srcRect_ ? &srcRect_val : nullptr;
     auto dstRectF = std::bit_cast<SDL_FRect>(dstRectF_);
     int flipFlags = 0;
     if (dstRectF.w < 0)
@@ -230,7 +228,7 @@ void Texture::maybe_set_filtering(bool filter) const
 void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
                    const double angle, const Point* center) const
 {
-    Rect srcRectTmp = srcRect;
+    auto srcRectTmp = std::bit_cast<SDL_Rect>(srcRect);
     if (srcRectTmp.w == RECT_FULL.w)
         srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h)
