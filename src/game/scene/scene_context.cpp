@@ -1555,6 +1555,19 @@ void createNotification(StringContent text)
     lunaticvibes::assert_failed("skinTypeForKeysBattle");
 }
 
+[[nodiscard]] static bool canBattleInGameMode(unsigned keys)
+{
+    switch (keys)
+    {
+    case 5:
+    case 7: return true;
+    case 9:
+    case 10:
+    case 14: return false;
+    default: lunaticvibes::verify_failed("canBattleInGameMode"); return false;
+    }
+}
+
 void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType)
 {
     gChartContext.chart = std::move(chart_);
@@ -1585,34 +1598,19 @@ void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battl
 
     // set gamemode
     gChartContext.isDoubleBattle = false;
-    if (gChartContext.chart->type() == eChartFormat::BMS)
+    gPlayContext.mode = lunaticvibes::skinTypeForKeys(gChartContext.chart->gamemode);
+    if (gPlayContext.isBattle)
     {
-        auto pBMS = std::reinterpret_pointer_cast<ChartFormatBMSMeta>(gChartContext.chart);
-        gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
-        if (gPlayContext.isBattle)
+        if (battleType == Option::BATTLE_LOCAL || battleType == Option::BATTLE_GHOST)
         {
-            if (battleType == Option::BATTLE_LOCAL || battleType == Option::BATTLE_GHOST)
-            {
-                gPlayContext.mode = skinTypeForKeysBattle(pBMS->gamemode);
-                auto canBattleInGameMode = [](unsigned keys) {
-                    switch (keys)
-                    {
-                    case 5:
-                    case 7: return true;
-                    case 9:
-                    case 10:
-                    case 14: return false;
-                    default: lunaticvibes::verify_failed("canBattleInGameMode"); return false;
-                    }
-                };
-                gPlayContext.isBattle = canBattleInGameMode(pBMS->gamemode);
-            }
+            gPlayContext.mode = skinTypeForKeysBattle(gChartContext.chart->gamemode);
+            gPlayContext.isBattle = canBattleInGameMode(gChartContext.chart->gamemode);
         }
-        else if (battleType == Option::BATTLE_DB)
-        {
-            gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
-            gChartContext.isDoubleBattle = true;
-        }
+    }
+    else if (battleType == Option::BATTLE_DB)
+    {
+        gPlayContext.mode = lunaticvibes::skinTypeForKeys(gChartContext.chart->gamemode);
+        gChartContext.isDoubleBattle = true;
     }
 
     switch (gPlayContext.mode)
