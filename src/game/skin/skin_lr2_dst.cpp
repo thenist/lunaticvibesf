@@ -285,26 +285,28 @@ static bool getDstOptAbs(unsigned d)
     case 183: return getDstOptAbs(5) && State::get(IndexOption::CHART_JUDGE_TYPE) == JUDGE_EASY;
     case 184: return false; // VERYEASY (beatoraja extension)
     case 185:
-        switch (State::get(IndexOption::CHART_DIFFICULTY))
+        switch (static_cast<e_select_diff>(State::get(IndexOption::CHART_DIFFICULTY)))
         {
+        case DIFF_ANY: return false;
         case DIFF_BEGINNER: return getDstOptAbs(70);
         case DIFF_NORMAL: return getDstOptAbs(71);
         case DIFF_HYPER: return getDstOptAbs(72);
         case DIFF_ANOTHER: return getDstOptAbs(73);
         case DIFF_INSANE: return getDstOptAbs(74);
         }
-        lunaticvibes::verify_failed("185?");
+        lunaticvibes::verify_failed("DST 185");
         return false;
     case 186:
-        switch (State::get(IndexOption::CHART_DIFFICULTY))
+        switch (static_cast<e_select_diff>(State::get(IndexOption::CHART_DIFFICULTY)))
         {
+        case DIFF_ANY: return false;
         case DIFF_BEGINNER: return getDstOptAbs(75);
         case DIFF_NORMAL: return getDstOptAbs(76);
         case DIFF_HYPER: return getDstOptAbs(77);
         case DIFF_ANOTHER: return getDstOptAbs(78);
         case DIFF_INSANE: return getDstOptAbs(79);
         }
-        lunaticvibes::verify_failed("186?");
+        lunaticvibes::verify_failed("DST 186");
         return false;
     case 190: return !State::get(IndexSwitch::CHART_HAVE_STAGEFILE);
     case 191: return State::get(IndexSwitch::CHART_HAVE_STAGEFILE);
