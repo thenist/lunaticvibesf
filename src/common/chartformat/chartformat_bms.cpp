@@ -466,6 +466,15 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 }
                 else if (lunaticvibes::iequals(key, "BPM"))
                     bpm = toDouble(value);
+                else if (lunaticvibes::iequals(key, "VOLWAV"))
+                {
+                    // not in LR2
+                    static constexpr int def{100};
+                    if (toInt(value, -1) != def)
+                    {
+                        LOG_DEBUG << "[BMS] #VOLWAV is ignored";
+                    }
+                }
 
                 // strings
                 else if (lunaticvibes::iequals(key, "TITLE"))
