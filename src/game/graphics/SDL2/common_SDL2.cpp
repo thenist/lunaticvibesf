@@ -94,7 +94,8 @@ int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* 
 static void do_draw(SDL_Texture* pTex, const SDL_Rect* srcRect, const RectF dstRectF_, const Color c, const BlendMode b,
                     const double angle, const Point* center)
 {
-    auto dstRectF = std::bit_cast<SDL_FRect>(dstRectF_);
+    const int ssLevel = lunaticvibes::window::graphics_get_supersample_level();
+    auto dstRectF = std::bit_cast<SDL_FRect>(dstRectF_ * ssLevel);
     int flipFlags = 0;
     if (dstRectF.w < 0)
     {
@@ -108,12 +109,6 @@ static void do_draw(SDL_Texture* pTex, const SDL_Rect* srcRect, const RectF dstR
     }
 
     SDL_SetTextureColorMod(pTex, c.r, c.g, c.b);
-
-    int ssLevel = lunaticvibes::window::graphics_get_supersample_level();
-    dstRectF.x *= ssLevel;
-    dstRectF.y *= ssLevel;
-    dstRectF.w *= ssLevel;
-    dstRectF.h *= ssLevel;
 
     SDL_FPoint scenter;
     if (center)
