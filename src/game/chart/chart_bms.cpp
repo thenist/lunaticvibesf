@@ -258,10 +258,6 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
         {
             eLanePriority type;
             unsigned index;
-            bool operator<(const Lane& rhs) const
-            {
-                return std::make_pair(type, index) < std::make_pair(rhs.type, rhs.index);
-            }
         };
 
         // notes [] {metre, {lane, sample/val}}
@@ -272,31 +268,18 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             auto push_notes = [&objBms, m](decltype(notes)& notes, eLanePriority priority, LaneCode code, int area) {
                 for (unsigned i = 0; i < 10; i++)
                 {
-                    const auto& ch = objBms.getLane(code, i, m);
-                    unsigned index = i;
-                    if (area != 0)
-                    {
-                        index += 10;
-                    }
-                    for (const auto& n : ch.notes)
-                    {
-                        //              { metre,                               { { lane,              val     } }
+                    const unsigned index = i + (area == 0 ? 0 : 10);
+                    for (const auto& ch = objBms.getLane(code, i, m); const auto& n : ch.notes)
                         notes.push_back({Segment(n.segment, ch.resolution), {{priority, index}, n.value}});
-                    }
                 }
             };
             auto push_notes_ln = [&objBms, m, &isLnTail](decltype(notes)& notes, LaneCode code, int area) {
                 for (unsigned i = 0; i < 10; i++)
                 {
-                    const auto& ch = objBms.getLane(code, i, m);
-                    unsigned index = i;
-                    if (area != 0)
+                    const unsigned index = i + (area == 0 ? 0 : 10);
+                    for (const auto& ch = objBms.getLane(code, i, m); const auto& n : ch.notes)
                     {
-                        index += 10;
-                    }
-                    for (const auto& n : ch.notes)
-                    {
-                        eLanePriority priority = isLnTail[index] ? eLanePriority::LNTAIL : eLanePriority::LNHEAD;
+                        const eLanePriority priority = isLnTail[index] ? eLanePriority::LNTAIL : eLanePriority::LNHEAD;
                         notes.push_back({fraction(n.segment, ch.resolution), {{priority, index}, n.value}});
                         isLnTail[index].flip();
                     }
@@ -310,13 +293,10 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             {
                 // load notes into 2P area
 
-                // Regular Notes
                 push_notes(notes, eLanePriority::NOTE, LaneCode::NOTE1, 1);
 
-                // LN
                 push_notes_ln(notes, LaneCode::NOTELN1, 1);
 
-                // invisible
                 push_notes(notes, eLanePriority::INV, LaneCode::NOTEINV1, 1);
 
                 // mine, specify a damage by [01-ZZ] (decimalize/2) ZZ: instant gameover
@@ -324,15 +304,12 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             }
             else if (isChartDP && gPlayContext.mods[_playerSlot].DPFlip)
             {
-                // Regular Notes
                 push_notes(notes, eLanePriority::NOTE, LaneCode::NOTE2, 0);
                 push_notes(notes, eLanePriority::NOTE, LaneCode::NOTE1, 1);
 
-                // LN
                 push_notes_ln(notes, LaneCode::NOTELN2, 0);
                 push_notes_ln(notes, LaneCode::NOTELN1, 1);
 
-                // invisible
                 push_notes(notes, eLanePriority::INV, LaneCode::NOTEINV2, 0);
                 push_notes(notes, eLanePriority::INV, LaneCode::NOTEINV1, 1);
 
@@ -342,13 +319,10 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             }
             else
             {
-                // Regular Notes
                 push_notes(notes, eLanePriority::NOTE, LaneCode::NOTE1, 0);
 
-                // LN
                 push_notes_ln(notes, LaneCode::NOTELN1, 0);
 
-                // invisible
                 push_notes(notes, eLanePriority::INV, LaneCode::NOTEINV1, 0);
 
                 // mine, specify a damage by [01-ZZ] (decimalize/2) ZZ: instant gameover
@@ -369,61 +343,31 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 }
             }
 
-            // BGM
             for (unsigned i = 0; i < objBms.bgmLayersCount[m]; i++)
             {
-                const auto& ch = objBms.getLane(LaneCode::BGM, i, m);
-                for (const auto& n : ch.notes)
-                    //              { metre,                               { { lane,                       val     } }
+                for (const auto& ch = objBms.getLane(LaneCode::BGM, i, m); const auto& n : ch.notes)
                     notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGM, i}, n.value}});
             }
 
-            // BGA
             if (State::get(IndexSwitch::_LOAD_BGA))
             {
-                {
-                    const auto& ch = objBms.getLane(LaneCode::BGABASE, 0, m);
-                    for (const auto& n : ch.notes)
-                        //              { metre,                               { { lane,                        val } }
-                        notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGABASE, 0}, n.value}});
-                }
-                {
-                    const auto& ch = objBms.getLane(LaneCode::BGALAYER, 0, m);
-                    for (const auto& n : ch.notes)
-                        //              { metre,                               { { lane,                        val } }
-                        notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGALAYER, 0}, n.value}});
-                }
-                {
-                    const auto& ch = objBms.getLane(LaneCode::BGAPOOR, 0, m);
-                    for (const auto& n : ch.notes)
-                        //              { metre,                               { { lane,                        val } }
-                        notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGAPOOR, 0}, n.value}});
-                }
+
+                for (const auto& ch = objBms.getLane(LaneCode::BGABASE, 0, m); const auto& n : ch.notes)
+                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGABASE, 0}, n.value}});
+                for (const auto& ch = objBms.getLane(LaneCode::BGALAYER, 0, m); const auto& n : ch.notes)
+                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGALAYER, 0}, n.value}});
+                for (const auto& ch = objBms.getLane(LaneCode::BGAPOOR, 0, m); const auto& n : ch.notes)
+                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGAPOOR, 0}, n.value}});
             }
 
-            // BPM Change
-            {
-                const auto& ch = objBms.getLane(LaneCode::BPM, 0, m);
-                for (const auto& n : ch.notes)
-                    //              { metre,                               { { lane,                        val     } }
-                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BPM, 0}, n.value}});
-            }
+            for (const auto& ch = objBms.getLane(LaneCode::BPM, 0, m); const auto& n : ch.notes)
+                notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BPM, 0}, n.value}});
 
-            // EX BPM
-            {
-                const auto& ch = objBms.getLane(LaneCode::EXBPM, 0, m);
-                for (const auto& n : ch.notes)
-                    //              { metre,                               { { lane,                        val     } }
-                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::EXBPM, 0}, n.value}});
-            }
+            for (const auto& ch = objBms.getLane(LaneCode::EXBPM, 0, m); const auto& n : ch.notes)
+                notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::EXBPM, 0}, n.value}});
 
-            // Stop
-            {
-                const auto& ch = objBms.getLane(LaneCode::STOP, 0, m);
-                for (const auto& n : ch.notes)
-                    //              { metre,                               { { lane,                        val     } }
-                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::STOP, 0}, n.value}});
-            }
+            for (const auto& ch = objBms.getLane(LaneCode::STOP, 0, m); const auto& n : ch.notes)
+                notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::STOP, 0}, n.value}});
         }
 
         // Sort by time / lane value
