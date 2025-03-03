@@ -1198,8 +1198,7 @@ bool SkinLR2::SRC()
                     it != _base_shared_data->textureNameMap.end())
                     return {it->second, nullptr};
                 LOG_WARNING << "[SkinLR2] Texture not found for " << gr_key;
-                (void)_base_shared_data->error; // Why not?
-                return {std::make_shared<Texture>(nullptr, 0, 0), nullptr};
+                return {_base_shared_data->error, nullptr};
             }
             }
         }();
