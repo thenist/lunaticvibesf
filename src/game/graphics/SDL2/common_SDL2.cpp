@@ -242,20 +242,21 @@ void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const Blen
 ////////////////////////////////////////////////////////////////////////////////
 // TextureFull
 
-TextureFull::TextureFull(const Color& c) : Texture(nullptr)
+struct SdlSurfaceDeleter
+{
+    void operator()(SDL_Surface* surface) { SDL_FreeSurface(surface); }
+};
+
+static std::unique_ptr<SDL_Surface, SdlSurfaceDeleter> make_full(const Color& c)
 {
     auto surface = SDL_CreateRGBSurfaceWithFormat(0, 1, 1, 24, SDL_PIXELFORMAT_RGB24);
     const SDL_Rect textureRect = {0, 0, 1, 1};
     SDL_FillRect(&*surface, &textureRect, SDL_MapRGBA(surface->format, c.r, c.g, c.b, c.a));
-    _texture = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
-        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-    loaded = true;
-    SDL_FreeSurface(surface);
+    return std::unique_ptr<SDL_Surface, SdlSurfaceDeleter>{surface};
 }
 
+TextureFull::TextureFull(const Color& c) : Texture(make_full(c).get()) {}
 TextureFull::~TextureFull() = default;
-
 void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const BlendMode b, const bool filter,
                        const double angle, const Point* center) const
 {
