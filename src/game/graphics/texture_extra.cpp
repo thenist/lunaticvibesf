@@ -321,40 +321,38 @@ static void lr2ScaleBgaRect(const Rect& srcRect, RectF& dstRect)
 void TextureBmsBga::draw(const Rect& sr, RectF dr, const Color c, const BlendMode b, const bool f, const double a,
                          const Point* ct) const
 {
-    std::shared_lock l(idxLock);
-    if (inPoor && poorIdx != INDEX_INVALID && objs.at(poorIdx).type != obj::Ty::EMPTY)
-    {
-        Rect srcRect = objs.at(poorIdx).pt ? objs.at(poorIdx).pt->getRect() : RECT_FULL;
+    auto draw = [&](const TextureBmsBga::obj& obj) {
+        Rect srcRect = obj.pt ? obj.pt->getRect() : RECT_FULL;
         RectF dstRect = dr;
         lr2ScaleBgaRect(srcRect, dstRect);
-        objs.at(poorIdx).pt->draw(srcRect, dstRect, c, b, f, a, ct);
-    }
-    else
-    {
-        if (baseIdx != INDEX_INVALID && objs.at(baseIdx).type != obj::Ty::EMPTY)
-        {
-            Rect srcRect = objs.at(baseIdx).pt ? objs.at(baseIdx).pt->getRect() : RECT_FULL;
-            RectF dstRect = dr;
-            lr2ScaleBgaRect(srcRect, dstRect);
-            objs.at(baseIdx).pt->draw(srcRect, dstRect, c, b, f, a, ct);
-        }
+        obj.pt->draw(srcRect, dstRect, c, b, f, a, ct);
+    };
 
-        if (layerIdx != INDEX_INVALID && objs.at(layerIdx).type != obj::Ty::EMPTY)
+    std::shared_lock l(idxLock);
+
+    if (inPoor && poorIdx != INDEX_INVALID)
+    {
+        if (auto& obj = objs.at(poorIdx); obj.type != obj::Ty::EMPTY)
         {
-            if (objs.at(layerIdx).type == obj::Ty::PIC && objs_layer.at(layerIdx).pt != nullptr)
-            {
-                Rect srcRect = objs_layer.at(layerIdx).pt ? objs_layer.at(layerIdx).pt->getRect() : RECT_FULL;
-                RectF dstRect = dr;
-                lr2ScaleBgaRect(srcRect, dstRect);
-                objs_layer.at(layerIdx).pt->draw(srcRect, dstRect, c, b, f, a, ct);
-            }
+            draw(obj);
+            return;
+        }
+    }
+
+    if (baseIdx != INDEX_INVALID)
+    {
+        if (auto& obj = objs.at(baseIdx); obj.type != obj::Ty::EMPTY)
+            draw(obj);
+    }
+
+    if (layerIdx != INDEX_INVALID)
+    {
+        if (auto& obj = objs.at(layerIdx); obj.type != obj::Ty::EMPTY)
+        {
+            if (obj.type == obj::Ty::PIC && objs_layer.at(layerIdx).pt != nullptr)
+                draw(objs_layer.find(layerIdx)->second);
             else
-            {
-                Rect srcRect = objs.at(layerIdx).pt ? objs.at(layerIdx).pt->getRect() : RECT_FULL;
-                RectF dstRect = dr;
-                lr2ScaleBgaRect(srcRect, dstRect);
-                objs.at(layerIdx).pt->draw(srcRect, dstRect, c, b, f, a, ct);
-            }
+                draw(obj);
         }
     }
 }
