@@ -59,7 +59,7 @@ void SpriteText::updateTextTexture(std::string_view text, const Color& c)
     _text = text;
     textColor = c;
 
-    pTexture = pFont->TextUTF8(_text.c_str(), c);
+    pTexture = pFont->build_texture(_text.c_str(), c);
     if (pTexture)
     {
         textureRect = pTexture->getRect();
