@@ -217,6 +217,7 @@ struct s_number : s_basic
                 case 212: num = 371; break;
                 case 213: num = 213; break;
                 case 214: num = 372; break;
+                default: break;
                 }
             }
         }
@@ -243,6 +244,7 @@ struct s_slider : s_basic
             case 5: type = 4; break;
             case 8: type = 9; break;
             case 9: type = 8; break;
+            default: break;
             }
         }
     }
@@ -322,6 +324,7 @@ struct s_text
             case 68: st = 67; break;
             case 84: st = 85; break;
             case 85: st = 84; break;
+            default: break;
             }
         }
     }
@@ -386,6 +389,7 @@ struct s_groovegauge : s_basic
         {
         case 0: _null = flipSide ? 1 : 0; break;
         case 1: _null = flipSide ? 0 : 1; break;
+        default: break;
         }
     }
 };
@@ -1595,6 +1599,7 @@ ParseRet SkinLR2::SRC_TEXT()
     case 74: isSupportHsFixInitialAndMain = true; break;
     case 84:
     case 85: isSupportLift = true; break;
+    default: break;
     }
 
     return ParseRet::OK;
@@ -3257,6 +3262,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
         case 15: info.mode = SkinType::COURSE_RESULT; break;
 
         case 17: info.mode = SkinType::TITLE; break;
+        default: break;
         }
         info.name = parseParamBuf[1];
         info.maker = parseParamBuf[2];
@@ -4386,6 +4392,7 @@ void SkinLR2::update(const lunaticvibes::Time& t)
                         comboShiftUnitCount +=
                             (static_cast<int>(-combo->maxDigits) - 1) + (combo->maxDigits - combo->digitCount + 1) * 2;
                         break;
+                    default: break; // TODO: convert alignNowCombo  qto enum
                     }
                     // NOTE: std ceil - magic for off-by-one errors, fixes odd/uneven combos with Remi-S.
                     d.x += base.x + std::ceil(shiftUnit * static_cast<float>(comboShiftUnitCount));
