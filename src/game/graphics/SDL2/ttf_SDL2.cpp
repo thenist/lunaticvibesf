@@ -53,7 +53,7 @@ TTFFont::~TTFFont()
 {
     if (!_loaded)
         return;
-    pushAndWaitMainThreadTask<void>(std::bind_front(TTF_CloseFont, _data));
+    pushAndWaitMainThreadTask<void>(std::bind_front(TTF_CloseFont, static_cast<TTF_Font*>(_data)));
 }
 
 std::shared_ptr<Texture> TTFFont::build_texture(const char* text, const Color& c)
@@ -62,7 +62,7 @@ std::shared_ptr<Texture> TTFFont::build_texture(const char* text, const Color& c
     if (!_loaded)
         return nullptr;
 
-    SDL_Surface* surfaceText = TTF_RenderUTF8_Blended(_data, text, std::bit_cast<SDL_Color>(c));
+    SDL_Surface* surfaceText = TTF_RenderUTF8_Blended(static_cast<TTF_Font*>(_data), text, std::bit_cast<SDL_Color>(c));
     std::shared_ptr<Texture> pTexture = std::make_shared<Texture>(surfaceText);
     SDL_FreeSurface(surfaceText);
     return pTexture;

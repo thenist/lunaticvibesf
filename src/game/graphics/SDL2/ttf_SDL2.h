@@ -5,15 +5,13 @@
 #include <filesystem>
 #include <string>
 
-using TTF_Font = struct _TTF_Font; // NOLINT(cert-dcl37-c,cert-dcl51-cpp,bugprone-reserved-identifier): SDL detail
-
 class Texture;
 
 class TTFFont
 {
 private:
     std::string _path;
-    TTF_Font* _data = nullptr;
+    void* _data = nullptr; // Implementation-specific.
     bool _loaded = false;
 
 public:
