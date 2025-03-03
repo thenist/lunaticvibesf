@@ -1106,6 +1106,19 @@ void SceneSelect::imguiPageDebugMain()
     HelpMarker("Showcase Dear ImGui's features (debug build only)");
 }
 
+static const std::string& get_3rd_party_text()
+{
+    static std::string text = []() {
+        std::stringstream ss;
+        {
+            std::ifstream ifsFile(Path(GAMEDATA_PATH) / "resources" / "LICENSE_3RD_PARTY");
+            ss << ifsFile.rdbuf();
+        }
+        return ss.str();
+    }();
+    return text;
+}
+
 void SceneSelect::imguiPageAbout()
 {
     using namespace i18nText;
@@ -1196,18 +1209,7 @@ Special Thanks:
     {
         if (ImGui::BeginChild("##pagesub22"))
         {
-            static std::string text;
-            if (text.empty())
-            {
-                std::stringstream ss;
-                {
-                    std::ifstream ifsFile(Path(GAMEDATA_PATH) / "resources" / "LICENSE_3RD_PARTY");
-                    ss << ifsFile.rdbuf();
-                }
-                text = ss.str();
-            }
-            ImGui::TextUnformatted(text.c_str());
-
+            ImGui::TextUnformatted(get_3rd_party_text().c_str());
             ImGui::EndChild();
         }
         ImGui::EndTabItem();
