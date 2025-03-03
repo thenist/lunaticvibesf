@@ -1676,10 +1676,10 @@ bool SceneSelect::imguiRefreshAudioDevices()
 
 bool SceneSelect::imguiApplyAudioSettings()
 {
-    bool ret;
     ConfigMgr::General()->set(cfg::A_BUFCOUNT, imgui_audio_bufferCount);
     ConfigMgr::General()->set(cfg::A_BUFLEN, imgui_audio_bufferSize);
-    if (SoundMgr::setDevice(imgui_audio_device_index) == 0)
+    const bool ret = SoundMgr::setDevice(imgui_audio_device_index) == 0;
+    if (ret)
     {
         const auto mode = std::next(imgui_audio_devices.begin(), imgui_audio_device_index);
         ConfigMgr::General()->set(cfg::A_DEVNAME, mode->second);
@@ -1687,12 +1687,6 @@ bool SceneSelect::imguiApplyAudioSettings()
 
         SoundMgr::stopSysSamples();
         SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::BGM_SELECT);
-
-        ret = true;
-    }
-    else
-    {
-        ret = false;
     }
 
     auto [count, size] = SoundMgr::getDSPBufferSize();
