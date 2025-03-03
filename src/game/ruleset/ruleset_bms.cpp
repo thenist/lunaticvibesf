@@ -820,8 +820,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr
 
     using namespace std::string_literals;
 
-    _basic.health = health; // Needed for dans.
-    initGaugeParams(mods);
+    initGaugeParams(mods, health);
 
     _side = side;
     _judgeScratch = !(mods.assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
@@ -897,14 +896,14 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr
     lunaticvibes::assert_failed("isCourseGrade");
 }
 
-void RulesetBMS::initGaugeParams(const PlayModifiers& mods)
+void RulesetBMS::initGaugeParams(const PlayModifiers& mods, double start_health)
 {
     const auto gauge = mods.gauge;
     const auto bms_gauge = get_gauge(gauge);
     LOG_VERBOSE << "[RulesetBMS] initGaugeParams " << bms_gauge;
 
     LVF_ASSERT(_format != nullptr);
-    auto buildGauge = [this](GaugeType type, double start_health = 0.) -> lunaticvibes::GaugeHolder {
+    auto buildGauge = [this, start_health](GaugeType type) -> lunaticvibes::GaugeHolder {
         const unsigned total = lunaticvibes::getEffectiveChartTotal(*_format, type);
         auto gauge = getGauge(type, total, getNoteCount());
         if (start_health != 0.)
@@ -936,7 +935,7 @@ void RulesetBMS::initGaugeParams(const PlayModifiers& mods)
     }
     else
     {
-        _gaugeProc = lunaticvibes::GaugeHolderProxy{std::array{buildGauge(bms_gauge, _basic.health)}};
+        _gaugeProc = lunaticvibes::GaugeHolderProxy{std::array{buildGauge(bms_gauge)}};
     }
     // TODO: can't use 'this' in constructor :(
     // _gaugeProc.update_for_show(*this);

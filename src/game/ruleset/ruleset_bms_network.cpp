@@ -147,7 +147,7 @@ bool RulesetBMSNetwork::unpackInit(const std::vector<unsigned char>& payload)
     PlayModifiers mods{};
     mods.gauge = static_cast<PlayModifierGaugeType>(p.gauge);
     mods.gas_gauge = true; // TODO: check GAS in arena.
-    initGaugeParams(mods);
+    initGaugeParams(mods, p.health);
     assist_mask = p.assist_mask;
     dpflip = p.dpflip;
     _basic.health = p.health;

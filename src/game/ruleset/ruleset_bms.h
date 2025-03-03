@@ -404,7 +404,8 @@ public:
     RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart, PlayModifiers mods,
                GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side, int fiveKeyMapIndex);
 
-    void initGaugeParams(const PlayModifiers& mods);
+    // \param start_health Use 0. for default.
+    void initGaugeParams(const PlayModifiers& mods, double start_health);
 
 private:
     [[nodiscard]] JudgeRes _calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const;
