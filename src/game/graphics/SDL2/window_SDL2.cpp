@@ -114,8 +114,8 @@ int lunaticvibes::window::graphics_init()
         graphics_set_maxfps(maxFPS);
 
         unsigned renderer_flags = SDL_RENDERER_TARGETTEXTURE;
-        if (ConfigMgr::General()->get(cfg::V_VSYNC, 0) != 0)
-            renderer_flags += SDL_RENDERER_PRESENTVSYNC;
+        if (ConfigMgr::General()->get(cfg::V_VSYNC, false))
+            renderer_flags |= SDL_RENDERER_PRESENTVSYNC;
         gFrameRenderer = SDL_CreateRenderer(gFrameWindow, -1, renderer_flags);
         if (!gFrameRenderer)
         {

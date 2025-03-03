@@ -1045,7 +1045,7 @@ static void vsync(int plus)
     const unsigned val = (State::get(IndexOption::SYS_VSYNC) + 2 + plus) % 2;
 
     State::set(IndexOption::SYS_VSYNC, val);
-    State::set(IndexText::VSYNC, Option::s_vsync_mode[val]);
+    State::set(IndexText::VSYNC, val ? "ON" : "OFF");
 
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 

@@ -17,7 +17,7 @@ void ConfigGeneral::setDefaults() noexcept
     set(V_DISPLAY_RES_Y, CANVAS_HEIGHT);
     set(V_WINMODE, V_WINMODE_WINDOWED);
     set(V_MAXFPS, 480);
-    set(V_VSYNC, 1);
+    set(V_VSYNC, true);
     set(E_PROFILE, PROFILE_DEFAULT);
     set(E_LR2PATH, ".");
     set(E_FOLDERS, std::vector<std::string>());

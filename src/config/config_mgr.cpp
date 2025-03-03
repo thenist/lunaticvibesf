@@ -691,17 +691,7 @@ static void setText()
     }
 
     // vsync
-    {
-        static const std::map<int, string> smap = {{0, Option::s_vsync_mode[Option::VSYNC_OFF]},
-                                                   {1, Option::s_vsync_mode[Option::VSYNC_ON]},
-                                                   {2, Option::s_vsync_mode[Option::VSYNC_ADAPTIVE]}};
-
-        auto&& s = ConfigMgr::General()->get<int>(V_VSYNC, 0);
-        if (auto it = smap.find(s); it != smap.end())
-            State::set(IndexText::VSYNC, it->second);
-        else
-            State::set(IndexText::VSYNC, Option::s_vsync_mode[Option::VSYNC_OFF]);
-    }
+    State::set(IndexText::VSYNC, ConfigMgr::General()->get(V_VSYNC, false) ? "ON" : "OFF");
 
     // autoadjust
     {

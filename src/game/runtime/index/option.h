@@ -499,18 +499,6 @@ static constexpr const char* s_windowed[] = {
     "WINDOW",
 };
 
-enum e_vsync_mode
-{
-    VSYNC_OFF,
-    VSYNC_ON,
-    VSYNC_ADAPTIVE
-};
-static constexpr const char* s_vsync_mode[] = {
-    "OFF",
-    "ON",
-    "ADAPTIVE",
-};
-
 enum e_course_type
 {
     COURSE_NONSTOP,
