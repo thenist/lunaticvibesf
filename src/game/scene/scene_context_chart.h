@@ -4,7 +4,7 @@
 #include <common/chartformat/chartformat.h>
 #include <common/hash.h>
 #include <common/types.h>
-#include <game/graphics/texture_extra.h>
+#include <game/graphics/texture_dynamic.h>
 
 #include <memory>
 #include <mutex>

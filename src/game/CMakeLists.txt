@@ -74,6 +74,7 @@ add_library(
     graphics/sprite_slider.cpp
     graphics/sprite_text.cpp
     graphics/sprite_video.cpp
+    graphics/texture_dynamic.cpp
     graphics/texture_extra.cpp
     graphics/texture_video.cpp
     graphics/video.cpp
