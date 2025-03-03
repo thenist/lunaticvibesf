@@ -58,7 +58,11 @@ static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
 bool lunaticvibes::in_test_mode()
 {
+#ifndef NDEBUG
+    return true;
+#else
     return false;
+#endif
 }
 
 static void mainLoop();

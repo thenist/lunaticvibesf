@@ -3,13 +3,10 @@
 
 #include <benchmark/benchmark.h>
 
-namespace lunaticvibes
-{
-bool in_test_mode()
+bool lunaticvibes::in_test_mode()
 {
     return false;
 };
-} // namespace lunaticvibes
 
 int main(int argc, char** argv)
 {
