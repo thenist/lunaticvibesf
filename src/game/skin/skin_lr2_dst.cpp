@@ -1,3 +1,5 @@
+#include "skin_lr2_dst.h"
+
 #include <common/assert.h>
 #include <game/arena/arena_data.h>
 #include <game/ruleset/ruleset_bms.h>
@@ -773,7 +775,7 @@ static bool getDstOptAbs(unsigned d)
     }
 }
 
-bool getDstOpt(int d)
+bool lunaticvibes::getDstOpt(int d)
 {
     const bool invert_result = d < 0;
     auto op = (dst_option)std::abs(d);
@@ -781,7 +783,7 @@ bool getDstOpt(int d)
     return invert_result ? !result : result;
 }
 
-void setCustomDstOpt(unsigned base, size_t offset, bool val)
+void lunaticvibes::setCustomDstOpt(unsigned base, size_t offset, bool val)
 {
     if (base + offset < 900 || base + offset > 999)
         return;
@@ -789,10 +791,10 @@ void setCustomDstOpt(unsigned base, size_t offset, bool val)
     _customOp[base + offset - 900] = val;
 }
 
-void clearCustomDstOpt()
+void lunaticvibes::clearCustomDstOpt()
 {
     std::unique_lock l{s_customOpMutex};
     _customOp.reset();
 }
 
-void updateDstOpt() {}
+void lunaticvibes::updateDstOpt() {}

@@ -45,6 +45,7 @@
 #include <game/skin/skin.h>
 #include <game/skin/skin_lr2_button_callbacks.h>
 #include <game/skin/skin_lr2_converters.h>
+#include <game/skin/skin_lr2_dst.h>
 #include <game/skin/skin_lr2_slider_callbacks.h>
 
 using uint8_t = std::uint8_t;

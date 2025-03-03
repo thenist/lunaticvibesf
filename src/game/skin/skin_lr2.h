@@ -5,11 +5,11 @@
 #include <common/types.h>
 #include <game/graphics/sprite_imagetext_charmapping.h>
 #include <game/skin/skin.h>
+#include <game/skin/skin_lr2_dst.h>
 
 #include <array>
 #include <atomic>
 #include <bitset>
-#include <cstdint>
 #include <list>
 #include <map>
 #include <vector>
@@ -24,11 +24,6 @@ class sVideo;
 
 namespace LR2SkinDef
 {
-
-// Negative value means inverse of the option.
-using dst_option = std::int16_t;
-inline constexpr dst_option DST_TRUE = 0;
-inline constexpr dst_option DST_FALSE = 999;
 
 const size_t GLOBAL_SPRITE_IDX_1PJUDGE = 0;
 const size_t GLOBAL_SPRITE_IDX_1PJUDGENUM = 6;
@@ -410,9 +405,3 @@ public:
 private:
     std::vector<std::string> _helpFiles;
 };
-
-// adapt helper
-void updateDstOpt();
-void setCustomDstOpt(unsigned base, size_t offset, bool val);
-void clearCustomDstOpt();
-bool getDstOpt(int d);
