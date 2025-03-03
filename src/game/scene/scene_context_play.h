@@ -6,7 +6,7 @@
 #include <common/play_modifiers.h>
 #include <common/types.h>
 #include <game/chart/chart.h>
-#include <game/graphics/texture_extra.h>
+#include <game/graphics/texture_bms_bga.h>
 #include <game/replay/replay_chart.h>
 #include <game/ruleset/ruleset.h>
 #include <game/runtime/index/option.h>
