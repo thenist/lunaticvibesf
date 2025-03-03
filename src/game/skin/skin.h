@@ -62,7 +62,7 @@ public:
 
 protected:
     // Images
-    std::map<std::string, std::shared_ptr<lunaticvibes::Font>> fontNameMap;
+    std::map<int, std::shared_ptr<lunaticvibes::Font>> _font_name_map;
     // Textures
     std::map<int, std::shared_ptr<sVideo>> _video_name_map; // Use this to get video instance from name
     // Sprite elements

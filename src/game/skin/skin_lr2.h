@@ -76,8 +76,8 @@ struct SkinLr2SharedData
     std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX> sprites;
 
     std::map<Path, std::shared_ptr<details::LR2Font>> font_cache;
-    std::map<std::string, Path> font_path_cache;
-    std::map<std::string, std::shared_ptr<details::LR2Font>> font_name_map;
+    std::map<int, Path> font_path_cache;
+    std::map<int, std::shared_ptr<details::LR2Font>> font_name_map;
 };
 
 } // namespace lunaticvibes
@@ -97,7 +97,7 @@ private:
     // Only filled while parsing skin.
     std::map<int, std::shared_ptr<Texture>> prevSkinTextureNameMap;
     // Only filled while parsing skin.
-    std::map<std::string, std::shared_ptr<lunaticvibes::details::LR2Font>> _prev_font_by_name;
+    std::map<int, std::shared_ptr<lunaticvibes::details::LR2Font>> _prev_font_by_name;
 
     struct Customize
     {
