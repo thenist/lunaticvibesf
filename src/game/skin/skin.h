@@ -41,7 +41,7 @@ public:
         std::shared_ptr<Texture> stagefile;
         std::shared_ptr<Texture> thumbnail;
         std::shared_ptr<Texture> white;
-        std::map<std::string, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
+        std::map<int, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
     };
 
 protected:
@@ -60,16 +60,12 @@ public:
     [[nodiscard]] constexpr bool isLoaded() const { return loaded; }
     virtual void setGaugeDisplayType(unsigned slot, GaugeDisplayType type) {};
 
+protected:
     // Images
-protected:
     std::map<std::string, std::shared_ptr<lunaticvibes::Font>> fontNameMap;
-
     // Textures
-protected:
-    std::map<std::string, std::shared_ptr<sVideo>> videoNameMap; // Use this to get video instance from name
-
+    std::map<int, std::shared_ptr<sVideo>> _video_name_map; // Use this to get video instance from name
     // Sprite elements
-protected:
     std::vector<std::shared_ptr<SpriteBase>> _sprites;             // Only modified while parsing the skin.
     std::vector<std::shared_ptr<SpriteLaneVertical>> _laneSprites; // Portion of '_sprites'.
     std::vector<std::shared_ptr<SpriteBase>> _mouseSprites;        // Portion of '_sprites' which are also iSpriteMouse.

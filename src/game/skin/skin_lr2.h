@@ -95,7 +95,7 @@ public:
 
 private:
     // Only filled while parsing skin.
-    std::map<std::string, std::shared_ptr<Texture>> prevSkinTextureNameMap;
+    std::map<int, std::shared_ptr<Texture>> prevSkinTextureNameMap;
     // Only filled while parsing skin.
     std::map<std::string, std::shared_ptr<lunaticvibes::details::LR2Font>> _prev_font_by_name;
 
