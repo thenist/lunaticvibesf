@@ -176,13 +176,15 @@ bool TextureBmsBga::addBmp(size_t idx, Path pBmp)
         }
         else
         {
+            Image img(pBmp);
             objs[idx].type = obj::Ty::PIC;
-            objs[idx].pt = std::make_shared<Texture>(Image(pBmp));
+            objs[idx].pt = std::make_shared<Texture>(img);
 
-            objs_layer[idx].type = obj::Ty::PIC;
-            Image layerImg(pBmp);
+            auto layerImg = std::move(img);
             layerImg.setTransparentColorRGB(Color(0, 0, 0, 255));
+            objs_layer[idx].type = obj::Ty::PIC;
             objs_layer[idx].pt = std::make_shared<Texture>(layerImg);
+
             LOG_DEBUG << "[TextureBmsBga] added pic: " << pBmp;
             return true;
         }
