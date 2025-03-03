@@ -4,6 +4,8 @@
 #include <future>
 #include <memory>
 
+#include <game/graphics/image.h>
+
 class TextureDynamic final : public Texture
 {
 private:

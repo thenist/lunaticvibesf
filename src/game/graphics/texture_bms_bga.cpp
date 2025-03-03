@@ -13,6 +13,7 @@
 #include <common/u8.h>
 #include <common/utils.h>
 #include <game/chart/chart_bms.h>
+#include <game/graphics/image.h>
 #include <game/graphics/texture_video.h>
 #include <game/graphics/video.h>
 #include <game/scene/scene_context.h>

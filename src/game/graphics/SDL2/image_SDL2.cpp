@@ -7,6 +7,7 @@
 #include <common/utils.h>
 #include <game/graphics/SDL2/graphics_SDL2.h>
 #include <game/graphics/color.h>
+#include <game/graphics/image.h>
 #include <game/graphics/rect.h>
 
 #include <filesystem>
@@ -68,20 +69,48 @@ static void maybe_init_image()
     (void)_;
 }
 
-Image::Image(const std::filesystem::path& path) : Image(lunaticvibes::cs(path.u8string())) {}
+namespace lunaticvibes
+{
 
-Image::Image(const char* filePath)
-    : Image(filePath, std::shared_ptr<SDL_RWops>(SDL_RWFromFile(filePath, "rb"), close_rwops))
+class Image::Impl
+{
+private:
+    std::string _path;
+    std::shared_ptr<SDL_RWops> _pRWop;
+    std::shared_ptr<SDL_Surface> _pSurface;
+    bool loaded = false;
+    bool _haveAlphaLayer = false;
+
+private:
+    Impl(const char* path, std::shared_ptr<SDL_RWops>&& rw);
+
+public:
+    Impl(const std::filesystem::path& path);
+    Impl(const char* filePath);
+    void setTransparentColorRGB(Color c);
+    [[nodiscard]] bool hasAlphaLayer() const { return _haveAlphaLayer; }
+
+    [[nodiscard]] Rect getRect() const;
+    [[nodiscard]] bool isLoaded() const { return loaded; }
+    [[nodiscard]] const std::string& path() const { return _path; }
+
+    [[nodiscard]] Texture build_texture() const;
+};
+
+Image::Impl::Impl(const std::filesystem::path& path) : Image::Impl(lunaticvibes::cs(path.u8string())) {}
+
+Image::Impl::Impl(const char* filePath)
+    : Image::Impl(filePath, std::shared_ptr<SDL_RWops>(SDL_RWFromFile(filePath, "rb"), close_rwops))
 {
 }
 
-Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _pRWop(rw)
+Image::Impl::Impl(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _pRWop(rw)
 {
     if (!_pRWop && !_path.empty())
     {
         if (_path != "dummy")
         {
-            LOG_WARNING << "[Image] Load image file error! " << SDL_GetError();
+            LOG_WARNING << "[Image::Impl] Load image file error! " << SDL_GetError();
         }
         return;
     }
@@ -104,16 +133,16 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _
 
     if (!_pSurface)
     {
-        LOG_WARNING << "[Image] Build surface object error! " << IMG_GetError();
+        LOG_WARNING << "[Image::Impl] Build surface object error! " << IMG_GetError();
         return;
     }
 
     _haveAlphaLayer = !(_pSurface->format->Amask == 0 || is_file_extension(pathView, "tga"));
     loaded = true;
-    LOG_VERBOSE << "[Image] Load image file finished " << _path;
+    LOG_VERBOSE << "[Image::Impl] Load image file finished " << _path;
 }
 
-void Image::setTransparentColorRGB(Color c)
+void Image::Impl::setTransparentColorRGB(Color c)
 {
     if (_pSurface)
     {
@@ -128,17 +157,50 @@ void Image::setTransparentColorRGB(Color c)
     }
 }
 
-Rect Image::getRect() const
+Rect Image::Impl::getRect() const
 {
     if (_pSurface == nullptr)
         return {};
     return {0, 0, _pSurface->w, _pSurface->h};
 }
 
-Texture Image::build_texture() const
+Texture Image::Impl::build_texture() const
 {
     return Texture{_pSurface.get()};
 }
+
+Image::Image(Image&&) noexcept = default;
+Image& Image::operator=(Image&&) noexcept = default;
+Image::~Image() = default;
+
+Image::Image(const std::filesystem::path& path) : _impl(std::make_unique<Image::Impl>(path)) {}
+Image::Image(const char* filePath) : _impl(std::make_unique<Image::Impl>(filePath)) {}
+void Image::setTransparentColorRGB(Color c)
+{
+    _impl->setTransparentColorRGB(c);
+}
+bool Image::hasAlphaLayer() const
+{
+    return _impl->hasAlphaLayer();
+}
+Rect Image::getRect() const
+{
+    return _impl->getRect();
+}
+bool Image::isLoaded() const
+{
+    return _impl->isLoaded();
+}
+const std::string& Image::path() const
+{
+    return _impl->path();
+}
+Texture Image::build_texture() const
+{
+    return _impl->build_texture();
+};
+
+} // namespace lunaticvibes
 
 bool lunaticvibes::save_into_png(SDL_Surface* surface, const std::filesystem::path& path)
 {
