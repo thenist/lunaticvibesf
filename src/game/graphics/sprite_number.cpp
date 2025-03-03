@@ -187,9 +187,6 @@ void SpriteNumber::draw() const
 
     if (pTexture->isLoaded() && _draw)
     {
-        // for (size_t i = 0; i < _outRectDigit.size(); ++i)
-        //     pTexture->draw(_drawRectDigit[i], _outRectDigit[i], _current.angle);
-
         size_t max = 0;
         switch (alignType)
         {
