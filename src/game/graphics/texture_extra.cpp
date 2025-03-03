@@ -123,12 +123,7 @@ void TextureVideo::stopUpdate()
 }
 
 void TextureVideo::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                        const double angleInDegrees) const
-{
-    Texture::draw(srcRect, dstRect, updated ? c : Color(0, 0, 0, c.a), blend, filter, angleInDegrees);
-}
-void TextureVideo::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                        const double angleInDegrees, const Point& center) const
+                        const double angleInDegrees, const Point* center) const
 {
     Texture::draw(srcRect, dstRect, updated ? c : Color(0, 0, 0, c.a), blend, filter, angleInDegrees, center);
 }
@@ -323,48 +318,8 @@ static void lr2ScaleBgaRect(const Rect& srcRect, RectF& dstRect)
     }
 }
 
-void TextureBmsBga::draw(const Rect& sr, RectF dr, const Color c, const BlendMode b, const bool f, const double a) const
-{
-    std::shared_lock l(idxLock);
-    if (inPoor && poorIdx != INDEX_INVALID && objs.at(poorIdx).type != obj::Ty::EMPTY)
-    {
-        Rect srcRect = objs.at(poorIdx).pt ? objs.at(poorIdx).pt->getRect() : RECT_FULL;
-        RectF dstRect = dr;
-        lr2ScaleBgaRect(srcRect, dstRect);
-        objs.at(poorIdx).pt->draw(srcRect, dstRect, c, b, f, a);
-    }
-    else
-    {
-        if (baseIdx != INDEX_INVALID && objs.at(baseIdx).type != obj::Ty::EMPTY)
-        {
-            Rect srcRect = objs.at(baseIdx).pt ? objs.at(baseIdx).pt->getRect() : RECT_FULL;
-            RectF dstRect = dr;
-            lr2ScaleBgaRect(srcRect, dstRect);
-            objs.at(baseIdx).pt->draw(srcRect, dstRect, c, b, f, a);
-        }
-
-        if (layerIdx != INDEX_INVALID && objs.at(layerIdx).type != obj::Ty::EMPTY)
-        {
-            if (objs.at(layerIdx).type == obj::Ty::PIC && objs_layer.at(layerIdx).pt != nullptr)
-            {
-                Rect srcRect = objs_layer.at(layerIdx).pt ? objs_layer.at(layerIdx).pt->getRect() : RECT_FULL;
-                RectF dstRect = dr;
-                lr2ScaleBgaRect(srcRect, dstRect);
-                objs_layer.at(layerIdx).pt->draw(srcRect, dstRect, c, b, f, a);
-            }
-            else
-            {
-                Rect srcRect = objs.at(layerIdx).pt ? objs.at(layerIdx).pt->getRect() : RECT_FULL;
-                RectF dstRect = dr;
-                lr2ScaleBgaRect(srcRect, dstRect);
-                objs.at(layerIdx).pt->draw(srcRect, dstRect, c, b, f, a);
-            }
-        }
-    }
-}
-
 void TextureBmsBga::draw(const Rect& sr, RectF dr, const Color c, const BlendMode b, const bool f, const double a,
-                         const Point& ct) const
+                         const Point* ct) const
 {
     std::shared_lock l(idxLock);
     if (inPoor && poorIdx != INDEX_INVALID && objs.at(poorIdx).type != obj::Ty::EMPTY)
@@ -532,13 +487,7 @@ void TextureDynamic::applyImageIfNeeded()
 }
 
 void TextureDynamic::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
-                          const double angle) const
-{
-    _dynTexture->draw(srcRect, dstRect, c, b, filter, angle);
-}
-
-void TextureDynamic::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
-                          const double angle, const Point& center) const
+                          const double angle, const Point* center) const
 {
     _dynTexture->draw(srcRect, dstRect, c, b, filter, angle, center);
 }

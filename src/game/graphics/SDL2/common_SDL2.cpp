@@ -250,19 +250,7 @@ void Texture::maybe_set_filtering(bool filter) const
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
-                   const double angle) const
-{
-    Rect srcRectTmp(srcRect);
-    if (srcRectTmp.w == RECT_FULL.w)
-        srcRectTmp.w = textureRect.w;
-    if (srcRectTmp.h == RECT_FULL.h)
-        srcRectTmp.h = textureRect.h;
-    maybe_set_filtering(filter);
-    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, angle, nullptr);
-}
-
-void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
-                   const double angle, const Point& center) const
+                   const double angle, const Point* center) const
 {
     Rect srcRectTmp = srcRect;
     if (srcRectTmp.w == RECT_FULL.w)
@@ -270,7 +258,7 @@ void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const Blen
     if (srcRectTmp.h == RECT_FULL.h)
         srcRectTmp.h = textureRect.h;
     maybe_set_filtering(filter);
-    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, angle, &center);
+    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, angle, center);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -291,9 +279,9 @@ TextureFull::TextureFull(const Color& c) : Texture(nullptr)
 TextureFull::~TextureFull() = default;
 
 void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const BlendMode b, const bool filter,
-                       const double angle) const
+                       const double angle, const Point* center) const
 {
     (void)ignored;
     (void)filter;
-    do_draw(_texture.get(), nullptr, dstRect, c, b, angle, nullptr);
+    do_draw(_texture.get(), nullptr, dstRect, c, b, angle, center);
 }

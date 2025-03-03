@@ -34,9 +34,17 @@ protected:
 
 public:
     virtual void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                      const double angleInDegrees) const;
-    virtual void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                      const double angleInDegrees, const Point& center) const;
+                      const double angleInDegrees, const Point* center) const;
+    void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
+              const double angleInDegrees) const
+    {
+        draw(srcRect, dstRect, c, blend, filter, angleInDegrees, nullptr);
+    }
+    void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
+              const double angleInDegrees, const Point& center) const
+    {
+        draw(srcRect, dstRect, c, blend, filter, angleInDegrees, &center);
+    }
 
 public:
     enum class PixelFormat
@@ -75,7 +83,7 @@ class TextureFull : public Texture
 {
 private:
     void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees) const override;
+              const double angleInDegrees, const Point* center) const override;
 
 public:
     TextureFull(const Color& srcColor);

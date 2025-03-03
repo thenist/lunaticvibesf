@@ -26,9 +26,7 @@ public:
     void reset();
 
     void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees) const override;
-    void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees, const Point& center) const override;
+              const double angleInDegrees, const Point* center) const override;
 
     void stopUpdate();
 
@@ -102,9 +100,7 @@ public:
 
     virtual void update(const lunaticvibes::Time& t, bool poor);
     void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees) const override;
-    void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees, const Point& center) const override;
+              const double angleInDegrees, const Point* center) const override;
 
     void reset();
     void clear();
@@ -132,7 +128,5 @@ public:
     void applyImageIfNeeded();      // Synchronously upload the image to GPU.
 
     void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees) const override;
-    void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees, const Point& center) const override;
+              const double angleInDegrees, const Point* center) const override;
 };

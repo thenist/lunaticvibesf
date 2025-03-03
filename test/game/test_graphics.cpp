@@ -22,11 +22,7 @@ public:
     }
     MOCK_METHOD(void, draw,
                 (const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                 const double angleInDegrees),
-                (const override));
-    MOCK_METHOD(void, draw,
-                (const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                 const double angleInDegrees, const Point& pt),
+                 const double angleInDegrees, const Point* pt),
                 (const override));
 };
 
@@ -325,84 +321,84 @@ TEST_F(sAnimated, animUpdate)
     using namespace ::testing;
 
     s.update(t0);
-    EXPECT_CALL(
-        *pt, draw(Rect(0 * w, 0 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(Rect(0 * w, 0 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
     s.update(t1);
-    EXPECT_CALL(
-        *pt, draw(Rect(1 * w, 0 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(Rect(1 * w, 0 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
     s.update(t2);
-    EXPECT_CALL(
-        *pt, draw(Rect(0 * w, 1 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(Rect(0 * w, 1 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
     s.update(t3);
-    EXPECT_CALL(
-        *pt, draw(Rect(1 * w, 1 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(Rect(1 * w, 1 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
     s.update(t4);
-    EXPECT_CALL(
-        *pt, draw(Rect(0 * w, 2 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(Rect(0 * w, 2 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
     s.update(t5);
-    EXPECT_CALL(
-        *pt, draw(Rect(1 * w, 2 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(Rect(1 * w, 2 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
     s.update(t6);
-    EXPECT_CALL(
-        *pt, draw(Rect(0 * w, 3 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(Rect(0 * w, 3 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
     s.update(t7);
-    EXPECT_CALL(
-        *pt, draw(Rect(1 * w, 3 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(Rect(1 * w, 3 * h, w, h), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     ss.update(t0);
     EXPECT_CALL(*pt, draw(Rect(0 * ww, 0 * hh, ww, hh), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
-                          Point(0, 0)))
+                          Pointee(Point(0, 0))))
         .Times(1);
     ss.draw();
     ss.update(t1);
     EXPECT_CALL(*pt, draw(Rect(1 * ww, 0 * hh, ww, hh), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
-                          Point(0, 0)))
+                          Pointee(Point(0, 0))))
         .Times(1);
     ss.draw();
     ss.update(t2);
     EXPECT_CALL(*pt, draw(Rect(2 * ww, 0 * hh, ww, hh), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
-                          Point(0, 0)))
+                          Pointee(Point(0, 0))))
         .Times(1);
     ss.draw();
     ss.update(t3);
     EXPECT_CALL(*pt, draw(Rect(3 * ww, 0 * hh, ww, hh), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
-                          Point(0, 0)))
+                          Pointee(Point(0, 0))))
         .Times(1);
     ss.draw();
     ss.update(t4);
     EXPECT_CALL(*pt, draw(Rect(0 * ww, 1 * hh, ww, hh), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
-                          Point(0, 0)))
+                          Pointee(Point(0, 0))))
         .Times(1);
     ss.draw();
     ss.update(t5);
     EXPECT_CALL(*pt, draw(Rect(1 * ww, 1 * hh, ww, hh), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
-                          Point(0, 0)))
+                          Pointee(Point(0, 0))))
         .Times(1);
     ss.draw();
     ss.update(t6);
     EXPECT_CALL(*pt, draw(Rect(2 * ww, 1 * hh, ww, hh), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
-                          Point(0, 0)))
+                          Pointee(Point(0, 0))))
         .Times(1);
     ss.draw();
     ss.update(t7);
     EXPECT_CALL(*pt, draw(Rect(3 * ww, 1 * hh, ww, hh), RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
-                          Point(0, 0)))
+                          Pointee(Point(0, 0))))
         .Times(1);
     ss.draw();
 }
@@ -640,7 +636,8 @@ TEST_F(sNumber, RectNormal1)
     State::set(IndexNumber::_TEST1, 1);
     s1.update(t0);
 
-    EXPECT_CALL(*pt, draw(Rect(20, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+    EXPECT_CALL(*pt, draw(Rect(20, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+        .Times(1);
     s1.draw();
 }
 
@@ -653,10 +650,14 @@ TEST_F(sNumber, RectNormal4)
         State::set(IndexNumber::_TEST1, 456);
         s.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(20, 80, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(0, 80, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(80, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        // EXPECT_CALL(*pt, draw(Rect(0, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(20, 80, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(0, 80, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(80, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        // EXPECT_CALL(*pt, draw(Rect(0, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0,
+        // nullptr)).Times(1);
         // //b
         s.draw();
     }
@@ -664,10 +665,14 @@ TEST_F(sNumber, RectNormal4)
         State::set(IndexNumber::_TEST1, 1234);
         s.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(80, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(60, 0, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(40, 0, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(20, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(80, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(60, 0, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         s.draw();
     }
 
@@ -675,10 +680,14 @@ TEST_F(sNumber, RectNormal4)
         State::set(IndexNumber::_TEST1, 6789);
         s.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(80, 80, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(60, 80, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(40, 80, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(20, 80, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(80, 80, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(60, 80, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(40, 80, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(20, 80, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         s.draw();
     }
 
@@ -686,11 +695,13 @@ TEST_F(sNumber, RectNormal4)
         State::set(IndexNumber::_TEST1, 0);
         s.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(0, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        // EXPECT_CALL(*pt, draw(Rect(0, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(0, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        // EXPECT_CALL(*pt, draw(Rect(0, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0,
+        // nullptr)).Times(1);
         // //b EXPECT_CALL(*pt, draw(Rect(0, 0, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0,
         // 0)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(0, 0, 20, 80), RectF(10, 0, 10, 10), dstColor,
-        // BlendMode::ALPHA, 0, 0)).Times(1);  //b
+        // BlendMode::ALPHA, 0, 0, nullptr)).Times(1);  //b
         s.draw();
     }
 }
@@ -704,9 +715,12 @@ TEST_F(sNumber, RectBzero4)
         State::set(IndexNumber::_TEST1, 123);
         s11.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         // EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0,
         // 0)).Times(1);  //b
         s11.draw();
@@ -716,10 +730,14 @@ TEST_F(sNumber, RectBzero4)
         State::set(IndexNumber::_TEST1, 6789);
         s11.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(90, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(80, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(70, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(60, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(90, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(80, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(70, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(60, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         s11.draw();
     }
 
@@ -727,13 +745,13 @@ TEST_F(sNumber, RectBzero4)
         State::set(IndexNumber::_TEST1, 0);
         s11.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 0
 
         // EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0,
         // 0)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(20, 0, 10, 10), dstColor,
-        // BlendMode::ALPHA, 0, 0)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(10, 0, 10, 10),
-        // dstColor, BlendMode::ALPHA, 0, 0)).Times(1);  //b
+        // BlendMode::ALPHA, 0, 0, nullptr)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(10, 0,
+        // 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr)).Times(1);  //b
         s11.draw();
     }
 }
@@ -747,13 +765,13 @@ TEST_F(sNumber, RectFull4)
         State::set(IndexNumber::_TEST1, 123);
         s24.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(60, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(60, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 3
-        EXPECT_CALL(*pt, draw(Rect(40, 0, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 2
-        EXPECT_CALL(*pt, draw(Rect(20, 0, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 1
-        EXPECT_CALL(*pt, draw(Rect(220, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(220, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // +
         s24.draw();
     }
@@ -762,13 +780,13 @@ TEST_F(sNumber, RectFull4)
         State::set(IndexNumber::_TEST1, 6789);
         s24.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(180, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(180, 0, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 9
-        EXPECT_CALL(*pt, draw(Rect(160, 0, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(160, 0, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 8
-        EXPECT_CALL(*pt, draw(Rect(140, 0, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(140, 0, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 7
-        EXPECT_CALL(*pt, draw(Rect(220, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(220, 0, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // +
         s24.draw();
     }
@@ -777,11 +795,11 @@ TEST_F(sNumber, RectFull4)
         State::set(IndexNumber::_TEST1, -20);
         s24.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(0, 80, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(0, 80, 20, 80), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 0
-        EXPECT_CALL(*pt, draw(Rect(40, 80, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(40, 80, 20, 80), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // 2
-        EXPECT_CALL(*pt, draw(Rect(220, 80, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(220, 80, 20, 80), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1); // -
 
         // EXPECT_CALL(*pt, draw(Rect(200, 80, 20, 80), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0,
@@ -799,10 +817,14 @@ TEST_F(sNumber, RectBzero4Right)
         State::set(IndexNumber::_TEST1, 123);
         sr.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         sr.draw();
     }
 
@@ -810,10 +832,14 @@ TEST_F(sNumber, RectBzero4Right)
         State::set(IndexNumber::_TEST1, 6789);
         sr.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(90, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(80, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(70, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(60, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(90, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(80, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(70, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(60, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         sr.draw();
     }
 
@@ -821,10 +847,14 @@ TEST_F(sNumber, RectBzero4Right)
         State::set(IndexNumber::_TEST1, 0);
         sr.update(t0);
 
-        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 160), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(100, 0, 10, 160), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         sr.draw();
     }
 }
@@ -839,9 +869,12 @@ TEST_F(sNumber, RectBzero4Anim1123)
         State::set(IndexNumber::_TEST1, 123);
         sa11.update(t1);
 
-        EXPECT_CALL(*pt, draw(Rect(30, 40, 10, 40), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(20, 40, 10, 40), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(10, 40, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(30, 40, 10, 40), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(20, 40, 10, 40), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(10, 40, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         // EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0,
         // 0)).Times(1);  //b
         sa11.draw();
@@ -856,10 +889,14 @@ TEST_F(sNumber, RectBzero4Anim16789)
         State::set(IndexNumber::_TEST1, 6789);
         sa11.update(t1);
 
-        EXPECT_CALL(*pt, draw(Rect(90, 40, 10, 40), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(80, 40, 10, 40), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(70, 40, 10, 40), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(60, 40, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(90, 40, 10, 40), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(80, 40, 10, 40), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(70, 40, 10, 40), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(60, 40, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         sa11.draw();
     }
 }
@@ -872,11 +909,12 @@ TEST_F(sNumber, RectBzero4Anim10)
         State::set(IndexNumber::_TEST1, 0);
         sa11.update(t1);
 
-        EXPECT_CALL(*pt, draw(Rect(0, 40, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(0, 40, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         // EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0,
         // 0)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(20, 0, 10, 10), dstColor,
-        // BlendMode::ALPHA, 0, 0)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(10, 0, 10, 10),
-        // dstColor, BlendMode::ALPHA, 0, 0)).Times(1);  //b
+        // BlendMode::ALPHA, 0, 0, nullptr)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(10, 0,
+        // 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr)).Times(1);  //b
         sa11.draw();
     }
 }
@@ -890,9 +928,12 @@ TEST_F(sNumber, RectBzero4Anim3123)
         State::set(IndexNumber::_TEST1, 123);
         sa11.update(t3);
 
-        EXPECT_CALL(*pt, draw(Rect(30, 120, 10, 40), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(20, 120, 10, 40), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(10, 120, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(30, 120, 10, 40), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(20, 120, 10, 40), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(10, 120, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         // EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0,
         // 0)).Times(1);  //b
         sa11.draw();
@@ -907,10 +948,14 @@ TEST_F(sNumber, RectBzero4Anim36789)
         State::set(IndexNumber::_TEST1, 6789);
         sa11.update(t3);
 
-        EXPECT_CALL(*pt, draw(Rect(90, 120, 10, 40), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(80, 120, 10, 40), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(70, 120, 10, 40), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
-        EXPECT_CALL(*pt, draw(Rect(60, 120, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(90, 120, 10, 40), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(80, 120, 10, 40), RectF(20, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(70, 120, 10, 40), RectF(10, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
+        EXPECT_CALL(*pt, draw(Rect(60, 120, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         sa11.draw();
     }
 }
@@ -923,11 +968,12 @@ TEST_F(sNumber, RectBzero4Anim30)
         State::set(IndexNumber::_TEST1, 0);
         sa11.update(t3);
 
-        EXPECT_CALL(*pt, draw(Rect(0, 120, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0)).Times(1);
+        EXPECT_CALL(*pt, draw(Rect(0, 120, 10, 40), RectF(0, 0, 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(1);
         // EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(30, 0, 10, 10), dstColor, BlendMode::ALPHA, 0,
         // 0)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(20, 0, 10, 10), dstColor,
-        // BlendMode::ALPHA, 0, 0)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(10, 0, 10, 10),
-        // dstColor, BlendMode::ALPHA, 0, 0)).Times(1);  //b
+        // BlendMode::ALPHA, 0, 0, nullptr)).Times(1);  //b EXPECT_CALL(*pt, draw(Rect(100, 40, 10, 40), RectF(10, 0,
+        // 10, 10), dstColor, BlendMode::ALPHA, 0, 0, nullptr)).Times(1);  //b
         sa11.draw();
     }
 }
@@ -1034,25 +1080,29 @@ TEST_F(sSlider, updateLeft)
 
     State::set(IndexSlider::_TEST1, 0);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 0.33);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0 - 33, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0 - 33, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 0.50);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0 - 50, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0 - 50, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 1.00);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0 - 100, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0 - 100, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 }
@@ -1065,25 +1115,29 @@ TEST_F(sSlider, updateRight)
 
     State::set(IndexSlider::_TEST1, 0);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 0.33);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0 + 33, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0 + 33, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 0.5);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0 + 50, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0 + 50, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 1);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0 + 100, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0 + 100, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 }
@@ -1096,25 +1150,29 @@ TEST_F(sSlider, updateUp)
 
     State::set(IndexSlider::_TEST1, 0);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 0.33);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0 - 66, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0, 0 - 66, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 0.50);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0 - 100, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0, 0 - 100, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 1.00);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0 - 200, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0, 0 - 200, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 }
@@ -1127,25 +1185,29 @@ TEST_F(sSlider, updateDown)
 
     State::set(IndexSlider::_TEST1, 0);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 0.33);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0 + 66, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0, 0 + 66, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 0.505);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0 + 101, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0, 0 + 101, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     State::set(IndexSlider::_TEST1, 1.00);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0 + 200, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0, 0 + 200, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 }
@@ -1204,28 +1266,29 @@ TEST_F(sBargraph, updateLeft)
 
     lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(200, 0, 0, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(200, 0, 0, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(0.33);
     s.update(t0);
-    EXPECT_CALL(*pt,
-                draw(TEST_RECT, RectF(200 - 66, 0, 66, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(200 - 66, 0, 66, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(0.50);
     s.update(t0);
-    EXPECT_CALL(*pt,
-                draw(TEST_RECT, RectF(200 - 100, 0, 100, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(200 - 100, 0, 100, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(1.00);
     s.update(t0);
-    EXPECT_CALL(*pt,
-                draw(TEST_RECT, RectF(200 - 200, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(200 - 200, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                          Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 }
@@ -1238,25 +1301,29 @@ TEST_F(sBargraph, updateRight)
 
     lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 0, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(0.33);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 66, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 66, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(0.5);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 100, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 100, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(1);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 }
@@ -1269,25 +1336,29 @@ TEST_F(sBargraph, updateUp)
 
     lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 200, 200, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 200, 200, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(0.33);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 134, 200, 66), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0, 134, 200, 66), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(0.50);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 100, 200, 100), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(
+        *pt, draw(TEST_RECT, RectF(0, 100, 200, 100), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(1.00);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 }
@@ -1300,25 +1371,29 @@ TEST_F(sBargraph, updateDown)
 
     lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 200, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(0.33);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 66), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 200, 66), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(0.505);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 101), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 200, 101), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 
     lunaticvibes::set_bargraph_test1(1.00);
     s.update(t0);
-    EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
+    EXPECT_CALL(*pt,
+                draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Pointee(Point(0, 0))))
         .Times(1);
     s.draw();
 }
@@ -1454,109 +1529,111 @@ TEST_F(sGaugeGrid, valUpdate)
     {
         State::set(IndexNumber::PLAY_1P_GROOVEGAUGE, 74);
         s1.update(t0);
-        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(0); // clear light
-        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(37 - 3); // normal light
-        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(11 - 1); // clear dark
-        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(39 - 37 - 1); // normal dark
 
-        EXPECT_CALL(*pt,
-                    draw(Rect(10, 0, 10, 40), RectF(0, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 2%
-        EXPECT_CALL(*pt,
-                    draw(Rect(10, 0, 10, 40), RectF(240, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 50%
-        EXPECT_CALL(*pt,
-                    draw(Rect(10, 0, 10, 40), RectF(360, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 74%
-        EXPECT_CALL(*pt,
-                    draw(Rect(30, 0, 10, 40), RectF(370, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 76%
-        EXPECT_CALL(
-            *pt, draw(Rect(20, 0, 10, 40), RectF(490, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 100%
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), RectF(0, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 2%
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), RectF(240, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 50%
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), RectF(360, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 74%
+        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), RectF(370, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 76%
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), RectF(490, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 100%
         s1.draw();
     }
     {
         State::set(IndexNumber::PLAY_1P_GROOVEGAUGE, 33); // 16.5, floor to 16
         s1.update(t0);
-        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(0); // clear light
-        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(16 - 2); // normal light
-        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(11 - 1); // clear dark
-        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(39 - 16 - 2); // normal dark
 
-        EXPECT_CALL(*pt,
-                    draw(Rect(10, 0, 10, 40), RectF(0, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 2%
-        EXPECT_CALL(*pt,
-                    draw(Rect(10, 0, 10, 40), RectF(150, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 32%
-        EXPECT_CALL(*pt,
-                    draw(Rect(30, 0, 10, 40), RectF(160, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 34%
-        EXPECT_CALL(*pt,
-                    draw(Rect(30, 0, 10, 40), RectF(370, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 76%
-        EXPECT_CALL(
-            *pt, draw(Rect(20, 0, 10, 40), RectF(490, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 100%
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), RectF(0, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 2%
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), RectF(150, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 32%
+        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), RectF(160, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 34%
+        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), RectF(370, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 76%
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), RectF(490, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 100%
         s1.draw();
     }
     {
         State::set(IndexNumber::PLAY_1P_GROOVEGAUGE, 98);
         s1.update(t0);
-        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(11 - 1 - 1); // clear light
-        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(39 - 3); // normal light
-        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(1 - 1); // clear dark
-        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0))
+        EXPECT_CALL(*pt, draw(Rect(30, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
             .Times(0); // normal dark
 
-        EXPECT_CALL(*pt,
-                    draw(Rect(10, 0, 10, 40), RectF(0, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 2%
-        EXPECT_CALL(*pt,
-                    draw(Rect(10, 0, 10, 40), RectF(150, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 32%
-        EXPECT_CALL(*pt,
-                    draw(Rect(10, 0, 10, 40), RectF(370, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 76%
-        EXPECT_CALL(*pt,
-                    draw(Rect(0, 0, 10, 40), RectF(430, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 88%
-        EXPECT_CALL(
-            *pt, draw(Rect(20, 0, 10, 40), RectF(490, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 100%
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), RectF(0, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 2%
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), RectF(150, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 32%
+        EXPECT_CALL(*pt, draw(Rect(10, 0, 10, 40), RectF(370, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 76%
+        EXPECT_CALL(*pt, draw(Rect(0, 0, 10, 40), RectF(430, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 88%
+        EXPECT_CALL(*pt, draw(Rect(20, 0, 10, 40), RectF(490, 0, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 100%
         s1.draw();
     }
     {
         State::set(IndexNumber::PLAY_2P_GROOVEGAUGE, 100);
         s2.update(t0);
-        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)).Times(45);
-        EXPECT_CALL(*pt, draw(Rect(50, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)).Times(0);
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr)).Times(45);
+        EXPECT_CALL(*pt, draw(Rect(50, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr)).Times(0);
 
-        EXPECT_CALL(
-            *pt, draw(Rect(40, 0, 10, 40), RectF(490, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 2%
-        EXPECT_CALL(
-            *pt, draw(Rect(40, 0, 10, 40), RectF(250, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 50%
-        EXPECT_CALL(
-            *pt, draw(Rect(40, 0, 10, 40), RectF(130, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 74%
-        EXPECT_CALL(
-            *pt, draw(Rect(40, 0, 10, 40), RectF(120, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 76%
-        EXPECT_CALL(
-            *pt, draw(Rect(40, 0, 10, 40), RectF(0, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 100%
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), RectF(490, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 2%
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), RectF(250, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 50%
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), RectF(130, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 74%
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), RectF(120, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 76%
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), RectF(0, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 100%
         s2.draw();
     }
     {
         State::set(IndexNumber::PLAY_2P_GROOVEGAUGE, 50);
         s2.update(t0);
-        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)).Times(25 - 2);
-        EXPECT_CALL(*pt, draw(Rect(50, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)).Times(45 - (25 - 2));
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(25 - 2);
+        EXPECT_CALL(*pt, draw(Rect(50, 0, 10, 40), _, Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, nullptr))
+            .Times(45 - (25 - 2));
 
-        EXPECT_CALL(
-            *pt, draw(Rect(40, 0, 10, 40), RectF(490, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 2%
-        EXPECT_CALL(
-            *pt, draw(Rect(40, 0, 10, 40), RectF(250, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 50%
-        EXPECT_CALL(
-            *pt, draw(Rect(50, 0, 10, 40), RectF(130, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 74%
-        EXPECT_CALL(
-            *pt, draw(Rect(50, 0, 10, 40), RectF(120, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 76%
-        EXPECT_CALL(
-            *pt, draw(Rect(50, 0, 10, 40), RectF(0, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0)); // 100%
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), RectF(490, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 2%
+        EXPECT_CALL(*pt, draw(Rect(40, 0, 10, 40), RectF(250, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 50%
+        EXPECT_CALL(*pt, draw(Rect(50, 0, 10, 40), RectF(130, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 74%
+        EXPECT_CALL(*pt, draw(Rect(50, 0, 10, 40), RectF(120, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 76%
+        EXPECT_CALL(*pt, draw(Rect(50, 0, 10, 40), RectF(0, 100, 10, 40), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0,
+                              nullptr)); // 100%
         s2.draw();
     }
 }
