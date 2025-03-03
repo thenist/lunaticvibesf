@@ -1555,7 +1555,6 @@ void createNotification(StringContent text)
     lunaticvibes::assert_failed("skinTypeForKeysBattle");
 }
 
-// Chart taken from `gChartContext.chart`.
 void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType)
 {
     gChartContext.chart = std::move(chart_);
