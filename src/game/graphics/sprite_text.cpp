@@ -2,6 +2,7 @@
 
 #include <common/assert.h>
 #include <common/sysutil.h>
+#include <game/graphics/font.h>
 
 #include <cmath>
 #include <string_view>

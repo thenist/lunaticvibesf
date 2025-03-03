@@ -3,7 +3,6 @@
 // Don't include graphics platform here. It leaks a lot of details.
 // TODO: actually don't do that, lol.
 #include <game/graphics/SDL2/graphics_SDL2.h>
-#include <game/graphics/SDL2/ttf_SDL2.h>
 
 #include <common/types.h>
 #include <game/graphics/blend_mode.h> // IWYU pragma: export

@@ -53,6 +53,7 @@ inline SceneType getSceneFromSkinType(SkinType m)
 
 namespace lunaticvibes
 {
+class Font;
 // Update global state to next course stage.
 [[nodiscard]] SceneType advanceCourseStage(const SceneType exitScene, const SceneType playScene);
 } // namespace lunaticvibes
@@ -68,7 +69,7 @@ protected:
     bool inTextEdit = false;
     unsigned _rate;
 
-    std::shared_ptr<TTFFont> _fNotifications;
+    std::shared_ptr<lunaticvibes::Font> _fNotifications;
     std::shared_ptr<Texture> _texNotificationsBG;
     std::array<std::shared_ptr<SpriteText>,
                size_t(IndexText::_OVERLAY_NOTIFICATION_MAX) - size_t(IndexText::_OVERLAY_NOTIFICATION_0) + 1>

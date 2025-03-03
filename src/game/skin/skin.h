@@ -16,6 +16,11 @@ class SpriteLaneVertical;
 class SpriteText;
 class iSpriteMouse;
 
+namespace lunaticvibes
+{
+class Font;
+} // namespace lunaticvibes
+
 enum class SkinVersion
 {
     UNDEF,
@@ -51,7 +56,7 @@ public:
 
     // Images
 protected:
-    std::map<std::string, std::shared_ptr<TTFFont>> fontNameMap;
+    std::map<std::string, std::shared_ptr<lunaticvibes::Font>> fontNameMap;
 
     // Textures
 protected:

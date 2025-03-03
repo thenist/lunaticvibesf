@@ -1,12 +1,11 @@
-#include "ttf_SDL2.h"
-
-#include <SDL_ttf.h>
-
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/sysutil.h>
 #include <common/u8.h>
 #include <game/graphics/SDL2/graphics_SDL2.h>
+#include <game/graphics/font.h>
+
+#include <SDL_ttf.h>
 
 #include <filesystem>
 #include <functional>

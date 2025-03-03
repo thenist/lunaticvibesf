@@ -11,6 +11,7 @@
 #include <common/sysutil.h>
 #include <config/cfg_profile.h>
 #include <config/config_mgr.h>
+#include <game/graphics/font.h>
 #include <game/graphics/graphics.h>
 #include <game/graphics/sprite.h>
 #include <game/graphics/texture_video.h>
@@ -61,7 +62,7 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
         const Path fontPath = getSysMonoFontPath(nullptr, &faceIndex, i18n::getCurrentLanguage());
         const int notificationHeight = 20;
         const int textHeight = 24;
-        _fNotifications = std::make_shared<TTFFont>(fontPath, int(textHeight * 1.5), faceIndex);
+        _fNotifications = std::make_shared<lunaticvibes::Font>(fontPath, int(textHeight * 1.5), faceIndex);
         _texNotificationsBG = std::make_shared<TextureFull>(0x000000ff);
         for (size_t i = 0; i < _sNotifications.size(); ++i)
         {

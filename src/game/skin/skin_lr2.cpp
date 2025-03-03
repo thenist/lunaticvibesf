@@ -29,6 +29,7 @@
 #include <config/cfg_skin.h>
 #include <config/config_mgr.h>
 #include <game/graphics/dxa.h>
+#include <game/graphics/font.h>
 #include <game/graphics/sprite.h>
 #include <game/graphics/sprite_bar_entry.h>
 #include <game/graphics/sprite_graph.h>
@@ -920,7 +921,7 @@ int SkinLR2::SYSTEMFONT()
         int faceIndex;
         Path fontPath = getSysMonoFontPath(nullptr, &faceIndex, i18n::getCurrentLanguage());
         size_t idx = fontNameMap.size();
-        fontNameMap[std::to_string(idx)] = std::make_shared<TTFFont>(fontPath, ptsize, faceIndex);
+        fontNameMap[std::to_string(idx)] = std::make_shared<lunaticvibes::Font>(fontPath, ptsize, faceIndex);
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added FONT[" << idx << "]: " << fontPath;
         return 1;
     }

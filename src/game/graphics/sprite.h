@@ -16,6 +16,7 @@
 
 namespace lunaticvibes
 {
+class Font;
 bool isPanelOpen(int panelIdx);
 } // namespace lunaticvibes
 
@@ -335,11 +336,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 
 // Text sprite:
-// TTFFont contains Texture object
+// Font contains the actual Texture object
 class SpriteText : public SpriteBase, public iSpriteMouse
 {
 private:
-    std::shared_ptr<TTFFont> pFont;
+    std::shared_ptr<lunaticvibes::Font> pFont;
     unsigned textHeight;
     Color textColor;
 
@@ -364,7 +365,7 @@ protected:
 public:
     struct SpriteTextBuilder : SpriteBuilder
     {
-        std::shared_ptr<TTFFont> font = nullptr;
+        std::shared_ptr<lunaticvibes::Font> font = nullptr;
         IndexText textInd = IndexText::INVALID;
         TextAlign align = TEXT_ALIGN_LEFT;
         unsigned ptsize = 72;

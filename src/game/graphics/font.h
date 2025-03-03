@@ -26,5 +26,3 @@ public:
 };
 
 } // namespace lunaticvibes
-
-using TTFFont = lunaticvibes::Font;
