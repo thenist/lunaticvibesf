@@ -4507,24 +4507,16 @@ void SkinLR2::update(const lunaticvibes::Time& t)
                 if (pS->getLane().first == chart::NoteLaneCategory::EXTRA)
                 {
                     if (pS->getLane().second == chart::NoteLaneExtra::EXTRA_BARLINE_1P)
-                    {
                         pS->adjustAfterUpdate(move1PX, move1PY, adjustPlayNote1PW, 0);
-                    }
                     else
-                    {
                         pS->adjustAfterUpdate(move2PX, move2PY, adjustPlayNote2PW, 0);
-                    }
                 }
                 else
                 {
                     if (pS->playerSlot == PLAYER_SLOT_PLAYER)
-                    {
                         pS->adjustAfterUpdate(move1PX, move1PY, adjustPlayNote1PW, -adjustPlayNote1PH);
-                    }
                     else if (pS->playerSlot == PLAYER_SLOT_TARGET)
-                    {
                         pS->adjustAfterUpdate(move2PX, move2PY, adjustPlayNote2PW, -adjustPlayNote2PH);
-                    }
                 }
             }
         });
