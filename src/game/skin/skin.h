@@ -152,6 +152,8 @@ public:
     [[nodiscard]] virtual StringContent getMaker() const = 0;
     [[nodiscard]] virtual StringPath getFilePath() const = 0;
 
+    [[nodiscard]] virtual const std::vector<std::string>& getHelpFiles() const = 0;
+
     // For customize scene itself.
     void setThumbnailTextureSize(int w, int h);
 

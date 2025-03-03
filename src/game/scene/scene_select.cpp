@@ -39,7 +39,6 @@
 #include <game/scene/scene_customize.h>
 #include <game/scene/scene_pre_select.h>
 #include <game/scene/scene_select.h>
-#include <game/skin/skin_lr2.h>
 #include <game/skin/skin_lr2_button_callbacks.h>
 #include <game/skin/skin_lr2_slider_callbacks.h>
 #include <game/skin/skin_mgr.h>
@@ -651,13 +650,7 @@ void SceneSelect::openChartReadme(const lunaticvibes::Time& open_time)
 
 void SceneSelect::openHelpFile(const lunaticvibes::Time& open_time, size_t idx)
 {
-    std::shared_ptr<SkinLR2> s = std::dynamic_pointer_cast<SkinLR2>(pSkin);
-    if (s == nullptr)
-    {
-        LOG_ERROR << "[Select] Skin error";
-        return;
-    }
-    const std::vector<std::string>& help_files = s->getHelpFiles();
+    const std::vector<std::string>& help_files = pSkin->getHelpFiles();
     if (idx >= help_files.size())
     {
         LOG_WARNING << "[Select] Trying to open out-of-bounds help file";

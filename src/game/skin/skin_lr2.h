@@ -405,7 +405,7 @@ public:
     [[nodiscard]] StringContent getMaker() const override;
     [[nodiscard]] StringPath getFilePath() const override;
 
-    [[nodiscard]] const std::vector<std::string>& getHelpFiles() const;
+    [[nodiscard]] const std::vector<std::string>& getHelpFiles() const override;
 
 private:
     std::vector<std::string> _helpFiles;
