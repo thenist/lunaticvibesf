@@ -5,6 +5,7 @@
 #include <common/sysutil.h>
 #include <common/u8.h>
 #include <common/utils.h>
+#include <game/graphics/SDL2/graphics_SDL2.h>
 #include <game/graphics/color.h>
 #include <game/graphics/rect.h>
 
@@ -132,6 +133,11 @@ Rect Image::getRect() const
     if (_pSurface == nullptr)
         return {};
     return {0, 0, _pSurface->w, _pSurface->h};
+}
+
+Texture Image::build_texture() const
+{
+    return Texture{_pSurface.get()};
 }
 
 bool lunaticvibes::save_into_png(SDL_Surface* surface, const std::filesystem::path& path)

@@ -178,12 +178,12 @@ bool TextureBmsBga::addBmp(size_t idx, Path pBmp)
         {
             Image img(pBmp);
             objs[idx].type = obj::Ty::PIC;
-            objs[idx].pt = std::make_shared<Texture>(img);
+            objs[idx].pt = std::make_shared<Texture>(img.build_texture());
 
             auto layerImg = std::move(img);
             layerImg.setTransparentColorRGB(Color(0, 0, 0, 255));
             objs_layer[idx].type = obj::Ty::PIC;
-            objs_layer[idx].pt = std::make_shared<Texture>(layerImg);
+            objs_layer[idx].pt = std::make_shared<Texture>(layerImg.build_texture());
 
             LOG_DEBUG << "[TextureBmsBga] added pic: " << pBmp;
             return true;
@@ -480,7 +480,7 @@ void TextureDynamic::applyImageIfNeeded()
         return;
 
     Image image = _loadImage.get();
-    _dynTexture = std::make_unique<Texture>(image);
+    _dynTexture = std::make_unique<Texture>(image.build_texture());
     // For public Texture methods.
     textureRect = image.getRect();
     loaded = _dynTexture->isLoaded();

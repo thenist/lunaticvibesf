@@ -4,18 +4,12 @@
 
 #include <gmock/gmock.h>
 
-class mock_Image : public Image
-{
-public:
-    mock_Image() : Image("") {}
-};
-
 static constexpr Rect TEST_RECT{0, 0, 256, 256};
 static constexpr lunaticvibes::Time t0{1}, t1{2}, t2{3}, t3{4}, t4{5}, t5{6}, t6{7}, t7{8};
 class mock_Texture : public Texture
 {
 public:
-    mock_Texture() : Texture(mock_Image())
+    mock_Texture() : Texture(nullptr)
     {
         textureRect = TEST_RECT;
         loaded = true;

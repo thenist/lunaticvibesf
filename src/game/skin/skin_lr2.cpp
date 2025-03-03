@@ -741,7 +741,7 @@ int SkinLR2::IMAGE()
         Image img{pathFile};
         if (!img.hasAlphaLayer() && info.hasTransparentColor)
             img.setTransparentColorRGB(info.transparentColor);
-        _base_shared_data->textureNameMap[textureMapKey] = std::make_shared<Texture>(img);
+        _base_shared_data->textureNameMap[textureMapKey] = std::make_shared<Texture>(img.build_texture());
     }
 
     LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added IMAGE[" << imageCount << "]: " << pathFile;
@@ -839,7 +839,7 @@ int SkinLR2::LR2FONT()
             // スキンcsvとは違って「lr2fontファイルからの相対参照」で画像ファイルを指定します。
             Path p = path.parent_path() / PathFromUTF8(tokens[2]);
             findAndExtractDXA(p);
-            pf->T_texture.push_back(std::make_shared<Texture>(Image{p}));
+            pf->T_texture.push_back(std::make_shared<Texture>(Image{p}.build_texture()));
         }
         else if (matchToken(key, "#R"))
         {

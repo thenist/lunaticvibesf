@@ -15,8 +15,6 @@ struct SDL_Renderer;
 struct SDL_Surface;
 struct SDL_Texture;
 
-class Image;
-
 // global control pointer, do not modify
 inline SDL_Renderer* gFrameRenderer;
 
@@ -63,7 +61,6 @@ public:
     };
 
 public:
-    Texture(const Image& srcImage);
     Texture(const SDL_Surface* pSurface);
     Texture(SDL_Texture* pTexture, int w, int h);
     Texture(int w, int h, PixelFormat fmt, bool target);

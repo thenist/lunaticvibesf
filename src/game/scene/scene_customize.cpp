@@ -595,7 +595,7 @@ void SceneCustomize::load(SkinType mode)
             optionsKeyList.push_back(opSkin.internalName);
         }
 
-        *pSkin->getTextureCustomizeThumbnail() = Texture{Image{ss.getThumbnailPath()}};
+        *pSkin->getTextureCustomizeThumbnail() = Image{ss.getThumbnailPath()}.build_texture();
 
         configFilePath = ss.getFilePath();
     }

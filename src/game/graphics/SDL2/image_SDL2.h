@@ -10,7 +10,9 @@
 struct SDL_RWops;
 struct SDL_Surface;
 
-// SDL_Image loads pictures into SDL_Surface instances
+class Texture;
+
+// Under the hood SDL_Image loads pictures into SDL_Surface instances.
 class Image
 {
 private:
@@ -32,7 +34,8 @@ public:
     [[nodiscard]] Rect getRect() const;
     [[nodiscard]] bool isLoaded() const { return loaded; }
     [[nodiscard]] const std::string& path() const { return _path; }
-    [[nodiscard]] std::shared_ptr<SDL_Surface> surface() const { return _pSurface; }
+
+    [[nodiscard]] Texture build_texture() const;
 };
 
 namespace lunaticvibes

@@ -20,28 +20,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Texture
 
-Texture::Texture(const Image& srcImage)
-{
-    if (!srcImage.isLoaded())
-        return;
-
-    _texture = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(
-            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, srcImage.surface().get())),
-        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-    if (_texture)
-    {
-        textureRect = srcImage.getRect();
-        loaded = true;
-        LOG_VERBOSE << "[Texture] Build texture object finished. " << srcImage.path();
-    }
-    else
-    {
-        LOG_WARNING << "[Texture] Build texture object error! " << srcImage.path();
-        LOG_WARNING << "[Texture] ^ " << SDL_GetError();
-    }
-}
-
 Texture::Texture(const SDL_Surface* pSurface)
 {
     _texture = std::shared_ptr<SDL_Texture>(
