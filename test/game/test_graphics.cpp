@@ -20,10 +20,14 @@ public:
         textureRect = TEST_RECT;
         loaded = true;
     }
-    MOCK_CONST_METHOD6(draw, void(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend,
-                                  const bool filter, const double angleInDegrees));
-    MOCK_CONST_METHOD7(draw, void(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend,
-                                  const bool filter, const double angleInDegrees, const Point& pt));
+    MOCK_METHOD(void, draw,
+                (const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
+                 const double angleInDegrees),
+                (const override));
+    MOCK_METHOD(void, draw,
+                (const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
+                 const double angleInDegrees, const Point& pt),
+                (const override));
 };
 
 TEST(Color, construct)
@@ -99,7 +103,7 @@ class mock_SpriteBase : public SpriteBase
 {
 public:
     mock_SpriteBase(const SpriteBuilder& builder) : SpriteBase(builder) {}
-    MOCK_CONST_METHOD0(draw, void());
+    MOCK_METHOD(void, draw, (), (const override));
     FRIEND_TEST(TestSpriteBase, rectConstruct);
     FRIEND_TEST(TestSpriteBase, FuncUpdate);
 };
