@@ -239,9 +239,6 @@ void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const Blen
     do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, angle, center);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// TextureFull
-
 struct SdlSurfaceDeleter
 {
     void operator()(SDL_Surface* surface) { SDL_FreeSurface(surface); }
@@ -249,18 +246,11 @@ struct SdlSurfaceDeleter
 
 static std::unique_ptr<SDL_Surface, SdlSurfaceDeleter> make_full(const Color& c)
 {
+    // NOTE: whatever srcrect you will use to render this, SDL will show the whole texture.
     auto surface = SDL_CreateRGBSurfaceWithFormat(0, 1, 1, 24, SDL_PIXELFORMAT_RGB24);
     const SDL_Rect textureRect = {0, 0, 1, 1};
     SDL_FillRect(&*surface, &textureRect, SDL_MapRGBA(surface->format, c.r, c.g, c.b, c.a));
     return std::unique_ptr<SDL_Surface, SdlSurfaceDeleter>{surface};
 }
 
-TextureFull::TextureFull(const Color& c) : Texture(make_full(c).get()) {}
-TextureFull::~TextureFull() = default;
-void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const BlendMode b, const bool filter,
-                       const double angle, const Point* center) const
-{
-    (void)ignored;
-    (void)filter;
-    do_draw(_texture.get(), nullptr, dstRect, c, b, angle, center);
-}
+Texture::Texture(const Color& c) : Texture(make_full(c).get()) {}

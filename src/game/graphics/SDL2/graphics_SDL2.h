@@ -63,6 +63,7 @@ public:
 public:
     Texture(const SDL_Surface* pSurface);
     Texture(SDL_Texture* pTexture, int w, int h);
+    Texture(const Color& color);
     Texture(int w, int h, PixelFormat fmt, bool target);
     virtual ~Texture() = default;
 
@@ -71,18 +72,4 @@ public:
     [[nodiscard]] Rect getRect() const { return textureRect; }
     [[nodiscard]] bool isLoaded() const { return loaded; }
     int updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* V, int Vpitch);
-};
-
-// Special texture class that always uses full texture size as output rect.
-// That is, srcRect is ignored and replaced with textureRects.
-// Useful when rendering BGs and Error-texture.
-class TextureFull : public Texture
-{
-private:
-    void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees, const Point* center) const override;
-
-public:
-    TextureFull(const Color& srcColor);
-    ~TextureFull() override;
 };

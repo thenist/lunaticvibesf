@@ -63,7 +63,7 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
         const int notificationHeight = 20;
         const int textHeight = 24;
         _fNotifications = std::make_shared<lunaticvibes::Font>(fontPath, int(textHeight * 1.5), faceIndex);
-        _texNotificationsBG = std::make_shared<TextureFull>(0x000000ff);
+        _texNotificationsBG = std::make_shared<Texture>(0x000000ff);
         for (size_t i = 0; i < _sNotifications.size(); ++i)
         {
             SpriteText::SpriteTextBuilder textBuilder;

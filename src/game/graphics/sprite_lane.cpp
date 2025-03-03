@@ -15,7 +15,7 @@ SpriteLaneVertical::SpriteLaneVertical(const SpriteLaneVerticalBuilder& builder)
     _hispeed = 1.0;
     _category = builder.laneCategory;
     _index = builder.laneIndex;
-    _hiddenCompatibleTexture = std::make_shared<TextureFull>(Color(128, 128, 128, 255));
+    _hiddenCompatibleTexture = std::make_shared<Texture>(Color(128, 128, 128, 255));
 
     if (_category != chart::NoteLaneCategory::EXTRA)
     {

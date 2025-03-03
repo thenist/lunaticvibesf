@@ -22,9 +22,9 @@ SkinBase::SkinBase(std::shared_ptr<SharedData> data_)
     LVF_ASSERT(_base_shared_data != nullptr);
     if (auto& preDefinedTextures = _base_shared_data->preDefinedTextures; preDefinedTextures.empty())
     {
-        preDefinedTextures["Black"] = std::make_shared<TextureFull>(0x000000ff);
-        preDefinedTextures["White"] = std::make_shared<TextureFull>(0xffffffff);
-        preDefinedTextures["Error"] = std::make_shared<TextureFull>(0xff00ffff);
+        preDefinedTextures["Black"] = std::make_shared<Texture>(0x000000ff);
+        preDefinedTextures["White"] = std::make_shared<Texture>(0xffffffff);
+        preDefinedTextures["Error"] = std::make_shared<Texture>(0xff00ffff);
         preDefinedTextures["STAGEFILE"] = std::shared_ptr<Texture>(&gChartContext.texStagefile, [](Texture*) {});
         preDefinedTextures["BACKBMP"] = std::shared_ptr<Texture>(&gChartContext.texBackbmp, [](Texture*) {});
         preDefinedTextures["BANNER"] = std::shared_ptr<Texture>(&gChartContext.texBanner, [](Texture*) {});
