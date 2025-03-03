@@ -25,10 +25,6 @@ public:
     void update();
     void reset();
 
-    void draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees) const override;
-    void draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter, const double angleInDegrees,
-              const Point& center) const override;
     void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
               const double angleInDegrees) const override;
     void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
@@ -135,10 +131,6 @@ public:
     void setPath(const Path& path); // Asynchronously load the image from disk.
     void applyImageIfNeeded();      // Synchronously upload the image to GPU.
 
-    void draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees) const override;
-    void draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter, const double angleInDegrees,
-              const Point& center) const override;
     void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
               const double angleInDegrees) const override;
     void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,

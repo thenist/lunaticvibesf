@@ -33,11 +33,6 @@ protected:
     void maybe_set_filtering(bool) const;
 
 public:
-    // Inner draw function.
-    virtual void draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                      const double angleInDegrees) const;
-    virtual void draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                      const double angleInDegrees, const Point& center) const;
     virtual void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
                       const double angleInDegrees) const;
     virtual void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,

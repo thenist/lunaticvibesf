@@ -249,19 +249,6 @@ void Texture::maybe_set_filtering(bool filter) const
         SDL_SetTextureScaleMode(_texture.get(), mode);
 }
 
-void Texture::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle) const
-{
-    maybe_set_filtering(filter);
-    do_draw(_texture.get(), nullptr, dstRect, c, b, angle, nullptr);
-}
-
-void Texture::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle,
-                   const Point& center) const
-{
-    maybe_set_filtering(filter);
-    do_draw(_texture.get(), nullptr, dstRect, c, b, angle, &center);
-}
-
 void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
                    const double angle) const
 {

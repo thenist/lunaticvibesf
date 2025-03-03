@@ -122,16 +122,6 @@ void TextureVideo::stopUpdate()
     updated = false;
 }
 
-void TextureVideo::draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                        const double angleInDegrees) const
-{
-    Texture::draw(dstRect, updated ? c : Color(0, 0, 0, c.a), blend, filter, angleInDegrees);
-}
-void TextureVideo::draw(RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-                        const double angleInDegrees, const Point& center) const
-{
-    Texture::draw(dstRect, updated ? c : Color(0, 0, 0, c.a), blend, filter, angleInDegrees, center);
-}
 void TextureVideo::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
                         const double angleInDegrees) const
 {
@@ -539,17 +529,6 @@ void TextureDynamic::applyImageIfNeeded()
     // For public Texture methods.
     textureRect = image.getRect();
     loaded = _dynTexture->isLoaded();
-}
-
-void TextureDynamic::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle) const
-{
-    _dynTexture->draw(dstRect, c, b, filter, angle);
-}
-
-void TextureDynamic::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle,
-                          const Point& center) const
-{
-    _dynTexture->draw(dstRect, c, b, filter, angle, center);
 }
 
 void TextureDynamic::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
