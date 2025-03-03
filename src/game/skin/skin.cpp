@@ -20,19 +20,17 @@ SkinBase::SkinBase(std::shared_ptr<SharedData> data_)
 
     _base_shared_data = std::move(data_);
     LVF_ASSERT(_base_shared_data != nullptr);
-    if (auto& preDefinedTextures = _base_shared_data->preDefinedTextures; preDefinedTextures.empty())
-    {
-        preDefinedTextures["Black"] = std::make_shared<Texture>(0x000000ff);
-        preDefinedTextures["White"] = std::make_shared<Texture>(0xffffffff);
-        preDefinedTextures["Error"] = std::make_shared<Texture>(0xff00ffff);
-        preDefinedTextures["STAGEFILE"] = std::shared_ptr<Texture>(&gChartContext.texStagefile, [](Texture*) {});
-        preDefinedTextures["BACKBMP"] = std::shared_ptr<Texture>(&gChartContext.texBackbmp, [](Texture*) {});
-        preDefinedTextures["BANNER"] = std::shared_ptr<Texture>(&gChartContext.texBanner, [](Texture*) {});
-        preDefinedTextures["THUMBNAIL"] = std::make_shared<Texture>(1920, 1080, Texture::PixelFormat::RGB24, true);
-    }
 
-    for (auto& [key, texture] : _base_shared_data->preDefinedTextures)
-        _base_shared_data->textureNameMap[key] = texture;
+    if (_base_shared_data->black == nullptr /*then others too*/)
+    {
+        _base_shared_data->black = std::make_shared<Texture>(0x000000ff);
+        _base_shared_data->white = std::make_shared<Texture>(0xffffffff);
+        _base_shared_data->error = std::make_shared<Texture>(0xff00ffff);
+        _base_shared_data->stagefile = std::shared_ptr<Texture>(&gChartContext.texStagefile, [](Texture*) {});
+        _base_shared_data->backbmp = std::shared_ptr<Texture>(&gChartContext.texBackbmp, [](Texture*) {});
+        _base_shared_data->banner = std::shared_ptr<Texture>(&gChartContext.texBanner, [](Texture*) {});
+        _base_shared_data->thumbnail = std::make_shared<Texture>(1920, 1080, Texture::PixelFormat::RGB24, true);
+    }
 }
 
 SkinBase::~SkinBase()
@@ -201,10 +199,10 @@ void SkinBase::stopTextEdit(bool modify)
 
 std::shared_ptr<Texture> SkinBase::getTextureCustomizeThumbnail()
 {
-    return _base_shared_data->textureNameMap["THUMBNAIL"];
+    return _base_shared_data->thumbnail;
 }
 
 void SkinBase::setThumbnailTextureSize(int w, int h)
 {
-    *_base_shared_data->textureNameMap["THUMBNAIL"] = Texture{w, h, Texture::PixelFormat::RGB24, true};
+    *_base_shared_data->thumbnail = Texture{w, h, Texture::PixelFormat::RGB24, true};
 }

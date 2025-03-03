@@ -34,7 +34,13 @@ class SkinBase
 public:
     struct SharedData
     {
-        std::map<std::string, std::shared_ptr<Texture>> preDefinedTextures;
+        std::shared_ptr<Texture> backbmp;
+        std::shared_ptr<Texture> banner;
+        std::shared_ptr<Texture> black;
+        std::shared_ptr<Texture> error;
+        std::shared_ptr<Texture> stagefile;
+        std::shared_ptr<Texture> thumbnail;
+        std::shared_ptr<Texture> white;
         std::map<std::string, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
     };
 

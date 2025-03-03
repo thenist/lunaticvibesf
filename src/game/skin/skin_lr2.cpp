@@ -15,6 +15,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 
 #include <common/assert.h>
@@ -737,7 +738,7 @@ int SkinLR2::IMAGE()
     if (lunaticvibes::is_video_file_path(pathFile))
     {
         videoNameMap[textureMapKey] = std::make_shared<sVideo>(pathFile, 1.0, true);
-        _base_shared_data->textureNameMap[textureMapKey] = _base_shared_data->textureNameMap["White"];
+        _base_shared_data->textureNameMap[textureMapKey] = _base_shared_data->white;
     }
     else
     {
@@ -1179,43 +1180,29 @@ bool SkinLR2::SRC()
     case DefType::AUTO_LN_START: break;
 
     default: {
-        // Find texture from map by gr
-        int gr = toInt(parseParamBuf[1]);
-        std::string gr_key;
-        if (gr == 105)
-        {
-            textureBuf = getTextureCustomizeThumbnail();
-            videoBuf = nullptr;
-        }
-        else
-        {
+        std::tie(textureBuf, videoBuf) = [&]() -> std::pair<std::shared_ptr<Texture>, std::shared_ptr<sVideo>> {
+            int gr = toInt(parseParamBuf[1]);
             switch (gr)
             {
-            case 100: gr_key = "STAGEFILE"; break;
-            case 101: gr_key = "BACKBMP"; break;
-            case 102: gr_key = "BANNER"; break;
-            case 110: gr_key = "Black"; break;
-            case 111: gr_key = "White"; break;
-            default: gr_key = std::to_string(gr); break;
+            case 100: return {_base_shared_data->stagefile, nullptr};
+            case 101: return {_base_shared_data->backbmp, nullptr};
+            case 102: return {_base_shared_data->banner, nullptr};
+            case 105: return {getTextureCustomizeThumbnail(), nullptr};
+            case 110: return {_base_shared_data->black, nullptr};
+            case 111: return {_base_shared_data->white, nullptr};
+            default: {
+                const std::string gr_key = std::to_string(gr);
+                if (auto it = videoNameMap.find(gr_key); it != videoNameMap.end())
+                    return {_base_shared_data->white, it->second};
+                if (auto it = _base_shared_data->textureNameMap.find(gr_key);
+                    it != _base_shared_data->textureNameMap.end())
+                    return {it->second, nullptr};
+                LOG_WARNING << "[SkinLR2] Texture not found for " << gr_key;
+                (void)_base_shared_data->error; // Why not?
+                return {std::make_shared<Texture>(nullptr, 0, 0), nullptr};
             }
-            if (auto it = videoNameMap.find(gr_key); it != videoNameMap.end())
-            {
-                textureBuf = _base_shared_data->textureNameMap["White"];
-                videoBuf = it->second;
             }
-            else if (auto it = _base_shared_data->textureNameMap.find(gr_key);
-                     it != _base_shared_data->textureNameMap.end())
-            {
-                textureBuf = it->second;
-                videoBuf = nullptr;
-            }
-            else
-            {
-                // textureBuf = _base_shared_data->textureNameMap["Error"];
-                textureBuf = std::make_shared<Texture>(nullptr, 0, 0);
-                videoBuf = nullptr;
-            }
-        }
+        }();
     }
     break;
     }
@@ -1997,7 +1984,7 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     if (auto it = _base_shared_data->textureNameMap.find(gr_key); it != _base_shared_data->textureNameMap.end())
         tex = it->second;
     else
-        tex = _base_shared_data->textureNameMap["Error"];
+        tex = _base_shared_data->error;
 
     // SRC
     if (d._null >= 20)
@@ -3610,7 +3597,7 @@ SkinLR2::SkinLR2(std::shared_ptr<SharedData> baseSharedData_,
 
     // load images from last skin
     prevSkinTextureNameMap = _base_shared_data->textureNameMap;
-    _base_shared_data->textureNameMap = _base_shared_data->preDefinedTextures;
+    _base_shared_data->textureNameMap.clear();
     _prev_font_by_name = _sharedData->font_name_map;
     _sharedData->font_name_map.clear();
 
