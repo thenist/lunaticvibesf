@@ -581,6 +581,8 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                     msg += "' value='";
                     msg += value;
                     msg += "'";
+                    // Not assert-worthy since this is not an invariant. Just want to make unknown commands more visible
+                    // in Debug mode.
                     lunaticvibes::verify_failed(msg.c_str());
                 }
             }
