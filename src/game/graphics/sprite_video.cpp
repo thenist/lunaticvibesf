@@ -1,7 +1,7 @@
 #include "sprite_video.h"
 
 #include <common/utils.h>
-#include <game/graphics/texture_extra.h>
+#include <game/graphics/texture_video.h>
 #include <game/graphics/video.h>
 
 extern "C"

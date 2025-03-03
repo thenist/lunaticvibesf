@@ -75,6 +75,7 @@ add_library(
     graphics/sprite_text.cpp
     graphics/sprite_video.cpp
     graphics/texture_extra.cpp
+    graphics/texture_video.cpp
     graphics/video.cpp
     input/input_mgr.cpp
     input/platform/windows/input_dinput8.cpp

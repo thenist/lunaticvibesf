@@ -1,43 +1,13 @@
 #pragma once
 
+#include <future>
 #include <map>
+#include <shared_mutex>
 #include <utility>
 
 #include <common/beat.h>
 #include <common/types.h>
 #include <game/graphics/video.h>
-
-class TextureVideo : public Texture
-{
-protected:
-    std::shared_ptr<sVideo> pVideo;
-    int64_t decoded_frames = ~0;
-    PixelFormat format;
-    bool updated = false;
-
-public:
-    TextureVideo(std::shared_ptr<sVideo> pv);
-    ~TextureVideo() override;
-    void start();
-    void stop();
-    void seek(int64_t sec);
-    void setSpeed(double speed);
-    void update();
-    void reset();
-
-    void draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode blend, const bool filter,
-              const double angleInDegrees, const Point* center) const override;
-
-    void stopUpdate();
-
-private:
-    static std::shared_ptr<std::shared_mutex> texMapMutex;
-    static std::shared_ptr<std::map<uintptr_t, TextureVideo*>> textures;
-    std::shared_ptr<std::shared_mutex> pTexMapMutex;               // ref counter guard
-    std::shared_ptr<std::map<uintptr_t, TextureVideo*>> pTextures; // ref counter guard
-public:
-    static void updateAll();
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 

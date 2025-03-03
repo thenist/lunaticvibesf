@@ -13,6 +13,7 @@
 #include <config/config_mgr.h>
 #include <game/graphics/graphics.h>
 #include <game/graphics/sprite.h>
+#include <game/graphics/texture_video.h>
 #include <game/runtime/generic_info.h>
 #include <game/runtime/i18n.h>
 #include <game/runtime/state.h>
