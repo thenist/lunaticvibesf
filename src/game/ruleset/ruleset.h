@@ -40,7 +40,6 @@ protected:
     std::shared_ptr<ChartFormatBase> _format;
     std::shared_ptr<ChartObjectBase> _chart;
     BasicData _basic{};
-    double _minHealth;
 
     bool _isCleared = false;
     bool _isFailed = false;
