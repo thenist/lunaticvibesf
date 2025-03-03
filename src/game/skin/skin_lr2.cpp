@@ -50,7 +50,6 @@
 #include <game/skin/skin_lr2_slider_callbacks.h>
 
 using uint8_t = std::uint8_t;
-using lunaticvibes::SPRITE_GLOBAL_MAX;
 
 namespace r = std::ranges;
 namespace v = std::views;
@@ -1704,7 +1703,7 @@ ParseRet SkinLR2::SRC_JUDGELINE()
 
 ParseRet SkinLR2::SRC_NOWJUDGE(size_t idx)
 {
-    if (idx >= SPRITE_GLOBAL_MAX)
+    if (idx >= _sharedData->sprites.size())
     {
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Nowjudge idx out of range (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
@@ -1728,7 +1727,7 @@ ParseRet SkinLR2::SRC_NOWJUDGE(size_t idx)
 
 ParseRet SkinLR2::SRC_NOWCOMBO(size_t idx)
 {
-    if (idx >= SPRITE_GLOBAL_MAX)
+    if (idx >= _sharedData->sprites.size())
     {
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Nowjudge idx out of range (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;

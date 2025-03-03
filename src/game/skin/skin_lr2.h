@@ -52,8 +52,6 @@ using namespace LR2SkinDef;
 namespace lunaticvibes
 {
 
-inline const size_t SPRITE_GLOBAL_MAX = 32;
-
 namespace details
 {
 
@@ -70,6 +68,8 @@ struct LR2Font
 
 struct SkinLr2SharedData
 {
+    static constexpr size_t SPRITE_GLOBAL_MAX = 32;
+
     std::atomic<bool> flipSideFlag = false;
     std::atomic<bool> flipResultFlag = false; // Set in play skin
     std::atomic<bool> flipSide = false;
