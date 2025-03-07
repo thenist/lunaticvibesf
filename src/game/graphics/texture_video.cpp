@@ -28,7 +28,7 @@ TextureVideo::TextureVideo(std::shared_ptr<sVideo> pv_)
     pTextures = s_textures;
 
     std::unique_lock l(*s_tex_map_mutex);
-    (*s_textures)[(uintptr_t)this] = this;
+    (*s_textures)[reinterpret_cast<uintptr_t>(this)] = this;
 }
 
 TextureVideo::~TextureVideo()
@@ -37,7 +37,7 @@ TextureVideo::~TextureVideo()
         pVideo->stopPlaying();
 
     std::unique_lock l(*s_tex_map_mutex);
-    s_textures->erase((uintptr_t)this);
+    s_textures->erase(reinterpret_cast<uintptr_t>(this));
 }
 
 void TextureVideo::start()

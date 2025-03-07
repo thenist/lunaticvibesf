@@ -16,7 +16,7 @@ int SoundMgr::initFMOD()
     {
         LOG_INFO << "[Sound] Initializing sound driver...";
         _inst.driver = std::make_unique<SoundDriverFMOD>();
-        auto ret = ((SoundDriverFMOD*)_inst.driver.get())->initRet;
+        auto ret = (reinterpret_cast<SoundDriverFMOD*>(_inst.driver.get()))->initRet;
         if (ret == FMOD_OK)
         {
             _inst._initialized = true;

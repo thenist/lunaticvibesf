@@ -95,7 +95,7 @@ std::shared_ptr<ArenaMessage> ArenaMessage::unpack(const unsigned char* data, si
     }
 
     std::stringstream ss;
-    ss.write((char*)&data[1], len - 1);
+    ss.write(reinterpret_cast<const char*>(&data[1]), len - 1);
     try
     {
         // LOG_DEBUG << "[Arena] Parse message type: " << (int)data[0];

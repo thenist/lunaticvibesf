@@ -33,10 +33,10 @@ using u64 = uint64_t;
 
 const u32 MIN_COMPRESS_VER5 = 4;
 
-const u16 DXA_HEAD_VER5 = *(u16*)("DX");     // ヘッダ
-const u16 DXA_VER_VER5 = (0x0005);           // バージョン
-const u32 DXA_BUFFERSIZE_VER5 = (0x1000000); // アーカイブ作成時に使用するバッファのサイズ
-const u32 DXA_KEYSTR_LENGTH_VER5 = (12);     // 鍵文字列の長さ
+const u16 DXA_HEAD_VER5 = *reinterpret_cast<const u16*>("DX"); // ヘッダ
+const u16 DXA_VER_VER5 = (0x0005);                             // バージョン
+const u32 DXA_BUFFERSIZE_VER5 = (0x1000000);                   // アーカイブ作成時に使用するバッファのサイズ
+const u32 DXA_KEYSTR_LENGTH_VER5 = (12);                       // 鍵文字列の長さ
 
 #pragma pack(push)
 #pragma pack(1)
