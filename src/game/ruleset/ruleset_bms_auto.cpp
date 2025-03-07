@@ -157,7 +157,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                                 State::set(IndexTimer::S1_UP, TIMER_NEVER);
                                 State::set(IndexSwitch::S1_DOWN, true);
                             }
-                            if (k == Input::S2L || k == Input::S2R)
+                            else if (k == Input::S2L || k == Input::S2R)
                             {
                                 State::set(IndexTimer::S2_DOWN, t.norm());
                                 State::set(IndexTimer::S2_UP, TIMER_NEVER);
@@ -199,7 +199,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                                         State::set(IndexTimer::S1_UP, TIMER_NEVER);
                                         State::set(IndexSwitch::S1_DOWN, true);
                                     }
-                                    if (k == Input::S2L || k == Input::S2R)
+                                    else if (k == Input::S2L || k == Input::S2R)
                                     {
                                         State::set(IndexTimer::S2_DOWN, t.norm());
                                         State::set(IndexTimer::S2_UP, TIMER_NEVER);
@@ -239,7 +239,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                                         State::set(IndexTimer::S1_UP, t.norm());
                                         State::set(IndexSwitch::S1_DOWN, false);
                                     }
-                                    if (k == Input::S2L || k == Input::S2R)
+                                    else if (k == Input::S2L || k == Input::S2R)
                                     {
                                         State::set(IndexTimer::S2_DOWN, TIMER_NEVER);
                                         State::set(IndexTimer::S2_UP, t.norm());
@@ -302,7 +302,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                             State::set(IndexTimer::S1_UP, t.norm());
                             State::set(IndexSwitch::S1_DOWN, false);
                         }
-                        if (k == Input::S2L || k == Input::S2R)
+                        else if (k == Input::S2L || k == Input::S2R)
                         {
                             State::set(IndexTimer::S2_DOWN, TIMER_NEVER);
                             State::set(IndexTimer::S2_UP, t.norm());
