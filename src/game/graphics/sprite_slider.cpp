@@ -120,10 +120,10 @@ bool SpriteSlider::OnDrag(int x, int y)
     double val = 0.0;
     switch (dir)
     {
-    case SliderDirection::UP: val = double(minValuePos - y) / valueRange; break;
-    case SliderDirection::RIGHT: val = double(x - minValuePos) / valueRange; break;
-    case SliderDirection::DOWN: val = double(y - minValuePos) / valueRange; break;
-    case SliderDirection::LEFT: val = double(minValuePos - x) / valueRange; break;
+    case SliderDirection::UP: val = static_cast<double>(minValuePos - y) / valueRange; break;
+    case SliderDirection::RIGHT: val = static_cast<double>(x - minValuePos) / valueRange; break;
+    case SliderDirection::DOWN: val = static_cast<double>(y - minValuePos) / valueRange; break;
+    case SliderDirection::LEFT: val = static_cast<double>(minValuePos - x) / valueRange; break;
     }
     val = std::clamp(val, 0.0, 1.0);
     if (std::abs(value - val) > 0.000001) // this should be enough

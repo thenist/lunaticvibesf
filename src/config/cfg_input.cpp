@@ -61,7 +61,7 @@ void ConfigInput::load()
 {
     vConfig::load();
 
-    for (auto p = Input::Pad::S1L; p < Input::Pad::ESC; p = Input::Pad(int(p) + 1))
+    for (auto p = Input::Pad::S1L; p < Input::Pad::ESC; p = Input::Pad(static_cast<int>(p) + 1))
     {
         const char* mapKey = getBindingKey(p);
         const auto& c = _yaml[mapKey];
@@ -90,7 +90,7 @@ void ConfigInput::setDefaults() noexcept
     try
     {
         _yaml = YAML::LoadFile(lunaticvibes::u8str(path));
-        for (auto p = Input::Pad::S1L; p < Input::Pad::ESC; p = Input::Pad(int(p) + 1))
+        for (auto p = Input::Pad::S1L; p < Input::Pad::ESC; p = Input::Pad(static_cast<int>(p) + 1))
         {
             const char* mapKey = getBindingKey(p);
             const auto& c = _yaml[mapKey];
@@ -148,7 +148,7 @@ void ConfigInput::clearAll()
     set(I_BINDINGS_K2SpdDn, "");
     set(I_BINDINGS_K2ScAxis, "");
 
-    for (auto p = Input::Pad::S1L; p < Input::Pad::ESC; p = Input::Pad(int(p) + 1))
+    for (auto p = Input::Pad::S1L; p < Input::Pad::ESC; p = Input::Pad(static_cast<int>(p) + 1))
     {
         buffer[p] = KeyMap("INVALID");
     }

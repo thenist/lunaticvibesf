@@ -457,7 +457,7 @@ int ChartFormatBMS::initWithText(std::stringstream& bmsFile, eFileEncoding encod
                 else if (lunaticvibes::iequals(key, "PLAYLEVEL"))
                 {
                     playLevel = toInt(value);
-                    levelEstimated = double(playLevel);
+                    levelEstimated = static_cast<double>(playLevel);
                 }
                 else if (lunaticvibes::iequals(key, "DIFFICULTY"))
                 {

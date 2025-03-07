@@ -27,32 +27,33 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
     _basic.play_time = rt;
 
     auto N = [this](IndexNumber base) -> IndexNumber {
-        return IndexNumber((int)base +
-                           ((int)IndexNumber::ARENA_PLAYDATA_MAX - (int)IndexNumber::ARENA_PLAYDATA_BASE + 1) *
-                               playerIndex);
+        return IndexNumber(static_cast<int>(base) + (static_cast<int>(IndexNumber::ARENA_PLAYDATA_MAX) -
+                                                     static_cast<int>(IndexNumber::ARENA_PLAYDATA_BASE) + 1) *
+                                                        playerIndex);
     };
     auto O = [this](IndexOption base) -> IndexOption {
-        return IndexOption((int)base +
-                           ((int)IndexOption::ARENA_PLAYDATA_MAX - (int)IndexOption::ARENA_PLAYDATA_BASE + 1) *
-                               playerIndex);
+        return IndexOption(static_cast<int>(base) + (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) -
+                                                     static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+                                                        playerIndex);
     };
 
-    State::set(N(IndexNumber::ARENA_PLAYDATA_SCORE), int(std::round(moneyScore)));
+    State::set(N(IndexNumber::ARENA_PLAYDATA_SCORE), static_cast<int>(std::round(moneyScore)));
     State::set(N(IndexNumber::ARENA_PLAYDATA_EXSCORE), exScore);
     State::set(N(IndexNumber::ARENA_PLAYDATA_NOWCOMBO), _basic.combo + _basic.comboDisplay);
     State::set(N(IndexNumber::ARENA_PLAYDATA_MAXCOMBO), _basic.maxComboDisplay);
-    State::set(N(IndexNumber::ARENA_PLAYDATA_RATE), int(std::floor(_basic.acc)));
-    State::set(N(IndexNumber::ARENA_PLAYDATA_RATEDECIMAL), int(std::floor((_basic.acc - int(_basic.acc)) * 100)));
+    State::set(N(IndexNumber::ARENA_PLAYDATA_RATE), static_cast<int>(std::floor(_basic.acc)));
+    State::set(N(IndexNumber::ARENA_PLAYDATA_RATEDECIMAL),
+               static_cast<int>(std::floor((_basic.acc - static_cast<int>(_basic.acc)) * 100)));
     State::set(N(IndexNumber::ARENA_PLAYDATA_TOTALNOTES), getNoteCount());
-    State::set(N(IndexNumber::ARENA_PLAYDATA_TOTAL_RATE), int(std::floor(_basic.total_acc)));
+    State::set(N(IndexNumber::ARENA_PLAYDATA_TOTAL_RATE), static_cast<int>(std::floor(_basic.total_acc)));
     State::set(N(IndexNumber::ARENA_PLAYDATA_TOTAL_RATEDECIMAL),
-               int(std::floor((_basic.total_acc - int(_basic.total_acc)) * 100)));
+               static_cast<int>(std::floor((_basic.total_acc - static_cast<int>(_basic.total_acc)) * 100)));
     State::set(N(IndexNumber::ARENA_PLAYDATA_PERFECT), _basic.judge[JUDGE_PERFECT]);
     State::set(N(IndexNumber::ARENA_PLAYDATA_GREAT), _basic.judge[JUDGE_GREAT]);
     State::set(N(IndexNumber::ARENA_PLAYDATA_GOOD), _basic.judge[JUDGE_GOOD]);
     State::set(N(IndexNumber::ARENA_PLAYDATA_BAD), _basic.judge[JUDGE_BAD]);
     State::set(N(IndexNumber::ARENA_PLAYDATA_POOR), _basic.judge[JUDGE_POOR]);
-    State::set(N(IndexNumber::ARENA_PLAYDATA_GROOVEGAUGE), int(_basic.health * 100));
+    State::set(N(IndexNumber::ARENA_PLAYDATA_GROOVEGAUGE), static_cast<int>(_basic.health * 100));
     State::set(N(IndexNumber::ARENA_PLAYDATA_MISS), _basic.judge[JUDGE_MISS]);
     State::set(N(IndexNumber::ARENA_PLAYDATA_COMBOBREAK), _basic.judge[JUDGE_CB]);
     State::set(N(IndexNumber::ARENA_PLAYDATA_BPOOR), _basic.judge[JUDGE_KPOOR]);
@@ -68,19 +69,26 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
     if (_basic.total_acc >= 100.0 * 8.0 / 9)
         State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF), exScore - maxScore); // MAX-
     else if (_basic.total_acc >= 100.0 * 7.0 / 9)
-        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF), int(exScore - maxScore * 8.0 / 9)); // AAA-
+        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF),
+                   static_cast<int>(exScore - maxScore * 8.0 / 9)); // AAA-
     else if (_basic.total_acc >= 100.0 * 6.0 / 9)
-        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF), int(exScore - maxScore * 7.0 / 9)); // AA-
+        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF),
+                   static_cast<int>(exScore - maxScore * 7.0 / 9)); // AA-
     else if (_basic.total_acc >= 100.0 * 5.0 / 9)
-        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF), int(exScore - maxScore * 6.0 / 9)); // A-
+        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF),
+                   static_cast<int>(exScore - maxScore * 6.0 / 9)); // A-
     else if (_basic.total_acc >= 100.0 * 4.0 / 9)
-        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF), int(exScore - maxScore * 5.0 / 9)); // B-
+        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF),
+                   static_cast<int>(exScore - maxScore * 5.0 / 9)); // B-
     else if (_basic.total_acc >= 100.0 * 3.0 / 9)
-        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF), int(exScore - maxScore * 4.0 / 9)); // C-
+        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF),
+                   static_cast<int>(exScore - maxScore * 4.0 / 9)); // C-
     else if (_basic.total_acc >= 100.0 * 2.0 / 9)
-        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF), int(exScore - maxScore * 3.0 / 9)); // D-
+        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF),
+                   static_cast<int>(exScore - maxScore * 3.0 / 9)); // D-
     else
-        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF), int(exScore - maxScore * 2.0 / 9)); // E-
+        State::set(N(IndexNumber::ARENA_PLAYDATA_NEXT_RANK_EX_DIFF),
+                   static_cast<int>(exScore - maxScore * 2.0 / 9)); // E-
 
     if (auto player = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); player)
         State::set(N(IndexNumber::ARENA_PLAYDATA_PLAYER_EX_DIFF), player->getExScore() - exScore);
@@ -94,9 +102,9 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
 std::vector<unsigned char> RulesetBMSNetwork::packInit(const std::shared_ptr<RulesetBMS>& local)
 {
     PayloadInit p;
-    p.randomLeft = (int8_t)gPlayContext.mods[PLAYER_SLOT_PLAYER].randomLeft;
-    p.randomRight = (int8_t)gPlayContext.mods[PLAYER_SLOT_PLAYER].randomRight;
-    p.gauge = (int8_t)gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge;
+    p.randomLeft = static_cast<int8_t>(gPlayContext.mods[PLAYER_SLOT_PLAYER].randomLeft);
+    p.randomRight = static_cast<int8_t>(gPlayContext.mods[PLAYER_SLOT_PLAYER].randomRight);
+    p.gauge = static_cast<int8_t>(gPlayContext.mods[PLAYER_SLOT_PLAYER].gauge);
     p.assist_mask = gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask;
     p.dpflip = gPlayContext.mods[PLAYER_SLOT_PLAYER].DPFlip;
     p.health = local->getData().health;
@@ -142,8 +150,8 @@ bool RulesetBMSNetwork::unpackInit(const std::vector<unsigned char>& payload)
     }
 
     // No one will surely pass us any garbage instead of these enums. :^)
-    randomLeft = (PlayModifierRandomType)p.randomLeft;
-    randomRight = (PlayModifierRandomType)p.randomRight;
+    randomLeft = static_cast<PlayModifierRandomType>(p.randomLeft);
+    randomRight = static_cast<PlayModifierRandomType>(p.randomRight);
     PlayModifiers mods{};
     mods.gauge = static_cast<PlayModifierGaugeType>(p.gauge);
     mods.gas_gauge = true; // TODO: check GAS in arena.

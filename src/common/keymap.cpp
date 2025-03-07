@@ -105,7 +105,7 @@ void KeyMap::loadFromStringJ(const std::string_view name)
         std::string_view axisName = name.substr(7, name.size() - 1 - 7);
         bool axisPositive = name[name.size() - 1] == '+';
         int axisIndex = -1;
-        for (int i = 0; i < (int)Input::JoystickAxis::COUNT; ++i)
+        for (int i = 0; i < static_cast<int>(Input::JoystickAxis::COUNT); ++i)
         {
             if (axisName == Input::joystickAxisName[i])
             {
@@ -117,14 +117,14 @@ void KeyMap::loadFromStringJ(const std::string_view name)
         {
             joystick.type = axisPositive ? Input::Joystick::Type::AXIS_RELATIVE_POSITIVE
                                          : Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE;
-            joystick.index = (size_t)axisIndex;
+            joystick.index = static_cast<size_t>(axisIndex);
         }
     }
     else if (subType == "ABS_")
     {
         std::string_view axisName = name.substr(7);
         int axisIndex = -1;
-        for (int i = 0; i < (int)Input::JoystickAxis::COUNT; ++i)
+        for (int i = 0; i < static_cast<int>(Input::JoystickAxis::COUNT); ++i)
         {
             if (axisName == Input::joystickAxisName[i])
             {
@@ -135,7 +135,7 @@ void KeyMap::loadFromStringJ(const std::string_view name)
         if (axisIndex != -1)
         {
             joystick.type = Input::Joystick::Type::AXIS_ABSOLUTE;
-            joystick.index = (size_t)axisIndex;
+            joystick.index = static_cast<size_t>(axisIndex);
         }
     }
 

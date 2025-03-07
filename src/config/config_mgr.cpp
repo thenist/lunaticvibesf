@@ -696,8 +696,9 @@ static void setText()
     // autoadjust
     {
         State::set(IndexText::AUTOADJUST,
-                   Option::s_autoadjust[std::min((unsigned int)std::size(Option::s_autoadjust),
-                                                 (unsigned int)ConfigMgr::Profile()->get(P_JUDGE_AUTOADJUST, 0))]);
+                   Option::s_autoadjust[std::min(
+                       static_cast<unsigned int>(std::size(Option::s_autoadjust)),
+                       static_cast<unsigned int>(ConfigMgr::Profile()->get(P_JUDGE_AUTOADJUST, 0)))]);
     }
 
     // fixed tokens

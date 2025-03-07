@@ -203,9 +203,9 @@ bool InputMgr::getMousePos(int& x, int& y)
     {
         const auto [canvasScaleX, canvasScaleY] = lunaticvibes::window::graphics_get_canvas_scale();
         if (canvasScaleX != 1.0)
-            x = (int)std::floor(x / canvasScaleX);
+            x = static_cast<int>(std::floor(x / canvasScaleX));
         if (canvasScaleY != 1.0)
-            y = (int)std::floor(y / canvasScaleY);
+            y = static_cast<int>(std::floor(y / canvasScaleY));
     }
     return true;
 }

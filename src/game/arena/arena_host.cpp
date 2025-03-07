@@ -290,7 +290,7 @@ void ArenaHost::startPlaying()
     {
         auto n = std::make_shared<ArenaMessageHostStartPlaying>();
         n->messageIndex = ++cc.sendMessageIndex;
-        n->rulesetType = (uint32_t)gPlayContext.rulesetType;
+        n->rulesetType = static_cast<uint32_t>(gPlayContext.rulesetType);
         n->chartHashMD5String = hostRequestChartHash.hexdigest();
         n->randomSeed = gArenaData.getRandomSeed();
 
@@ -1029,7 +1029,7 @@ void ArenaHost::update()
             LOG_WARNING << "[Arena] Decide";
 
             static std::random_device rd;
-            gArenaData.randomSeed = ((uint64_t)rd() << 32) | rd();
+            gArenaData.randomSeed = (static_cast<uint64_t>(rd()) << 32) | rd();
 
             startPlaying();
         }

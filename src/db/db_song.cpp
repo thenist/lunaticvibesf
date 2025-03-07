@@ -289,7 +289,7 @@ bool SongDB::asyncAddChartTask(const HashMD5& folder, const Path& path)
                                   "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
                                   {c->fileHash.hexdigest(),
                                    folder.hexdigest(),
-                                   int(c->type()),
+                                   static_cast<int>(c->type()),
                                    c->fileName.filename().u8string(),
                                    c->title,
                                    c->title2,
@@ -504,7 +504,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const Ha
     ss << "addtime>=?";
 
     const std::string strSql = ss.str();
-    auto result = query(strSql.c_str(), {(long long)addTime});
+    auto result = query(strSql.c_str(), {static_cast<long long>(addTime)});
 
     std::vector<std::shared_ptr<ChartFormatBase>> ret;
     for (const auto& r : result)
@@ -634,7 +634,7 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
 
         const HashMD5 folderMD5{ANY_STR(q[0][0])};
         // std::string folderPath = ANY_STR(q[0][1]);
-        auto folderType = (FolderType)ANY_INT(q[0][2]);
+        auto folderType = static_cast<FolderType>(ANY_INT(q[0][2]));
         const long long folderModifyTimeDB = ANY_INT(q[0][3]);
 
         const bool step_in_subfolder = folderType != FolderType::SONG_BMS;
@@ -699,11 +699,12 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
     const long long folderModifyTime = getFileLastWriteTime(path);
     if (!parentHash.empty())
         ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)",
-                   {hash.hexdigest(), parentHash.hexdigest(), folderName.u8string(), (int)type, path.u8string(),
-                    folderModifyTime});
+                   {hash.hexdigest(), parentHash.hexdigest(), folderName.u8string(), static_cast<int>(type),
+                    path.u8string(), folderModifyTime});
     else
-        ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)",
-                   {hash.hexdigest(), nullptr, folderName.u8string(), (int)type, path.u8string(), folderModifyTime});
+        ret =
+            exec("INSERT INTO folder VALUES(?,?,?,?,?,?)", {hash.hexdigest(), nullptr, folderName.u8string(),
+                                                            static_cast<int>(type), path.u8string(), folderModifyTime});
     if (SQLITE_OK != ret)
     {
         LOG_WARNING << "[SongDB] Insert folder into db fail: [" << ret << "] " << errmsg() << " (" << path << ")";
@@ -1039,7 +1040,7 @@ std::shared_ptr<EntryFolderRegular> SongDB::browse(const HashMD5& root, bool rec
             const HashMD5 md5{ANY_STR(c[0])};
             // auto parent = ANY_STR(c[1]);
             auto name = ANY_STR(c[2]);
-            auto type = (FolderType)ANY_INT(c[3]);
+            auto type = static_cast<FolderType>(ANY_INT(c[3]));
             auto path = ANY_STR(c[4]);
             auto modtime = ANY_INT(c[5]);
 
@@ -1103,7 +1104,7 @@ std::shared_ptr<EntryFolderSong> SongDB::browseSong(const HashMD5& root)
             try
             {
                 const auto& c = songQueryPool[index];
-                auto type = (eChartFormat)ANY_INT(c[3]);
+                auto type = static_cast<eChartFormat>(ANY_INT(c[3]));
                 switch (type)
                 {
                 case eChartFormat::BMS: {

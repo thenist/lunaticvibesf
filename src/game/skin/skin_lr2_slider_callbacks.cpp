@@ -18,10 +18,10 @@ void select_pos(double p)
     if (gSelectContext.entries.empty())
         return;
     // TODO: allow smooth dragging. It currently snaps to closest possible value.
-    auto idx_new = (size_t)std::floor(p * gSelectContext.entries.size());
+    auto idx_new = static_cast<size_t>(std::floor(p * gSelectContext.entries.size()));
     if (idx_new != gSelectContext.selectedEntryIndex)
     {
-        State::set(IndexSlider::SELECT_LIST, (double)idx_new / gSelectContext.entries.size());
+        State::set(IndexSlider::SELECT_LIST, static_cast<double>(idx_new) / gSelectContext.entries.size());
         gSelectContext.draggingListSlider = true;
     }
 }
@@ -39,42 +39,42 @@ void ir_ranking_scrollbar(double p)
 
 void eq(int idx, double p)
 {
-    int val = int(p * 24) - 12;
+    int val = static_cast<int>(p * 24) - 12;
     p = (val + 12) / 24.0;
-    State::set(IndexSlider(idx + (int)IndexSlider::EQ0), p);
-    State::set(IndexNumber(idx + (int)IndexNumber::EQ0), val);
+    State::set(IndexSlider(idx + static_cast<int>(IndexSlider::EQ0)), p);
+    State::set(IndexNumber(idx + static_cast<int>(IndexNumber::EQ0)), val);
 
     if (State::get(IndexSwitch::SOUND_EQ))
     {
-        SoundMgr::setEQ((EQFreq)idx, val);
+        SoundMgr::setEQ(static_cast<EQFreq>(idx), val);
     }
 }
 
 void master_volume(double p)
 {
     State::set(IndexSlider::VOLUME_MASTER, p);
-    State::set(IndexNumber::VOLUME_MASTER, int(std::round(p * 100)));
+    State::set(IndexNumber::VOLUME_MASTER, static_cast<int>(std::round(p * 100)));
 
     if (State::get(IndexSwitch::SOUND_VOLUME))
-        SoundMgr::setVolume(SampleChannel::MASTER, (float)p);
+        SoundMgr::setVolume(SampleChannel::MASTER, static_cast<float>(p));
 }
 
 void key_volume(double p)
 {
     State::set(IndexSlider::VOLUME_KEY, p);
-    State::set(IndexNumber::VOLUME_KEY, int(std::round(p * 100)));
+    State::set(IndexNumber::VOLUME_KEY, static_cast<int>(std::round(p * 100)));
 
     if (State::get(IndexSwitch::SOUND_VOLUME))
-        SoundMgr::setVolume(SampleChannel::KEY, (float)p);
+        SoundMgr::setVolume(SampleChannel::KEY, static_cast<float>(p));
 }
 
 void bgm_volume(double p)
 {
     State::set(IndexSlider::VOLUME_BGM, p);
-    State::set(IndexNumber::VOLUME_BGM, int(std::round(p * 100)));
+    State::set(IndexNumber::VOLUME_BGM, static_cast<int>(std::round(p * 100)));
 
     if (State::get(IndexSwitch::SOUND_VOLUME))
-        SoundMgr::setVolume(SampleChannel::BGM, (float)p);
+        SoundMgr::setVolume(SampleChannel::BGM, static_cast<float>(p));
 }
 
 static SampleChannel get_sample_channel_for_target(unsigned int idx)
@@ -107,10 +107,10 @@ static DSPType get_dsp_type_from_sound_fx(unsigned int idx)
 void fx0(int idx, double p)
 {
     State::set(idx == 0 ? IndexSlider::FX0_P1 : IndexSlider::FX0_P2, p);
-    State::set(idx == 0 ? IndexNumber::FX0_P1 : IndexNumber::FX0_P2, int(std::round(p * 100)));
+    State::set(idx == 0 ? IndexNumber::FX0_P1 : IndexNumber::FX0_P2, static_cast<int>(std::round(p * 100)));
 
-    float p1 = (idx == 0) ? (float)p : State::get(IndexSlider::FX0_P1);
-    float p2 = (idx != 0) ? (float)p : State::get(IndexSlider::FX0_P2);
+    float p1 = (idx == 0) ? static_cast<float>(p) : State::get(IndexSlider::FX0_P1);
+    float p2 = (idx != 0) ? static_cast<float>(p) : State::get(IndexSlider::FX0_P2);
 
     if (State::get(IndexSwitch::SOUND_FX0))
     {
@@ -122,10 +122,10 @@ void fx0(int idx, double p)
 void fx1(int idx, double p)
 {
     State::set(idx == 0 ? IndexSlider::FX1_P1 : IndexSlider::FX1_P2, p);
-    State::set(idx == 0 ? IndexNumber::FX1_P1 : IndexNumber::FX1_P2, int(std::round(p * 100)));
+    State::set(idx == 0 ? IndexNumber::FX1_P1 : IndexNumber::FX1_P2, static_cast<int>(std::round(p * 100)));
 
-    float p1 = (idx == 0) ? (float)p : State::get(IndexSlider::FX1_P1);
-    float p2 = (idx != 0) ? (float)p : State::get(IndexSlider::FX1_P2);
+    float p1 = (idx == 0) ? static_cast<float>(p) : State::get(IndexSlider::FX1_P1);
+    float p2 = (idx != 0) ? static_cast<float>(p) : State::get(IndexSlider::FX1_P2);
 
     if (State::get(IndexSwitch::SOUND_FX1))
     {
@@ -137,10 +137,10 @@ void fx1(int idx, double p)
 void fx2(int idx, double p)
 {
     State::set(idx == 0 ? IndexSlider::FX2_P1 : IndexSlider::FX2_P2, p);
-    State::set(idx == 0 ? IndexNumber::FX2_P1 : IndexNumber::FX2_P2, int(std::round(p * 100)));
+    State::set(idx == 0 ? IndexNumber::FX2_P1 : IndexNumber::FX2_P2, static_cast<int>(std::round(p * 100)));
 
-    float p1 = (idx == 0) ? (float)p : State::get(IndexSlider::FX2_P1);
-    float p2 = (idx != 0) ? (float)p : State::get(IndexSlider::FX2_P2);
+    float p1 = (idx == 0) ? static_cast<float>(p) : State::get(IndexSlider::FX2_P1);
+    float p2 = (idx != 0) ? static_cast<float>(p) : State::get(IndexSlider::FX2_P2);
 
     if (State::get(IndexSwitch::SOUND_FX2))
     {
@@ -178,7 +178,7 @@ void updatePitchState(int val)
 
 void pitch(double p)
 {
-    int val = int(p * 24) - 12;
+    int val = static_cast<int>(p * 24) - 12;
     double ps = (val + 12) / 24.0;
     State::set(IndexSlider::PITCH, ps);
     State::set(IndexNumber::PITCH, val);

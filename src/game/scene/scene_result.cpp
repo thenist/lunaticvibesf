@@ -112,8 +112,8 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
 
         // TODO set chart info (total notes, etc.)
         auto chartLength = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength().norm() / 1000;
-        param["min"] = int(chartLength / 60);
-        param["sec"] = int(chartLength % 60);
+        param["min"] = static_cast<int>(chartLength / 60);
+        param["sec"] = static_cast<int>(chartLength % 60);
 
         // compare to db record
         auto pScore = g_pScoreDB->getChartScoreBMS(gChartContext.hash);
@@ -123,14 +123,14 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
             param["dbexscorediff"] = param["1pexscore"] - pScore->exscore;
             param["newexscore"] = param["1pexscore"];
             param["newexscorediff"] = param["newexscore"] - pScore->exscore;
-            param["dbmaxcombo"] = (int)pScore->maxcombo;
+            param["dbmaxcombo"] = static_cast<int>(pScore->maxcombo);
             param["newmaxcombo"] = param["1pmaxcombo"];
             param["newmaxcombodiff"] = param["newmaxcombo"] - pScore->maxcombo;
             param["dbbp"] = pScore->bp;
             param["newbp"] = param["1pbp"];
             param["newbpdiff"] = param["newbp"] - pScore->bp;
-            param["dbrate"] = (int)(pScore->rate);
-            param["dbrated2"] = (int)(pScore->rate * 100.0) % 100;
+            param["dbrate"] = static_cast<int>(pScore->rate);
+            param["dbrated2"] = static_cast<int>(pScore->rate * 100.0) % 100;
             param_new.db_rank = Option::getRankType(pScore->rate);
 
             param["updatedscore"] = pScore->exscore < param["1pexscore"];
@@ -307,7 +307,7 @@ static void saveReplay(const lunaticvibes::Time t, std::string replayFileName, S
         score->replayFileName = std::move(replayFileName);
 
         auto rBMS = std::dynamic_pointer_cast<RulesetBMS>(ruleset);
-        score->score = int(std::floor(rBMS->getScore()));
+        score->score = static_cast<int>(std::floor(rBMS->getScore()));
         score->exscore = rBMS->getExScore();
         score->fast = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_EARLY);
         score->slow = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_LATE);
@@ -438,7 +438,7 @@ void SceneResult::updateRecord(const lunaticvibes::Time& t)
                 gPlayContext.mods[PLAYER_SLOT_MYBEST].assist_mask = gPlayContext.replayMybest->assistMask;
                 gPlayContext.mods[PLAYER_SLOT_MYBEST].hispeedFix = gPlayContext.replayMybest->hispeedFix;
                 gPlayContext.mods[PLAYER_SLOT_MYBEST].laneEffect =
-                    (PlayModifierLaneEffectType)gPlayContext.replayMybest->laneEffectType;
+                    static_cast<PlayModifierLaneEffectType>(gPlayContext.replayMybest->laneEffectType);
                 gPlayContext.mods[PLAYER_SLOT_MYBEST].DPFlip = gPlayContext.replayMybest->DPFlip;
             }
             else

@@ -62,13 +62,13 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
         const Path fontPath = getSysMonoFontPath(nullptr, &faceIndex, i18n::getCurrentLanguage());
         const int notificationHeight = 20;
         const int textHeight = 24;
-        _fNotifications = std::make_shared<lunaticvibes::Font>(fontPath, int(textHeight * 1.5), faceIndex);
+        _fNotifications = std::make_shared<lunaticvibes::Font>(fontPath, static_cast<int>(textHeight * 1.5), faceIndex);
         _texNotificationsBG = std::make_shared<Texture>(0x000000ff);
         for (size_t i = 0; i < _sNotifications.size(); ++i)
         {
             SpriteText::SpriteTextBuilder textBuilder;
             textBuilder.font = _fNotifications;
-            textBuilder.textInd = IndexText(size_t(IndexText::_OVERLAY_NOTIFICATION_0) + i);
+            textBuilder.textInd = IndexText(static_cast<size_t>(IndexText::_OVERLAY_NOTIFICATION_0) + i);
             textBuilder.align = TextAlign::TEXT_ALIGN_LEFT;
             textBuilder.ptsize = textHeight;
             _sNotifications[i] = textBuilder.build();
@@ -153,12 +153,13 @@ void SceneBase::update()
             {
                 if (itNotifications != gOverlayContext.notifications.rend())
                 {
-                    State::set(IndexText(size_t(IndexText::_OVERLAY_NOTIFICATION_0) + i), itNotifications->second);
+                    State::set(IndexText(static_cast<size_t>(IndexText::_OVERLAY_NOTIFICATION_0) + i),
+                               itNotifications->second);
                     ++itNotifications;
                 }
                 else
                 {
-                    State::set(IndexText(size_t(IndexText::_OVERLAY_NOTIFICATION_0) + i), "");
+                    State::set(IndexText(static_cast<size_t>(IndexText::_OVERLAY_NOTIFICATION_0) + i), "");
                 }
             }
         }
@@ -274,7 +275,7 @@ void SceneBase::draw() const
 static bool should_show_text_overlay()
 {
     for (size_t i = 0; i < 4; ++i)
-        if (!State::get(IndexText(int(IndexText::_OVERLAY_TOPLEFT) + i)).empty())
+        if (!State::get(IndexText(static_cast<int>(IndexText::_OVERLAY_TOPLEFT) + i)).empty())
             return true;
     return false;
 }
@@ -315,7 +316,7 @@ void SceneBase::updateImgui()
             size_t count = 0;
             for (size_t i = 0; i < 4; ++i)
             {
-                auto idx = IndexText(int(IndexText::_OVERLAY_TOPLEFT) + i);
+                auto idx = IndexText(static_cast<int>(IndexText::_OVERLAY_TOPLEFT) + i);
                 if (!State::get(idx).empty())
                 {
                     ImGui::PushID(overlayTextID[count++]);

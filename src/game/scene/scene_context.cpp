@@ -41,7 +41,7 @@ std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge)
     if (State::get(IndexOption::PLAY_HSFIX_TYPE) == Option::e_speed_type::SPEED_FIX_CONSTANT)
         return {false, Option::LAMP_NOPLAY};
 
-    auto randomType = (Option::e_random_type)State::get(IndexOption::PLAY_RANDOM_TYPE_1P);
+    auto randomType = static_cast<Option::e_random_type>(State::get(IndexOption::PLAY_RANDOM_TYPE_1P));
 
     bool isPlaymodeDP = (State::get(IndexOption::PLAY_MODE) == Option::PLAY_MODE_DOUBLE ||
                          State::get(IndexOption::PLAY_MODE) == Option::PLAY_MODE_DP_GHOST_BATTLE);
@@ -53,7 +53,7 @@ std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge)
 
     if (isPlaymodeDP)
     {
-        auto randomType2P = (Option::e_random_type)State::get(IndexOption::PLAY_RANDOM_TYPE_2P);
+        auto randomType2P = static_cast<Option::e_random_type>(State::get(IndexOption::PLAY_RANDOM_TYPE_2P));
         if (randomType2P == Option::e_random_type::RAN_HRAN)
             return {false, Option::LAMP_ASSIST};
         else if (randomType2P == Option::e_random_type::RAN_ALLSCR)
@@ -123,7 +123,7 @@ void clearContextPlay()
     gPlayContext.remainTime = 0;
 
     static std::random_device rd;
-    gPlayContext.randomSeed = ((uint64_t)rd() << 32) | rd();
+    gPlayContext.randomSeed = (static_cast<uint64_t>(rd()) << 32) | rd();
 
     gPlayContext.isCourse = false;
     gPlayContext.courseStage = 0;
@@ -354,11 +354,11 @@ void loadSongList()
                     return idx;
                 }
             }
-            return (size_t)-1;
+            return static_cast<size_t>(-1);
         };
 
         size_t i = findChart(currentEntryHash);
-        if (i != (size_t)-1)
+        if (i != static_cast<size_t>(-1))
         {
             gSelectContext.selectedEntryIndex = i;
         }
@@ -374,7 +374,7 @@ void loadSongList()
                     i = findChart((*chartList.begin())->fileHash);
                 }
             }
-            if (i != (size_t)-1)
+            if (i != static_cast<size_t>(-1))
             {
                 gSelectContext.selectedEntryIndex = i;
             }
@@ -388,7 +388,7 @@ void loadSongList()
                     i = findChart((*chartList.begin())->fileHash);
                 }
             }
-            if (i != (size_t)-1)
+            if (i != static_cast<size_t>(-1))
             {
                 gSelectContext.selectedEntryIndex = i;
             }
@@ -408,7 +408,7 @@ void loadSongList()
                     }
                 }
             }
-            if (i != (size_t)-1)
+            if (i != static_cast<size_t>(-1))
             {
                 gSelectContext.selectedEntryIndex = i;
             }
@@ -420,16 +420,17 @@ void loadSongList()
                     i = findChart(currentEntrySong->getChart(0)->fileHash);
                 }
             }
-            if (i != (size_t)-1)
+            if (i != static_cast<size_t>(-1))
             {
                 gSelectContext.selectedEntryIndex = i;
             }
         }
     }
 
-    State::set(IndexSlider::SELECT_LIST, gSelectContext.entries.empty() ? 0.0
-                                                                        : ((double)gSelectContext.selectedEntryIndex /
-                                                                           gSelectContext.entries.size()));
+    State::set(IndexSlider::SELECT_LIST,
+               gSelectContext.entries.empty()
+                   ? 0.0
+                   : (static_cast<double>(gSelectContext.selectedEntryIndex) / gSelectContext.entries.size()));
 }
 
 void updateEntryScore(size_t idx)
@@ -600,9 +601,10 @@ void sortSongList()
     {
         gSelectContext.selectedEntryIndex = 0;
     }
-    State::set(IndexSlider::SELECT_LIST, gSelectContext.entries.empty() ? 0.0
-                                                                        : ((double)gSelectContext.selectedEntryIndex /
-                                                                           gSelectContext.entries.size()));
+    State::set(IndexSlider::SELECT_LIST,
+               gSelectContext.entries.empty()
+                   ? 0.0
+                   : (static_cast<double>(gSelectContext.selectedEntryIndex) / gSelectContext.entries.size()));
 }
 
 void setBarInfo()
@@ -613,8 +615,8 @@ void setBarInfo()
 
     const size_t idx = gSelectContext.selectedEntryIndex;
     const size_t cursor = gSelectContext.highlightBarIndex;
-    const size_t count =
-        size_t(IndexText::_SELECT_BAR_TITLE_FULL_MAX) - size_t(IndexText::_SELECT_BAR_TITLE_FULL_0) + 1;
+    const size_t count = static_cast<size_t>(IndexText::_SELECT_BAR_TITLE_FULL_MAX) -
+                         static_cast<size_t>(IndexText::_SELECT_BAR_TITLE_FULL_0) + 1;
     const bool subtitle = !ConfigMgr::Profile()->get(cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, false);
 
     auto setSingleBarInfo = [&](size_t list_idx, size_t bar_index) {
@@ -652,22 +654,22 @@ void setBarInfo()
                     if (!entry->_name2.empty())
                         name += entry->_name2;
                 }
-                State::set(IndexText(int(IndexText::_SELECT_BAR_TITLE_FULL_0) + bar_index), name);
-                State::set(IndexNumber(int(IndexNumber::_SELECT_BAR_LEVEL_0) + bar_index), bms->playLevel);
+                State::set(IndexText(static_cast<int>(IndexText::_SELECT_BAR_TITLE_FULL_0) + bar_index), name);
+                State::set(IndexNumber(static_cast<int>(IndexNumber::_SELECT_BAR_LEVEL_0) + bar_index), bms->playLevel);
 
                 break;
             }
 
             default:
-                State::set(IndexText(int(IndexText::_SELECT_BAR_TITLE_FULL_0) + bar_index), entry->_name);
-                State::set(IndexNumber(int(IndexNumber::_SELECT_BAR_LEVEL_0) + bar_index), 0);
+                State::set(IndexText(static_cast<int>(IndexText::_SELECT_BAR_TITLE_FULL_0) + bar_index), entry->_name);
+                State::set(IndexNumber(static_cast<int>(IndexNumber::_SELECT_BAR_LEVEL_0) + bar_index), 0);
                 break;
             }
         }
         else
         {
             // other types. eg. folder, course, etc
-            State::set(IndexText(int(IndexText::_SELECT_BAR_TITLE_FULL_0) + bar_index), entry->_name);
+            State::set(IndexText(static_cast<int>(IndexText::_SELECT_BAR_TITLE_FULL_0) + bar_index), entry->_name);
         }
     };
     for (size_t list_idx = idx, bar_index = cursor; bar_index > 0;
@@ -888,7 +890,7 @@ void setEntryInfo(const size_t idx)
             param_new.genre = i18n::s(i18nText::CLASS_TITLE);
             break;
         }
-        param["coursestagecount"] = (int)ps->charts.size();
+        param["coursestagecount"] = static_cast<int>(ps->charts.size());
         if (ps->charts.empty())
         {
             param["coursenotplayable"] = 1;
@@ -1053,20 +1055,20 @@ void setEntryInfo(const size_t idx)
                 param["pr"] = pScore->kpoor + pScore->miss;
                 if (pScore->notes != 0)
                 {
-                    param["pgrate"] = int(100 * pScore->pgreat / pScore->notes);
-                    param["grrate"] = int(100 * pScore->great / pScore->notes);
-                    param["gdrate"] = int(100 * pScore->good / pScore->notes);
-                    param["bdrate"] = int(100 * pScore->bad / pScore->notes);
-                    param["prrate"] = int(100 * (pScore->kpoor + pScore->miss) / pScore->notes);
+                    param["pgrate"] = (100 * pScore->pgreat / pScore->notes);
+                    param["grrate"] = (100 * pScore->great / pScore->notes);
+                    param["gdrate"] = (100 * pScore->good / pScore->notes);
+                    param["bdrate"] = (100 * pScore->bad / pScore->notes);
+                    param["prrate"] = (100 * (pScore->kpoor + pScore->miss) / pScore->notes);
 
-                    paramf["pg"] = (double)pScore->pgreat / pScore->notes;
-                    paramf["gr"] = (double)pScore->great / pScore->notes;
-                    paramf["gd"] = (double)pScore->good / pScore->notes;
-                    paramf["bd"] = (double)pScore->bad / pScore->notes;
-                    paramf["pr"] = (double)(pScore->kpoor + pScore->miss) / pScore->notes;
-                    paramf["maxcombo"] = (double)pScore->maxcombo / pScore->notes;
-                    paramf["score"] = (double)pScore->score / 200000;
-                    paramf["exscore"] = (double)pScore->exscore / (pScore->notes * 2);
+                    paramf["pg"] = static_cast<double>(pScore->pgreat) / pScore->notes;
+                    paramf["gr"] = static_cast<double>(pScore->great) / pScore->notes;
+                    paramf["gd"] = static_cast<double>(pScore->good) / pScore->notes;
+                    paramf["bd"] = static_cast<double>(pScore->bad) / pScore->notes;
+                    paramf["pr"] = static_cast<double>(pScore->kpoor + pScore->miss) / pScore->notes;
+                    paramf["maxcombo"] = static_cast<double>(pScore->maxcombo) / pScore->notes;
+                    paramf["score"] = static_cast<double>(pScore->score) / 200000;
+                    paramf["exscore"] = static_cast<double>(pScore->exscore) / (pScore->notes * 2);
                 }
 
                 break;
@@ -1122,20 +1124,21 @@ void setEntryInfo(const size_t idx)
             param["pr"] = pScore->kpoor + pScore->miss;
             if (pScore->notes != 0)
             {
-                param["pgrate"] = int(100 * pScore->pgreat / pScore->notes);
-                param["grrate"] = int(100 * pScore->great / pScore->notes);
-                param["gdrate"] = int(100 * pScore->good / pScore->notes);
-                param["bdrate"] = int(100 * pScore->bad / pScore->notes);
-                param["prrate"] = int(100 * (pScore->kpoor + pScore->miss) / pScore->notes);
+                param["pgrate"] = (100 * pScore->pgreat / pScore->notes);
+                param["grrate"] = (100 * pScore->great / pScore->notes);
+                param["gdrate"] = (100 * pScore->good / pScore->notes);
+                param["bdrate"] = (100 * pScore->bad / pScore->notes);
+                param["prrate"] = (100 * (pScore->kpoor + pScore->miss) / pScore->notes);
 
-                paramf["pg"] = (double)pScore->pgreat / pScore->notes;
-                paramf["gr"] = (double)pScore->great / pScore->notes;
-                paramf["gd"] = (double)pScore->good / pScore->notes;
-                paramf["bd"] = (double)pScore->bad / pScore->notes;
-                paramf["pr"] = (double)(pScore->kpoor + pScore->miss) / pScore->notes;
-                paramf["maxcombo"] = (double)pScore->maxcombo / pScore->notes;
-                paramf["score"] = ps->charts.empty() ? 0.0 : (double)pScore->score / 200000 * ps->charts.size();
-                paramf["exscore"] = (double)pScore->exscore / (pScore->notes * 2);
+                paramf["pg"] = static_cast<double>(pScore->pgreat) / pScore->notes;
+                paramf["gr"] = static_cast<double>(pScore->great) / pScore->notes;
+                paramf["gd"] = static_cast<double>(pScore->good) / pScore->notes;
+                paramf["bd"] = static_cast<double>(pScore->bad) / pScore->notes;
+                paramf["pr"] = static_cast<double>(pScore->kpoor + pScore->miss) / pScore->notes;
+                paramf["maxcombo"] = static_cast<double>(pScore->maxcombo) / pScore->notes;
+                paramf["score"] =
+                    ps->charts.empty() ? 0.0 : static_cast<double>(pScore->score) / 200000 * ps->charts.size();
+                paramf["exscore"] = static_cast<double>(pScore->exscore) / (pScore->notes * 2);
             }
         }
         break;
@@ -1423,10 +1426,11 @@ void switchVersion(unsigned difficulty)
                                  (difficulty == 0 || pns->_file->difficulty == difficulty))
                         {
                             gSelectContext.selectedEntryIndex = nextIdx;
-                            State::set(IndexSlider::SELECT_LIST, gSelectContext.entries.empty()
-                                                                     ? 0.0
-                                                                     : ((double)gSelectContext.selectedEntryIndex /
-                                                                        gSelectContext.entries.size()));
+                            State::set(IndexSlider::SELECT_LIST,
+                                       gSelectContext.entries.empty()
+                                           ? 0.0
+                                           : (static_cast<double>(gSelectContext.selectedEntryIndex) /
+                                              gSelectContext.entries.size()));
                             return;
                         }
                     }
@@ -1447,10 +1451,11 @@ void switchVersion(unsigned difficulty)
                                 (difficulty == 0 || pns->_file->difficulty == difficulty))
                             {
                                 gSelectContext.selectedEntryIndex = nextIdx;
-                                State::set(IndexSlider::SELECT_LIST, gSelectContext.entries.empty()
-                                                                         ? 0.0
-                                                                         : ((double)gSelectContext.selectedEntryIndex /
-                                                                            gSelectContext.entries.size()));
+                                State::set(IndexSlider::SELECT_LIST,
+                                           gSelectContext.entries.empty()
+                                               ? 0.0
+                                               : (static_cast<double>(gSelectContext.selectedEntryIndex) /
+                                                  gSelectContext.entries.size()));
                                 return;
                             }
                         }
@@ -1459,10 +1464,10 @@ void switchVersion(unsigned difficulty)
 
                 // fallback to first entry
                 gSelectContext.selectedEntryIndex = firstIdx;
-                State::set(IndexSlider::SELECT_LIST,
-                           gSelectContext.entries.empty()
-                               ? 0.0
-                               : ((double)gSelectContext.selectedEntryIndex / gSelectContext.entries.size()));
+                State::set(IndexSlider::SELECT_LIST, gSelectContext.entries.empty()
+                                                         ? 0.0
+                                                         : (static_cast<double>(gSelectContext.selectedEntryIndex) /
+                                                            gSelectContext.entries.size()));
             }
         }
     }
@@ -1636,7 +1641,7 @@ void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battl
 double lunaticvibes::getSysLoadProgress()
 {
     std::shared_lock l{gPlayContext._mutex};
-    return int(gPlayContext.chartObjLoaded) * 0.5 + int(gPlayContext.rulesetLoaded) * 0.5;
+    return static_cast<int>(gPlayContext.chartObjLoaded) * 0.5 + static_cast<int>(gPlayContext.rulesetLoaded) * 0.5;
 }
 double lunaticvibes::getWavLoadProgress()
 {
@@ -1645,7 +1650,8 @@ double lunaticvibes::getWavLoadProgress()
         return !gChartContext.concurrent.sampleLoadedHash.empty();
     }();
     std::shared_lock l{gPlayContext._mutex};
-    return (gPlayContext.wavTotal == 0) ? (loaded ? 1.0 : 0.0) : (double)gPlayContext.wavLoaded / gPlayContext.wavTotal;
+    return (gPlayContext.wavTotal == 0) ? (loaded ? 1.0 : 0.0)
+                                        : static_cast<double>(gPlayContext.wavLoaded) / gPlayContext.wavTotal;
 }
 double lunaticvibes::getBgaLoadProgress()
 {
@@ -1654,5 +1660,6 @@ double lunaticvibes::getBgaLoadProgress()
         return !gChartContext.concurrent.bgaLoadedHash.empty();
     }();
     std::shared_lock l{gPlayContext._mutex};
-    return (gPlayContext.bmpTotal == 0) ? (loaded ? 1.0 : 0.0) : (double)gPlayContext.bmpLoaded / gPlayContext.bmpTotal;
+    return (gPlayContext.bmpTotal == 0) ? (loaded ? 1.0 : 0.0)
+                                        : static_cast<double>(gPlayContext.bmpLoaded) / gPlayContext.bmpTotal;
 }

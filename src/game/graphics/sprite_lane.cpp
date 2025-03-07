@@ -152,7 +152,7 @@ void SpriteLaneVertical::updateNoteRect(const lunaticvibes::Time& t)
                 y = (c.y + c.h) -
                     static_cast<int>(std::floor(-noteMetreOffset * _noteAreaHeight * _basespd * _hispeed));
             it++;
-            _outRect.emplace(_outRect.begin(), c.x, (float)y, c.w, -c.h);
+            _outRect.emplace(_outRect.begin(), c.x, static_cast<float>(y), c.w, -c.h);
         }
     }
     else
@@ -175,7 +175,7 @@ void SpriteLaneVertical::updateNoteRect(const lunaticvibes::Time& t)
                 y = (c.y + c.h) -
                     static_cast<int>(std::floor(-noteTimeOffset / 1600.0 * _noteAreaHeight * _basespd * _hispeed));
             it++;
-            _outRect.emplace(_outRect.begin(), c.x, (float)y, c.w, -c.h);
+            _outRect.emplace(_outRect.begin(), c.x, static_cast<float>(y), c.w, -c.h);
         }
     }
 }
@@ -416,9 +416,9 @@ void SpriteLaneVerticalLN::updateNoteRect(const lunaticvibes::Time& t)
                 ++it;
             }
 
-            _outRect.emplace(_outRect.begin(), c.x, (float)head_y, c.w, -c.h);
-            _outRectBody.emplace(_outRectBody.begin(), c.x, (float)tail_y, c.w, float(head_y - tail_y - c.h));
-            _outRectTail.emplace(_outRectTail.begin(), c.x, (float)tail_y, c.w, -c.h);
+            _outRect.emplace(_outRect.begin(), c.x, static_cast<float>(head_y), c.w, -c.h);
+            _outRectBody.emplace(_outRectBody.begin(), c.x, static_cast<float>(tail_y), c.w, (head_y - tail_y - c.h));
+            _outRectTail.emplace(_outRectTail.begin(), c.x, static_cast<float>(tail_y), c.w, -c.h);
         }
     }
     else
@@ -502,9 +502,9 @@ void SpriteLaneVerticalLN::updateNoteRect(const lunaticvibes::Time& t)
                 ++it;
             }
 
-            _outRect.emplace(_outRect.begin(), c.x, (float)head_y, c.w, -c.h);
-            _outRectBody.emplace(_outRectBody.begin(), c.x, (float)tail_y, c.w, float(head_y - tail_y - c.h));
-            _outRectTail.emplace(_outRectTail.begin(), c.x, (float)tail_y, c.w, -c.h);
+            _outRect.emplace(_outRect.begin(), c.x, static_cast<float>(head_y), c.w, -c.h);
+            _outRectBody.emplace(_outRectBody.begin(), c.x, static_cast<float>(tail_y), c.w, (head_y - tail_y - c.h));
+            _outRectTail.emplace(_outRectTail.begin(), c.x, static_cast<float>(tail_y), c.w, -c.h);
         }
     }
 

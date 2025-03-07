@@ -158,7 +158,7 @@ PlayModifiers ReplayChart::getMods() const
     out.gauge = gaugeType;
     out.assist_mask = assistMask;
     out.hispeedFix = hispeedFix;
-    out.laneEffect = (PlayModifierLaneEffectType)laneEffectType;
+    out.laneEffect = static_cast<PlayModifierLaneEffectType>(laneEffectType);
     out.DPFlip = DPFlip;
     return out;
 }

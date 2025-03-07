@@ -59,7 +59,7 @@ void imguiMonitorNumber()
             {
                 for (int j = 0; j <= 20; j++)
                 {
-                    ImGui::Text("% 4d: %d", i + j, lunaticvibes::get_number((IndexNumber)(i + j)));
+                    ImGui::Text("% 4d: %d", i + j, lunaticvibes::get_number(static_cast<IndexNumber>(i + j)));
                 }
             }
         }
@@ -71,7 +71,7 @@ void imguiMonitorNumber()
                 IndexNumber::NEW_ENTRY_SECONDS,
             };
             for (auto& e : etcNumbers)
-                ImGui::Text("% 4d: %d", (int)e, lunaticvibes::get_number(e));
+                ImGui::Text("% 4d: %d", static_cast<int>(e), lunaticvibes::get_number(e));
         }
         ImGui::End();
     }
@@ -93,7 +93,7 @@ void imguiMonitorOption()
             {
                 for (int j = 0; j <= 20; j++)
                 {
-                    ImGui::Text("% 4d: %d", i + j, State::get((IndexOption)(i + j)));
+                    ImGui::Text("% 4d: %d", i + j, State::get(static_cast<IndexOption>(i + j)));
                 }
             }
         }
@@ -117,7 +117,7 @@ void imguiMonitorSlider()
             {
                 for (int j = 0; j <= 20; j++)
                 {
-                    ImGui::Text("% 4d: %lf", i + j, State::get((IndexSlider)(i + j)));
+                    ImGui::Text("% 4d: %lf", i + j, State::get(static_cast<IndexSlider>(i + j)));
                 }
             }
         }
@@ -148,7 +148,8 @@ void imguiMonitorSwitch()
                         for (int k = 0; k <= 9; ++k)
                         {
                             ImGui::TableSetColumnIndex(k);
-                            ImGui::Text("% 4d%c", i + j + k, State::get((IndexSwitch)(i + j + k)) ? '+' : ' ');
+                            ImGui::Text("% 4d%c", i + j + k,
+                                        State::get(static_cast<IndexSwitch>(i + j + k)) ? '+' : ' ');
                         }
                     }
                     ImGui::EndTable();
@@ -168,14 +169,14 @@ void imguiMonitorText()
     if (ImGui::Begin("Text (F6)", &imguiShowMonitorText, ImGuiWindowFlags_NoCollapse))
     {
         char titleBuf[32] = {0};
-        for (int i = 0; i <= (int)IndexText::TEXT_COUNT; i += 20)
+        for (int i = 0; i <= static_cast<int>(IndexText::TEXT_COUNT); i += 20)
         {
             sprintf(titleBuf, "%d - %d", i, i + 20);
             if (ImGui::CollapsingHeader(titleBuf))
             {
                 for (int j = 0; j <= 20; j++)
                 {
-                    ImGui::Text("% 4d: %s", i + j, State::get((IndexText)(i + j)).c_str());
+                    ImGui::Text("% 4d: %s", i + j, State::get(static_cast<IndexText>(i + j)).c_str());
                 }
             }
         }
@@ -199,7 +200,7 @@ void imguiMonitorBargraph()
             {
                 for (int j = 0; j <= 20; j++)
                 {
-                    ImGui::Text("% 4d: %lf", i + j, lunaticvibes::get_bargraph((IndexBargraph)(i + j)));
+                    ImGui::Text("% 4d: %lf", i + j, lunaticvibes::get_bargraph(static_cast<IndexBargraph>(i + j)));
                 }
             }
         }
@@ -223,7 +224,7 @@ void imguiMonitorTimer()
             {
                 for (int j = 0; j <= 20; j++)
                 {
-                    long long t = State::get((IndexTimer)(i + j));
+                    long long t = State::get(static_cast<IndexTimer>(i + j));
                     if (t == TIMER_NEVER)
                         ImGui::Text("% 4d: -", i + j);
                     else

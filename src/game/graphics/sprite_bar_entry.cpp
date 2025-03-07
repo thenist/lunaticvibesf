@@ -12,7 +12,7 @@ int SpriteBarEntry::setBody(BarType type, const SpriteAnimated::SpriteAnimatedBu
 {
     if (static_cast<size_t>(type) >= static_cast<size_t>(BarType::TYPE_COUNT))
     {
-        LOG_DEBUG << "[Sprite] BarBody type (" << int(type) << "Invalid!"
+        LOG_DEBUG << "[Sprite] BarBody type (" << static_cast<int>(type) << "Invalid!"
                   << " (Line " << srcLine << ")";
         return 1;
     }
@@ -36,7 +36,7 @@ int SpriteBarEntry::setLevel(BarLevelType type, const SpriteNumber::SpriteNumber
 {
     if (static_cast<size_t>(type) >= static_cast<size_t>(BarLevelType::LEVEL_TYPE_COUNT))
     {
-        LOG_DEBUG << "[Sprite] BarEntry level type (" << int(type) << "Invalid!"
+        LOG_DEBUG << "[Sprite] BarEntry level type (" << static_cast<int>(type) << "Invalid!"
                   << " (Line " << srcLine << ")";
         return 1;
     }
@@ -48,12 +48,12 @@ int SpriteBarEntry::setLevel(BarLevelType type, const SpriteNumber::SpriteNumber
     }
     else if (builder.maxDigits < 2)
     {
-        LOG_DEBUG << "[Sprite] BarEntry level digit (" << builder.maxDigits << ") not enough for idx " << int(type)
-                  << " (Line " << srcLine << ")";
+        LOG_DEBUG << "[Sprite] BarEntry level digit (" << builder.maxDigits << ") not enough for idx "
+                  << static_cast<int>(type) << " (Line " << srcLine << ")";
     }
 
     SpriteNumber::SpriteNumberBuilder tmpBuilder = builder;
-    tmpBuilder.numInd = IndexNumber(unsigned(IndexNumber::_SELECT_BAR_LEVEL_0) + index);
+    tmpBuilder.numInd = IndexNumber(static_cast<unsigned>(IndexNumber::_SELECT_BAR_LEVEL_0) + index);
     sLevel[static_cast<size_t>(type)] = tmpBuilder.build();
     return 0;
 }
@@ -62,7 +62,7 @@ int SpriteBarEntry::setLamp(BarLampType type, const SpriteAnimated::SpriteAnimat
 {
     if (static_cast<size_t>(type) >= static_cast<size_t>(BarLampType::LAMP_TYPE_COUNT))
     {
-        LOG_DEBUG << "[Sprite] BarEntry lamp type (" << int(type) << "Invalid!"
+        LOG_DEBUG << "[Sprite] BarEntry lamp type (" << static_cast<int>(type) << "Invalid!"
                   << " (Line " << srcLine << ")";
         return 1;
     }
@@ -74,7 +74,7 @@ int SpriteBarEntry::setLamp(BarLampType type, const SpriteAnimated::SpriteAnimat
 int SpriteBarEntry::setTitle(BarTitleType type, const SpriteText::SpriteTextBuilder& builder)
 {
     SpriteText::SpriteTextBuilder tmpBuilder = builder;
-    tmpBuilder.textInd = IndexText(int(IndexText::_SELECT_BAR_TITLE_FULL_0) + index);
+    tmpBuilder.textInd = IndexText(static_cast<int>(IndexText::_SELECT_BAR_TITLE_FULL_0) + index);
     sTitle[static_cast<size_t>(type)] = tmpBuilder.build();
     return 0;
 }
@@ -82,7 +82,7 @@ int SpriteBarEntry::setTitle(BarTitleType type, const SpriteText::SpriteTextBuil
 int SpriteBarEntry::setTitle(BarTitleType type, const SpriteImageText::SpriteImageTextBuilder& builder)
 {
     SpriteImageText::SpriteImageTextBuilder tmpBuilder = builder;
-    tmpBuilder.textInd = IndexText(int(IndexText::_SELECT_BAR_TITLE_FULL_0) + index);
+    tmpBuilder.textInd = IndexText(static_cast<int>(IndexText::_SELECT_BAR_TITLE_FULL_0) + index);
     sTitle[static_cast<size_t>(type)] = tmpBuilder.build();
     return 0;
 }
@@ -93,7 +93,7 @@ int SpriteBarEntry::setRank(BarRankType type, const SpriteAnimated::SpriteAnimat
     {
         if (srcLine >= 0)
         {
-            LOG_DEBUG << "[Sprite] BarEntry rank type (" << int(type) << "Invalid!"
+            LOG_DEBUG << "[Sprite] BarEntry rank type (" << static_cast<int>(type) << "Invalid!"
                       << " (Line " << srcLine << ")";
         }
         return 1;
@@ -109,7 +109,7 @@ int SpriteBarEntry::setRivalWinLose(BarRivalType type, const SpriteAnimated::Spr
     {
         if (srcLine >= 0)
         {
-            LOG_DEBUG << "[Sprite] BarEntry rival type (" << int(type) << ") Invalid!"
+            LOG_DEBUG << "[Sprite] BarEntry rival type (" << static_cast<int>(type) << ") Invalid!"
                       << " (Line " << srcLine << ")";
         }
         return 1;
@@ -125,7 +125,7 @@ int SpriteBarEntry::setRivalLampSelf(BarLampType type, const SpriteAnimated::Spr
     {
         if (srcLine >= 0)
         {
-            LOG_DEBUG << "[Sprite] BarEntry rival lamp self type (" << int(type) << "Invalid!"
+            LOG_DEBUG << "[Sprite] BarEntry rival lamp self type (" << static_cast<int>(type) << "Invalid!"
                       << " (Line " << srcLine << ")";
         }
         return 1;
@@ -141,7 +141,7 @@ int SpriteBarEntry::setRivalLampRival(BarLampType type, const SpriteAnimated::Sp
     {
         if (srcLine >= 0)
         {
-            LOG_DEBUG << "[Sprite] BarEntry rival lamp rival type (" << int(type) << "Invalid!"
+            LOG_DEBUG << "[Sprite] BarEntry rival lamp rival type (" << static_cast<int>(type) << "Invalid!"
                       << " (Line " << srcLine << ")";
         }
         return 1;
@@ -321,9 +321,9 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                                                         State::get(IndexNumber::NEW_ENTRY_SECONDS));
 
         auto barTypeIdx = static_cast<size_t>(entry_bar_type(pEntry->type()));
-        if (isNewEntry && (BarType)barTypeIdx == BarType::SONG)
+        if (isNewEntry && static_cast<BarType>(barTypeIdx) == BarType::SONG)
         {
-            barTypeIdx = (size_t)BarType::NEW_SONG;
+            barTypeIdx = static_cast<size_t>(BarType::NEW_SONG);
         }
         std::shared_ptr<SpriteBase> pBody = nullptr;
         if (!drawBodyOn && sBodyOff[barTypeIdx])
@@ -380,8 +380,9 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
             sFlash->setHideInternal(false);
         }
 
-        if ((BarType)barTypeIdx == BarType::SONG || (BarType)barTypeIdx == BarType::NEW_SONG ||
-            (BarType)barTypeIdx == BarType::SONG_RIVAL)
+        if (static_cast<BarType>(barTypeIdx) == BarType::SONG ||
+            static_cast<BarType>(barTypeIdx) == BarType::NEW_SONG ||
+            static_cast<BarType>(barTypeIdx) == BarType::SONG_RIVAL)
         {
             std::shared_ptr<ChartFormatBase> pf;
             if (pEntry->type() == eEntryType::SONG || pEntry->type() == eEntryType::RIVAL_SONG)
@@ -400,7 +401,7 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                     const auto bms = std::reinterpret_pointer_cast<const ChartFormatBMSMeta>(pf);
 
                     // level
-                    if ((size_t)bms->difficulty < sLevel.size() && sLevel[bms->difficulty])
+                    if (static_cast<size_t>(bms->difficulty) < sLevel.size() && sLevel[bms->difficulty])
                     {
                         sLevel[bms->difficulty]->update(time);
                         sLevel[bms->difficulty]->setHideInternal(false);
@@ -418,7 +419,7 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                             if (sprite == nullptr)
                             {
                                 lampTypeIdx = static_cast<size_t>(score_to_bar_lamp_lr2(score->lamp));
-                                sprite = sLamp[(size_t)score_to_bar_lamp_lr2(score->lamp)];
+                                sprite = sLamp[static_cast<size_t>(score_to_bar_lamp_lr2(score->lamp))];
                             }
                             if (sprite != nullptr)
                             {
@@ -429,22 +430,22 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                             }
                         }
 
-                        if ((BarType)barTypeIdx == BarType::SONG_RIVAL)
+                        if (static_cast<BarType>(barTypeIdx) == BarType::SONG_RIVAL)
                         {
                             // rank
                             auto t = Option::getRankType(score->rival_rate);
                             switch (t)
                             {
-                            case Option::RANK_0: drawRankType = (size_t)BarRankType::MAX; break;
-                            case Option::RANK_1: drawRankType = (size_t)BarRankType::AAA; break;
-                            case Option::RANK_2: drawRankType = (size_t)BarRankType::AA; break;
-                            case Option::RANK_3: drawRankType = (size_t)BarRankType::A; break;
-                            case Option::RANK_4: drawRankType = (size_t)BarRankType::B; break;
-                            case Option::RANK_5: drawRankType = (size_t)BarRankType::C; break;
-                            case Option::RANK_6: drawRankType = (size_t)BarRankType::D; break;
-                            case Option::RANK_7: drawRankType = (size_t)BarRankType::E; break;
-                            case Option::RANK_8: drawRankType = (size_t)BarRankType::F; break;
-                            case Option::RANK_NONE: drawRankType = (size_t)BarRankType::NONE; break;
+                            case Option::RANK_0: drawRankType = static_cast<size_t>(BarRankType::MAX); break;
+                            case Option::RANK_1: drawRankType = static_cast<size_t>(BarRankType::AAA); break;
+                            case Option::RANK_2: drawRankType = static_cast<size_t>(BarRankType::AA); break;
+                            case Option::RANK_3: drawRankType = static_cast<size_t>(BarRankType::A); break;
+                            case Option::RANK_4: drawRankType = static_cast<size_t>(BarRankType::B); break;
+                            case Option::RANK_5: drawRankType = static_cast<size_t>(BarRankType::C); break;
+                            case Option::RANK_6: drawRankType = static_cast<size_t>(BarRankType::D); break;
+                            case Option::RANK_7: drawRankType = static_cast<size_t>(BarRankType::E); break;
+                            case Option::RANK_8: drawRankType = static_cast<size_t>(BarRankType::F); break;
+                            case Option::RANK_NONE: drawRankType = static_cast<size_t>(BarRankType::NONE); break;
                             }
                             if (sRank[drawRankType])
                             {
@@ -453,7 +454,8 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                                 drawRank = true;
                             }
                             // win/lose/draw
-                            if ((size_t)score->rival_win < sRivalWinLose.size() && sRivalWinLose[score->rival_win])
+                            if (static_cast<size_t>(score->rival_win) < sRivalWinLose.size() &&
+                                sRivalWinLose[score->rival_win])
                             {
                                 sRivalWinLose[score->rival_win]->update(time);
                                 sRivalWinLose[score->rival_win]->setHideInternal(false);
@@ -485,7 +487,7 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                 }
             }
         }
-        else if ((BarType)barTypeIdx == BarType::COURSE)
+        else if (static_cast<BarType>(barTypeIdx) == BarType::COURSE)
         {
             auto score = std::dynamic_pointer_cast<ScoreBMS>(pScore);
             if (score)
@@ -495,7 +497,7 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                 if (sprite == nullptr)
                 {
                     lampTypeIdx = static_cast<size_t>(score_to_bar_lamp_lr2(score->lamp));
-                    sprite = sLamp[(size_t)score_to_bar_lamp_lr2(score->lamp)];
+                    sprite = sLamp[static_cast<size_t>(score_to_bar_lamp_lr2(score->lamp))];
                 }
                 if (sprite != nullptr)
                 {

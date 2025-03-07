@@ -75,67 +75,67 @@ double lunaticvibes::get_bargraph(IndexBargraph ind)
         break;
     case IndexBargraph::RESULT_PG:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_PERFECT] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_PERFECT]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_GR:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_GREAT] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_GREAT]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_GD:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_GOOD] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_GOOD]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_BD:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_BAD] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_BAD]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_PR:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_POOR] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_POOR]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_MAXCOMBO:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
-            return (double)ruleset->getData().maxCombo / ruleset->getMaxCombo();
+            return static_cast<double>(ruleset->getData().maxCombo) / ruleset->getMaxCombo();
         break;
     case IndexBargraph::RESULT_SCORE:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
-            return (double)ruleset->getScore() / ruleset->getMaxMoneyScore();
+            return ruleset->getScore() / ruleset->getMaxMoneyScore();
         break;
     case IndexBargraph::RESULT_EXSCORE:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); ruleset)
-            return (double)ruleset->getExScore() / ruleset->getMaxScore();
+            return static_cast<double>(ruleset->getExScore()) / ruleset->getMaxScore();
         break;
     case IndexBargraph::RESULT_RIVAL_PG:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_PERFECT] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_PERFECT]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_RIVAL_GR:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_GREAT] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_GREAT]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_RIVAL_GD:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_GOOD] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_GOOD]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_RIVAL_BD:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_BAD] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_BAD]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_RIVAL_PR:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_POOR] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_POOR]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::RESULT_RIVAL_MAXCOMBO:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
-            return (double)ruleset->getData().maxCombo / ruleset->getMaxCombo();
+            return static_cast<double>(ruleset->getData().maxCombo) / ruleset->getMaxCombo();
         break;
     case IndexBargraph::RESULT_RIVAL_SCORE:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
-            return (double)ruleset->getScore() / ruleset->getMaxMoneyScore();
+            return ruleset->getScore() / ruleset->getMaxMoneyScore();
         break;
     case IndexBargraph::RESULT_RIVAL_EXSCORE:
         if (auto ruleset = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); ruleset)
-            return (double)ruleset->getExScore() / ruleset->getMaxScore();
+            return static_cast<double>(ruleset->getExScore()) / ruleset->getMaxScore();
         break;
     case IndexBargraph::SELECT_MYBEST_PG: return gSelectContext.bargraph_select_mybest_pg;
     case IndexBargraph::SELECT_MYBEST_GR: return gSelectContext.bargraph_select_mybest_gr;
@@ -147,21 +147,21 @@ double lunaticvibes::get_bargraph(IndexBargraph ind)
     case IndexBargraph::SELECT_MYBEST_EXSCORE: return gSelectContext.bargraph_select_mybest_exscore;
     case IndexBargraph::PLAY_1P_SLOW_COUNT:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_LATE] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_LATE]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::PLAY_1P_FAST_COUNT:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_EARLY] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_EARLY]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::MINBPM_LANECOVER:
     case IndexBargraph::MAXBPM_LANECOVER:
     case IndexBargraph::PLAY_2P_SLOW_COUNT:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_LATE] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_LATE]) / ruleset->getNoteCount();
         break;
     case IndexBargraph::PLAY_2P_FAST_COUNT:
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
-            return (double)ruleset->getData().judge[RulesetBMS::JUDGE_EARLY] / ruleset->getNoteCount();
+            return static_cast<double>(ruleset->getData().judge[RulesetBMS::JUDGE_EARLY]) / ruleset->getNoteCount();
         break;
     // `case IndexBargraph::FORCE_\(.*\):/case IndexBargraph::FORCE_\1: return
     // gKeyconfigContext.bargraphForce[Input::Pad::\1];`

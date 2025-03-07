@@ -33,7 +33,7 @@ void SpriteGaugeGrid::setGaugeType(SpriteGaugeGrid::GaugeType ty)
         darkFailGridType = NORMAL_DARK;
         lightClearGridType = CLEAR_LIGHT;
         darkClearGridType = CLEAR_DARK;
-        failGrids = (unsigned short)std::floor(0.6 * totalGrids);
+        failGrids = static_cast<unsigned short>(std::floor(0.6 * totalGrids));
         break;
 
     case GaugeType::GROOVE:
@@ -41,7 +41,7 @@ void SpriteGaugeGrid::setGaugeType(SpriteGaugeGrid::GaugeType ty)
         darkFailGridType = NORMAL_DARK;
         lightClearGridType = CLEAR_LIGHT;
         darkClearGridType = CLEAR_DARK;
-        failGrids = (unsigned short)std::floor(0.8 * totalGrids);
+        failGrids = static_cast<unsigned short>(std::floor(0.8 * totalGrids));
         break;
 
     case GaugeType::SURVIVAL:
@@ -77,18 +77,18 @@ void SpriteGaugeGrid::setGaugeType(SpriteGaugeGrid::GaugeType ty)
     // set FailRect
     updateSelection(lightFailGridType);
     SpriteAnimated::update(t);
-    lightFailRectIdxOffset = unsigned(selectionIndex * animationFrames);
+    lightFailRectIdxOffset = static_cast<unsigned>(selectionIndex * animationFrames);
     updateSelection(darkFailGridType);
     SpriteAnimated::update(t);
-    darkFailRectIdxOffset = unsigned(selectionIndex * animationFrames);
+    darkFailRectIdxOffset = static_cast<unsigned>(selectionIndex * animationFrames);
 
     // set ClearRect
     updateSelection(lightClearGridType);
     SpriteAnimated::update(t);
-    lightClearRectIdxOffset = unsigned(selectionIndex * animationFrames);
+    lightClearRectIdxOffset = static_cast<unsigned>(selectionIndex * animationFrames);
     updateSelection(darkClearGridType);
     SpriteAnimated::update(t);
-    darkClearRectIdxOffset = unsigned(selectionIndex * animationFrames);
+    darkClearRectIdxOffset = static_cast<unsigned>(selectionIndex * animationFrames);
 }
 
 void SpriteGaugeGrid::updateVal(unsigned v)
@@ -141,7 +141,7 @@ void SpriteGaugeGrid::draw() const
     if (_draw && pTexture != nullptr && pTexture->isLoaded())
     {
         RectF r = _current.rect;
-        auto grid_val = unsigned(failGrids - 1);
+        auto grid_val = static_cast<unsigned>(failGrids - 1);
         const Rect clear_tex_flashing = textureRects[lightClearRectIdxOffset + animationFrameIndex];
         const Rect clear_tex = textureRects[darkClearRectIdxOffset + animationFrameIndex];
         const Rect fail_tex_flashing = textureRects[lightFailRectIdxOffset + animationFrameIndex];

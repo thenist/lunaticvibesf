@@ -28,7 +28,7 @@ void RulesetBMSAuto::setTargetRate(double rate)
 {
     targetRate = rate;
     unsigned count = getNoteCount();
-    auto score = (unsigned)std::round(2 * count * rate);
+    auto score = static_cast<unsigned>(std::round(2 * count * rate));
     if (!_judgeScratch)
     {
         auto pChart = std::dynamic_pointer_cast<ChartObjectBMS>(_chart);
@@ -67,9 +67,9 @@ void RulesetBMSAuto::setTargetRate(double rate)
     totalJudgeCount[JudgeArea::EARLY_GREAT] = count1;
     totalJudgeCount[JudgeArea::EARLY_GOOD] = count0;
 
-    double interval0 = count0 ? (double)count / count0 : 0.;
-    double interval1 = count1 ? (double)count / count1 : 0.;
-    double interval2 = count2 ? (double)count / count2 : 0.;
+    double interval0 = count0 ? static_cast<double>(count) / count0 : 0.;
+    double interval1 = count1 ? static_cast<double>(count) / count1 : 0.;
+    double interval2 = count2 ? static_cast<double>(count) / count2 : 0.;
     double c0 = 0.;
     double c1 = 0.;
     double c2 = 0.;
@@ -131,7 +131,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
 
             NoteLaneIndex idx;
 
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Note, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Note, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Note, idx);
@@ -171,7 +171,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                 }
             }
 
-            idx = _chart->getLaneFromKey(NoteLaneCategory::LN, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::LN, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::LN, idx);
@@ -260,7 +260,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                 }
             }
 
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Invs, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Invs, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Invs, idx);
@@ -273,7 +273,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                 }
             }
 
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Mine, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Mine, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Mine, idx);

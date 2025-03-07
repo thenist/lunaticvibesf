@@ -862,16 +862,16 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr
         for (size_t k = Input::S1L; k <= Input::K2SPDDN; ++k)
         {
             NoteLaneIndex idx;
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Note, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Note, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
                 _noteListIterators[{NoteLaneCategory::Note, idx}] = _chart->firstNote(NoteLaneCategory::Note, idx);
-            idx = _chart->getLaneFromKey(NoteLaneCategory::LN, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::LN, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
                 _noteListIterators[{NoteLaneCategory::LN, idx}] = _chart->firstNote(NoteLaneCategory::LN, idx);
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Mine, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Mine, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
                 _noteListIterators[{NoteLaneCategory::Mine, idx}] = _chart->firstNote(NoteLaneCategory::Mine, idx);
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Invs, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Invs, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
                 _noteListIterators[{NoteLaneCategory::Invs, idx}] = _chart->firstNote(NoteLaneCategory::Invs, idx);
         }
@@ -948,27 +948,27 @@ RulesetBMS::JudgeRes RulesetBMS::_calcJudgeByTimes(const Note& note, const lunat
     // spot judge area
     JudgeArea a = JudgeArea::NOTHING;
     int error = time.norm() - note.time.norm();
-    if (error > -judgeTime[(size_t)_judgeDifficulty].KPOOR)
+    if (error > -judgeTime[static_cast<size_t>(_judgeDifficulty)].KPOOR)
     {
-        if (error < -judgeTime[(size_t)_judgeDifficulty].BAD)
+        if (error < -judgeTime[static_cast<size_t>(_judgeDifficulty)].BAD)
             a = JudgeArea::EARLY_KPOOR;
-        else if (error < -judgeTime[(size_t)_judgeDifficulty].GOOD)
+        else if (error < -judgeTime[static_cast<size_t>(_judgeDifficulty)].GOOD)
             a = JudgeArea::EARLY_BAD;
-        else if (error < -judgeTime[(size_t)_judgeDifficulty].GREAT)
+        else if (error < -judgeTime[static_cast<size_t>(_judgeDifficulty)].GREAT)
             a = JudgeArea::EARLY_GOOD;
-        else if (error < -judgeTime[(size_t)_judgeDifficulty].PERFECT)
+        else if (error < -judgeTime[static_cast<size_t>(_judgeDifficulty)].PERFECT)
             a = JudgeArea::EARLY_GREAT;
         else if (error < 0)
             a = JudgeArea::EARLY_PERFECT;
         else if (error == 0)
             a = JudgeArea::EXACT_PERFECT;
-        else if (error < judgeTime[(size_t)_judgeDifficulty].PERFECT)
+        else if (error < judgeTime[static_cast<size_t>(_judgeDifficulty)].PERFECT)
             a = JudgeArea::LATE_PERFECT;
-        else if (error < judgeTime[(size_t)_judgeDifficulty].GREAT)
+        else if (error < judgeTime[static_cast<size_t>(_judgeDifficulty)].GREAT)
             a = JudgeArea::LATE_GREAT;
-        else if (error < judgeTime[(size_t)_judgeDifficulty].GOOD)
+        else if (error < judgeTime[static_cast<size_t>(_judgeDifficulty)].GOOD)
             a = JudgeArea::LATE_GOOD;
-        else if (error < judgeTime[(size_t)_judgeDifficulty].BAD)
+        else if (error < judgeTime[static_cast<size_t>(_judgeDifficulty)].BAD)
             a = JudgeArea::LATE_BAD;
     }
 
@@ -1496,7 +1496,7 @@ void RulesetBMS::updatePress(InputMask& pg, const lunaticvibes::Time& t, const l
         {
             if (!pg[k])
                 continue;
-            judgeNotePress((Input::Pad)k, t, tt[k] - _startTime, slot);
+            judgeNotePress(static_cast<Input::Pad>(k), t, tt[k] - _startTime, slot);
         }
     };
     if (_k1P)
@@ -1536,7 +1536,7 @@ void RulesetBMS::updateHold(InputMask& hg, const lunaticvibes::Time& t)
         {
             if (!hg[k])
                 continue;
-            judgeNoteHold((Input::Pad)k, t, rt, slot);
+            judgeNoteHold(static_cast<Input::Pad>(k), t, rt, slot);
         }
     };
     if (_k1P)
@@ -1564,7 +1564,7 @@ void RulesetBMS::updateRelease(InputMask& rg, const lunaticvibes::Time& t)
         {
             if (!rg[k])
                 continue;
-            judgeNoteRelease((Input::Pad)k, t, rt, slot);
+            judgeNoteRelease(static_cast<Input::Pad>(k), t, rt, slot);
         }
     };
     if (_k1P)
@@ -1654,14 +1654,14 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
 
             NoteLaneIndex idx;
 
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Note, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Note, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Note, idx);
                 while (!_chart->isLastNote(NoteLaneCategory::Note, idx, itNote) && !itNote->expired)
                 {
                     const auto latePoorWindow =
-                        (!scratch || _judgeScratch) ? judgeTime[(size_t)_judgeDifficulty].BAD : 0;
+                        (!scratch || _judgeScratch) ? judgeTime[static_cast<size_t>(_judgeDifficulty)].BAD : 0;
                     if (rt.norm() - itNote->time.norm() >= latePoorWindow)
                     {
                         itNote->expired = true;
@@ -1680,7 +1680,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                 }
             }
 
-            idx = _chart->getLaneFromKey(NoteLaneCategory::LN, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::LN, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::LN, idx);
@@ -1690,7 +1690,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                     {
                         if (rt >= itNote->time)
                         {
-                            auto hitTime = itNote->time.norm() + judgeTime[(size_t)_judgeDifficulty].BAD;
+                            auto hitTime = itNote->time.norm() + judgeTime[static_cast<size_t>(_judgeDifficulty)].BAD;
                             auto itTail = itNote;
                             itTail++;
                             if (!_chart->isLastNote(NoteLaneCategory::LN, idx, itTail) &&
@@ -1733,10 +1733,10 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                 }
             }
 
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Invs, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Invs, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
             {
-                const auto& hitTime = -judgeTime[(size_t)_judgeDifficulty].BAD;
+                const auto& hitTime = -judgeTime[static_cast<size_t>(_judgeDifficulty)].BAD;
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Invs, idx);
                 while (!_chart->isLastNote(NoteLaneCategory::Invs, idx, itNote) && !itNote->expired &&
                        rt.norm() - itNote->time.norm() >= hitTime)
@@ -1746,7 +1746,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                 }
             }
 
-            idx = _chart->getLaneFromKey(NoteLaneCategory::Mine, (Input::Pad)k);
+            idx = _chart->getLaneFromKey(NoteLaneCategory::Mine, static_cast<Input::Pad>(k));
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Mine, idx);
@@ -2019,19 +2019,20 @@ void RulesetBMS::updateGlobals()
         State::set(IndexNumber::PLAY_1P_EXSCORE, exScore);
         State::set(IndexNumber::PLAY_1P_NOWCOMBO, _basic.combo + _basic.comboDisplay);
         State::set(IndexNumber::PLAY_1P_MAXCOMBO, _basic.maxComboDisplay);
-        State::set(IndexNumber::PLAY_1P_RATE, int(std::floor(_basic.acc)));
-        State::set(IndexNumber::PLAY_1P_RATEDECIMAL, int(std::floor((_basic.acc - int(_basic.acc)) * 100)));
+        State::set(IndexNumber::PLAY_1P_RATE, static_cast<int>(std::floor(_basic.acc)));
+        State::set(IndexNumber::PLAY_1P_RATEDECIMAL,
+                   static_cast<int>(std::floor((_basic.acc - static_cast<int>(_basic.acc)) * 100)));
         State::set(IndexNumber::PLAY_1P_TOTALNOTES, getNoteCount());
-        State::set(IndexNumber::PLAY_1P_TOTAL_RATE, int(std::floor(_basic.total_acc)));
+        State::set(IndexNumber::PLAY_1P_TOTAL_RATE, static_cast<int>(std::floor(_basic.total_acc)));
         State::set(IndexNumber::PLAY_1P_TOTAL_RATE_DECIMAL2,
-                   int(std::floor((_basic.total_acc - int(_basic.total_acc)) * 100)));
+                   static_cast<int>(std::floor((_basic.total_acc - static_cast<int>(_basic.total_acc)) * 100)));
         State::set(IndexNumber::PLAY_1P_PERFECT, _basic.judge[JUDGE_PERFECT]);
         State::set(IndexNumber::PLAY_1P_GREAT, _basic.judge[JUDGE_GREAT]);
         State::set(IndexNumber::PLAY_1P_GOOD, _basic.judge[JUDGE_GOOD]);
         State::set(IndexNumber::PLAY_1P_BAD, _basic.judge[JUDGE_BAD]);
         State::set(IndexNumber::PLAY_1P_POOR, _basic.judge[JUDGE_POOR]);
         // TODO: remove as it can be calculated. This is needed right now for internal state.
-        State::set(IndexNumber::PLAY_1P_GROOVEGAUGE, int(_basic.health * 100));
+        State::set(IndexNumber::PLAY_1P_GROOVEGAUGE, static_cast<int>(_basic.health * 100));
 
         State::set(IndexNumber::PLAY_1P_MISS, _basic.judge[JUDGE_MISS]);
         State::set(IndexNumber::PLAY_1P_FAST_COUNT, _basic.judge[JUDGE_EARLY]);
@@ -2090,19 +2091,20 @@ void RulesetBMS::updateGlobals()
         }
         State::set(IndexNumber::PLAY_2P_NOWCOMBO, _basic.combo + _basic.comboDisplay);
         State::set(IndexNumber::PLAY_2P_MAXCOMBO, _basic.maxComboDisplay);
-        State::set(IndexNumber::PLAY_2P_RATE, int(std::floor(_basic.acc)));
-        State::set(IndexNumber::PLAY_2P_RATEDECIMAL, int(std::floor((_basic.acc - int(_basic.acc)) * 100)));
+        State::set(IndexNumber::PLAY_2P_RATE, static_cast<int>(std::floor(_basic.acc)));
+        State::set(IndexNumber::PLAY_2P_RATEDECIMAL,
+                   static_cast<int>(std::floor((_basic.acc - static_cast<int>(_basic.acc)) * 100)));
         State::set(IndexNumber::PLAY_2P_TOTALNOTES, getNoteCount());
-        State::set(IndexNumber::PLAY_2P_TOTAL_RATE, int(std::floor(_basic.total_acc)));
+        State::set(IndexNumber::PLAY_2P_TOTAL_RATE, static_cast<int>(std::floor(_basic.total_acc)));
         State::set(IndexNumber::PLAY_2P_TOTAL_RATE_DECIMAL2,
-                   int(std::floor((_basic.total_acc - int(_basic.total_acc)) * 100)));
+                   static_cast<int>(std::floor((_basic.total_acc - static_cast<int>(_basic.total_acc)) * 100)));
         State::set(IndexNumber::PLAY_2P_PERFECT, _basic.judge[JUDGE_PERFECT]);
         State::set(IndexNumber::PLAY_2P_GREAT, _basic.judge[JUDGE_GREAT]);
         State::set(IndexNumber::PLAY_2P_GOOD, _basic.judge[JUDGE_GOOD]);
         State::set(IndexNumber::PLAY_2P_BAD, _basic.judge[JUDGE_BAD]);
         State::set(IndexNumber::PLAY_2P_POOR, _basic.judge[JUDGE_POOR]);
         // TODO: remove as it can be calculated. This is needed right now for internal state.
-        State::set(IndexNumber::PLAY_2P_GROOVEGAUGE, int(_basic.health * 100));
+        State::set(IndexNumber::PLAY_2P_GROOVEGAUGE, static_cast<int>(_basic.health * 100));
 
         State::set(IndexNumber::PLAY_2P_MISS, _basic.judge[JUDGE_MISS]);
         State::set(IndexNumber::PLAY_2P_FAST_COUNT, _basic.judge[JUDGE_EARLY]);

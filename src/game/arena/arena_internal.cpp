@@ -69,14 +69,14 @@ std::shared_ptr<std::vector<unsigned char>> ArenaMessage::pack()
     }
     if (ss.str().empty())
     {
-        LOG_WARNING << "[Arena] Message pack failed. Type: " << (int)type;
+        LOG_WARNING << "[Arena] Message pack failed. Type: " << static_cast<int>(type);
         return ret;
     }
 
     size_t length = ss.tellp();
     ret->resize(length + 1);
     (*ret)[0] = type;
-    ss.read((char*)&(*ret)[1], length);
+    ss.read(reinterpret_cast<char*>(&(*ret)[1]), length);
 
     return ret;
 }
@@ -90,7 +90,7 @@ std::shared_ptr<ArenaMessage> ArenaMessage::unpack(const unsigned char* data, si
     }
     if (data[0] == UNDEF || data[0] >= MESSAGE_TYPE_COUNT)
     {
-        LOG_WARNING << "[Arena] Invalid message type: " << (int)data[0];
+        LOG_WARNING << "[Arena] Invalid message type: " << static_cast<int>(data[0]);
         return nullptr;
     }
 
@@ -133,6 +133,6 @@ std::shared_ptr<ArenaMessage> ArenaMessage::unpack(const unsigned char* data, si
     {
         LOG_ERROR << "[ArenaInternal] cereal exception: " << e.what();
     }
-    LOG_WARNING << "[Arena] Message parsing failed. Type: " << (int)data[0];
+    LOG_WARNING << "[Arena] Message parsing failed. Type: " << static_cast<int>(data[0]);
     return nullptr;
 }

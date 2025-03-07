@@ -1422,17 +1422,17 @@ public:
         ss.appendMotionKeyFrame(
             {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         ss.setMotionLoopTo(0);
-        ss.setInd(SpriteOption::opType::SWITCH, (unsigned)IndexSwitch::_TEST1);
+        ss.setInd(SpriteOption::opType::SWITCH, static_cast<unsigned>(IndexSwitch::_TEST1));
         ss0.setMotionStartTimer(IndexTimer::K11_BOMB);
         ss0.appendMotionKeyFrame(
             {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         ss0.setMotionLoopTo(0);
-        ss0.setInd(SpriteOption::opType::SWITCH, (unsigned)IndexSwitch::_TEST1);
+        ss0.setInd(SpriteOption::opType::SWITCH, static_cast<unsigned>(IndexSwitch::_TEST1));
         so.setMotionStartTimer(IndexTimer::K11_BOMB);
         so.appendMotionKeyFrame(
             {0, {Rect(0, 0, 0, 0), MotionKeyFrameParams::CONSTANT, Color(0xFFFFFFFF), BlendMode::ALPHA, false, 0}});
         so.setMotionLoopTo(0);
-        so.setInd(SpriteOption::opType::OPTION, (unsigned)IndexOption::_TEST1);
+        so.setInd(SpriteOption::opType::OPTION, static_cast<unsigned>(IndexOption::_TEST1));
     }
 };
 

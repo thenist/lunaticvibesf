@@ -128,7 +128,8 @@ using DARC_DIRECTORY_VER5 = struct tagDARC_DIRECTORY_VER5
 // ファイル名データから元のファイル名の文字列を取得する
 const char* GetOriginalFileName(u8* FileNameTable)
 {
-    return (char*)FileNameTable + static_cast<ptrdiff_t>(*((u16*)&FileNameTable[0]) * 4) + 4;
+    return reinterpret_cast<char*>(FileNameTable) +
+           static_cast<ptrdiff_t>(*(reinterpret_cast<u16*>(&FileNameTable[0])) * 4) + 4;
 }
 
 // 鍵文字列を作成
@@ -183,7 +184,7 @@ void KeyConv(void* Data, int Size, int Position, unsigned char* Key)
     j = Position;
     for (i = 0; i < Size; i++)
     {
-        ((u8*)Data)[i] ^= Key[j];
+        (static_cast<u8*>(Data))[i] ^= Key[j];
 
         j++;
         if (j == DXA_KEYSTR_LENGTH_VER5)
@@ -204,7 +205,7 @@ void KeyConvFileRead(void* Data, int Size, std::ifstream& fp, unsigned char* Key
         pos = Position;
 
     // 読み込む
-    fp.read((char*)Data, Size);
+    fp.read(static_cast<char*>(Data), Size);
 
     // データを鍵文字列を使って Xor 演算
     KeyConv(Data, Size, pos, Key);
@@ -216,14 +217,14 @@ int Decompress(void* Src, void* Dest)
     u32 srcsize, destsize, code, indexsize, keycode, conbo, index;
     u8 *srcp, *destp, *dp, *sp;
 
-    destp = (u8*)Dest;
-    srcp = (u8*)Src;
+    destp = static_cast<u8*>(Dest);
+    srcp = static_cast<u8*>(Src);
 
     // 解凍後のデータサイズを得る
-    destsize = *((u32*)&srcp[0]);
+    destsize = *(reinterpret_cast<u32*>(&srcp[0]));
 
     // 圧縮データのサイズを得る
-    srcsize = *((u32*)&srcp[4]) - 9;
+    srcsize = *(reinterpret_cast<u32*>(&srcp[4])) - 9;
 
     // キーコード
     keycode = srcp[8];
@@ -251,7 +252,7 @@ int Decompress(void* Src, void* Dest)
         // キーコードが連続していた場合はキーコード自体を出力
         if (sp[1] == keycode)
         {
-            *dp = (u8)keycode;
+            *dp = static_cast<u8>(keycode);
             dp++;
             sp += 2;
             srcsize -= 2;
@@ -336,7 +337,7 @@ int Decompress(void* Src, void* Dest)
     }
 
     // 解凍後のサイズを返す
-    return (int)destsize;
+    return static_cast<int>(destsize);
 }
 
 // 指定のディレクトリデータにあるファイルを展開する
@@ -349,7 +350,7 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
         DARC_FILEHEAD_VER5* DirFile;
 
         // DARC_FILEHEAD_VER5 のアドレスを取得
-        DirFile = (DARC_FILEHEAD_VER5*)(FileP + Dir->DirectoryAddress);
+        DirFile = reinterpret_cast<DARC_FILEHEAD_VER5*>(FileP + Dir->DirectoryAddress);
 
         DirPath /= GetOriginalFileName(NameP + DirFile->NameAddress);
     }
@@ -361,15 +362,17 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
 
         // 格納されているファイルの数だけ繰り返す
         FileHeadSize = Head->Version >= 0x0002 ? sizeof(DARC_FILEHEAD_VER5) : sizeof(DARC_FILEHEAD_VER1);
-        File = (DARC_FILEHEAD_VER5*)(FileP + Dir->FileHeadAddress);
-        for (i = 0; i < Dir->FileHeadNum; i++, File = (DARC_FILEHEAD_VER5*)((u8*)File + FileHeadSize))
+        File = reinterpret_cast<DARC_FILEHEAD_VER5*>(FileP + Dir->FileHeadAddress);
+        for (i = 0; i < Dir->FileHeadNum;
+             i++, File = reinterpret_cast<DARC_FILEHEAD_VER5*>(reinterpret_cast<u8*>(File) + FileHeadSize))
         {
             // ディレクトリかどうかで処理を分岐
             if (File->Attributes & FILE_ATTRIBUTE_DIRECTORY)
             {
                 // ディレクトリの場合は再帰をかける
-                DirectoryDecode(NameP, DirP, FileP, Head, (DARC_DIRECTORY_VER5*)(DirP + File->DataAddress), ArcP, Key,
-                                DirPath, output);
+                DirectoryDecode(NameP, DirP, FileP, Head,
+                                reinterpret_cast<DARC_DIRECTORY_VER5*>(DirP + File->DataAddress), ArcP, Key, DirPath,
+                                output);
             }
             else
             {
@@ -469,7 +472,7 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
         DARC_FILEHEAD_VER5* DirFile;
 
         // DARC_FILEHEAD_VER5 のアドレスを取得
-        DirFile = (DARC_FILEHEAD_VER5*)(FileP + Dir->DirectoryAddress);
+        DirFile = reinterpret_cast<DARC_FILEHEAD_VER5*>(FileP + Dir->DirectoryAddress);
 
         DirPath /= GetOriginalFileName(NameP + DirFile->NameAddress);
 
@@ -484,15 +487,16 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
 
         // 格納されているファイルの数だけ繰り返す
         FileHeadSize = Head->Version >= 0x0002 ? sizeof(DARC_FILEHEAD_VER5) : sizeof(DARC_FILEHEAD_VER1);
-        File = (DARC_FILEHEAD_VER5*)(FileP + Dir->FileHeadAddress);
-        for (i = 0; i < Dir->FileHeadNum; i++, File = (DARC_FILEHEAD_VER5*)((u8*)File + FileHeadSize))
+        File = reinterpret_cast<DARC_FILEHEAD_VER5*>(FileP + Dir->FileHeadAddress);
+        for (i = 0; i < Dir->FileHeadNum;
+             i++, File = reinterpret_cast<DARC_FILEHEAD_VER5*>(reinterpret_cast<u8*>(File) + FileHeadSize))
         {
             // ディレクトリかどうかで処理を分岐
             if (File->Attributes & FILE_ATTRIBUTE_DIRECTORY)
             {
                 // ディレクトリの場合は再帰をかける
-                DirectoryDecode(NameP, DirP, FileP, Head, (DARC_DIRECTORY_VER5*)(DirP + File->DataAddress), ArcP, Key,
-                                DirPath);
+                DirectoryDecode(NameP, DirP, FileP, Head,
+                                reinterpret_cast<DARC_DIRECTORY_VER5*>(DirP + File->DataAddress), ArcP, Key, DirPath);
             }
             else
             {
@@ -537,7 +541,7 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
 
                         std::ofstream ofs((DirPath / GetOriginalFileName(NameP + File->NameAddress)),
                                           std::ios_base::binary);
-                        ofs.write((const char*)buffer.get(), File->DataSize);
+                        ofs.write(reinterpret_cast<const char*>(buffer.get()), File->DataSize);
                     }
                     else
                     {
@@ -573,7 +577,7 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
 
                             std::ofstream ofs((DirPath / GetOriginalFileName(NameP + File->NameAddress)),
                                               std::ios_base::binary);
-                            ofs.write((const char*)buffer.get(), File->DataSize);
+                            ofs.write(reinterpret_cast<const char*>(buffer.get()), File->DataSize);
                         }
                     }
                 }
@@ -642,9 +646,10 @@ static int DecodeArchive(const Path& path, DXArchive* output = nullptr)
 
         // アーカイブの展開を開始する
         if (output != nullptr)
-            DirectoryDecode(NameP, DirP, FileP, &Head, (DARC_DIRECTORY_VER5*)DirP, ArcP, Key, ".", *output);
+            DirectoryDecode(NameP, DirP, FileP, &Head, reinterpret_cast<DARC_DIRECTORY_VER5*>(DirP), ArcP, Key, ".",
+                            *output);
         else
-            DirectoryDecode(NameP, DirP, FileP, &Head, (DARC_DIRECTORY_VER5*)DirP, ArcP, Key,
+            DirectoryDecode(NameP, DirP, FileP, &Head, reinterpret_cast<DARC_DIRECTORY_VER5*>(DirP), ArcP, Key,
                             path.parent_path() / path.stem());
     }
 

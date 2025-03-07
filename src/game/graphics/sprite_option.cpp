@@ -13,12 +13,12 @@ SpriteOption::SpriteOption(const SpriteOptionBuilder& builder) : SpriteAnimated(
 
     case opType::OPTION:
         indType = opType::OPTION;
-        ind.op = (IndexOption)builder.optionInd;
+        ind.op = static_cast<IndexOption>(builder.optionInd);
         break;
 
     case opType::SWITCH:
         indType = opType::SWITCH;
-        ind.sw = (IndexSwitch)builder.optionInd;
+        ind.sw = static_cast<IndexSwitch>(builder.optionInd);
         break;
 
     case opType::FIXED:
@@ -38,12 +38,12 @@ bool SpriteOption::setInd(opType type, unsigned ind)
 
     case opType::OPTION:
         indType = opType::OPTION;
-        this->ind.op = (IndexOption)ind;
+        this->ind.op = static_cast<IndexOption>(ind);
         return true;
 
     case opType::SWITCH:
         indType = opType::SWITCH;
-        this->ind.sw = (IndexSwitch)ind;
+        this->ind.sw = static_cast<IndexSwitch>(ind);
         return true;
 
     case opType::FIXED:

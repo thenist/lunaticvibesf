@@ -80,7 +80,7 @@ static int getLanecoverTop(int slot)
         lcTopInd = IndexNumber::LANECOVER_TOP_2P;
         lcTypeInd = IndexOption::PLAY_LANE_EFFECT_TYPE_2P;
     }
-    switch ((Option::e_lane_effect_type)State::get(lcTypeInd))
+    switch (static_cast<Option::e_lane_effect_type>(State::get(lcTypeInd)))
     {
     case Option::LANE_SUDDEN:
     case Option::LANE_SUDHID:
@@ -107,7 +107,7 @@ static int getLanecoverBottom(int slot)
         lcBottomInd = IndexNumber::LANECOVER_BOTTOM_2P;
         lcTypeInd = IndexOption::PLAY_LANE_EFFECT_TYPE_2P;
     }
-    switch ((Option::e_lane_effect_type)State::get(lcTypeInd))
+    switch (static_cast<Option::e_lane_effect_type>(State::get(lcTypeInd)))
     {
     case Option::LANE_SUDHID: return State::get(lcTopInd);
     case Option::LANE_HIDDEN:
@@ -146,7 +146,7 @@ static std::pair<int, double> calcGreenNumber(double bpm, int slot, double hs)
     double speedValue = (visible == 0.0) ? std::numeric_limits<double>::max() : (bpm * hs / visible);
 
     double den = hs * bpm;
-    int green = den != 0.0 ? int(std::round(visible * 120.0 * 1200 / hs / bpm)) : 0;
+    int green = den != 0.0 ? static_cast<int>(std::round(visible * 120.0 * 1200 / hs / bpm)) : 0;
 
     return {green, speedValue};
 }
@@ -305,11 +305,15 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
     State::set(IndexText::PLAY_ARTIST, gChartContext.artist);
     State::set(IndexText::PLAY_SUBARTIST, gChartContext.artist2);
     State::set(IndexText::PLAY_GENRE, gChartContext.genre);
-    State::set(IndexNumber::PLAY_BPM, int(std::round(gChartContext.startBPM * gSelectContext.pitchSpeed)));
-    State::set(IndexNumber::INFO_BPM_MIN, int(std::round(gChartContext.minBPM * gSelectContext.pitchSpeed)));
-    State::set(IndexNumber::INFO_BPM_MAX, int(std::round(gChartContext.maxBPM * gSelectContext.pitchSpeed)));
-    State::set(IndexNumber::INFO_RIVAL_BPM_MIN, int(std::round(gChartContext.minBPM * gSelectContext.pitchSpeed)));
-    State::set(IndexNumber::INFO_RIVAL_BPM_MAX, int(std::round(gChartContext.maxBPM * gSelectContext.pitchSpeed)));
+    State::set(IndexNumber::PLAY_BPM, static_cast<int>(std::round(gChartContext.startBPM * gSelectContext.pitchSpeed)));
+    State::set(IndexNumber::INFO_BPM_MIN,
+               static_cast<int>(std::round(gChartContext.minBPM * gSelectContext.pitchSpeed)));
+    State::set(IndexNumber::INFO_BPM_MAX,
+               static_cast<int>(std::round(gChartContext.maxBPM * gSelectContext.pitchSpeed)));
+    State::set(IndexNumber::INFO_RIVAL_BPM_MIN,
+               static_cast<int>(std::round(gChartContext.minBPM * gSelectContext.pitchSpeed)));
+    State::set(IndexNumber::INFO_RIVAL_BPM_MAX,
+               static_cast<int>(std::round(gChartContext.maxBPM * gSelectContext.pitchSpeed)));
 
     State::set(IndexOption::PLAY_RANK_ESTIMATED_1P, Option::RANK_NONE);
     State::set(IndexOption::PLAY_RANK_ESTIMATED_2P, Option::RANK_NONE);
@@ -458,7 +462,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
         double hidden = 0.;
         if (slot == PLAYER_SLOT_PLAYER && gPlayContext.isReplay && gPlayContext.replay)
         {
-            switch ((PlayModifierLaneEffectType)gPlayContext.replay->laneEffectType)
+            switch (static_cast<PlayModifierLaneEffectType>(gPlayContext.replay->laneEffectType))
             {
             case PlayModifierLaneEffectType::HIDDEN:
                 playerState[PLAYER_SLOT_PLAYER].origLanecoverType = Option::LANE_HIDDEN;
@@ -494,7 +498,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
         }
         else
         {
-            playerState[slot].origLanecoverType = (Option::e_lane_effect_type)State::get(indLanecoverType);
+            playerState[slot].origLanecoverType = static_cast<Option::e_lane_effect_type>(State::get(indLanecoverType));
 
             sudden = ConfigMgr::Profile()->get(cfgLanecoverTop, 0) / 1000.0;
             hidden = ConfigMgr::Profile()->get(cfgLanecoverBottom, 0) / 1000.0;
@@ -510,8 +514,8 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
             case Option::LANE_LIFT: sudden = 0.; break;
             case Option::LANE_LIFTSUD: break;
             }
-            lcTop = int(sudden * 1000);
-            lcBottom = int(hidden * 1000);
+            lcTop = static_cast<int>(sudden * 1000);
+            lcBottom = static_cast<int>(hidden * 1000);
             lc100 = lcTop / 10;
         }
 
@@ -578,7 +582,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
         const auto [hs, val] = calcHiSpeed(bpm, slot, green);
 
         *pHispeed = hs;
-        State::set(indNum, (int)std::round(*pHispeed * 100));
+        State::set(indNum, static_cast<int>(std::round(*pHispeed * 100)));
         State::set(indSli, *pHispeed / 10.0);
         playerState[slot].lockspeedValueInternal = val;
         playerState[slot].lockspeedGreenNumber = green;
@@ -729,9 +733,10 @@ void ScenePlay::clearGlobalData()
     {
         State::set(e, 0);
     }
-    for (int i = (int)IndexNumber::ARENA_PLAYDATA_BASE; i <= (int)IndexNumber::ARENA_PLAYDATA_ALL_MAX; i++)
+    for (int i = static_cast<int>(IndexNumber::ARENA_PLAYDATA_BASE);
+         i <= static_cast<int>(IndexNumber::ARENA_PLAYDATA_ALL_MAX); i++)
     {
-        State::set((IndexNumber)i, 0);
+        State::set(static_cast<IndexNumber>(i), 0);
     }
 
     gPlayContext.bargraph_mybest_final = 0.;
@@ -768,9 +773,9 @@ bool ScenePlay::createChartObj()
             itReplayCommand = gPlayContext.replay->commands.begin();
 
         State::set(IndexNumber::PLAY_REMAIN_MIN,
-                   int(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength().norm() / 1000 / 60));
+                   static_cast<int>(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength().norm() / 1000 / 60));
         State::set(IndexNumber::PLAY_REMAIN_SEC,
-                   int(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength().norm() / 1000 % 60));
+                   static_cast<int>(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength().norm() / 1000 % 60));
         return true;
     }
 
@@ -953,12 +958,14 @@ bool ScenePlay::createRuleset()
             gPlayContext.replayNew->replay->randomTypeRight = gPlayContext.mods[PLAYER_SLOT_PLAYER].randomRight;
             gPlayContext.replayNew->replay->assistMask = gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask;
             gPlayContext.replayNew->replay->hispeedFix = gPlayContext.mods[PLAYER_SLOT_PLAYER].hispeedFix;
-            gPlayContext.replayNew->replay->laneEffectType = (int8_t)gPlayContext.mods[PLAYER_SLOT_PLAYER].laneEffect;
+            gPlayContext.replayNew->replay->laneEffectType =
+                static_cast<int8_t>(gPlayContext.mods[PLAYER_SLOT_PLAYER].laneEffect);
             if (State::get(IndexSwitch::SOUND_PITCH))
             {
-                gPlayContext.replayNew->replay->pitchType = (int8_t)State::get(IndexOption::SOUND_PITCH_TYPE);
+                gPlayContext.replayNew->replay->pitchType =
+                    static_cast<int8_t>(State::get(IndexOption::SOUND_PITCH_TYPE));
                 gPlayContext.replayNew->replay->pitchValue =
-                    (int8_t)std::round((State::get(IndexSlider::PITCH) - 0.5) * 2 * 12);
+                    static_cast<int8_t>(std::round((State::get(IndexSlider::PITCH) - 0.5) * 2 * 12));
             }
             gPlayContext.replayNew->replay->DPFlip = gPlayContext.mods[PLAYER_SLOT_PLAYER].DPFlip;
         }
@@ -1040,18 +1047,19 @@ bool ScenePlay::createRuleset()
             if (!gArenaData.isOnline())
             {
                 gPlayContext.bargraph_mybest_final =
-                    (double)pScore->exscore / gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxScore();
+                    static_cast<double>(pScore->exscore) / gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxScore();
             }
             if (!gPlayContext.replayMybest)
             {
                 if (!gArenaData.isOnline())
                 {
                     gPlayContext.bargraph_mybest_now_fallback =
-                        (double)pScore->exscore / gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxScore();
+                        static_cast<double>(pScore->exscore) / gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxScore();
                 }
                 State::set(IndexNumber::RESULT_MYBEST_EX, pScore->exscore);
-                State::set(IndexNumber::RESULT_MYBEST_RATE, (int)std::floor(pScore->rate * 100.0));
-                State::set(IndexNumber::RESULT_MYBEST_RATE_DECIMAL2, (int)std::floor(pScore->rate * 10000.0) % 100);
+                State::set(IndexNumber::RESULT_MYBEST_RATE, static_cast<int>(std::floor(pScore->rate * 100.0)));
+                State::set(IndexNumber::RESULT_MYBEST_RATE_DECIMAL2,
+                           static_cast<int>(std::floor(pScore->rate * 10000.0)) % 100);
                 State::set(IndexNumber::RESULT_MYBEST_DIFF, -pScore->exscore);
             }
         }
@@ -1151,11 +1159,13 @@ void ScenePlay::setInitialHealthBMS()
     }
     else
     {
-        State::set(IndexNumber::PLAY_1P_GROOVEGAUGE, (int)(gPlayContext.initialHealth[PLAYER_SLOT_PLAYER] * 100));
+        State::set(IndexNumber::PLAY_1P_GROOVEGAUGE,
+                   static_cast<int>(gPlayContext.initialHealth[PLAYER_SLOT_PLAYER] * 100));
 
         if (gPlayContext.isBattle)
         {
-            State::set(IndexNumber::PLAY_2P_GROOVEGAUGE, (int)(gPlayContext.initialHealth[PLAYER_SLOT_TARGET] * 100));
+            State::set(IndexNumber::PLAY_2P_GROOVEGAUGE,
+                       static_cast<int>(gPlayContext.initialHealth[PLAYER_SLOT_TARGET] * 100));
         }
     }
 }
@@ -1233,26 +1243,26 @@ void ScenePlay::update_fixed(const lunaticvibes::Time& t)
             if (playerState[PLAYER_SLOT_PLAYER].hispeedHasChanged)
             {
                 gPlayContext.replayNew->replay->commands.push_back(
-                    {int64_t(ms), ReplayChart::Commands::Type::HISPEED,
+                    {static_cast<int64_t>(ms), ReplayChart::Commands::Type::HISPEED,
                      gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed});
             }
             if (playerState[PLAYER_SLOT_PLAYER].lanecoverTopHasChanged)
             {
-                gPlayContext.replayNew->replay->commands.push_back({int64_t(ms),
-                                                                    ReplayChart::Commands::Type::LANECOVER_TOP,
-                                                                    double(State::get(IndexNumber::LANECOVER_TOP_1P))});
+                gPlayContext.replayNew->replay->commands.push_back(
+                    {static_cast<int64_t>(ms), ReplayChart::Commands::Type::LANECOVER_TOP,
+                     static_cast<double>(State::get(IndexNumber::LANECOVER_TOP_1P))});
             }
             if (playerState[PLAYER_SLOT_PLAYER].lanecoverBottomHasChanged)
             {
                 gPlayContext.replayNew->replay->commands.push_back(
-                    {int64_t(ms), ReplayChart::Commands::Type::LANECOVER_BOTTOM,
-                     double(State::get(IndexNumber::LANECOVER_BOTTOM_1P))});
+                    {static_cast<int64_t>(ms), ReplayChart::Commands::Type::LANECOVER_BOTTOM,
+                     static_cast<double>(State::get(IndexNumber::LANECOVER_BOTTOM_1P))});
             }
             if (playerState[PLAYER_SLOT_PLAYER].lanecoverStateHasChanged)
             {
                 gPlayContext.replayNew->replay->commands.push_back(
-                    {int64_t(ms), ReplayChart::Commands::Type::LANECOVER_ENABLE,
-                     double(int(State::get(IndexSwitch::P1_LANECOVER_ENABLED)))});
+                    {static_cast<int64_t>(ms), ReplayChart::Commands::Type::LANECOVER_ENABLE,
+                     static_cast<double>(static_cast<int>(State::get(IndexSwitch::P1_LANECOVER_ENABLED)))});
             }
         }
     }
@@ -1300,8 +1310,9 @@ void ScenePlay::updateAsyncLanecover(const lunaticvibes::Time& t)
     int hsThreshold = getRate() / 25 * _input.getRate() / 1000;  // hispeed, +25 per second
 
     auto handleSide = [&](int slot) {
-        auto lanecoverType = (Option::e_lane_effect_type)State::get(
-            slot == PLAYER_SLOT_PLAYER ? IndexOption::PLAY_LANE_EFFECT_TYPE_1P : IndexOption::PLAY_LANE_EFFECT_TYPE_2P);
+        auto lanecoverType = static_cast<Option::e_lane_effect_type>(
+            State::get(slot == PLAYER_SLOT_PLAYER ? IndexOption::PLAY_LANE_EFFECT_TYPE_1P
+                                                  : IndexOption::PLAY_LANE_EFFECT_TYPE_2P));
 
         int lc = 0;
         switch (lanecoverType)
@@ -1555,7 +1566,7 @@ void ScenePlay::updateAsyncLanecoverDisplay(const lunaticvibes::Time& t)
 
             gPlayContext.playerState[slot].hispeedGradientStart = t;
             gPlayContext.playerState[slot].hispeedGradientFrom = gPlayContext.playerState[slot].hispeedGradientNow;
-            State::set(indNumHispeed, (int)std::round(gPlayContext.playerState[slot].hispeed * 100));
+            State::set(indNumHispeed, static_cast<int>(std::round(gPlayContext.playerState[slot].hispeed * 100)));
             State::set(indSliHispeed, gPlayContext.playerState[slot].hispeed / 10.0);
         }
         if (playerState[slot].lanecoverBottomHasChanged)
@@ -1599,7 +1610,8 @@ void ScenePlay::updateAsyncHSGradient(const lunaticvibes::Time& t)
             lunaticvibes::Time hsGradient = t - gPlayContext.playerState[slot].hispeedGradientStart;
             if (hsGradient.norm() < HS_GRADIENT_LENGTH_MS)
             {
-                double prog = std::sin((hsGradient.norm() / (double)HS_GRADIENT_LENGTH_MS) * 1.57079632679);
+                double prog =
+                    std::sin((hsGradient.norm() / static_cast<double>(HS_GRADIENT_LENGTH_MS)) * 1.57079632679);
                 gPlayContext.playerState[slot].hispeedGradientNow =
                     gPlayContext.playerState[slot].hispeedGradientFrom +
                     prog *
@@ -1790,11 +1802,12 @@ void ScenePlay::updateLoading(const lunaticvibes::Time& t)
     auto rt = t - State::get(IndexTimer::_LOAD_START);
 
     State::set(IndexNumber::PLAY_LOAD_PROGRESS_SYS,
-               int(gPlayContext.chartObjLoaded * 50 + gPlayContext.rulesetLoaded * 50));
-    State::set(IndexNumber::PLAY_LOAD_PROGRESS_WAV, int(lunaticvibes::getWavLoadProgress() * 100));
-    State::set(IndexNumber::PLAY_LOAD_PROGRESS_BGA, int(lunaticvibes::getBgaLoadProgress() * 100));
+               (gPlayContext.chartObjLoaded * 50 + gPlayContext.rulesetLoaded * 50));
+    State::set(IndexNumber::PLAY_LOAD_PROGRESS_WAV, static_cast<int>(lunaticvibes::getWavLoadProgress() * 100));
+    State::set(IndexNumber::PLAY_LOAD_PROGRESS_BGA, static_cast<int>(lunaticvibes::getBgaLoadProgress() * 100));
     State::set(IndexNumber::PLAY_LOAD_PROGRESS_PERCENT,
-               int(lunaticvibes::getWavLoadProgress() * 100 + lunaticvibes::getBgaLoadProgress() * 100) / 2);
+               static_cast<int>(lunaticvibes::getWavLoadProgress() * 100 + lunaticvibes::getBgaLoadProgress() * 100) /
+                   2);
 
     const bool chart_loaded = [&]() {
         const auto [sample, bga] = [] {
@@ -1872,7 +1885,7 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
 
     auto rt = t - State::get(IndexTimer::PLAY_START);
     State::set(IndexTimer::MUSIC_BEAT,
-               int(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) % 1000);
+               static_cast<int>(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) % 1000);
 
     auto update_play_context = [&](int slot) {
         auto chart = gPlayContext.chartObj[slot];
@@ -1956,7 +1969,7 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
             case ReplayChart::Commands::Type::LANECOVER_ENABLE:
                 State::set(slot == PLAYER_SLOT_PLAYER ? IndexSwitch::P1_LANECOVER_ENABLED
                                                       : IndexSwitch::P2_LANECOVER_ENABLED,
-                           (bool)(int)itReplayCommand->value);
+                           static_cast<bool>(static_cast<int>(itReplayCommand->value)));
                 playerState[slot].lanecoverStateHasChanged = true;
                 break;
 
@@ -2020,8 +2033,8 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
         {
             auto dpb = gPlayContext.ruleset[PLAYER_SLOT_MYBEST]->getData();
 
-            State::set(IndexNumber::RESULT_MYBEST_RATE, (int)std::floor(dpb.acc * 100.0));
-            State::set(IndexNumber::RESULT_MYBEST_RATE_DECIMAL2, (int)std::floor(dpb.acc * 10000.0) % 100);
+            State::set(IndexNumber::RESULT_MYBEST_RATE, static_cast<int>(std::floor(dpb.acc * 100.0)));
+            State::set(IndexNumber::RESULT_MYBEST_RATE_DECIMAL2, static_cast<int>(std::floor(dpb.acc * 10000.0)) % 100);
 
             if (auto prpb = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_MYBEST]); prpb)
             {
@@ -2037,8 +2050,9 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
             {
                 auto dp2 = gPlayContext.ruleset[PLAYER_SLOT_MYBEST]->getData();
 
-                State::set(IndexNumber::RESULT_TARGET_RATE, (int)std::floor(dp2.acc * 100.0) / 100);
-                State::set(IndexNumber::RESULT_TARGET_RATE_DECIMAL2, (int)std::floor(dp2.acc * 10000.0) % 100);
+                State::set(IndexNumber::RESULT_TARGET_RATE, static_cast<int>(std::floor(dp2.acc * 100.0)) / 100);
+                State::set(IndexNumber::RESULT_TARGET_RATE_DECIMAL2,
+                           static_cast<int>(std::floor(dp2.acc * 10000.0)) % 100);
             }
             else if (targetType == Option::TARGET_0)
             {
@@ -2049,8 +2063,9 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
             {
                 auto dp2 = gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData();
 
-                State::set(IndexNumber::RESULT_TARGET_RATE, (int)std::floor(dp2.acc * 100.0) / 100);
-                State::set(IndexNumber::RESULT_TARGET_RATE_DECIMAL2, (int)std::floor(dp2.acc * 10000.0) % 100);
+                State::set(IndexNumber::RESULT_TARGET_RATE, static_cast<int>(std::floor(dp2.acc * 100.0)) / 100);
+                State::set(IndexNumber::RESULT_TARGET_RATE_DECIMAL2,
+                           static_cast<int>(std::floor(dp2.acc * 10000.0)) % 100);
             }
 
             if (auto pr2 = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_TARGET]); pr2)
@@ -2116,7 +2131,8 @@ void ScenePlay::updatePlaying(const lunaticvibes::Time& t)
     }
 
     // BPM
-    State::set(IndexNumber::PLAY_BPM, int(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
+    State::set(IndexNumber::PLAY_BPM,
+               static_cast<int>(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
 
     // play time / remain time
     updatePlayTime(rt);
@@ -2280,7 +2296,8 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
         {
             gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed = playerState[PLAYER_SLOT_PLAYER].savedHispeed;
         }
-        State::set(IndexNumber::HS_1P, (int)std::round(gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed * 100));
+        State::set(IndexNumber::HS_1P,
+                   static_cast<int>(std::round(gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed * 100)));
         State::set(IndexSlider::HISPEED_1P, gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed / 10.0);
         if (gPlayContext.isBattle)
         {
@@ -2288,7 +2305,8 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
             {
                 gPlayContext.playerState[PLAYER_SLOT_TARGET].hispeed = playerState[PLAYER_SLOT_TARGET].savedHispeed;
             }
-            State::set(IndexNumber::HS_2P, (int)std::round(gPlayContext.playerState[PLAYER_SLOT_TARGET].hispeed * 100));
+            State::set(IndexNumber::HS_2P,
+                       static_cast<int>(std::round(gPlayContext.playerState[PLAYER_SLOT_TARGET].hispeed * 100)));
             State::set(IndexSlider::HISPEED_2P, gPlayContext.playerState[PLAYER_SLOT_TARGET].hispeed / 10.0);
         }
 
@@ -2417,7 +2435,7 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
             {
                 // the retry is requested by START+SELECT
                 static std::random_device rd;
-                gPlayContext.randomSeed = ((uint64_t)rd() << 32) | rd();
+                gPlayContext.randomSeed = (static_cast<uint64_t>(rd()) << 32) | rd();
             }
             SoundMgr::stopNoteSamples();
             gNextScene = SceneType::RETRY_TRANS;
@@ -2487,11 +2505,13 @@ void ScenePlay::updateFailed(const lunaticvibes::Time& t)
     if (gChartContext.started)
     {
         State::set(IndexTimer::MUSIC_BEAT,
-                   int(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) % 1000);
+                   static_cast<int>(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) %
+                       1000);
 
         gPlayContext.bgaTexture->update(rt, false);
 
-        State::set(IndexNumber::PLAY_BPM, int(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
+        State::set(IndexNumber::PLAY_BPM,
+                   static_cast<int>(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
     }
 
     // play time / remain time
@@ -2520,11 +2540,13 @@ void ScenePlay::updateWaitArena(const lunaticvibes::Time& t)
     if (gChartContext.started)
     {
         State::set(IndexTimer::MUSIC_BEAT,
-                   int(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) % 1000);
+                   static_cast<int>(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) %
+                       1000);
 
         gPlayContext.bgaTexture->update(rt, false);
 
-        State::set(IndexNumber::PLAY_BPM, int(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
+        State::set(IndexNumber::PLAY_BPM,
+                   static_cast<int>(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
     }
 
     // play time / remain time
@@ -2548,11 +2570,11 @@ void ScenePlay::updatePlayTime(const lunaticvibes::Time& rt)
         const auto totalTime = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength().norm();
         const auto playtime_s = rt.norm() / 1000;
         const auto remaintime_s = totalTime / 1000 - playtime_s;
-        State::set(IndexNumber::PLAY_MIN, int(playtime_s / 60));
-        State::set(IndexNumber::PLAY_SEC, int(playtime_s % 60));
-        State::set(IndexNumber::PLAY_REMAIN_MIN, int(remaintime_s / 60));
-        State::set(IndexNumber::PLAY_REMAIN_SEC, int(remaintime_s % 60));
-        State::set(IndexSlider::SONG_PROGRESS, (double)rt.norm() / totalTime);
+        State::set(IndexNumber::PLAY_MIN, static_cast<int>(playtime_s / 60));
+        State::set(IndexNumber::PLAY_SEC, static_cast<int>(playtime_s % 60));
+        State::set(IndexNumber::PLAY_REMAIN_MIN, static_cast<int>(remaintime_s / 60));
+        State::set(IndexNumber::PLAY_REMAIN_SEC, static_cast<int>(remaintime_s % 60));
+        State::set(IndexSlider::SONG_PROGRESS, static_cast<double>(rt.norm()) / totalTime);
     }
 }
 
@@ -2564,9 +2586,9 @@ void ScenePlay::procCommonNotes()
     size_t i = 0;
     for (; i < max && it != gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->noteBgmExpired.end(); ++i, ++it)
     {
-        _bgmSampleIdxBuf[i] = (unsigned)it->dvalue;
+        _bgmSampleIdxBuf[i] = static_cast<unsigned>(it->dvalue);
     }
-    SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, (size_t*)_bgmSampleIdxBuf.data());
+    SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, static_cast<size_t*>(_bgmSampleIdxBuf.data()));
 
     // also play keysound in auto
     if (gPlayContext.isAuto)
@@ -2579,12 +2601,12 @@ void ScenePlay::procCommonNotes()
         {
             if ((it->flags & ~(Note::SCRATCH | Note::KEY_6_7)) == 0)
             {
-                _keySampleIdxBuf[i] = (unsigned)it->dvalue;
+                _keySampleIdxBuf[i] = static_cast<unsigned>(it->dvalue);
                 ++i;
             }
             ++it;
         }
-        SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, (size_t*)_keySampleIdxBuf.data());
+        SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, static_cast<size_t*>(_keySampleIdxBuf.data()));
     }
 
     // play auto-scratch keysound
@@ -2598,12 +2620,12 @@ void ScenePlay::procCommonNotes()
         {
             if ((it->flags & (Note::SCRATCH | Note::LN_TAIL)) == Note::SCRATCH)
             {
-                _keySampleIdxBuf[i] = (unsigned)it->dvalue;
+                _keySampleIdxBuf[i] = static_cast<unsigned>(it->dvalue);
                 ++i;
             }
             ++it;
         }
-        SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, (size_t*)_keySampleIdxBuf.data());
+        SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, static_cast<size_t*>(_keySampleIdxBuf.data()));
     }
     if (gPlayContext.isBattle && gPlayContext.mods[PLAYER_SLOT_TARGET].assist_mask & PLAY_MOD_ASSIST_AUTOSCR)
     {
@@ -2615,12 +2637,12 @@ void ScenePlay::procCommonNotes()
         {
             if ((it->flags & (Note::SCRATCH | Note::LN_TAIL)) == Note::SCRATCH)
             {
-                _keySampleIdxBuf[i] = (unsigned)it->dvalue;
+                _keySampleIdxBuf[i] = static_cast<unsigned>(it->dvalue);
                 ++i;
             }
             ++it;
         }
-        SoundMgr::playNoteSample(SoundChannelType::KEY_RIGHT, i, (size_t*)_keySampleIdxBuf.data());
+        SoundMgr::playNoteSample(SoundChannelType::KEY_RIGHT, i, static_cast<size_t*>(_keySampleIdxBuf.data()));
     }
 }
 
@@ -2662,12 +2684,12 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
 
         if (soonest_note && (rt == USE_FIRST_KEYSOUNDS || soonest_note->time - rt <= MIN_REMAP_INTERVAL))
         {
-            keySampleIndex[(size_t)k] = (size_t)soonest_note->dvalue;
+            keySampleIndex[static_cast<size_t>(k)] = static_cast<size_t>(soonest_note->dvalue);
 
             if (k == Input::S1L)
-                keySampleIndex[Input::S1R] = (size_t)soonest_note->dvalue;
+                keySampleIndex[Input::S1R] = static_cast<size_t>(soonest_note->dvalue);
             if (k == Input::S2L)
-                keySampleIndex[Input::S2R] = (size_t)soonest_note->dvalue;
+                keySampleIndex[Input::S2R] = static_cast<size_t>(soonest_note->dvalue);
         }
     };
 
@@ -2675,14 +2697,14 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
     for (size_t i = Input::K11; i <= Input::K19; ++i)
     {
         if (_inputAvailable[i])
-            changeKeySample((Input::Pad)i, PLAYER_SLOT_PLAYER);
+            changeKeySample(static_cast<Input::Pad>(i), PLAYER_SLOT_PLAYER);
     }
     if (!(gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask & PLAY_MOD_ASSIST_AUTOSCR))
     {
         for (size_t i = Input::S1L; i <= Input::S1R; ++i)
         {
             if (_inputAvailable[i])
-                changeKeySample((Input::Pad)i, PLAYER_SLOT_PLAYER);
+                changeKeySample(static_cast<Input::Pad>(i), PLAYER_SLOT_PLAYER);
         }
     }
     if (isPlaymodeDP())
@@ -2690,14 +2712,14 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
         for (size_t i = Input::K21; i <= Input::K29; ++i)
         {
             if (_inputAvailable[i])
-                changeKeySample((Input::Pad)i, PLAYER_SLOT_PLAYER);
+                changeKeySample(static_cast<Input::Pad>(i), PLAYER_SLOT_PLAYER);
         }
         if (!(gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask & PLAY_MOD_ASSIST_AUTOSCR))
         {
             for (size_t i = Input::S2L; i <= Input::S2R; ++i)
             {
                 if (_inputAvailable[i])
-                    changeKeySample((Input::Pad)i, PLAYER_SLOT_PLAYER);
+                    changeKeySample(static_cast<Input::Pad>(i), PLAYER_SLOT_PLAYER);
             }
         }
     }
@@ -2707,14 +2729,14 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
         for (size_t i = Input::K21; i <= Input::K29; ++i)
         {
             if (_inputAvailable[i])
-                changeKeySample((Input::Pad)i, PLAYER_SLOT_TARGET);
+                changeKeySample(static_cast<Input::Pad>(i), PLAYER_SLOT_TARGET);
         }
         if (!(gPlayContext.mods[PLAYER_SLOT_TARGET].assist_mask & PLAY_MOD_ASSIST_AUTOSCR))
         {
             for (size_t i = Input::S2L; i <= Input::S2R; ++i)
             {
                 if (_inputAvailable[i])
-                    changeKeySample((Input::Pad)i, PLAYER_SLOT_TARGET);
+                    changeKeySample(static_cast<Input::Pad>(i), PLAYER_SLOT_TARGET);
             }
         }
     }
@@ -2725,8 +2747,8 @@ void ScenePlay::spinTurntable(bool startedPlaying)
     const auto rt = startedPlaying ? lunaticvibes::Time::now().norm() - State::get(IndexTimer::PLAY_START) : 0;
     const auto angle = rt * 360 / 1000; // This matches LR2 on static spin.
                                         // TODO: spin twice as fast when player is spinning turntable.
-    State::set(IndexNumber::_ANGLE_TT_1P, (angle + (int)playerState[0].turntableAngleAdd) % 360);
-    State::set(IndexNumber::_ANGLE_TT_2P, (angle + (int)playerState[1].turntableAngleAdd) % 360);
+    State::set(IndexNumber::_ANGLE_TT_1P, (angle + static_cast<int>(playerState[0].turntableAngleAdd)) % 360);
+    State::set(IndexNumber::_ANGLE_TT_2P, (angle + static_cast<int>(playerState[1].turntableAngleAdd)) % 360);
 }
 
 void ScenePlay::requestExit()
@@ -2819,7 +2841,7 @@ void ScenePlay::toggleLanecover(int slot, bool state)
 
     State::set(indLanecoverEnabled, state);
 
-    auto lcType = (Option::e_lane_effect_type)State::get(indLanecoverType);
+    auto lcType = static_cast<Option::e_lane_effect_type>(State::get(indLanecoverType));
     switch (lcType)
     {
     case Option::LANE_OFF:
@@ -2908,7 +2930,7 @@ void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t, const 
 
                 if (gPlayContext.mode == SkinType::PLAY5 || gPlayContext.mode == SkinType::PLAY5_2)
                 {
-                    if (auto it = REPLAY_INPUT_DOWN_CMD_MAP_5K[replayCmdMapIndex].find((Input::Pad)k);
+                    if (auto it = REPLAY_INPUT_DOWN_CMD_MAP_5K[replayCmdMapIndex].find(static_cast<Input::Pad>(k));
                         it != REPLAY_INPUT_DOWN_CMD_MAP_5K[replayCmdMapIndex].end())
                     {
                         cmd.type = it->second;
@@ -2917,7 +2939,8 @@ void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t, const 
                 }
                 else
                 {
-                    if (auto it = REPLAY_INPUT_DOWN_CMD_MAP.find((Input::Pad)k); it != REPLAY_INPUT_DOWN_CMD_MAP.end())
+                    if (auto it = REPLAY_INPUT_DOWN_CMD_MAP.find(static_cast<Input::Pad>(k));
+                        it != REPLAY_INPUT_DOWN_CMD_MAP.end())
                     {
                         cmd.type = it->second;
                         gPlayContext.replayNew->replay->commands.push_back(cmd);
@@ -3178,7 +3201,7 @@ void ScenePlay::inputGamePressPlayKeysounds(InputMask inputSample, const lunatic
             State::set(InputGamePressMap[i].sw, true);
         }
     }
-    SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, sampleCount, (size_t*)&_keySampleIdxBuf[0]);
+    SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, sampleCount, static_cast<size_t*>(&_keySampleIdxBuf[0]));
 }
 
 // CALLBACK
@@ -3281,7 +3304,7 @@ void ScenePlay::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 
             if (gPlayContext.mode == SkinType::PLAY5 || gPlayContext.mode == SkinType::PLAY5_2)
             {
-                if (auto it = REPLAY_INPUT_UP_CMD_MAP_5K[replayCmdMapIndex].find((Input::Pad)k);
+                if (auto it = REPLAY_INPUT_UP_CMD_MAP_5K[replayCmdMapIndex].find(static_cast<Input::Pad>(k));
                     it != REPLAY_INPUT_UP_CMD_MAP_5K[replayCmdMapIndex].end())
                 {
                     cmd.type = it->second;
@@ -3290,7 +3313,8 @@ void ScenePlay::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
             }
             else
             {
-                if (auto it = REPLAY_INPUT_UP_CMD_MAP.find((Input::Pad)k); it != REPLAY_INPUT_UP_CMD_MAP.end())
+                if (auto it = REPLAY_INPUT_UP_CMD_MAP.find(static_cast<Input::Pad>(k));
+                    it != REPLAY_INPUT_UP_CMD_MAP.end())
                 {
                     cmd.type = it->second;
                     gPlayContext.replayNew->replay->commands.push_back(cmd);
@@ -3385,7 +3409,7 @@ void ScenePlay::inputGameAxis(double S1, double S2, const lunaticvibes::Time& t)
 
             double lanecoverThreshold = 0.0002;
 
-            int val = (int)std::round(S2 / lanecoverThreshold);
+            int val = static_cast<int>(std::round(S2 / lanecoverThreshold));
             if (lanecover && fnLanecover)
             {
                 playerState[slot].lanecoverAddPending += val;

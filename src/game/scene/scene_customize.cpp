@@ -358,7 +358,7 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
             if (soundsetList.size() > 1)
             {
                 int selectedIdx;
-                for (selectedIdx = 0; selectedIdx < (int)soundsetList.size(); selectedIdx++)
+                for (selectedIdx = 0; selectedIdx < static_cast<int>(soundsetList.size()); selectedIdx++)
                 {
                     Path path =
                         convertLR2Path(ConfigMgr::General()->get(cfg::E_LR2PATH, "."),
@@ -395,7 +395,7 @@ void SceneCustomize::updateMain(const lunaticvibes::Time& t)
             {
                 int selectedIdx;
                 const auto currentSkin = _skinMgr->get(selectedMode);
-                for (selectedIdx = 0; selectedIdx < (int)skinList[selectedMode].size(); selectedIdx++)
+                for (selectedIdx = 0; selectedIdx < static_cast<int>(skinList[selectedMode].size()); selectedIdx++)
                 {
                     const Path& p1 = skinList[selectedMode][selectedIdx];
                     const Path& p2 = currentSkin ? Path(currentSkin->getFilePath()) : Path();
@@ -671,7 +671,7 @@ void SceneCustomize::load(SkinType mode)
 
     topOptionIndex = 0;
     if (optionsMap.size() > 2)
-        State::set(IndexSlider::SKIN_CONFIG_OPTIONS, double(topOptionIndex) / (optionsMap.size() - 1));
+        State::set(IndexSlider::SKIN_CONFIG_OPTIONS, static_cast<double>(topOptionIndex) / (optionsMap.size() - 1));
     updateTexts();
 }
 
@@ -719,8 +719,8 @@ void SceneCustomize::updateTexts() const
 {
     for (size_t i = 0; i < 10; ++i)
     {
-        auto optionNameId = IndexText(size_t(IndexText::スキンカスタマイズカテゴリ名1個目) + i);
-        auto entryNameId = IndexText(size_t(IndexText::スキンカスタマイズ項目名1個目) + i);
+        auto optionNameId = IndexText(static_cast<size_t>(IndexText::スキンカスタマイズカテゴリ名1個目) + i);
+        auto entryNameId = IndexText(static_cast<size_t>(IndexText::スキンカスタマイズ項目名1個目) + i);
         size_t idx = topOptionIndex + i;
         if (idx < optionsKeyList.size())
         {
@@ -753,7 +753,7 @@ void SceneCustomize::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
     {
         topOptionIndex--;
         if (optionsMap.size() > 2)
-            State::set(IndexSlider::SKIN_CONFIG_OPTIONS, double(topOptionIndex) / (optionsMap.size() - 1));
+            State::set(IndexSlider::SKIN_CONFIG_OPTIONS, static_cast<double>(topOptionIndex) / (optionsMap.size() - 1));
         updateTexts();
     }
 
@@ -761,7 +761,7 @@ void SceneCustomize::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
     {
         topOptionIndex++;
         if (optionsMap.size() > 2)
-            State::set(IndexSlider::SKIN_CONFIG_OPTIONS, double(topOptionIndex) / (optionsMap.size() - 1));
+            State::set(IndexSlider::SKIN_CONFIG_OPTIONS, static_cast<double>(topOptionIndex) / (optionsMap.size() - 1));
         updateTexts();
     }
 }

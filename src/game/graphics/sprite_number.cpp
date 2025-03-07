@@ -162,9 +162,9 @@ void SpriteNumber::updateNumberRect()
     case NUM_ALIGN_CENTER: {
         RectF offset{0, 0, 0, 0};
         if (hideLeadingZeros)
-            offset.x = int(std::floor(_current.rect.w * 0.5 * (digitCount - 1)));
+            offset.x = static_cast<int>(std::floor(_current.rect.w * 0.5 * (digitCount - 1)));
         else
-            offset.x = int(std::floor(_current.rect.w * (0.5 * (maxDigits + digitCount) - 1)));
+            offset.x = static_cast<int>(std::floor(_current.rect.w * (0.5 * (maxDigits + digitCount) - 1)));
         for (size_t i = 0; i < digitCount; ++i)
         {
             digitOutRect[i] = _current.rect + offset;

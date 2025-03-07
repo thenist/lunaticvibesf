@@ -881,7 +881,8 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
     {
         gSelectContext.draggingListSlider = false;
 
-        auto idx_new = (size_t)std::floor(State::get(IndexSlider::SELECT_LIST) * gSelectContext.entries.size());
+        auto idx_new =
+            static_cast<size_t>(std::floor(State::get(IndexSlider::SELECT_LIST) * gSelectContext.entries.size()));
         if (idx_new == gSelectContext.entries.size())
             idx_new = 0;
 
@@ -978,18 +979,18 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
                 double posOld = State::get(IndexSlider::SELECT_LIST);
                 double idxOld = posOld * gSelectContext.entries.size();
 
-                int idxNew = (int)idxOld;
+                int idxNew = static_cast<int>(idxOld);
                 if (gSelectContext.scrollDirection > 0)
                 {
                     double idxOldTmp = idxOld;
-                    if (idxOldTmp - (int)idxOldTmp < 0.0001)
+                    if (idxOldTmp - static_cast<int>(idxOldTmp) < 0.0001)
                         idxOldTmp -= 0.0001;
                     idxNew = std::floor(idxOldTmp) + 1;
                 }
                 else
                 {
                     double idxOldTmp = idxOld;
-                    if (idxOldTmp - (int)idxOldTmp > 0.9999)
+                    if (idxOldTmp - static_cast<int>(idxOldTmp) > 0.9999)
                         idxOldTmp += 0.0001;
                     idxNew = std::ceil(idxOldTmp) - 1;
                 }
@@ -1008,7 +1009,7 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
                 std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
 
                 State::set(IndexSlider::SELECT_LIST,
-                           (double)gSelectContext.selectedEntryIndex / gSelectContext.entries.size());
+                           static_cast<double>(gSelectContext.selectedEntryIndex) / gSelectContext.entries.size());
                 scrollAccumulator = 0.0;
                 scrollAccumulatorAddUnit = 0.0;
                 gSelectContext.scrollDirection = 0;
@@ -1029,8 +1030,8 @@ void SceneSelect::update_fixed(const lunaticvibes::Time& t)
             double posOld = State::get(IndexSlider::SELECT_LIST);
             double posNew = posOld + scrollAccumulatorAddUnit / gSelectContext.entries.size();
 
-            int idxOld = (int)std::round(posOld * gSelectContext.entries.size());
-            int idxNew = (int)std::round(posNew * gSelectContext.entries.size());
+            int idxOld = static_cast<int>(std::round(posOld * gSelectContext.entries.size()));
+            int idxNew = static_cast<int>(std::round(posNew * gSelectContext.entries.size()));
             if (idxOld != idxNew)
             {
                 if (idxOld < idxNew)
@@ -1094,10 +1095,10 @@ void SceneSelect::updatePrepare(const lunaticvibes::Time& t)
         // restore panel stat
         for (int i = 1; i <= 9; ++i)
         {
-            auto p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
+            auto p = static_cast<IndexSwitch>(static_cast<int>(IndexSwitch::SELECT_PANEL1) - 1 + i);
             if (State::get(p))
             {
-                auto tm = static_cast<IndexTimer>(int(IndexTimer::PANEL1_START) - 1 + i);
+                auto tm = static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_START) - 1 + i);
                 State::set(tm, t.norm());
                 SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_OPEN);
             }
@@ -1111,7 +1112,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
 {
     if (!refreshingSongList)
     {
-        int line = (int)IndexText::_OVERLAY_TOPLEFT;
+        int line = static_cast<int>(IndexText::_OVERLAY_TOPLEFT);
         if (State::get(IndexSwitch::SELECT_PANEL1))
         {
             if (!pSkin->isSupportGreenNumber)
@@ -1128,7 +1129,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                 std::string s = ss.str();
                 if (!s.empty())
                 {
-                    State::set((IndexText)line++, ss.str());
+                    State::set(static_cast<IndexText>(line++), ss.str());
                 }
             }
             if (!pSkin->isSupportNewRandom && _config_enable_new_random)
@@ -1170,7 +1171,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                 std::string s = ss.str();
                 if (!s.empty())
                 {
-                    State::set((IndexText)line++, ss.str());
+                    State::set(static_cast<IndexText>(line++), ss.str());
                 }
             }
             if (!pSkin->isSupportExHardAndAssistEasy && _config_enable_new_gauge)
@@ -1204,7 +1205,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                 std::string s = ss.str();
                 if (!s.empty())
                 {
-                    State::set((IndexText)line++, ss.str());
+                    State::set(static_cast<IndexText>(line++), ss.str());
                 }
             }
             if (!pSkin->isSupportLift && _config_enable_new_lane_option)
@@ -1238,7 +1239,7 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                 std::string s = ss.str();
                 if (!s.empty())
                 {
-                    State::set((IndexText)line++, ss.str());
+                    State::set(static_cast<IndexText>(line++), ss.str());
                 }
             }
             if (!pSkin->isSupportHsFixInitialAndMain)
@@ -1259,12 +1260,12 @@ void SceneSelect::updateSelect(const lunaticvibes::Time& t)
                 std::string s = ss.str();
                 if (!s.empty())
                 {
-                    State::set((IndexText)line++, ss.str());
+                    State::set(static_cast<IndexText>(line++), ss.str());
                 }
             }
         }
-        while (line <= (int)IndexText::_OVERLAY_TOPLEFT4)
-            State::set((IndexText)line++, "");
+        while (line <= static_cast<int>(IndexText::_OVERLAY_TOPLEFT4))
+            State::set(static_cast<IndexText>(line++), "");
     }
 
     if (gSelectContext.isGoingToKeyConfig || gSelectContext.isGoingToSkinSelect || gSelectContext.isGoingToReboot)
@@ -2261,9 +2262,9 @@ void SceneSelect::decide()
 
         // lane
         gPlayContext.mods[PLAYER_SLOT_PLAYER].laneEffect =
-            (PlayModifierLaneEffectType)State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_1P);
+            static_cast<PlayModifierLaneEffectType>(State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_1P));
         gPlayContext.mods[PLAYER_SLOT_TARGET].laneEffect =
-            (PlayModifierLaneEffectType)State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_2P);
+            static_cast<PlayModifierLaneEffectType>(State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_2P));
 
         // HS fix
         gPlayContext.mods[PLAYER_SLOT_PLAYER].hispeedFix =
@@ -2282,7 +2283,7 @@ void SceneSelect::decide()
                 gPlayContext.mods[PLAYER_SLOT_TARGET].randomRight = gPlayContext.replay->randomTypeLeft;
                 gPlayContext.mods[PLAYER_SLOT_TARGET].assist_mask = gPlayContext.replay->assistMask;
                 gPlayContext.mods[PLAYER_SLOT_TARGET].laneEffect =
-                    (PlayModifierLaneEffectType)gPlayContext.replay->laneEffectType;
+                    static_cast<PlayModifierLaneEffectType>(gPlayContext.replay->laneEffectType);
 
                 switch (gPlayContext.replay->randomTypeRight)
                 {
@@ -2332,7 +2333,7 @@ void SceneSelect::decide()
                 default: State::set(IndexOption::PLAY_GAUGE_TYPE_2P, Option::GAUGE_NORMAL); break;
                 }
 
-                switch ((PlayModifierLaneEffectType)gPlayContext.replay->laneEffectType)
+                switch (static_cast<PlayModifierLaneEffectType>(gPlayContext.replay->laneEffectType))
                 {
                 case PlayModifierLaneEffectType::SUDDEN:
                     State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_2P, Option::LANE_SUDDEN);
@@ -2388,7 +2389,7 @@ void SceneSelect::decide()
         gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask = gPlayContext.replay->assistMask;
         gPlayContext.mods[PLAYER_SLOT_PLAYER].hispeedFix = gPlayContext.replay->hispeedFix;
         gPlayContext.mods[PLAYER_SLOT_PLAYER].laneEffect =
-            (PlayModifierLaneEffectType)gPlayContext.replay->laneEffectType;
+            static_cast<PlayModifierLaneEffectType>(gPlayContext.replay->laneEffectType);
         gPlayContext.mods[PLAYER_SLOT_PLAYER].DPFlip = gPlayContext.replay->DPFlip;
 
         switch (gPlayContext.replay->randomTypeLeft)
@@ -2442,7 +2443,7 @@ void SceneSelect::decide()
         default: State::set(IndexOption::PLAY_GAUGE_TYPE_1P, Option::GAUGE_NORMAL); break;
         }
 
-        switch ((PlayModifierLaneEffectType)gPlayContext.replay->laneEffectType)
+        switch (static_cast<PlayModifierLaneEffectType>(gPlayContext.replay->laneEffectType))
         {
         case PlayModifierLaneEffectType::SUDDEN:
             State::set(IndexOption::PLAY_LANE_EFFECT_TYPE_1P, Option::LANE_SUDDEN);
@@ -2520,7 +2521,7 @@ void SceneSelect::decide()
                     gPlayContext.mods[PLAYER_SLOT_MYBEST].assist_mask = gPlayContext.replayMybest->assistMask;
                     gPlayContext.mods[PLAYER_SLOT_MYBEST].hispeedFix = gPlayContext.replayMybest->hispeedFix;
                     gPlayContext.mods[PLAYER_SLOT_MYBEST].laneEffect =
-                        (PlayModifierLaneEffectType)gPlayContext.replayMybest->laneEffectType;
+                        static_cast<PlayModifierLaneEffectType>(gPlayContext.replayMybest->laneEffectType);
                     gPlayContext.mods[PLAYER_SLOT_MYBEST].DPFlip = gPlayContext.replayMybest->DPFlip;
                 }
                 else
@@ -2776,7 +2777,7 @@ void SceneSelect::navigateBack(const lunaticvibes::Time& t, bool sound)
         if (!gSelectContext.entries.empty())
         {
             State::set(IndexSlider::SELECT_LIST,
-                       (double)gSelectContext.selectedEntryIndex / gSelectContext.entries.size());
+                       static_cast<double>(gSelectContext.selectedEntryIndex) / gSelectContext.entries.size());
         }
         else
         {
@@ -2823,13 +2824,13 @@ bool SceneSelect::closeAllPanels(const lunaticvibes::Time& t)
     bool hasPanelOpened = false;
     for (int i = 1; i <= 9; ++i)
     {
-        auto p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
+        auto p = static_cast<IndexSwitch>(static_cast<int>(IndexSwitch::SELECT_PANEL1) - 1 + i);
         if (State::get(p))
         {
             hasPanelOpened = true;
             State::set(p, false);
-            State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_START) - 1 + i), TIMER_NEVER);
-            State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_END) - 1 + i), t.norm());
+            State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_START) - 1 + i), TIMER_NEVER);
+            State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_END) - 1 + i), t.norm());
         }
     }
     if (hasPanelOpened)
@@ -3374,9 +3375,9 @@ void SceneSelect::updatePreview()
             for (; i < max && it != previewChartObj->noteBgmExpired.end(); ++i, ++it)
             {
                 // BGM
-                _bgmSampleIdxBuf[i] = (unsigned)it->dvalue;
+                _bgmSampleIdxBuf[i] = static_cast<unsigned>(it->dvalue);
             }
-            SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, (size_t*)_bgmSampleIdxBuf.data());
+            SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, static_cast<size_t*>(_bgmSampleIdxBuf.data()));
 
             // play KEY samples
             i = 0;
@@ -3386,12 +3387,12 @@ void SceneSelect::updatePreview()
             {
                 if ((it2->flags & ~(Note::SCRATCH | Note::KEY_6_7)) == 0)
                 {
-                    _keySampleIdxBuf[i] = (unsigned)it2->dvalue;
+                    _keySampleIdxBuf[i] = static_cast<unsigned>(it2->dvalue);
                     ++i;
                 }
                 ++it2;
             }
-            SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, (size_t*)_keySampleIdxBuf.data());
+            SoundMgr::playNoteSample(SoundChannelType::KEY_LEFT, i, static_cast<size_t*>(_keySampleIdxBuf.data()));
 
             if (previewRuleset->isFinished())
             {

@@ -172,7 +172,7 @@ static void panel_switch(int idx, int plus)
         // open panel
         State::set(panel, true);
         State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_START) - 1 + idx), t.norm());
-        State::set(static_cast<IndexTimer>(int(IndexTimer::PANEL1_END) - 1 + idx), TIMER_NEVER);
+        State::set(static_cast<IndexTimer>(static_cast<int>(IndexTimer::PANEL1_END) - 1 + idx), TIMER_NEVER);
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_OPEN);
     }
 }

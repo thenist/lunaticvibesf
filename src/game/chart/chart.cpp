@@ -176,7 +176,9 @@ std::shared_ptr<ChartObjectBase> ChartObjectBase::createFromChartFormat(int slot
             LOG_ERROR << "[chart] Load chart exception (" << e.what() << "): " << p->fileName;
             return nullptr;
         }
-    default: LOG_WARNING << "[chart] Chart type unknown (" << int(p->type()) << "): " << p->fileName; return nullptr;
+    default:
+        LOG_WARNING << "[chart] Chart type unknown (" << static_cast<int>(p->type()) << "): " << p->fileName;
+        return nullptr;
     }
 }
 
@@ -184,7 +186,7 @@ void ChartObjectBase::reset()
 {
     _currentBarTemp = 0;
     _currentMetreTemp = 0;
-    _currentBPM = _bpmNoteList.empty() ? 150 : BPM(_bpmNoteList.front().fvalue);
+    _currentBPM = _bpmNoteList.empty() ? 150 : static_cast<BPM>(_bpmNoteList.front().fvalue);
     _currentBeatLength = lunaticvibes::Time::singleBeatLengthFromBPM(_currentBPM);
     _lastChangedBPMTime = 0;
     _lastChangedBPMMetre = 0;
@@ -356,7 +358,7 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
     while (!isLastNoteBpm(b) && vt >= b->time)
     {
         //_currentMetreTemp = b->pos - getCurrentMeasureBeat();
-        _currentBPM = BPM(b->fvalue);
+        _currentBPM = static_cast<BPM>(b->fvalue);
         _currentBeatLength = lunaticvibes::Time::singleBeatLengthFromBPM(_currentBPM);
         _lastChangedBPMTime = b->time - _barTimestamp[_currentBarTemp];
         _lastChangedBPMMetre = b->pos - _barMetrePos[_currentBarTemp];
@@ -383,14 +385,14 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
     // Skip expired barline
     {
         NoteLaneCategory cat = NoteLaneCategory::EXTRA;
-        auto idx = (NoteLaneIndex)EXTRA_BARLINE_1P;
+        auto idx = static_cast<NoteLaneIndex>(EXTRA_BARLINE_1P);
         auto it = incomingNote(cat, idx);
         while (!isLastNote(cat, idx, it) && vt >= it->time)
         {
             it->expired = true;
             it = nextNote(cat, idx);
         }
-        idx = (NoteLaneIndex)EXTRA_BARLINE_2P;
+        idx = static_cast<NoteLaneIndex>(EXTRA_BARLINE_2P);
         it = incomingNote(cat, idx);
         while (!isLastNote(cat, idx, it) && vt >= it->time)
         {
@@ -423,7 +425,8 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
     // update beat
     lunaticvibes::Time currentMeasureTimePassed = vt - _barTimestamp[_currentBarTemp];
     lunaticvibes::Time timeFromBPMChange = currentMeasureTimePassed - _lastChangedBPMTime;
-    _currentMetreTemp = _lastChangedBPMMetre + (double)timeFromBPMChange.hres() / _currentBeatLength.hres() / 4;
+    _currentMetreTemp =
+        _lastChangedBPMMetre + static_cast<double>(timeFromBPMChange.hres()) / _currentBeatLength.hres() / 4;
 
     postUpdate(vt);
 

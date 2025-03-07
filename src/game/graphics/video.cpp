@@ -113,7 +113,7 @@ int sVideo::setVideo(const Path& file, double speed, bool loop)
         if (desc)
             LOG_WARNING << "[Video] Could not find codec " << desc->long_name;
         else
-            LOG_WARNING << "[Video] Could not find codec " << (int)id;
+            LOG_WARNING << "[Video] Could not find codec " << static_cast<int>(id);
 
         return -3;
     }
@@ -344,7 +344,7 @@ void sVideo::seek(int64_t second, bool backwards)
                       ? AV_TIME_BASE
                       : av_q2d(av_inv_q(pFormatCtx->streams[videoIndex]->time_base));
 
-    int ret = av_seek_frame(pFormatCtx.get(), videoIndex, int64_t(std::round(second / tsps)),
+    int ret = av_seek_frame(pFormatCtx.get(), videoIndex, static_cast<int64_t>(std::round(second / tsps)),
                             backwards ? AVSEEK_FLAG_BACKWARD : 0);
     if (ret >= 0)
     {

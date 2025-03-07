@@ -67,13 +67,13 @@ void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_
         if (line < first_line)
             continue;
         if (chrIt->second.textureIdx < _textures.size())
-            _drawListOrig.push_back({c, {draw_x, draw_y, (float)r.w, (float)r.h}});
+            _drawListOrig.push_back({c, {draw_x, draw_y, static_cast<float>(r.w), static_cast<float>(r.h)}});
         this_line_width = draw_x + r.w;
         text_width = std::max(text_width, this_line_width);
         draw_x += r.w + _margin;
     }
     //_drawList = _drawListOrig;
-    _drawRect = {0, 0, (int)std::ceil(text_width), (int)textHeight};
+    _drawRect = {0, 0, static_cast<int>(std::ceil(text_width)), static_cast<int>(textHeight)};
 }
 
 void SpriteImageText::updateTextRect()
@@ -84,7 +84,7 @@ void SpriteImageText::updateTextRect()
     double sizeFactor = 1.0;
     if (_current.rect.h != _drawRect.h && _drawRect.h != 0)
     {
-        sizeFactor = (double)_current.rect.h / _drawRect.h;
+        sizeFactor = static_cast<double>(_current.rect.h) / _drawRect.h;
         for (auto& [c, r] : _drawList)
         {
             r.x *= sizeFactor;
@@ -95,10 +95,10 @@ void SpriteImageText::updateTextRect()
 
     // shrink
     int text_w = static_cast<int>(std::round(_drawRect.w * sizeFactor));
-    int rect_w = _current.rect.w * (double(_current.rect.h) / textHeight);
+    int rect_w = _current.rect.w * (static_cast<double>(_current.rect.h) / textHeight);
     if (text_w > rect_w)
     {
-        double widthFactor = (double)rect_w / text_w;
+        double widthFactor = static_cast<double>(rect_w) / text_w;
         for (auto& [c, r] : _drawList)
         {
             r.x *= widthFactor;

@@ -140,7 +140,7 @@ struct s_basic
     int timer = 0;
     s_basic(const Tokens& tokens, bool flipSide, size_t csvLineNumber)
     {
-        convertLine(tokens, (int*)this, 0, static_cast<int>(MEMBERS));
+        convertLine(tokens, reinterpret_cast<int*>(this), 0, static_cast<int>(MEMBERS));
 
         if (w == -1)
             w = RECT_FULL.w;
@@ -187,7 +187,7 @@ struct s_number : s_basic
     int keta = 0;
     s_number(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
-        convertLine(tokens, (int*)this, &num - &_null, 3);
+        convertLine(tokens, reinterpret_cast<int*>(this), &num - &_null, 3);
 
         if (flipSide)
         {
@@ -232,7 +232,7 @@ struct s_slider : s_basic
     int disable = 0;
     s_slider(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
-        convertLine(tokens, (int*)this, &muki - &_null, 4);
+        convertLine(tokens, reinterpret_cast<int*>(this), &muki - &_null, 4);
 
         if (flipSide)
         {
@@ -256,7 +256,7 @@ struct s_bargraph : s_basic
     int muki = 0;
     s_bargraph(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
-        convertLine(tokens, (int*)this, &type - &_null, 2);
+        convertLine(tokens, reinterpret_cast<int*>(this), &type - &_null, 2);
 
         if (flipSide)
         {
@@ -280,7 +280,7 @@ struct s_button : s_basic
     int plusonly = 0;
     s_button(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
-        convertLine(tokens, (int*)this, &type - &_null, 4);
+        convertLine(tokens, reinterpret_cast<int*>(this), &type - &_null, 4);
     }
 };
 
@@ -293,7 +293,7 @@ struct s_onmouse : s_basic
     int h2 = 0;
     s_onmouse(const Tokens& tokens, bool flipSide, size_t csvLineNumber) : s_basic(tokens, flipSide, csvLineNumber)
     {
-        convertLine(tokens, (int*)this, &panel - &_null, 5);
+        convertLine(tokens, reinterpret_cast<int*>(this), &panel - &_null, 5);
     }
 };
 
@@ -308,7 +308,7 @@ struct s_text
     s_text(const Tokens& tokens, bool flip_side)
     {
         int count = sizeof(s_text) / sizeof(int);
-        convertLine(tokens, (int*)this, 0, count);
+        convertLine(tokens, reinterpret_cast<int*>(this), 0, count);
 
         if (flip_side)
         {
@@ -339,7 +339,7 @@ struct s_bga
     s_bga(const Tokens& tokens)
     {
         int count = sizeof(s_bga) / sizeof(int);
-        convertLine(tokens, (int*)this, 0, count);
+        convertLine(tokens, reinterpret_cast<int*>(this), 0, count);
     }
 };
 
@@ -354,7 +354,7 @@ struct s_nowjudge : s_basic
     {
         size_t offset = sizeof(s_basic) / sizeof(int);
         size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
-        convertLine(tokens, (int*)this, offset, count);
+        convertLine(tokens, reinterpret_cast<int*>(this), offset, count);
 
         // DO not flip index here; there are two separate definitions called SRC_NOWJUDGE_1P / SRC_NOWJUDGE_2P
     }
@@ -369,7 +369,7 @@ struct s_nowcombo : s_basic
     {
         size_t offset = sizeof(s_basic) / sizeof(int);
         size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
-        convertLine(tokens, (int*)this, offset, count);
+        convertLine(tokens, reinterpret_cast<int*>(this), offset, count);
 
         // DO not flip index here; there are two separate definitions called SRC_NOWCOMBO_1P / SRC_NOWCOMBO_2P
     }
@@ -383,7 +383,7 @@ struct s_groovegauge : s_basic
     {
         size_t offset = sizeof(s_basic) / sizeof(int);
         size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
-        convertLine(tokens, (int*)this, offset, count);
+        convertLine(tokens, reinterpret_cast<int*>(this), offset, count);
 
         switch (_null)
         {
@@ -407,7 +407,7 @@ struct s_bartitle
     s_bartitle(const Tokens& tokens)
     {
         int count = sizeof(s_bartitle) / sizeof(int);
-        convertLine(tokens, (int*)this, 0, count);
+        convertLine(tokens, reinterpret_cast<int*>(this), 0, count);
     }
 };
 using s_barrank = s_basic;
@@ -421,7 +421,7 @@ struct s_readme
     s_readme(const Tokens& tokens)
     {
         int count = sizeof(s_readme) / sizeof(int);
-        convertLine(tokens, (int*)this, 0, count);
+        convertLine(tokens, reinterpret_cast<int*>(this), 0, count);
     }
 };
 using s_mousecursor = s_basic;
@@ -436,7 +436,7 @@ struct s_gaugechart : s_basic
     {
         size_t offset = sizeof(s_basic) / sizeof(int);
         size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
-        convertLine(tokens, (int*)this, offset, count);
+        convertLine(tokens, reinterpret_cast<int*>(this), offset, count);
     }
 };
 using s_scorechart = s_gaugechart;
@@ -469,7 +469,7 @@ struct dst
             LOG_DEBUG << "[Skin] #DST_: invalid token count";
             return;
         }
-        convertLine(tokens, (int*)this, 0, MEMBERS);
+        convertLine(tokens, reinterpret_cast<int*>(this), 0, MEMBERS);
         convertOpsToInt(std::span{tokens}.subspan(MEMBERS - std::size(op)), {&op[0], &op[1], &op[2], &op[3]});
 
         if (flipSide)
@@ -599,8 +599,8 @@ static void csvLineTokenizeSimple(const std::string_view raw, Tokens& res)
 
 [[nodiscard]] static Point getCenterPoint(const int& wi, const int& hi, int numpadCenter)
 {
-    auto w = (double)wi;
-    auto h = (double)hi;
+    auto w = static_cast<double>(wi);
+    auto h = static_cast<double>(hi);
     switch (numpadCenter)
     {
     case 1: return {0, h};
@@ -889,7 +889,7 @@ int SkinLR2::LR2FONT()
             if (c_utf32 == U' ')
             {
                 // ID = space, LR2 displays a blank texture instead of actually texture file for spaces
-                pf->R[c_utf32] = {size_t(-1), r};
+                pf->R[c_utf32] = {static_cast<size_t>(-1), r};
             }
             else
             {
@@ -1311,10 +1311,10 @@ ParseRet SkinLR2::SRC_NUMBER()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = f;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    builder.align = (NumberAlign)d.align;
+    builder.align = static_cast<NumberAlign>(d.align);
     builder.maxDigits = d.keta;
     builder.numInd = iNum;
 
@@ -1358,16 +1358,16 @@ ParseRet SkinLR2::SRC_SLIDER()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    builder.sliderDirection = (SliderDirection)d.muki;
-    builder.sliderInd = (IndexSlider)d.type;
+    builder.sliderDirection = static_cast<SliderDirection>(d.muki);
+    builder.sliderInd = static_cast<IndexSlider>(d.type);
     builder.sliderRange = d.range;
     builder.callOnChanged = lr2skin::slider::getSliderCallback(d.disable ? -1 : d.type);
     _sprites.push_back(builder.build());
 
-    switch ((IndexSlider)d.type)
+    switch (static_cast<IndexSlider>(d.type))
     {
     case IndexSlider::HID_1P:
     case IndexSlider::HID_2P: isSupportLift = true; break;
@@ -1387,11 +1387,11 @@ ParseRet SkinLR2::SRC_BARGRAPH()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    builder.barDirection = (BargraphDirection)d.muki;
-    builder.barInd = (IndexBargraph)d.type;
+    builder.barDirection = static_cast<BargraphDirection>(d.muki);
+    builder.barInd = static_cast<IndexBargraph>(d.type);
     _sprites.push_back(builder.build());
 
     return ParseRet::OK;
@@ -1409,7 +1409,7 @@ ParseRet SkinLR2::SRC_BUTTON()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = 1;
     builder.animationDurationPerLoop = 0;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
 
@@ -1430,7 +1430,7 @@ ParseRet SkinLR2::SRC_BUTTON()
             }
         }
         builder.optionType = SpriteOption::opType::SWITCH;
-        builder.optionInd = (unsigned)sw;
+        builder.optionInd = static_cast<unsigned>(sw);
 
         if (sw == IndexSwitch::S1A_CONFIG || sw == IndexSwitch::S2A_CONFIG)
         {
@@ -1440,7 +1440,7 @@ ParseRet SkinLR2::SRC_BUTTON()
     else if (lr2skin::buttonOp(d.type, op))
     {
         builder.optionType = SpriteOption::opType::OPTION;
-        builder.optionInd = (unsigned)op;
+        builder.optionInd = static_cast<unsigned>(op);
 
         if (info.mode == SkinType::MUSIC_SELECT)
         {
@@ -1498,7 +1498,7 @@ ParseRet SkinLR2::SRC_ONMOUSE()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
     builder.visibleOnPanel = d.panel;
@@ -1518,7 +1518,7 @@ ParseRet SkinLR2::SRC_MOUSECURSOR()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
     _sprites.push_back(builder.build());
@@ -1759,10 +1759,10 @@ ParseRet SkinLR2::SRC_NOWCOMBO(size_t idx)
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = f;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    builder.align = (NumberAlign)d.align;
+    builder.align = static_cast<NumberAlign>(d.align);
     builder.maxDigits = d.keta;
     builder.numInd = iNum;
     builder.hideLeadingZeros = true;
@@ -1789,7 +1789,7 @@ ParseRet SkinLR2::SRC_GROOVEGAUGE()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x / 4;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
     builder.dx = d.add_x;
@@ -1845,7 +1845,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO1()
 
     bufJudge1PSlot = d._null;
     // modify necessary info for SRC_NOWCOMBO(idx)
-    static StringContent eNumBuf = std::to_string((int)IndexNumber::_DISP_NOWCOMBO_1P);
+    static StringContent eNumBuf = std::to_string(static_cast<int>(IndexNumber::_DISP_NOWCOMBO_1P));
     parseParamBuf[10] = StringContentView(eNumBuf);
     alignNowCombo1P[bufJudge1PSlot] = toInt(parseParamBuf[11]);
     parseParamBuf[11] = "1";
@@ -1867,7 +1867,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO2()
 
     bufJudge2PSlot = d._null;
     // modify necessary info for SRC_NOWCOMBO(idx)
-    static StringContent eNumBuf = std::to_string((int)IndexNumber::_DISP_NOWCOMBO_2P);
+    static StringContent eNumBuf = std::to_string(static_cast<int>(IndexNumber::_DISP_NOWCOMBO_2P));
     parseParamBuf[10] = StringContentView(eNumBuf);
     alignNowCombo2P[bufJudge2PSlot] = toInt(parseParamBuf[11]);
     parseParamBuf[11] = "1";
@@ -1994,7 +1994,7 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     {
     case DefType::LINE:
         cat = NoteLaneCategory::EXTRA;
-        idx = (NoteLaneIndex)(d._null == 0 ? EXTRA_BARLINE_1P : EXTRA_BARLINE_2P);
+        idx = static_cast<NoteLaneIndex>(d._null == 0 ? EXTRA_BARLINE_1P : EXTRA_BARLINE_2P);
         break;
 
     case DefType::NOTE:
@@ -2036,7 +2036,8 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     size_t i = channelToIdx(cat, idx);
     if (i == LANE_INVALID)
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Note channel illegal: " << unsigned(cat) << ", " << unsigned(idx);
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Note channel illegal: " << static_cast<unsigned>(cat) << ", "
+                  << static_cast<unsigned>(idx);
         return ParseRet::PARAM_INVALID;
     }
 
@@ -2207,7 +2208,7 @@ ParseRet SkinLR2::SRC_BAR_BODY()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
 
@@ -2232,7 +2233,7 @@ ParseRet SkinLR2::SRC_BAR_FLASH()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
 
@@ -2267,10 +2268,10 @@ ParseRet SkinLR2::SRC_BAR_LEVEL()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = f;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    builder.align = (NumberAlign)d.align;
+    builder.align = static_cast<NumberAlign>(d.align);
     builder.maxDigits = d.keta;
 
     for (auto& bar : barSprites)
@@ -2293,7 +2294,7 @@ ParseRet SkinLR2::SRC_BAR_LAMP()
     builder.textureRect = Rect(d.x, d.y, d.w, d.h);
     builder.animationFrameCount = d.div_y * d.div_x;
     builder.animationDurationPerLoop = d.cycle;
-    builder.animationTimer = (IndexTimer)d.timer;
+    builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
 
@@ -2312,8 +2313,8 @@ ParseRet SkinLR2::SRC_BAR_TITLE()
 
     SpriteImageText::SpriteImageTextBuilder builder;
     builder.srcLine = csvLineNumber;
-    builder.textInd = (IndexText)d.st;
-    builder.align = (TextAlign)d.align;
+    builder.textInd = static_cast<IndexText>(d.st);
+    builder.align = static_cast<TextAlign>(d.align);
     builder.editable = d.edit;
 
     for (auto& bar : barSprites)
@@ -2352,7 +2353,7 @@ ParseRet SkinLR2::SRC_BAR_RANK()
         builder.textureRect = Rect(d.x, d.y, d.w, d.h);
         builder.animationFrameCount = d.div_y * d.div_x;
         builder.animationDurationPerLoop = d.cycle;
-        builder.animationTimer = (IndexTimer)d.timer;
+        builder.animationTimer = static_cast<IndexTimer>(d.timer);
         builder.textureSheetRows = d.div_y;
         builder.textureSheetCols = d.div_x;
 
@@ -2376,7 +2377,7 @@ ParseRet SkinLR2::SRC_BAR_RIVAL()
         builder.textureRect = Rect(d.x, d.y, d.w, d.h);
         builder.animationFrameCount = d.div_y * d.div_x;
         builder.animationDurationPerLoop = d.cycle;
-        builder.animationTimer = (IndexTimer)d.timer;
+        builder.animationTimer = static_cast<IndexTimer>(d.timer);
         builder.textureSheetRows = d.div_y;
         builder.textureSheetCols = d.div_x;
 
@@ -2400,7 +2401,7 @@ ParseRet SkinLR2::SRC_BAR_RIVAL_MYLAMP()
         builder.textureRect = Rect(d.x, d.y, d.w, d.h);
         builder.animationFrameCount = d.div_y * d.div_x;
         builder.animationDurationPerLoop = d.cycle;
-        builder.animationTimer = (IndexTimer)d.timer;
+        builder.animationTimer = static_cast<IndexTimer>(d.timer);
         builder.textureSheetRows = d.div_y;
         builder.textureSheetCols = d.div_x;
 
@@ -2424,7 +2425,7 @@ ParseRet SkinLR2::SRC_BAR_RIVAL_RIVALLAMP()
         builder.textureRect = Rect(d.x, d.y, d.w, d.h);
         builder.animationFrameCount = d.div_y * d.div_x;
         builder.animationDurationPerLoop = d.cycle;
-        builder.animationTimer = (IndexTimer)d.timer;
+        builder.animationTimer = static_cast<IndexTimer>(d.timer);
         builder.textureSheetRows = d.div_y;
         builder.textureSheetCols = d.div_x;
 
@@ -2581,12 +2582,12 @@ bool SkinLR2::DST()
                 case DefType::NOWJUDGE_2P:
                     switch (bufJudge1PSlot)
                     {
-                    case 0: d.timer = (int)IndexTimer::_JUDGE_1P_0; break;
-                    case 1: d.timer = (int)IndexTimer::_JUDGE_1P_1; break;
-                    case 2: d.timer = (int)IndexTimer::_JUDGE_1P_2; break;
-                    case 3: d.timer = (int)IndexTimer::_JUDGE_1P_3; break;
-                    case 4: d.timer = (int)IndexTimer::_JUDGE_1P_4; break;
-                    case 5: d.timer = (int)IndexTimer::_JUDGE_1P_5; break;
+                    case 0: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_0); break;
+                    case 1: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_1); break;
+                    case 2: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_2); break;
+                    case 3: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_3); break;
+                    case 4: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_4); break;
+                    case 5: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_5); break;
                     default: break;
                     }
                     break;
@@ -2595,12 +2596,12 @@ bool SkinLR2::DST()
                 case DefType::NOWJUDGE_1P:
                     switch (bufJudge2PSlot)
                     {
-                    case 0: d.timer = (int)IndexTimer::_JUDGE_2P_0; break;
-                    case 1: d.timer = (int)IndexTimer::_JUDGE_2P_1; break;
-                    case 2: d.timer = (int)IndexTimer::_JUDGE_2P_2; break;
-                    case 3: d.timer = (int)IndexTimer::_JUDGE_2P_3; break;
-                    case 4: d.timer = (int)IndexTimer::_JUDGE_2P_4; break;
-                    case 5: d.timer = (int)IndexTimer::_JUDGE_2P_5; break;
+                    case 0: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_0); break;
+                    case 1: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_1); break;
+                    case 2: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_2); break;
+                    case 3: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_3); break;
+                    case 4: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_4); break;
+                    case 5: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_5); break;
                     default: break;
                     }
                     break;
@@ -2615,12 +2616,12 @@ bool SkinLR2::DST()
                 case DefType::NOWJUDGE_1P:
                     switch (bufJudge1PSlot)
                     {
-                    case 0: d.timer = (int)IndexTimer::_JUDGE_1P_0; break;
-                    case 1: d.timer = (int)IndexTimer::_JUDGE_1P_1; break;
-                    case 2: d.timer = (int)IndexTimer::_JUDGE_1P_2; break;
-                    case 3: d.timer = (int)IndexTimer::_JUDGE_1P_3; break;
-                    case 4: d.timer = (int)IndexTimer::_JUDGE_1P_4; break;
-                    case 5: d.timer = (int)IndexTimer::_JUDGE_1P_5; break;
+                    case 0: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_0); break;
+                    case 1: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_1); break;
+                    case 2: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_2); break;
+                    case 3: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_3); break;
+                    case 4: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_4); break;
+                    case 5: d.timer = static_cast<int>(IndexTimer::_JUDGE_1P_5); break;
                     default: break;
                     }
                     break;
@@ -2629,12 +2630,12 @@ bool SkinLR2::DST()
                 case DefType::NOWJUDGE_2P:
                     switch (bufJudge2PSlot)
                     {
-                    case 0: d.timer = (int)IndexTimer::_JUDGE_2P_0; break;
-                    case 1: d.timer = (int)IndexTimer::_JUDGE_2P_1; break;
-                    case 2: d.timer = (int)IndexTimer::_JUDGE_2P_2; break;
-                    case 3: d.timer = (int)IndexTimer::_JUDGE_2P_3; break;
-                    case 4: d.timer = (int)IndexTimer::_JUDGE_2P_4; break;
-                    case 5: d.timer = (int)IndexTimer::_JUDGE_2P_5; break;
+                    case 0: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_0); break;
+                    case 1: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_1); break;
+                    case 2: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_2); break;
+                    case 3: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_3); break;
+                    case 4: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_4); break;
+                    case 5: d.timer = static_cast<int>(IndexTimer::_JUDGE_2P_5); break;
                     default: break;
                     }
                     break;
@@ -2644,11 +2645,11 @@ bool SkinLR2::DST()
 
             std::vector<dst_option> dstOpt;
             if (d.op[0] != DST_TRUE)
-                dstOpt.push_back(dst_option(d.op[0]));
+                dstOpt.push_back(static_cast<dst_option>(d.op[0]));
             if (d.op[1] != DST_TRUE)
-                dstOpt.push_back(dst_option(d.op[1]));
+                dstOpt.push_back(static_cast<dst_option>(d.op[1]));
             if (d.op[2] != DST_TRUE)
-                dstOpt.push_back(dst_option(d.op[2]));
+                dstOpt.push_back(static_cast<dst_option>(d.op[2]));
             if (type == DefType::NUMBER)
             {
                 auto p = std::reinterpret_pointer_cast<SpriteNumber>(e);
@@ -2673,13 +2674,13 @@ bool SkinLR2::DST()
             drawQueue.push_back({e, dstOpt, d.op[3]});
 
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
         // e->pushKeyFrame(time, x, y, w, h, acc, r, g, b, a, blend, filter, angle, center);
         // LOG_DEBUG << "[Skin] " << raw << ": Set sprite Keyframe (time: " << d.time << ")";
     }
@@ -2715,19 +2716,19 @@ ParseRet SkinLR2::DST_NOTE()
         {
             std::vector<dst_option> dstOpt;
             if (d.op[0] != DST_TRUE)
-                dstOpt.push_back(dst_option(d.op[0]));
+                dstOpt.push_back(static_cast<dst_option>(d.op[0]));
             if (d.op[1] != DST_TRUE)
-                dstOpt.push_back(dst_option(d.op[1]));
+                dstOpt.push_back(static_cast<dst_option>(d.op[1]));
             if (d.op[2] != DST_TRUE)
-                dstOpt.push_back(dst_option(d.op[2]));
+                dstOpt.push_back(static_cast<dst_option>(d.op[2]));
             drawQueue.push_back({e, dstOpt, d.op[3]});
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
         }
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     };
 
     auto& [e1, e1a] = laneSprites[channelToIdx(NoteLaneCategory::Note, idx)];
@@ -2797,20 +2798,20 @@ ParseRet SkinLR2::DST_LINE()
     p->pNote->appendMotionKeyFrame(
         {0,
          {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a), lr2skin::convertBlend(d.blend),
-          !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+          !!d.filter, static_cast<double>(d.angle), getCenterPoint(d.w, d.h, d.center)}});
 
     std::vector<dst_option> dstOpt;
     if (d.op[0] != DST_TRUE)
-        dstOpt.push_back(dst_option(d.op[0]));
+        dstOpt.push_back(static_cast<dst_option>(d.op[0]));
     if (d.op[1] != DST_TRUE)
-        dstOpt.push_back(dst_option(d.op[1]));
+        dstOpt.push_back(static_cast<dst_option>(d.op[1]));
     if (d.op[2] != DST_TRUE)
-        dstOpt.push_back(dst_option(d.op[2]));
+        dstOpt.push_back(static_cast<dst_option>(d.op[2]));
     drawQueue.push_back({e, dstOpt, d.op[3]});
     e->appendMotionKeyFrame(
         {0,
          {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a), lr2skin::convertBlend(d.blend),
-          !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+          !!d.filter, static_cast<double>(d.angle), getCenterPoint(d.w, d.h, d.center)}});
     e->setMotionLoopTo(0);
     // e->pushKeyFrame(time, x, y, w, h, acc, r, g, b, a, blend, filter, angle, center);
     // LOG_DEBUG << "[Skin] " << raw << ": Set Lane sprite (Barline) Keyframe (time: " << d.time << ")";
@@ -2837,7 +2838,7 @@ ParseRet SkinLR2::DST_BAR_BODY()
     // timers are ignored for bars
     d.timer = 0;
 
-    auto idx = unsigned(d._null);
+    auto idx = static_cast<unsigned>(d._null);
 
     for (uint8_t i = 0; i != static_cast<uint8_t>(BarType::TYPE_COUNT); ++i)
     {
@@ -2853,7 +2854,7 @@ ParseRet SkinLR2::DST_BAR_BODY()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             if (!barSpriteAvailable[idx])
             {
@@ -2862,21 +2863,21 @@ ParseRet SkinLR2::DST_BAR_BODY()
 
                 std::vector<dst_option> dstOpt;
                 if (d.op[0] != DST_TRUE)
-                    dstOpt.push_back(dst_option(d.op[0]));
+                    dstOpt.push_back(static_cast<dst_option>(d.op[0]));
                 if (d.op[1] != DST_TRUE)
-                    dstOpt.push_back(dst_option(d.op[1]));
+                    dstOpt.push_back(static_cast<dst_option>(d.op[1]));
                 if (d.op[2] != DST_TRUE)
-                    dstOpt.push_back(dst_option(d.op[2]));
+                    dstOpt.push_back(static_cast<dst_option>(d.op[2]));
                 drawQueue.push_back({barSprites[idx], dstOpt, d.op[3]});
             }
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -2903,15 +2904,15 @@ ParseRet SkinLR2::DST_BAR_FLASH()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -2926,9 +2927,9 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
     d.timer = 0;
 
     auto type = BarLevelType(d._null);
-    if (d._null >= (int)BarLevelType::LEVEL_TYPE_COUNT)
+    if (d._null >= static_cast<int>(BarLevelType::LEVEL_TYPE_COUNT))
     {
-        LOG_DEBUG << "[SkinLR2] BarEntry level type (" << int(type) << ") Invalid!"
+        LOG_DEBUG << "[SkinLR2] BarEntry level type (" << static_cast<int>(type) << ") Invalid!"
                   << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
@@ -2946,15 +2947,15 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -2969,9 +2970,9 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
     d.timer = 0;
 
     auto type = BarLampType(d._null);
-    if (d._null >= (int)BarLampType::LAMP_TYPE_COUNT)
+    if (d._null >= static_cast<int>(BarLampType::LAMP_TYPE_COUNT))
     {
-        LOG_DEBUG << "[SkinLR2] BarEntry mylamp type (" << int(type) << ") Invalid!"
+        LOG_DEBUG << "[SkinLR2] BarEntry mylamp type (" << static_cast<int>(type) << ") Invalid!"
                   << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
@@ -2989,15 +2990,15 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3011,9 +3012,9 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
     d.timer = 0;
 
     auto type = BarLampType(d._null);
-    if (d._null >= (int)BarLampType::LAMP_TYPE_COUNT)
+    if (d._null >= static_cast<int>(BarLampType::LAMP_TYPE_COUNT))
     {
-        LOG_DEBUG << "[SkinLR2] BarEntry rivallamp type (" << int(type) << ") Invalid!"
+        LOG_DEBUG << "[SkinLR2] BarEntry rivallamp type (" << static_cast<int>(type) << ") Invalid!"
                   << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
@@ -3032,15 +3033,15 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3055,9 +3056,9 @@ ParseRet SkinLR2::DST_BAR_LAMP()
     d.timer = 0;
 
     auto type = BarLampType(d._null);
-    if (d._null >= (int)BarLampType::LAMP_TYPE_COUNT)
+    if (d._null >= static_cast<int>(BarLampType::LAMP_TYPE_COUNT))
     {
-        LOG_DEBUG << "[SkinLR2] BarEntry lamp type (" << int(type) << ") Invalid!"
+        LOG_DEBUG << "[SkinLR2] BarEntry lamp type (" << static_cast<int>(type) << ") Invalid!"
                   << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
@@ -3075,15 +3076,15 @@ ParseRet SkinLR2::DST_BAR_LAMP()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3097,7 +3098,7 @@ ParseRet SkinLR2::DST_BAR_TITLE()
     // timers are ignored for bars
     d.timer = 0;
 
-    if (d._null >= (int)BarTitleType::TITLE_TYPE_COUNT)
+    if (d._null >= static_cast<int>(BarTitleType::TITLE_TYPE_COUNT))
     {
         LOG_DEBUG << "[SkinLR2] BarEntry title type (" << d._null << ") Invalid!"
                   << " (Line " << csvLineNumber << ")";
@@ -3118,15 +3119,15 @@ ParseRet SkinLR2::DST_BAR_TITLE()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3141,9 +3142,9 @@ ParseRet SkinLR2::DST_BAR_RANK()
     d.timer = 0;
 
     auto type = BarRankType(d._null);
-    if (d._null >= (int)BarRankType::RANK_TYPE_COUNT)
+    if (d._null >= static_cast<int>(BarRankType::RANK_TYPE_COUNT))
     {
-        LOG_DEBUG << "[SkinLR2] BarEntry rank type (" << int(type) << ") Invalid!"
+        LOG_DEBUG << "[SkinLR2] BarEntry rank type (" << static_cast<int>(type) << ") Invalid!"
                   << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
@@ -3161,15 +3162,15 @@ ParseRet SkinLR2::DST_BAR_RANK()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3184,9 +3185,9 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
     d.timer = 0;
 
     auto type = BarRivalType(d._null);
-    if (d._null >= (int)BarRivalType::RIVAL_TYPE_COUNT)
+    if (d._null >= static_cast<int>(BarRivalType::RIVAL_TYPE_COUNT))
     {
-        LOG_DEBUG << "[SkinLR2] BarEntry rival type (" << int(type) << ") Invalid!"
+        LOG_DEBUG << "[SkinLR2] BarEntry rival type (" << static_cast<int>(type) << ") Invalid!"
                   << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
@@ -3204,15 +3205,15 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
         {
             e->setSrcLine(csvLineNumber);
             e->setMotionLoopTo(d.loop);
-            e->setMotionStartTimer((IndexTimer)d.timer);
+            e->setMotionStartTimer(static_cast<IndexTimer>(d.timer));
 
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame(
-            {d.time,
-             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        e->appendMotionKeyFrame({d.time,
+                                 {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+                                  lr2skin::convertBlend(d.blend), !!d.filter, static_cast<double>(d.angle),
+                                  getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3955,11 +3956,11 @@ void SkinLR2::postLoad()
         }
         if (count > 0)
         {
-            if ((double)countFHD / count > 0.5)
+            if (static_cast<double>(countFHD) / count > 0.5)
             {
                 info.resolution = {1920, 1080};
             }
-            else if ((double)countHD / count > 0.35)
+            else if (static_cast<double>(countHD) / count > 0.35)
             {
                 info.resolution = {1280, 720};
             }
@@ -4033,7 +4034,8 @@ void SkinLR2::postLoad()
         }
     };
     if (info.noteLaneHeight1PSub != 0 &&
-        (info.noteLaneHeight1P == 0 || std::abs((int)info.noteLaneHeight1P - (int)info.noteLaneHeight1PSub) > 50))
+        (info.noteLaneHeight1P == 0 ||
+         std::abs(static_cast<int>(info.noteLaneHeight1P) - static_cast<int>(info.noteLaneHeight1PSub)) > 50))
     {
         LOG_WARNING << "[Skin] 1P Bar line position (" << info.noteLaneHeight1P
                     << ") is suspiciously wrong. Using Note position (" << info.noteLaneHeight1PSub
@@ -4059,7 +4061,8 @@ void SkinLR2::postLoad()
     }
 
     if (info.noteLaneHeight2PSub != 0 &&
-        (info.noteLaneHeight2P == 0 || std::abs((int)info.noteLaneHeight2P - (int)info.noteLaneHeight2PSub) > 50))
+        (info.noteLaneHeight2P == 0 ||
+         std::abs(static_cast<int>(info.noteLaneHeight2P) - static_cast<int>(info.noteLaneHeight2PSub)) > 50))
     {
         LOG_WARNING << "[Skin] 2P Bar line position (" << info.noteLaneHeight2P
                     << ") is suspiciously wrong. Using Note position (" << info.noteLaneHeight2PSub
@@ -4196,18 +4199,18 @@ void SkinLR2::postLoad()
         {
             const Rect& rcFirst = s->motionKeyFrames.front().param.rect;
             const Rect& rcLast = s->motionKeyFrames.back().param.rect;
-            int timer = (int)s->motionStartTimer;
+            int timer = static_cast<int>(s->motionStartTimer);
             if ((timer >= 100 && timer <= 109) || (timer >= 120 && timer <= 129) ||
-                timer == (int)IndexTimer::S1L_DOWN || timer == (int)IndexTimer::S1L_UP ||
-                timer == (int)IndexTimer::S1R_DOWN || timer == (int)IndexTimer::S1R_UP)
+                timer == static_cast<int>(IndexTimer::S1L_DOWN) || timer == static_cast<int>(IndexTimer::S1L_UP) ||
+                timer == static_cast<int>(IndexTimer::S1R_DOWN) || timer == static_cast<int>(IndexTimer::S1R_UP))
             {
                 // 1P laser
                 if (rcFirst.h <= -100 || rcFirst.h >= 100 || rcLast.h <= -100 || rcLast.h >= 100)
                     spritesMoveWithLift1P.push_back(s);
             }
             else if ((timer >= 110 && timer <= 119) || (timer >= 130 && timer <= 139) ||
-                     timer == (int)IndexTimer::S2L_DOWN || timer == (int)IndexTimer::S2L_UP ||
-                     timer == (int)IndexTimer::S2R_DOWN || timer == (int)IndexTimer::S2R_UP)
+                     timer == static_cast<int>(IndexTimer::S2L_DOWN) || timer == static_cast<int>(IndexTimer::S2L_UP) ||
+                     timer == static_cast<int>(IndexTimer::S2R_DOWN) || timer == static_cast<int>(IndexTimer::S2R_UP))
             {
                 // 2P laser
                 if (rcFirst.h <= -100 || rcFirst.h >= 100 || rcLast.h <= -100 || rcLast.h >= 100)
@@ -4247,8 +4250,8 @@ void SkinLR2::postLoad()
         {
             const Rect& rcFirst = s->motionKeyFrames.front().param.rect;
             const Rect& rcLast = s->motionKeyFrames.back().param.rect;
-            int num = (int)std::dynamic_pointer_cast<SpriteNumber>(s)->numInd;
-            int timer = (int)s->motionStartTimer;
+            int num = static_cast<int>(std::dynamic_pointer_cast<SpriteNumber>(s)->numInd);
+            int timer = static_cast<int>(s->motionStartTimer);
             if (timer == 40 || timer == 46 || timer == 47)
             {
                 if ((rcFirst.y <= judgeLineRect1P.y + judgeLineRect1P.h ||
@@ -4375,7 +4378,8 @@ void SkinLR2::update(const lunaticvibes::Time& t)
                 const RectF base = judge->_current.rect;
                 const float shiftUnit = 0.5f * combo->_current.rect.w;
 
-                const int judgeShiftWidth = noshiftJudge ? 0 : int(shiftUnit * static_cast<float>(combo->digitCount));
+                const int judgeShiftWidth =
+                    noshiftJudge ? 0 : static_cast<int>(shiftUnit * static_cast<float>(combo->digitCount));
                 judge->_current.rect.x -= judgeShiftWidth;
 
                 for (auto& d : combo->digitOutRect)
@@ -4530,7 +4534,7 @@ void SkinLR2::update(const lunaticvibes::Time& t)
         if (hasBarMotionInterpOrigin && gSelectContext.scrollDirection != 0 && !gSelectContext.entries.empty())
         {
             const double posNow = State::get(IndexSlider::SELECT_LIST) * gSelectContext.entries.size();
-            const double decimal = posNow - (int)posNow;
+            const double decimal = posNow - static_cast<int>(posNow);
             for (size_t i = 1; i + 1 < barSprites.size(); ++i)
             {
                 if (!barSpriteAvailable[i])

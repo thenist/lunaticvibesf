@@ -154,10 +154,12 @@ void SceneKeyConfig::update_fixed(const lunaticvibes::Time& t)
                    gKeyconfigContext.selecting.second);
     }
 
-    State::set(IndexNumber::_ANGLE_TT_1P, int(playerTurntableAngleAdd[0]) % 360);
-    State::set(IndexNumber::_ANGLE_TT_2P, int(playerTurntableAngleAdd[1]) % 360);
-    State::set(IndexNumber::SCRATCH_AXIS_1P_ANGLE, (360 + int(playerTurntableAngleAdd[0]) % 360) % 360 / 360.0 * 256);
-    State::set(IndexNumber::SCRATCH_AXIS_2P_ANGLE, (360 + int(playerTurntableAngleAdd[1]) % 360) % 360 / 360.0 * 256);
+    State::set(IndexNumber::_ANGLE_TT_1P, static_cast<int>(playerTurntableAngleAdd[0]) % 360);
+    State::set(IndexNumber::_ANGLE_TT_2P, static_cast<int>(playerTurntableAngleAdd[1]) % 360);
+    State::set(IndexNumber::SCRATCH_AXIS_1P_ANGLE,
+               (360 + static_cast<int>(playerTurntableAngleAdd[0]) % 360) % 360 / 360.0 * 256);
+    State::set(IndexNumber::SCRATCH_AXIS_2P_ANGLE,
+               (360 + static_cast<int>(playerTurntableAngleAdd[1]) % 360) % 360 / 360.0 * 256);
     State::set(IndexText::KEYCONFIG_1P_SCRATCH_ABS_VALUE,
                std::to_string(State::get(IndexNumber::SCRATCH_AXIS_1P_ANGLE)));
     State::set(IndexText::KEYCONFIG_2P_SCRATCH_ABS_VALUE,
@@ -273,20 +275,20 @@ void SceneKeyConfig::inputGamePressKeyboard(KeyboardMask& mask, const lunaticvib
         else
         {
             KeyboardMask filtered = mask;
-            filtered[(size_t)Input::Keyboard::K_F1] = false;
-            filtered[(size_t)Input::Keyboard::K_F2] = false;
-            filtered[(size_t)Input::Keyboard::K_F3] = false;
-            filtered[(size_t)Input::Keyboard::K_F4] = false;
-            filtered[(size_t)Input::Keyboard::K_F5] = false;
-            filtered[(size_t)Input::Keyboard::K_F6] = false;
-            filtered[(size_t)Input::Keyboard::K_F7] = false;
-            filtered[(size_t)Input::Keyboard::K_F8] = false;
-            filtered[(size_t)Input::Keyboard::K_F9] = false;
-            filtered[(size_t)Input::Keyboard::K_F10] = false;
-            filtered[(size_t)Input::Keyboard::K_F11] = false;
-            filtered[(size_t)Input::Keyboard::K_F12] = false;
-            filtered[(size_t)Input::Keyboard::K_ESC] = false;
-            filtered[(size_t)Input::Keyboard::K_DEL] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F1)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F2)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F3)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F4)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F5)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F6)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F7)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F8)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F9)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F10)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F11)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_F12)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_ESC)] = false;
+            filtered[static_cast<size_t>(Input::Keyboard::K_DEL)] = false;
 
             for (auto i = static_cast<unsigned>(Input::Keyboard::K_1);
                  i != static_cast<unsigned>(Input::Keyboard::K_COUNT); ++i)

@@ -117,8 +117,9 @@ void ArenaData::updateTexts()
     {
         if (auto prb = std::dynamic_pointer_cast<RulesetBMS>(gArenaData.getPlayerRuleset(i)); prb)
         {
-            State::set(IndexText(size_t(IndexText::ARENA_MODIFIER_1) + i), prb->getModifierText());
-            State::set(IndexText(size_t(IndexText::ARENA_MODIFIER_SHORT_1) + i), prb->getModifierTextShort());
+            State::set(IndexText(static_cast<size_t>(IndexText::ARENA_MODIFIER_1) + i), prb->getModifierText());
+            State::set(IndexText(static_cast<size_t>(IndexText::ARENA_MODIFIER_SHORT_1) + i),
+                       prb->getModifierTextShort());
         }
     }
 }
@@ -135,8 +136,11 @@ void ArenaData::updateGlobals()
             d.ruleset->update(t);
             if (auto p = std::dynamic_pointer_cast<RulesetBMS>(d.ruleset); p)
             {
-                size_t offset = (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * i;
-                ranking.emplace_back(p->getExScore(), IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) + offset));
+                size_t offset = (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) -
+                                 static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+                                i;
+                ranking.emplace_back(p->getExScore(),
+                                     IndexOption(static_cast<int>(IndexOption::ARENA_PLAYDATA_RANKING) + offset));
             }
         }
     }

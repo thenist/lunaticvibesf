@@ -378,39 +378,67 @@ static const std::array buttonAdapter{std::to_array<std::variant<std::monostate,
     IndexSwitch::_FALSE,
     IndexOption::ARENA_PLAYDATA_CLEAR_TYPE, // NOPLAY / FAILED / ASSIST-EASY / EASY / GROOVE / HARD / EX-HARD /
                                             // FULLCOMBO
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 1),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 2),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 3),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 4),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 5),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 6),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 7),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            1),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            2),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            3),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            4),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            5),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            6),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_CLEAR_TYPE) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            7),
     IndexSwitch::_FALSE,
 
     // 310
     IndexOption::RESULT_ARENA_PLAYER_RANKING,
     IndexOption::ARENA_PLAYDATA_RANKING, // ABSENT / 1st / 2nd / 3rd / 4th / 5th / 6th / 7th / 8th / 9th
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 1),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 2),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 3),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 4),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 5),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 6),
-    IndexOption(int(IndexOption::ARENA_PLAYDATA_RANKING) +
-                (int(IndexOption::ARENA_PLAYDATA_MAX) - int(IndexOption::ARENA_PLAYDATA_BASE) + 1) * 7),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_RANKING) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            1),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_RANKING) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            2),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_RANKING) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            3),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_RANKING) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            4),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_RANKING) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            5),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_RANKING) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            6),
+    IndexOption(
+        static_cast<int>(IndexOption::ARENA_PLAYDATA_RANKING) +
+        (static_cast<int>(IndexOption::ARENA_PLAYDATA_MAX) - static_cast<int>(IndexOption::ARENA_PLAYDATA_BASE) + 1) *
+            7),
     IndexSwitch::_FALSE,
 })};
 

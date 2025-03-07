@@ -95,7 +95,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
     initRet = FMOD::System_Create(&fmodSystem); // Create the main system object.
     if (initRet != FMOD_OK)
     {
-        LOG_ERROR << "[FMOD] Create FMOD System Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+        LOG_ERROR << "[FMOD] Create FMOD System Failed: " << FMOD_ErrorString(static_cast<FMOD_RESULT>(initRet));
         return;
     }
 
@@ -123,7 +123,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
 #endif
         if (initRet != FMOD_OK)
         {
-            LOG_ERROR << "[FMOD] Set driver failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+            LOG_ERROR << "[FMOD] Set driver failed: " << FMOD_ErrorString(static_cast<FMOD_RESULT>(initRet));
             return;
         }
     }
@@ -133,8 +133,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
     int count = ConfigMgr::General()->get(cfg::A_BUFCOUNT, 2);
     if (FMOD_RESULT res = fmodSystem->setDSPBufferSize(len, count); res != FMOD_OK)
     {
-        LOG_WARNING << "[FMOD] Set DSP buffer size (" << len << ", " << count
-                    << ") failed: " << FMOD_ErrorString((FMOD_RESULT)res);
+        LOG_WARNING << "[FMOD] Set DSP buffer size (" << len << ", " << count << ") failed: " << FMOD_ErrorString(res);
     }
 
 #ifdef _WIN32
@@ -154,7 +153,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
 
     if (initRet != FMOD_OK)
     {
-        LOG_ERROR << "[FMOD] FMOD System Initialize Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+        LOG_ERROR << "[FMOD] FMOD System Initialize Failed: " << FMOD_ErrorString(static_cast<FMOD_RESULT>(initRet));
 
         LOG_ERROR << "[FMOD] Fallback to default device";
         fmodSystem->setOutput(FMOD_OUTPUTTYPE_AUTODETECT);
@@ -163,7 +162,8 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
         initRet = fmodSystem->init(512, FMOD_INIT_NORMAL, nullptr); // Initialize FMOD.
         if (initRet != FMOD_OK)
         {
-            LOG_ERROR << "[FMOD] FMOD System Initialize Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+            LOG_ERROR << "[FMOD] FMOD System Initialize Failed: "
+                      << FMOD_ErrorString(static_cast<FMOD_RESULT>(initRet));
             return;
         }
     }
@@ -211,7 +211,7 @@ SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMO
         int buffers;
         fmodSystem->getDSPBufferSize(&bufferLen, &buffers);
         LOG_INFO << "[FMOD] DSP Buffers: " << bufferLen << ", " << buffers;
-        ConfigMgr::General()->set(cfg::A_BUFLEN, int(bufferLen));
+        ConfigMgr::General()->set(cfg::A_BUFLEN, static_cast<int>(bufferLen));
         ConfigMgr::General()->set(cfg::A_BUFCOUNT, buffers);
     }
 
@@ -232,7 +232,8 @@ void SoundDriverFMOD::createChannelGroups()
         initRet = fmodSystem->createChannelGroup(name, &pcg);
         if (initRet != FMOD_OK)
         {
-            LOG_ERROR << "Create channel group " << name << " Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+            LOG_ERROR << "Create channel group " << name
+                      << " Failed: " << FMOD_ErrorString(static_cast<FMOD_RESULT>(initRet));
             return;
         }
         channelGroup[e] = std::shared_ptr<FMOD::ChannelGroup>(pcg, [](FMOD::ChannelGroup* p) { p->release(); });
@@ -246,7 +247,8 @@ void SoundDriverFMOD::createChannelGroups()
         initRet = fmodSystem->createChannelGroup(name, &pcg);
         if (initRet != FMOD_OK)
         {
-            LOG_ERROR << "Create channel group " << name << " Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+            LOG_ERROR << "Create channel group " << name
+                      << " Failed: " << FMOD_ErrorString(static_cast<FMOD_RESULT>(initRet));
             return;
         }
         channelGroup[e] = std::shared_ptr<FMOD::ChannelGroup>(pcg, [](FMOD::ChannelGroup* p) { p->release(); });
@@ -529,7 +531,7 @@ int SoundDriverFMOD::setDevice(size_t index)
     initRet = FMOD::System_Create(&pSystem); // Create the main system object.
     if (initRet != FMOD_OK)
     {
-        LOG_ERROR << "Create FMOD System Failed: " << FMOD_ErrorString((FMOD_RESULT)initRet);
+        LOG_ERROR << "Create FMOD System Failed: " << FMOD_ErrorString(static_cast<FMOD_RESULT>(initRet));
         return 1;
     }
 
@@ -546,7 +548,7 @@ int SoundDriverFMOD::setDevice(size_t index)
                 case DriverIDUnknownASIO:
                     if (FMOD_RESULT res = pSystem->setOutput(FMOD_OUTPUTTYPE_ASIO); res != FMOD_OK)
                     {
-                        LOG_WARNING << "[FMOD] Set output type to ASIO failed: " << FMOD_ErrorString((FMOD_RESULT)res);
+                        LOG_WARNING << "[FMOD] Set output type to ASIO failed: " << FMOD_ErrorString(res);
                         return 1;
                     }
                     break;
@@ -554,7 +556,7 @@ int SoundDriverFMOD::setDevice(size_t index)
 
                 if (FMOD_RESULT res = pSystem->setDriver(driver); res != FMOD_OK)
                 {
-                    LOG_WARNING << "[FMOD] Set driver failed: " << FMOD_ErrorString((FMOD_RESULT)res);
+                    LOG_WARNING << "[FMOD] Set driver failed: " << FMOD_ErrorString(res);
                     return 1;
                 }
             }
@@ -565,12 +567,12 @@ int SoundDriverFMOD::setDevice(size_t index)
                                                     ConfigMgr::General()->get(cfg::A_BUFCOUNT, 2));
         res != FMOD_OK)
     {
-        LOG_WARNING << "[FMOD] Set DSP buffer size failed: " << FMOD_ErrorString((FMOD_RESULT)res);
+        LOG_WARNING << "[FMOD] Set DSP buffer size failed: " << FMOD_ErrorString(res);
     }
 
     if (FMOD_RESULT res = pSystem->init(512, FMOD_INIT_NORMAL, nullptr); res != FMOD_OK)
     {
-        LOG_ERROR << "FMOD System Initialize Failed: " << FMOD_ErrorString((FMOD_RESULT)res);
+        LOG_ERROR << "FMOD System Initialize Failed: " << FMOD_ErrorString(res);
         return 1;
     }
 
@@ -633,7 +635,7 @@ int SoundDriverFMOD::setDevice(size_t index)
         int buffers;
         fmodSystem->getDSPBufferSize(&bufferLen, &buffers);
         LOG_INFO << "[FMOD] DSP Buffers: " << bufferLen << ", " << buffers;
-        ConfigMgr::General()->set(cfg::A_BUFLEN, int(bufferLen));
+        ConfigMgr::General()->set(cfg::A_BUFLEN, static_cast<int>(bufferLen));
         ConfigMgr::General()->set(cfg::A_BUFCOUNT, buffers);
     }
 
@@ -651,7 +653,7 @@ std::pair<int, int> SoundDriverFMOD::getDSPBufferSize()
     unsigned bufferLen;
     int buffers;
     fmodSystem->getDSPBufferSize(&bufferLen, &buffers);
-    return {buffers, int(bufferLen)};
+    return {buffers, static_cast<int>(bufferLen)};
 }
 
 static constexpr const char8_t* wavExtensionList[]{
@@ -854,7 +856,7 @@ void SoundDriverFMOD::update()
         }
         else
         {
-            double progress = double(t.norm() - sysVolumeGradientBeginTime) / sysVolumeGradientLength;
+            double progress = static_cast<double>(t.norm() - sysVolumeGradientBeginTime) / sysVolumeGradientLength;
             if (progress >= 1.0)
                 sysVolume = sysVolumeGradientEnd.load();
             else
@@ -871,7 +873,7 @@ void SoundDriverFMOD::update()
         }
         else
         {
-            double progress = double(t.norm() - noteVolumeGradientBeginTime) / noteVolumeGradientLength;
+            double progress = static_cast<double>(t.norm() - noteVolumeGradientBeginTime) / noteVolumeGradientLength;
             if (progress >= 1.0)
                 noteVolume = noteVolumeGradientEnd.load();
             else
@@ -996,37 +998,42 @@ void SoundDriverFMOD::setDSP(DSPType type, int dspIndex, SampleChannel ch, float
                 {
                 case FMOD_DSP_TYPE_SFXREVERB:
                     // emulates old reverb DSP effect
-                    dsp->setParameterFloat(
-                        FMOD_DSP_SFXREVERB_DECAYTIME,
-                        std::clamp(float(p1 * 20000.0), 100.0f, 20000.0f)); // FMOD_DSP_REVERB_ROOMSIZE 0.0-1.0
-                    dsp->setParameterFloat(
-                        FMOD_DSP_SFXREVERB_WETLEVEL,
-                        std::clamp(float(percentageToDecibel(p2)), -80.0f, 20.0f)); // FMOD_DSP_REVERB_WETMIX 0.0-1.0
+                    dsp->setParameterFloat(FMOD_DSP_SFXREVERB_DECAYTIME,
+                                           std::clamp(static_cast<float>(p1 * 20000.0), 100.0f,
+                                                      20000.0f)); // FMOD_DSP_REVERB_ROOMSIZE 0.0-1.0
+                    dsp->setParameterFloat(FMOD_DSP_SFXREVERB_WETLEVEL,
+                                           std::clamp(static_cast<float>(percentageToDecibel(p2)), -80.0f,
+                                                      20.0f)); // FMOD_DSP_REVERB_WETMIX 0.0-1.0
                     break;
 
                 case FMOD_DSP_TYPE_ECHO:
-                    dsp->setParameterFloat(FMOD_DSP_ECHO_DELAY, std::clamp(float(p1 * 1000.0), 1.0f, 5000.0f));
+                    dsp->setParameterFloat(FMOD_DSP_ECHO_DELAY,
+                                           std::clamp(static_cast<float>(p1 * 1000.0), 1.0f, 5000.0f));
                     dsp->setParameterFloat(FMOD_DSP_ECHO_WETLEVEL,
-                                           std::clamp(float(percentageToDecibel(p2)), -80.0f, 10.0f));
+                                           std::clamp(static_cast<float>(percentageToDecibel(p2)), -80.0f, 10.0f));
                     break;
 
                 case FMOD_DSP_TYPE_LOWPASS:
                     dsp->setParameterFloat(
                         FMOD_DSP_LOWPASS_CUTOFF,
-                        std::clamp(float(22000.0 / std::pow(1.06, (1.0 - p1) * 100.0)), 1.0f, 22000.0f));
-                    dsp->setParameterFloat(FMOD_DSP_LOWPASS_RESONANCE, std::clamp(float(p2 * 9.0 + 1.0), 0.0f, 10.0f));
+                        std::clamp(static_cast<float>(22000.0 / std::pow(1.06, (1.0 - p1) * 100.0)), 1.0f, 22000.0f));
+                    dsp->setParameterFloat(FMOD_DSP_LOWPASS_RESONANCE,
+                                           std::clamp(static_cast<float>(p2 * 9.0 + 1.0), 0.0f, 10.0f));
                     break;
 
                 case FMOD_DSP_TYPE_HIGHPASS:
-                    dsp->setParameterFloat(FMOD_DSP_HIGHPASS_CUTOFF,
-                                           std::clamp(float(22.0 * std::pow(1.06, p1 * 100.0)), 1.0f, 22000.0f));
-                    dsp->setParameterFloat(FMOD_DSP_HIGHPASS_RESONANCE, std::clamp(float(p2 * 9.0 + 1.0), 0.0f, 10.0f));
+                    dsp->setParameterFloat(
+                        FMOD_DSP_HIGHPASS_CUTOFF,
+                        std::clamp(static_cast<float>(22.0 * std::pow(1.06, p1 * 100.0)), 1.0f, 22000.0f));
+                    dsp->setParameterFloat(FMOD_DSP_HIGHPASS_RESONANCE,
+                                           std::clamp(static_cast<float>(p2 * 9.0 + 1.0), 0.0f, 10.0f));
                     break;
 
                 case FMOD_DSP_TYPE_FLANGE:
                     dsp->setParameterFloat(FMOD_DSP_FLANGE_DEPTH, std::clamp(p1, 0.01f, 1.0f));
-                    dsp->setParameterFloat(FMOD_DSP_FLANGE_RATE,
-                                           std::clamp(float(0.02 * std::pow(1.06, p2 * 100.0)), 0.0f, 20.0f));
+                    dsp->setParameterFloat(
+                        FMOD_DSP_FLANGE_RATE,
+                        std::clamp(static_cast<float>(0.02 * std::pow(1.06, p2 * 100.0)), 0.0f, 20.0f));
                     break;
 
                 case FMOD_DSP_TYPE_CHORUS:
@@ -1151,6 +1158,6 @@ void SoundDriverFMOD::setEQ(EQFreq freq, int gain)
     }
     for (const auto e : SOUND_CHANNEL_TYPES)
     {
-        EQFilter[i][e]->setParameterFloat(ch, (float)gain);
+        EQFilter[i][e]->setParameterFloat(ch, static_cast<float>(gain));
     }
 }

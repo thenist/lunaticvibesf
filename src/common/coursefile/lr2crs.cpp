@@ -98,7 +98,7 @@ HashMD5 CourseLr2crs::Course::getCourseHash() const
     // NOTE: do *not* change this, or old Lunatic Vibes course scores in the DB will get broken.
 
     std::stringstream ss;
-    ss << (int)type;
+    ss << static_cast<int>(type);
     ss << chartHash.size();
     for (auto& c : chartHash)
         ss << c.hexdigest();

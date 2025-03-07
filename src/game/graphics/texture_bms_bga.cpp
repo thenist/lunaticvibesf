@@ -22,7 +22,7 @@ namespace r = std::ranges;
 
 bool TextureBmsBga::addBmp(size_t idx, Path pBmp)
 {
-    if (idx == size_t(-1))
+    if (idx == static_cast<size_t>(-1))
         return false;
 
     if (!fs::exists(pBmp) && pBmp.has_extension() &&
@@ -182,12 +182,12 @@ static void lr2ScaleBgaRect(const Rect& srcRect, RectF& dstRect)
 {
     if (srcRect.w < 256)
     {
-        dstRect.x = dstRect.x + dstRect.w * (1.0 - (double)srcRect.w / 256) / 2;
-        dstRect.w = dstRect.w * ((double)srcRect.w / 256);
+        dstRect.x = dstRect.x + dstRect.w * (1.0 - static_cast<double>(srcRect.w) / 256) / 2;
+        dstRect.w = dstRect.w * (static_cast<double>(srcRect.w) / 256);
     }
     if (srcRect.h < 256)
     {
-        dstRect.h = dstRect.h * ((double)srcRect.h / 256);
+        dstRect.h = dstRect.h * (static_cast<double>(srcRect.h) / 256);
     }
 }
 

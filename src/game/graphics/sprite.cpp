@@ -40,10 +40,10 @@ bool lunaticvibes::isPanelOpen(int panelIdx)
 
 RenderParams& RenderParams::operator=(const MotionKeyFrameParams& rhs)
 {
-    rect.x = (float)rhs.rect.x;
-    rect.y = (float)rhs.rect.y;
-    rect.w = (float)rhs.rect.w;
-    rect.h = (float)rhs.rect.h;
+    rect.x = static_cast<float>(rhs.rect.x);
+    rect.y = static_cast<float>(rhs.rect.y);
+    rect.w = static_cast<float>(rhs.rect.w);
+    rect.h = static_cast<float>(rhs.rect.h);
 
     accel = rhs.accel;
     color = rhs.color;
@@ -152,14 +152,14 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
                 return lunaticvibes::animate(from, to, start, end, now, multiplier);
             };
 
-            _current.rect.x = (float)animate(keyFrameNext->param.rect.x, keyFrameCurr->param.rect.x);
-            _current.rect.y = (float)animate(keyFrameNext->param.rect.y, keyFrameCurr->param.rect.y);
-            _current.rect.w = (float)animate(keyFrameNext->param.rect.w, keyFrameCurr->param.rect.w);
-            _current.rect.h = (float)animate(keyFrameNext->param.rect.h, keyFrameCurr->param.rect.h);
-            _current.color.r = (uint8_t)animate(keyFrameNext->param.color.r, keyFrameCurr->param.color.r);
-            _current.color.g = (uint8_t)animate(keyFrameNext->param.color.g, keyFrameCurr->param.color.g);
-            _current.color.b = (uint8_t)animate(keyFrameNext->param.color.b, keyFrameCurr->param.color.b);
-            _current.color.a = (uint8_t)animate(keyFrameNext->param.color.a, keyFrameCurr->param.color.a);
+            _current.rect.x = static_cast<float>(animate(keyFrameNext->param.rect.x, keyFrameCurr->param.rect.x));
+            _current.rect.y = static_cast<float>(animate(keyFrameNext->param.rect.y, keyFrameCurr->param.rect.y));
+            _current.rect.w = static_cast<float>(animate(keyFrameNext->param.rect.w, keyFrameCurr->param.rect.w));
+            _current.rect.h = static_cast<float>(animate(keyFrameNext->param.rect.h, keyFrameCurr->param.rect.h));
+            _current.color.r = static_cast<uint8_t>(animate(keyFrameNext->param.color.r, keyFrameCurr->param.color.r));
+            _current.color.g = static_cast<uint8_t>(animate(keyFrameNext->param.color.g, keyFrameCurr->param.color.g));
+            _current.color.b = static_cast<uint8_t>(animate(keyFrameNext->param.color.b, keyFrameCurr->param.color.b));
+            _current.color.a = static_cast<uint8_t>(animate(keyFrameNext->param.color.a, keyFrameCurr->param.color.a));
             _current.angle = animate(keyFrameNext->param.angle, keyFrameCurr->param.angle);
             _current.center = keyFrameCurr->param.center;
             _current.blend = keyFrameCurr->param.blend;
@@ -328,7 +328,7 @@ void SpriteAnimated::updateAnimation(const lunaticvibes::Time& time)
     if (animationDurationPerLoop == static_cast<unsigned>(-1))
         return;
 
-    if (double timeEachFrame = double(animationDurationPerLoop) / animationFrames; timeEachFrame >= 1.0)
+    if (double timeEachFrame = static_cast<double>(animationDurationPerLoop) / animationFrames; timeEachFrame >= 1.0)
     {
         auto animFrameTime = (time.norm() >= 0) ? (time.norm() % animationDurationPerLoop) : 0;
         animationFrameIndex = static_cast<size_t>(std::floor(animFrameTime / timeEachFrame));

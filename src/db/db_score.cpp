@@ -109,7 +109,8 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
         }
         else if (score.exscore == record.exscore)
         {
-            if (score.maxcombo > record.maxcombo || score.bp < record.bp || (int)score.lamp > (int)record.lamp)
+            if (score.maxcombo > record.maxcombo || score.bp < record.bp ||
+                static_cast<int>(score.lamp) > static_cast<int>(record.lamp))
                 record.replayFileName = score.replayFileName;
         }
 
@@ -120,7 +121,7 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
         record.playcount = std::max(record.playcount, score.playcount);
         record.score = std::max(record.score, score.score);
 
-        if ((int)score.lamp > (int)record.lamp)
+        if (static_cast<int>(score.lamp) > static_cast<int>(record.lamp))
         {
             record.lamp = score.lamp;
         }
@@ -131,10 +132,26 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
                 "notes=?,score=?,rate=?,fast=?,slow=?,maxcombo=?,addtime=?,pc=?,clearcount=?,exscore=?,lamp=?,"
                 "pgreat=?,great=?,good=?,bad=?,bpoor=?,miss=?,bp=?,cb=?,replay=? WHERE md5=?",
                 tableName);
-        ret = exec(sqlbuf, {record.notes,     record.score,  record.rate,      record.fast,       record.slow,
-                            record.maxcombo,  score.addtime, record.playcount, record.clearcount, record.exscore,
-                            (int)record.lamp, record.pgreat, record.great,     record.good,       record.bad,
-                            record.kpoor,     record.miss,   record.bp,        record.combobreak, record.replayFileName,
+        ret = exec(sqlbuf, {record.notes,
+                            record.score,
+                            record.rate,
+                            record.fast,
+                            record.slow,
+                            record.maxcombo,
+                            score.addtime,
+                            record.playcount,
+                            record.clearcount,
+                            record.exscore,
+                            static_cast<int>(record.lamp),
+                            record.pgreat,
+                            record.great,
+                            record.good,
+                            record.bad,
+                            record.kpoor,
+                            record.miss,
+                            record.bp,
+                            record.combobreak,
+                            record.replayFileName,
                             hashStr});
     }
     else
@@ -144,12 +161,13 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
                 "INSERT INTO %s(md5,notes,score,rate,fast,slow,maxcombo,addtime,pc,clearcount,exscore,lamp,"
                 "pgreat,great,good,bad,bpoor,miss,bp,cb,replay) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 tableName);
-        ret = exec(
-            sqlbuf,
-            {hashStr,        score.notes,      score.score,         score.rate,       score.fast,    score.slow,
-             score.maxcombo, score.addtime,    score.playcount,     score.clearcount, score.exscore, (int)score.lamp,
-             score.pgreat,   score.great,      score.good,          score.bad,        score.kpoor,   score.miss,
-             score.bp,       score.combobreak, score.replayFileName});
+        ret = exec(sqlbuf, {hashStr,          score.notes,      score.score,
+                            score.rate,       score.fast,       score.slow,
+                            score.maxcombo,   score.addtime,    score.playcount,
+                            score.clearcount, score.exscore,    static_cast<int>(score.lamp),
+                            score.pgreat,     score.great,      score.good,
+                            score.bad,        score.kpoor,      score.miss,
+                            score.bp,         score.combobreak, score.replayFileName});
     }
     if (ret != SQLITE_OK)
         lunaticvibes::verify_failed(("[ScoreDB] Upserting legacy score: " + std::string{errmsg()}).c_str());
@@ -291,7 +309,8 @@ void ScoreDB::updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score)
         }
         else if (score.exscore == record.exscore)
         {
-            if (score.maxcombo > record.maxcombo || score.bp < record.bp || (int)score.lamp > (int)record.lamp)
+            if (score.maxcombo > record.maxcombo || score.bp < record.bp ||
+                static_cast<int>(score.lamp) > static_cast<int>(record.lamp))
                 record.replayFileName = score.replayFileName;
         }
 
@@ -302,7 +321,7 @@ void ScoreDB::updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score)
         record.playcount += score.playcount;
         record.score = std::max(record.score, score.score);
 
-        if ((int)score.lamp > (int)record.lamp)
+        if (static_cast<int>(score.lamp) > static_cast<int>(record.lamp))
         {
             record.lamp = score.lamp;
         }
@@ -314,7 +333,7 @@ void ScoreDB::updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score)
              "notes=?,score=?,fast=?,slow=?,maxcombo=?,addtime=?,pc=?,clearcount=?,exscore=?,lamp=?,pgreat=?,"
              "great=?,good=?,bad=?,bpoor=?,miss=?,bp=?,cb=?,playedtime=?,replay=? WHERE md5=?",
              {record.notes,   record.score,     record.fast,       record.slow,    record.maxcombo,
-              record.addtime, record.playcount, record.clearcount, record.exscore, (int)record.lamp,
+              record.addtime, record.playcount, record.clearcount, record.exscore, static_cast<int>(record.lamp),
               record.pgreat,  record.great,     record.good,       record.bad,     record.kpoor,
               record.miss,    record.bp,        record.combobreak, play_time,      record.replayFileName,
               hashStr});
@@ -327,10 +346,27 @@ void ScoreDB::updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score)
              "(md5,notes,score,fast,slow,maxcombo,addtime,pc,clearcount,exscore,lamp,pgreat,great,good,bad,bpoor,"
              "miss,bp,cb,playedtime,replay) "
              "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-             {hashStr,          score.notes,     score.score,         score.fast,    score.slow,      score.maxcombo,
-              score.addtime,    score.playcount, score.clearcount,    score.exscore, (int)score.lamp, score.pgreat,
-              score.great,      score.good,      score.bad,           score.kpoor,   score.miss,      score.bp,
-              score.combobreak, play_time,       score.replayFileName});
+             {hashStr,
+              score.notes,
+              score.score,
+              score.fast,
+              score.slow,
+              score.maxcombo,
+              score.addtime,
+              score.playcount,
+              score.clearcount,
+              score.exscore,
+              static_cast<int>(score.lamp),
+              score.pgreat,
+              score.great,
+              score.good,
+              score.bad,
+              score.kpoor,
+              score.miss,
+              score.bp,
+              score.combobreak,
+              play_time,
+              score.replayFileName});
         cache["score_bms"].insert_or_assign(hashStr, std::make_shared<ScoreBMS>(score));
     }
 }

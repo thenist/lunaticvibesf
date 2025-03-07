@@ -161,7 +161,7 @@ static bool getDstOptAbs(unsigned d)
     case 26:
     case 27:
     case 28:
-    case 29: return State::get((IndexSwitch)(d - 21 + (unsigned)IndexSwitch::SELECT_PANEL1));
+    case 29: return State::get(static_cast<IndexSwitch>(d - 21 + static_cast<unsigned>(IndexSwitch::SELECT_PANEL1)));
     case 30: return State::get(IndexOption::PLAY_BGA_SIZE) == BGA_NORMAL;
     case 31: return State::get(IndexOption::PLAY_BGA_SIZE) == BGA_EXTEND;
     case 32: return !State::get(IndexSwitch::SYSTEM_AUTOPLAY);
@@ -778,7 +778,7 @@ static bool getDstOptAbs(unsigned d)
 bool lunaticvibes::getDstOpt(int d)
 {
     const bool invert_result = d < 0;
-    auto op = (dst_option)std::abs(d);
+    auto op = static_cast<dst_option>(std::abs(d));
     const bool result = getDstOptAbs(op);
     return invert_result ? !result : result;
 }

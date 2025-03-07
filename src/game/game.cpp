@@ -34,6 +34,7 @@
 #include <format>
 #include <functional>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <type_traits>
 
@@ -194,28 +195,28 @@ int main(int argc, char* argv[])
     fontAtlas.AddFontFromFileTTF(lunaticvibes::cs(imguiFontPath.u8string()), 24, &fontConfig,
                                  fontAtlas.GetGlyphRangesChineseFull());
 
-    SoundMgr::setVolume(SampleChannel::MASTER, (float)State::get(IndexSlider::VOLUME_MASTER));
-    SoundMgr::setVolume(SampleChannel::KEY, (float)State::get(IndexSlider::VOLUME_KEY));
-    SoundMgr::setVolume(SampleChannel::BGM, (float)State::get(IndexSlider::VOLUME_BGM));
+    SoundMgr::setVolume(SampleChannel::MASTER, static_cast<float>(State::get(IndexSlider::VOLUME_MASTER)));
+    SoundMgr::setVolume(SampleChannel::KEY, static_cast<float>(State::get(IndexSlider::VOLUME_KEY)));
+    SoundMgr::setVolume(SampleChannel::BGM, static_cast<float>(State::get(IndexSlider::VOLUME_BGM)));
     if (State::get(IndexSwitch::SOUND_FX0))
-        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX0), 0,
-                         (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX0), State::get(IndexSlider::FX0_P1),
-                         State::get(IndexSlider::FX0_P2));
+        SoundMgr::setDSP(static_cast<DSPType>(State::get(IndexOption::SOUND_FX0)), 0,
+                         static_cast<SampleChannel>(State::get(IndexOption::SOUND_TARGET_FX0)),
+                         State::get(IndexSlider::FX0_P1), State::get(IndexSlider::FX0_P2));
     if (State::get(IndexSwitch::SOUND_FX1))
-        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX1), 1,
-                         (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX1), State::get(IndexSlider::FX1_P1),
-                         State::get(IndexSlider::FX1_P2));
+        SoundMgr::setDSP(static_cast<DSPType>(State::get(IndexOption::SOUND_FX1)), 1,
+                         static_cast<SampleChannel>(State::get(IndexOption::SOUND_TARGET_FX1)),
+                         State::get(IndexSlider::FX1_P1), State::get(IndexSlider::FX1_P2));
     if (State::get(IndexSwitch::SOUND_FX2))
-        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX2), 2,
-                         (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX2), State::get(IndexSlider::FX2_P1),
-                         State::get(IndexSlider::FX2_P2));
+        SoundMgr::setDSP(static_cast<DSPType>(State::get(IndexOption::SOUND_FX2)), 2,
+                         static_cast<SampleChannel>(State::get(IndexOption::SOUND_TARGET_FX2)),
+                         State::get(IndexSlider::FX2_P1), State::get(IndexSlider::FX2_P2));
     lr2skin::slider::updatePitchState(State::get(IndexNumber::PITCH));
     if (State::get(IndexSwitch::SOUND_EQ))
     {
         for (int idx = 0; idx < 7; ++idx)
         {
-            int val = State::get(IndexNumber(idx + (int)IndexNumber::EQ0));
-            SoundMgr::setEQ((EQFreq)idx, val);
+            int val = State::get(IndexNumber(idx + static_cast<int>(IndexNumber::EQ0)));
+            SoundMgr::setEQ(static_cast<EQFreq>(idx), val);
         }
     }
 

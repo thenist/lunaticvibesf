@@ -116,7 +116,7 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
 
             if (auto pr = std::dynamic_pointer_cast<RulesetBMS>(r); pr)
             {
-                summary[ARG_SCORE] += unsigned(std::floor(pr->getScore()));
+                summary[ARG_SCORE] += static_cast<unsigned>(std::floor(pr->getScore()));
                 summary[ARG_EXSCORE] += pr->getExScore();
                 summary[ARG_FAST] += pr->getJudgeCountEx(RulesetBMS::JUDGE_EARLY);
                 summary[ARG_SLOW] += pr->getJudgeCountEx(RulesetBMS::JUDGE_LATE);
@@ -152,16 +152,16 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
         params.p1cb = summary[ARG_CB];
         params.p1fast = summary[ARG_FAST];
         params.p1slow = summary[ARG_SLOW];
-        params.p1rate = (int)acc;
-        params.p1rated2 = (int)(acc * 100.0) % 100;
+        params.p1rate = static_cast<int>(acc);
+        params.p1rated2 = static_cast<int>(acc * 100.0) % 100;
 
         if (summary[ARG_TOTAL_NOTES] > 0)
         {
-            params.p1pgrate = int(100 * params.p1pg / summary[ARG_TOTAL_NOTES]);
-            params.p1grrate = int(100 * params.p1gr / summary[ARG_TOTAL_NOTES]);
-            params.p1gdrate = int(100 * params.p1gd / summary[ARG_TOTAL_NOTES]);
-            params.p1bdrate = int(100 * params.p1bd / summary[ARG_TOTAL_NOTES]);
-            params.p1prrate = int(100 * params.p1pr / summary[ARG_TOTAL_NOTES]);
+            params.p1pgrate = static_cast<int>(100 * params.p1pg / summary[ARG_TOTAL_NOTES]);
+            params.p1grrate = static_cast<int>(100 * params.p1gr / summary[ARG_TOTAL_NOTES]);
+            params.p1gdrate = static_cast<int>(100 * params.p1gd / summary[ARG_TOTAL_NOTES]);
+            params.p1bdrate = static_cast<int>(100 * params.p1bd / summary[ARG_TOTAL_NOTES]);
+            params.p1prrate = static_cast<int>(100 * params.p1pr / summary[ARG_TOTAL_NOTES]);
         }
 
         if (gPlayContext.isBattle && !gPlayContext.courseStageRulesetCopy[1].empty())
@@ -178,7 +178,7 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
 
                 if (auto pr = std::dynamic_pointer_cast<RulesetBMS>(r); pr)
                 {
-                    summary2P[ARG_SCORE] += unsigned(std::floor(pr->getScore()));
+                    summary2P[ARG_SCORE] += static_cast<unsigned>(std::floor(pr->getScore()));
                     summary2P[ARG_EXSCORE] += pr->getExScore();
                     summary2P[ARG_FAST] += pr->getJudgeCountEx(RulesetBMS::JUDGE_EARLY);
                     summary2P[ARG_SLOW] += pr->getJudgeCountEx(RulesetBMS::JUDGE_LATE);
@@ -213,16 +213,16 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
             params.p2cb = summary2P[ARG_CB];
             params.p2fast = summary2P[ARG_FAST];
             params.p2slow = summary2P[ARG_SLOW];
-            params.p2rate = (int)acc2P;
-            params.p2rated2 = (int)(acc2P * 100.0) % 100;
+            params.p2rate = static_cast<int>(acc2P);
+            params.p2rated2 = static_cast<int>(acc2P * 100.0) % 100;
 
             if (summary2P[ARG_TOTAL_NOTES] > 0)
             {
-                params.p2pgrate = int(100 * params.p2pg / summary2P[ARG_TOTAL_NOTES]);
-                params.p2grrate = int(100 * params.p2gr / summary2P[ARG_TOTAL_NOTES]);
-                params.p2gdrate = int(100 * params.p2gd / summary2P[ARG_TOTAL_NOTES]);
-                params.p2bdrate = int(100 * params.p2bd / summary2P[ARG_TOTAL_NOTES]);
-                params.p2prrate = int(100 * params.p2pr / summary2P[ARG_TOTAL_NOTES]);
+                params.p2pgrate = static_cast<int>(100 * params.p2pg / summary2P[ARG_TOTAL_NOTES]);
+                params.p2grrate = static_cast<int>(100 * params.p2gr / summary2P[ARG_TOTAL_NOTES]);
+                params.p2gdrate = static_cast<int>(100 * params.p2gd / summary2P[ARG_TOTAL_NOTES]);
+                params.p2bdrate = static_cast<int>(100 * params.p2bd / summary2P[ARG_TOTAL_NOTES]);
+                params.p2prrate = static_cast<int>(100 * params.p2pr / summary2P[ARG_TOTAL_NOTES]);
             }
 
             params.p1target = summary[ARG_EXSCORE] - summary2P[ARG_EXSCORE];
@@ -237,14 +237,14 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
             params.dbexscorediff = params.p1exscore - pScore->exscore;
             params.newexscore = params.p1exscore;
             params.newexscorediff = params.newexscore - pScore->exscore;
-            params.dbmaxcombo = (int)pScore->maxcombo;
+            params.dbmaxcombo = static_cast<int>(pScore->maxcombo);
             params.newmaxcombo = params.p1maxcombo;
             params.newmaxcombodiff = params.newmaxcombo - pScore->maxcombo;
             params.dbbp = pScore->bp;
             params.newbp = params.p1bp;
             params.newbpdiff = params.newbp - pScore->bp;
-            params.dbrate = (int)(pScore->rate);
-            params.dbrated2 = (int)(pScore->rate * 100.0) % 100;
+            params.dbrate = static_cast<int>(pScore->rate);
+            params.dbrated2 = static_cast<int>(pScore->rate * 100.0) % 100;
             params.db_rank = Option::getRankType(pScore->rate);
 
             params.updatedscore = pScore->exscore < params.p1exscore;

@@ -93,7 +93,7 @@ static void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
     if (a.type() == typeid(int))
         ret = sqlite3_bind_int(stmt, i, std::any_cast<int>(a));
     else if (a.type() == typeid(bool))
-        ret = sqlite3_bind_int(stmt, i, int(std::any_cast<bool>(a)));
+        ret = sqlite3_bind_int(stmt, i, static_cast<int>(std::any_cast<bool>(a)));
     else if (a.type() == typeid(long long))
         ret = sqlite3_bind_int64(stmt, i, std::any_cast<long long>(a));
     else if (a.type() == typeid(unsigned))
