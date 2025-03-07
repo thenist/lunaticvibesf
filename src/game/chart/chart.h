@@ -77,7 +77,7 @@ enum NoteLaneExtra : size_t
 
 using NoteLane = std::pair<NoteLaneCategory, size_t>;
 
-constexpr size_t LANE_ALL_KEY_COUNT = size_t(NoteLaneCategory::NOTECATEGORY_COUNT) * NOTELANEINDEX_COUNT;
+constexpr size_t LANE_ALL_KEY_COUNT = static_cast<size_t>(NoteLaneCategory::NOTECATEGORY_COUNT) * NOTELANEINDEX_COUNT;
 constexpr size_t LANE_BARLINE_1P = LANE_ALL_KEY_COUNT + 0;
 constexpr size_t LANE_BARLINE_2P = LANE_ALL_KEY_COUNT + 1;
 constexpr size_t LANE_INVALID = LANE_ALL_KEY_COUNT + 2;
@@ -92,13 +92,13 @@ constexpr size_t channelToIdx(NoteLaneCategory cat, size_t idx)
             return LANE_BARLINE_2P;
     }
 
-    auto ch = size_t(cat) * NOTELANEINDEX_COUNT + idx;
+    auto ch = static_cast<size_t>(cat) * NOTELANEINDEX_COUNT + idx;
     return (ch >= LANE_ALL_KEY_COUNT) ? LANE_INVALID : ch;
 }
 constexpr NoteLane idxToChannel(size_t idx)
 {
-    if (idx >=
-        size_t(NoteLaneCategory::EXTRA) * NoteLaneIndex::NOTELANEINDEX_COUNT + NoteLaneExtra::NOTELANEEXTRA_COUNT)
+    if (idx >= static_cast<size_t>(NoteLaneCategory::EXTRA) * NoteLaneIndex::NOTELANEINDEX_COUNT +
+                   NoteLaneExtra::NOTELANEEXTRA_COUNT)
         return {NoteLaneCategory::_, NoteLaneIndex::_};
 
     return {NoteLaneCategory(idx / NOTELANEINDEX_COUNT), NoteLaneIndex(idx % NOTELANEINDEX_COUNT)};

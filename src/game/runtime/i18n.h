@@ -179,7 +179,7 @@ enum i18nTextIndex
     TEXT_COUNT
 };
 } // namespace i18nText
-constexpr size_t i18n_TEXT_COUNT = (size_t)i18nText::TEXT_COUNT;
+constexpr size_t i18n_TEXT_COUNT = static_cast<size_t>(i18nText::TEXT_COUNT);
 
 class i18n
 {

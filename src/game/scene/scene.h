@@ -71,11 +71,11 @@ protected:
 
     std::shared_ptr<lunaticvibes::Font> _fNotifications;
     std::shared_ptr<Texture> _texNotificationsBG;
-    std::array<std::shared_ptr<SpriteText>,
-               size_t(IndexText::_OVERLAY_NOTIFICATION_MAX) - size_t(IndexText::_OVERLAY_NOTIFICATION_0) + 1>
+    std::array<std::shared_ptr<SpriteText>, static_cast<size_t>(IndexText::_OVERLAY_NOTIFICATION_MAX) -
+                                                static_cast<size_t>(IndexText::_OVERLAY_NOTIFICATION_0) + 1>
         _sNotifications;
-    std::array<std::shared_ptr<SpriteStatic>,
-               size_t(IndexText::_OVERLAY_NOTIFICATION_MAX) - size_t(IndexText::_OVERLAY_NOTIFICATION_0) + 1>
+    std::array<std::shared_ptr<SpriteStatic>, static_cast<size_t>(IndexText::_OVERLAY_NOTIFICATION_MAX) -
+                                                  static_cast<size_t>(IndexText::_OVERLAY_NOTIFICATION_0) + 1>
         _sNotificationsBG;
 
 protected:

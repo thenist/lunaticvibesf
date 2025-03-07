@@ -34,9 +34,9 @@ public:
 
         EXT_COUNT
     };
-    decltype(_specialNoteLists[0])& getBgaBase() { return _specialNoteLists[(size_t)eNoteExt::BGABASE]; }
-    decltype(_specialNoteLists[0])& getBgaLayer() { return _specialNoteLists[(size_t)eNoteExt::BGALAYER]; }
-    decltype(_specialNoteLists[0])& getBgaPoor() { return _specialNoteLists[(size_t)eNoteExt::BGAPOOR]; }
+    decltype(_specialNoteLists[0])& getBgaBase() { return _specialNoteLists[static_cast<size_t>(eNoteExt::BGABASE)]; }
+    decltype(_specialNoteLists[0])& getBgaLayer() { return _specialNoteLists[static_cast<size_t>(eNoteExt::BGALAYER)]; }
+    decltype(_specialNoteLists[0])& getBgaPoor() { return _specialNoteLists[static_cast<size_t>(eNoteExt::BGAPOOR)]; }
 
 public:
     ChartObjectBMS() = delete;

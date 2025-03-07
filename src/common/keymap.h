@@ -395,7 +395,7 @@ enum class JoystickAxis
 
     COUNT
 };
-inline const char* joystickAxisName[(size_t)JoystickAxis::COUNT] = {
+inline const char* joystickAxisName[static_cast<size_t>(JoystickAxis::COUNT)] = {
     "X", "Y", "Z", "Rx", "Ry", "Rz", "Slider1", "Slider2",
 };
 struct Joystick

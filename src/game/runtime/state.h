@@ -97,12 +97,12 @@ protected:
 
         void reset() { _data = _dataDefault; }
     };
-    StateContainer<IndexNumber, int, (size_t)IndexNumber::NUMBER_COUNT> gNumbers;
-    StateContainer<IndexOption, unsigned, (size_t)IndexOption::OPTION_COUNT> gOptions;
-    StateContainer<IndexSlider, Ratio, (size_t)IndexSlider::SLIDER_COUNT> gSliders;
-    StateContainer<IndexSwitch, bool, (size_t)IndexSwitch::SWITCH_COUNT> gSwitches;
-    StateContainer<IndexText, std::string, (size_t)IndexText::TEXT_COUNT> gTexts;
-    StateContainer<IndexTimer, long long, (size_t)IndexTimer::TIMER_COUNT> gTimers{TIMER_NEVER};
+    StateContainer<IndexNumber, int, static_cast<size_t>(IndexNumber::NUMBER_COUNT)> gNumbers;
+    StateContainer<IndexOption, unsigned, static_cast<size_t>(IndexOption::OPTION_COUNT)> gOptions;
+    StateContainer<IndexSlider, Ratio, static_cast<size_t>(IndexSlider::SLIDER_COUNT)> gSliders;
+    StateContainer<IndexSwitch, bool, static_cast<size_t>(IndexSwitch::SWITCH_COUNT)> gSwitches;
+    StateContainer<IndexText, std::string, static_cast<size_t>(IndexText::TEXT_COUNT)> gTexts;
+    StateContainer<IndexTimer, long long, static_cast<size_t>(IndexTimer::TIMER_COUNT)> gTimers{TIMER_NEVER};
 
 private:
     State();
