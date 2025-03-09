@@ -201,15 +201,18 @@ int main(int argc, char* argv[])
     if (State::get(IndexSwitch::SOUND_FX0))
         SoundMgr::setDSP(static_cast<DSPType>(State::get(IndexOption::SOUND_FX0)), 0,
                          static_cast<SampleChannel>(State::get(IndexOption::SOUND_TARGET_FX0)),
-                         State::get(IndexSlider::FX0_P1), State::get(IndexSlider::FX0_P2));
+                         static_cast<float>(State::get(IndexSlider::FX0_P1)),
+                         static_cast<float>(State::get(IndexSlider::FX0_P2)));
     if (State::get(IndexSwitch::SOUND_FX1))
         SoundMgr::setDSP(static_cast<DSPType>(State::get(IndexOption::SOUND_FX1)), 1,
                          static_cast<SampleChannel>(State::get(IndexOption::SOUND_TARGET_FX1)),
-                         State::get(IndexSlider::FX1_P1), State::get(IndexSlider::FX1_P2));
+                         static_cast<float>(State::get(IndexSlider::FX1_P1)),
+                         static_cast<float>(State::get(IndexSlider::FX1_P2)));
     if (State::get(IndexSwitch::SOUND_FX2))
         SoundMgr::setDSP(static_cast<DSPType>(State::get(IndexOption::SOUND_FX2)), 2,
                          static_cast<SampleChannel>(State::get(IndexOption::SOUND_TARGET_FX2)),
-                         State::get(IndexSlider::FX2_P1), State::get(IndexSlider::FX2_P2));
+                         static_cast<float>(State::get(IndexSlider::FX2_P1)),
+                         static_cast<float>(State::get(IndexSlider::FX2_P2)));
     lr2skin::slider::updatePitchState(State::get(IndexNumber::PITCH));
     if (State::get(IndexSwitch::SOUND_EQ))
     {

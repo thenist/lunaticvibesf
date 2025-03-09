@@ -33,7 +33,6 @@ Checks: |
   performance-*,
   portability-*,
   -bugprone-easily-swappable-parameters,
-  -bugprone-narrowing-conversions, # FIXME
   -misc-const-correctness, # Too noisy.
   -misc-include-cleaner, # TODO
   -misc-non-private-member-variables-in-classes,
