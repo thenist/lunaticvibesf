@@ -146,7 +146,7 @@ void ArenaData::updateGlobals()
     }
     ranking.emplace_back(State::get(IndexNumber::PLAY_1P_EXSCORE), IndexOption::RESULT_ARENA_PLAYER_RANKING);
 
-    std::sort(ranking.begin(), ranking.end());
+    std::ranges::sort(ranking);
     int rank = 1;
     int step = 0;
     unsigned exscorePrev = 0;

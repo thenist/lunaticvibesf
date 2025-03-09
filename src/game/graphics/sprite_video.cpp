@@ -10,17 +10,9 @@ extern "C"
 }
 
 SpriteVideo::SpriteVideo(int w, int h, const std::shared_ptr<sVideo>& pVid, int srcLine)
-    : SpriteStatic(std::make_shared<TextureVideo>(pVid), {0, 0, w, h}, srcLine), w(0), h(0),
-      format(Texture::PixelFormat::UNKNOWN)
+    : SpriteStatic(std::make_shared<TextureVideo>(pVid), {0, 0, w, h}, srcLine)
 {
     _type = SpriteTypes::VIDEO;
-
-    if (pVid)
-    {
-        w = pVid->getW();
-        h = pVid->getH();
-        format = pVid->getFormat();
-    }
 }
 
 void SpriteVideo::startPlaying()

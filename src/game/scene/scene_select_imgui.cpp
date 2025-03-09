@@ -3,6 +3,7 @@
 #include <array>
 #include <format>
 #include <fstream>
+#include <iterator>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -122,6 +123,7 @@ void SceneSelect::imguiInit()
     case 2000: imgui_play_inputPollingRate = 1; break;
     case 4000: imgui_play_inputPollingRate = 2; break;
     case 8000: imgui_play_inputPollingRate = 3; break;
+    default: LOG_WARNING << "Invalid " << cfg::P_INPUT_POLLING_RATE; break;
     }
 
     imgui_adv_previewDedicated = ConfigMgr::Profile()->get(cfg::P_PREVIEW_DEDICATED, true);
@@ -133,13 +135,15 @@ void SceneSelect::imguiInit()
         cfg::P_SELECT_KEYBINDINGS_5K,
         cfg::P_SELECT_KEYBINDINGS_9K,
     };
-    for (size_t i = 0; i < sizeof(imgui_select_keybindings_str) / sizeof(imgui_select_keybindings_str[0]); ++i)
     {
-        if (ConfigMgr::Profile()->get(cfg::P_SELECT_KEYBINDINGS, cfg::P_SELECT_KEYBINDINGS_7K) ==
-            imgui_select_keybindings_str[i])
+        const auto bindings = ConfigMgr::Profile()->get(cfg::P_SELECT_KEYBINDINGS, cfg::P_SELECT_KEYBINDINGS_7K);
+        for (int i = 0; i < std::ssize(imgui_select_keybindings_str); ++i)
         {
-            imgui_adv_selectKeyBindings = old_adv_selectKeyBindings = i;
-            break;
+            if (bindings == imgui_select_keybindings_str[i])
+            {
+                imgui_adv_selectKeyBindings = old_adv_selectKeyBindings = i;
+                break;
+            }
         }
     }
 
@@ -1608,6 +1612,7 @@ bool SceneSelect::imguiApplyResolution()
         case 0: windowMode = cfg::V_WINMODE_WINDOWED; break;
         case 1: windowMode = cfg::V_WINMODE_FULL; break;
         case 2: windowMode = cfg::V_WINMODE_BORDERLESS; break;
+        default: lunaticvibes::assert_failed("imgui_video_mode");
         }
         ConfigMgr::General()->set(cfg::V_WINMODE, windowMode);
     }

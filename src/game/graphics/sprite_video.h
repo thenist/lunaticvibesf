@@ -11,10 +11,6 @@ struct AVFrame;
 
 class SpriteVideo : public SpriteStatic
 {
-protected:
-    int w, h;
-    Texture::PixelFormat format;
-
 public:
     SpriteVideo(int w, int h, const std::shared_ptr<sVideo>& pVid, int srcLine = -1);
     ~SpriteVideo() override = default;

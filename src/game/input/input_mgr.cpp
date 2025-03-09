@@ -1,5 +1,6 @@
 #include "input_mgr.h"
 
+#include <common/assert.h>
 #include <common/log.h>
 #include <common/types.h>
 #include <config/cfg_input.h>
@@ -36,20 +37,15 @@ void InputMgr::updateBindings(GameModeKeys keys)
     {
     case 10: keys = 5; break;
     case 14: keys = 7; break;
-    }
-    switch (keys)
-    {
-    case 5:
-    case 7:
-    case 9:
-        for (size_t key_i = Input::S1L; key_i < Input::ESC; ++key_i)
-        {
-            const auto key = static_cast<Input::Pad>(key_i);
-            _inst.padBindings[key] = ConfigMgr::Input(keys)->getBindings(key);
-        }
-        break;
-
     default: break;
+    }
+
+    LVF_ASSERT(keys == 5 || keys == 7 || keys == 9);
+
+    for (size_t key_i = Input::S1L; key_i < Input::ESC; ++key_i)
+    {
+        const auto key = static_cast<Input::Pad>(key_i);
+        _inst.padBindings[key] = ConfigMgr::Input(keys)->getBindings(key);
     }
 
     updateDeadzones(keys);

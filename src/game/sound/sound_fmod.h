@@ -13,7 +13,7 @@
 
 // This game uses FMOD Low Level API to play sounds as we don't use FMOD Studio,
 
-class SoundDriverFMOD : public SoundDriver
+class SoundDriverFMOD final : public SoundDriver
 {
     friend class SoundMgr;
 

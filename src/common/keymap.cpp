@@ -6,6 +6,7 @@
 #include <string_view>
 
 #include <common/assert.h>
+#include <common/log.h>
 #include <common/utils.h>
 
 std::string KeyMap::toString() const
@@ -37,7 +38,8 @@ void KeyMap::setJoystick(size_t device, Input::Joystick::Type jtype, size_t inde
 void KeyMap::loadFromString(const std::string_view name)
 {
     type = DeviceType::UNDEF;
-    if (name.empty())
+    static constexpr std::string_view INVALID_OR_DEFAULT = "INVALID";
+    if (name.empty() || name == INVALID_OR_DEFAULT)
         return;
 
     switch (name[0])
@@ -45,7 +47,7 @@ void KeyMap::loadFromString(const std::string_view name)
     case 'K': loadFromStringK(name); break;
     case 'J': loadFromStringJ(name); break;
     case 'M': loadFromStringM(name); break;
-    default: break;
+    default: LOG_WARNING << "Bad keymap value: " << name;
     }
 }
 
@@ -95,6 +97,7 @@ void KeyMap::loadFromStringJ(const std::string_view name)
         case 'D': idxMask = (1ul << 30); break;
         case 'U': idxMask = (1ul << 29); break;
         case 'R': idxMask = (1ul << 28); break;
+        default: LOG_WARNING << "Bad keymap value: " << name;
         }
         if (idxMask != 0)
         {

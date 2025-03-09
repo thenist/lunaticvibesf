@@ -20,7 +20,7 @@ ConfigInput::ConfigInput(const std::string& profile, GameModeKeys k)
 
 ConfigInput::~ConfigInput() = default;
 
-const char* getBindingKey(Input::Pad ingame)
+const static char* getBindingKey(Input::Pad ingame)
 {
     using namespace cfg;
     using namespace Input;

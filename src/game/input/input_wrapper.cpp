@@ -182,7 +182,7 @@ void InputWrapper::loopAsync()
                     if (isButtonPressed(j, 0.7) && !_joyprev[device][base + j.index])
                         mask.set(base + j.index);
                 }
-                base += InputMgr::MAX_JOYSTICK_AXIS_COUNT;
+                // base += InputMgr::MAX_JOYSTICK_AXIS_COUNT;
 
                 _joycurr[device] = mask;
 

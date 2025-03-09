@@ -231,6 +231,7 @@ public:
 
 CEREAL_CLASS_VERSION(ReplayChart, 2);
 
+// TODO: convert to switch functions.
 extern const std::map<Input::Pad, ReplayChart::Commands::Type> REPLAY_INPUT_DOWN_CMD_MAP;
 extern const std::map<Input::Pad, ReplayChart::Commands::Type> REPLAY_INPUT_UP_CMD_MAP;
 extern const std::map<Input::Pad, ReplayChart::Commands::Type> REPLAY_INPUT_DOWN_CMD_MAP_5K[4];

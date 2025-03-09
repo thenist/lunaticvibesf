@@ -209,7 +209,7 @@ TEST(ScoreDb, ImportFromLr2)
     auto pbp = score_db.fetchCachedPbBMS(HashMD5{"deadbeefdeadbeefdeadbeefdeadbeef"});
     EXPECT_NE(pbp, nullptr);
 
-    auto pb = *pbp;
+    const auto& pb = *pbp;
 
     // struct ScoreBase values.
     EXPECT_EQ(pb.notes, 992);

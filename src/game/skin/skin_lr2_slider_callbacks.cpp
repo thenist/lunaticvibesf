@@ -13,7 +13,7 @@ namespace lr2skin::slider
 
 #pragma region slider type callbacks
 
-void select_pos(double p)
+static void select_pos(double p)
 {
     if (gSelectContext.entries.empty())
         return;
@@ -26,18 +26,18 @@ void select_pos(double p)
     }
 }
 
-void customize_scrollbar(double p)
+static void customize_scrollbar(double p)
 {
     State::set(IndexSlider::SKIN_CONFIG_OPTIONS, p);
     gCustomizeContext.messages.emplace(lunaticvibes::customize_message::OptionDrag{});
 }
 
-void ir_ranking_scrollbar(double p)
+static void ir_ranking_scrollbar(double p)
 {
     // no ir support right now
 }
 
-void eq(int idx, double p)
+static void eq(int idx, double p)
 {
     int val = static_cast<int>(p * 24) - 12;
     p = (val + 12) / 24.0;
@@ -50,7 +50,7 @@ void eq(int idx, double p)
     }
 }
 
-void master_volume(double p)
+static void master_volume(double p)
 {
     State::set(IndexSlider::VOLUME_MASTER, p);
     State::set(IndexNumber::VOLUME_MASTER, static_cast<int>(std::round(p * 100)));
@@ -59,7 +59,7 @@ void master_volume(double p)
         SoundMgr::setVolume(SampleChannel::MASTER, static_cast<float>(p));
 }
 
-void key_volume(double p)
+static void key_volume(double p)
 {
     State::set(IndexSlider::VOLUME_KEY, p);
     State::set(IndexNumber::VOLUME_KEY, static_cast<int>(std::round(p * 100)));
@@ -68,7 +68,7 @@ void key_volume(double p)
         SoundMgr::setVolume(SampleChannel::KEY, static_cast<float>(p));
 }
 
-void bgm_volume(double p)
+static void bgm_volume(double p)
 {
     State::set(IndexSlider::VOLUME_BGM, p);
     State::set(IndexNumber::VOLUME_BGM, static_cast<int>(std::round(p * 100)));
@@ -104,7 +104,7 @@ static DSPType get_dsp_type_from_sound_fx(unsigned int idx)
     lunaticvibes::assert_failed("get_dsp_type_from_sound_fx");
 };
 
-void fx0(int idx, double p)
+static void fx0(int idx, double p)
 {
     State::set(idx == 0 ? IndexSlider::FX0_P1 : IndexSlider::FX0_P2, p);
     State::set(idx == 0 ? IndexNumber::FX0_P1 : IndexNumber::FX0_P2, static_cast<int>(std::round(p * 100)));
@@ -119,7 +119,7 @@ void fx0(int idx, double p)
     }
 }
 
-void fx1(int idx, double p)
+static void fx1(int idx, double p)
 {
     State::set(idx == 0 ? IndexSlider::FX1_P1 : IndexSlider::FX1_P2, p);
     State::set(idx == 0 ? IndexNumber::FX1_P1 : IndexNumber::FX1_P2, static_cast<int>(std::round(p * 100)));
@@ -134,7 +134,7 @@ void fx1(int idx, double p)
     }
 }
 
-void fx2(int idx, double p)
+static void fx2(int idx, double p)
 {
     State::set(idx == 0 ? IndexSlider::FX2_P1 : IndexSlider::FX2_P2, p);
     State::set(idx == 0 ? IndexNumber::FX2_P1 : IndexNumber::FX2_P2, static_cast<int>(std::round(p * 100)));
@@ -190,7 +190,7 @@ void pitch(double p)
     State::set(IndexOption::CHART_SAVE_LAMP_TYPE, lamp);
 }
 
-void deadzone(int type, double p)
+static void deadzone(int type, double p)
 {
     using namespace cfg;
     int keys = 7;

@@ -126,14 +126,14 @@ using DARC_DIRECTORY_VER5 = struct tagDARC_DIRECTORY_VER5
 #pragma pack(pop)
 
 // ファイル名データから元のファイル名の文字列を取得する
-const char* GetOriginalFileName(u8* FileNameTable)
+const static char* GetOriginalFileName(u8* FileNameTable)
 {
     return reinterpret_cast<char*>(FileNameTable) +
            static_cast<ptrdiff_t>(*(reinterpret_cast<u16*>(&FileNameTable[0])) * 4) + 4;
 }
 
 // 鍵文字列を作成
-void KeyCreate(const char* Source, unsigned char* Key)
+static void KeyCreate(const char* Source, unsigned char* Key)
 {
     size_t Len;
 
@@ -175,7 +175,7 @@ void KeyCreate(const char* Source, unsigned char* Key)
 }
 
 // 鍵文字列を使用して Xor 演算( Key は必ず DXA_KEYSTR_LENGTH_VER5 の長さがなければならない )
-void KeyConv(void* Data, int Size, int Position, unsigned char* Key)
+static void KeyConv(void* Data, int Size, int Position, unsigned char* Key)
 {
     Position %= DXA_KEYSTR_LENGTH_VER5;
 
@@ -194,7 +194,7 @@ void KeyConv(void* Data, int Size, int Position, unsigned char* Key)
 
 // ファイルから読み込んだデータを鍵文字列を使用して Xor 演算する関数( Key は必ず DXA_KEYSTR_LENGTH_VER5
 // の長さがなければならない )
-void KeyConvFileRead(void* Data, int Size, std::ifstream& fp, unsigned char* Key, int Position = -1)
+static void KeyConvFileRead(void* Data, int Size, std::ifstream& fp, unsigned char* Key, int Position = -1)
 {
     int pos;
 
@@ -212,7 +212,7 @@ void KeyConvFileRead(void* Data, int Size, std::ifstream& fp, unsigned char* Key
 }
 
 // デコード( 戻り値:解凍後のサイズ  -1 はエラー  Dest に NULL を入れることも可能 )
-int Decompress(void* Src, void* Dest)
+static int Decompress(void* Src, void* Dest)
 {
     u32 srcsize, destsize, code, indexsize, keycode, conbo, index;
     u8 *srcp, *destp, *dp, *sp;
@@ -341,8 +341,8 @@ int Decompress(void* Src, void* Dest)
 }
 
 // 指定のディレクトリデータにあるファイルを展開する
-int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_DIRECTORY_VER5* Dir, std::ifstream& ArcP,
-                    unsigned char* Key, Path DirPath, DXArchive& output)
+static int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_DIRECTORY_VER5* Dir,
+                           std::ifstream& ArcP, unsigned char* Key, Path DirPath, DXArchive& output)
 {
     // ディレクトリ情報がある場合は、まず展開用のディレクトリを作成する
     if (Dir->DirectoryAddress != 0xffffffff && Dir->ParentDirectoryAddress != 0xffffffff)
@@ -460,8 +460,8 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
 }
 
 // 指定のディレクトリデータにあるファイルを展開する
-int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_DIRECTORY_VER5* Dir, std::ifstream& ArcP,
-                    unsigned char* Key, Path DirPath)
+static int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_DIRECTORY_VER5* Dir,
+                           std::ifstream& ArcP, unsigned char* Key, Path DirPath)
 {
     if (!std::filesystem::exists(DirPath))
         std::filesystem::create_directories(DirPath);
