@@ -3,9 +3,7 @@
 #include <common/types.h>
 #include <common/u8.h>
 
-#include <filesystem>
-
-namespace fs = std::filesystem;
+#include <string>
 
 std::string ConfigProfile::getName() const
 {

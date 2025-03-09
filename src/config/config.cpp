@@ -1,12 +1,15 @@
 #include "config.h"
 
-#include <fstream>
-
 #include <common/log.h>
 #include <common/meta.h>
 #include <common/types.h>
 #include <common/u8.h>
-#include <common/utils.h>
+
+#include <yaml-cpp/yaml.h>
+
+#include <fstream>
+#include <ios>
+#include <string>
 
 vConfig::vConfig()
 {

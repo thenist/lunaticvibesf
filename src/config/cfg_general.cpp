@@ -1,6 +1,7 @@
 #include "cfg_general.h"
 
 #include <common/meta.h>
+#include <common/types.h>
 #include <common/utils.h>
 
 #include <string>

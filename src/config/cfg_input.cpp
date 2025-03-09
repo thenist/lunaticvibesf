@@ -1,8 +1,15 @@
 #include "cfg_input.h"
 
-#include "common/log.h"
-#include "common/meta.h"
-#include "common/u8.h"
+#include <common/keymap.h>
+#include <common/log.h>
+#include <common/meta.h>
+#include <common/types.h>
+#include <common/u8.h>
+#include <config/config.h>
+
+#include <yaml-cpp/yaml.h>
+
+#include <string>
 
 ConfigInput::ConfigInput(const std::string& profile, GameModeKeys k)
     : vConfig(profile,

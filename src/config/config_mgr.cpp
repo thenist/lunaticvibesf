@@ -1,19 +1,31 @@
 #include "config_mgr.h"
 
-#include <filesystem>
-#include <fstream>
-#include <mutex>
-#include <string>
-
 #include <common/log.h>
 #include <common/meta.h>
+#include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
 #include <config/cfg_general.h>
 #include <config/cfg_input.h>
 #include <config/cfg_profile.h>
 #include <config/cfg_skin.h>
+#include <game/runtime/index/number.h>
+#include <game/runtime/index/option.h>
+#include <game/runtime/index/slider.h>
+#include <game/runtime/index/switch.h>
+#include <game/runtime/index/text.h>
 #include <game/runtime/state.h>
+
+#include <yaml-cpp/yaml.h>
+
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <shared_mutex>
+#include <string>
 
 static void setNumbers()
 {
