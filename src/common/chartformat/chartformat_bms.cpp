@@ -2,6 +2,7 @@
 
 #include <common/assert.h>
 #include <common/encoding.h>
+#include <common/hash.h>
 #include <common/log.h>
 #include <common/types.h>
 #include <common/u8.h>
@@ -10,15 +11,20 @@
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <numeric>
 #include <optional>
 #include <random>
 #include <set>
 #include <sstream>
+#include <stack>
+#include <stdexcept>
+#include <string>
 #include <string_view>
 #include <utility>
 

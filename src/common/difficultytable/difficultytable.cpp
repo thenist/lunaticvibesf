@@ -1,10 +1,14 @@
 #include "difficultytable.h"
 
+#include <common/entry/entry.h>
 #include <common/utils.h>
 
 #include <algorithm>
 #include <climits>
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 std::vector<std::string> DifficultyTable::getLevelList() const
 {

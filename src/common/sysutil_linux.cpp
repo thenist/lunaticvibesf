@@ -2,13 +2,15 @@
 
 #include "sysutil.h"
 
-#include <cstdint>
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <filesystem>
 #include <iomanip>
 #include <string>
+#include <string_view>
 
 #include <boost/format.hpp>
 
@@ -18,6 +20,7 @@
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/types.h>
 #include <common/utils.h>
 
 [[nodiscard]] static std::string ellipsize(const std::string_view s, const size_t len)

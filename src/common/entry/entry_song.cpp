@@ -1,5 +1,10 @@
 #include "entry_song.h"
 
+#include <cstddef>
+#include <memory>
+#include <utility>
+#include <vector>
+
 std::shared_ptr<ChartFormatBase> EntryFolderSong::getChart(size_t idx)
 {
     idx %= getContentsCount();

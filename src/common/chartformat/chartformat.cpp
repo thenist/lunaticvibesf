@@ -1,15 +1,21 @@
 #include "chartformat.h"
 
-#include <algorithm>
-#include <fstream>
-#include <string>
-#include <utility>
-
 #include <common/chartformat/chartformat_bms.h>
 #include <common/encoding.h>
 #include <common/log.h>
+#include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <fstream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace r = std::ranges;
 

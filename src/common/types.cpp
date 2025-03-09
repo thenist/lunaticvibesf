@@ -2,6 +2,8 @@
 
 #include <common/log.h>
 
+#include <ostream>
+
 std::ostream& operator<<(std::ostream& os, const SkinType& mode)
 {
     switch (mode)

@@ -1,16 +1,6 @@
 #include "table_bms.h"
 
-#include <format>
-#include <fstream>
-#include <ranges>
-#include <string>
-#include <string_view>
-
-#include <curl/curl.h>
-#include <re2/re2.h>
-#include <tao/json.hpp>
-
-#include <common/encoding.h>
+#include <common/difficultytable/difficultytable.h>
 #include <common/entry/entry_song.h>
 #include <common/hash.h>
 #include <common/log.h>
@@ -18,7 +8,24 @@
 #include <common/types.h>
 #include <common/utils.h>
 
-namespace v = std::views;
+#include <curl/curl.h>
+#include <re2/re2.h>
+#include <tao/json.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <functional>
+#include <ios>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <variant>
+#include <vector>
 
 enum class GetResult : uint8_t
 {

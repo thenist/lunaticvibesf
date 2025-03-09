@@ -1,5 +1,6 @@
 #include "str_utils.h"
 
+#include <algorithm>
 #include <cstring>
 #include <span>
 #include <string_view>

@@ -1,7 +1,9 @@
 #include "thread_pool.h"
 
 #include <cstddef>
+#include <mutex>
 #include <thread>
+#include <utility>
 
 using size_t = std::size_t;
 

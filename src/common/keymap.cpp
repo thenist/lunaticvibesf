@@ -1,9 +1,11 @@
 #include "keymap.h"
 
+#include <cstddef>
+#include <sstream>
 #include <string>
+#include <string_view>
 
 #include <common/assert.h>
-#include <common/log.h>
 #include <common/utils.h>
 
 std::string KeyMap::toString() const

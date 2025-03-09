@@ -1,6 +1,7 @@
 #include "encoding.h"
 
-#include <fstream>
+#include <cstdint>
+#include <iosfwd>
 #include <istream>
 #include <memory>
 #include <string>

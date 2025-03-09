@@ -1,5 +1,4 @@
 #include "asynclooper.h"
-#include <chrono>
 
 #ifdef _WIN32
 #include "encoding.h"
@@ -8,10 +7,14 @@
 #include <utility>
 #endif
 
-#include "log.h"
 #include <common/assert.h>
+#include <common/log.h>
 #include <common/sysutil.h>
 #include <common/utils.h>
+
+#include "common/types.h"
+#include <chrono>
+#include <functional>
 
 AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsigned rate_per_sec, bool single_inst)
     : _tag(tag), _loopFunc(std::move(func))

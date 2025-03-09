@@ -4,6 +4,8 @@
 #include <common/log.h>
 #include <common/sysutil.h>
 
+#include <source_location>
+
 [[noreturn]] static void die_on_assertion_fail(const char* msg)
 {
     panic("Internal error: assertion failed", msg);

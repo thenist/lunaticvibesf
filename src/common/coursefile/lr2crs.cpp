@@ -1,18 +1,22 @@
 #include "lr2crs.h"
 
-#include <exception>
-#include <fstream>
-#include <sstream>
-
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
 #include <common/encoding.h>
 #include <common/hash.h>
 #include <common/log.h>
 #include <common/sysutil.h>
+#include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
+#include <cstddef>
+#include <exception>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <string_view>
 
 static std::stringstream readFileIntoStringStream(const Path& filePath)
 {

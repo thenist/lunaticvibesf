@@ -1,5 +1,12 @@
 #include "entry_folder.h"
-#include "common/chartformat/chartformat.h"
+
+#include <common/entry/entry.h>
+#include <common/hash.h>
+#include <common/types.h>
+
+#include <cstddef>
+#include <memory>
+#include <utility>
 
 EntryFolderBase::EntryFolderBase(const HashMD5& md5, StringContentView name, StringContentView name2)
 {
