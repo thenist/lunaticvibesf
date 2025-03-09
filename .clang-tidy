@@ -33,6 +33,7 @@ Checks: |
   performance-*,
   portability-*,
   -bugprone-easily-swappable-parameters,
+  -cert-err33-c, # "Warns on unused function return values" for standard C library.
   -misc-const-correctness, # Too noisy.
   -misc-include-cleaner, # TODO
   -misc-non-private-member-variables-in-classes,
