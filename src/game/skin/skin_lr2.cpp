@@ -69,6 +69,17 @@ namespace v = std::views;
     return accelType::CONSTANT;
 }
 
+[[nodiscard]] static constexpr NumberAlign parse_number_align(int n)
+{
+    switch (n)
+    {
+    case 0: return NUM_ALIGN_RIGHT;
+    case 1: return NUM_ALIGN_LEFT;
+    case 2: return NUM_ALIGN_CENTER;
+    default: LOG_WARNING << "[SkinLR2] Bad NumberAlign " << n; return {};
+    }
+}
+
 namespace lr2skin
 {
 
@@ -1314,7 +1325,7 @@ ParseRet SkinLR2::SRC_NUMBER()
     builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    builder.align = static_cast<NumberAlign>(d.align);
+    builder.align = parse_number_align(d.align);
     builder.maxDigits = d.keta;
     builder.numInd = iNum;
 
@@ -1762,7 +1773,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO(size_t idx)
     builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    builder.align = static_cast<NumberAlign>(d.align);
+    builder.align = parse_number_align(d.align);
     builder.maxDigits = d.keta;
     builder.numInd = iNum;
     builder.hideLeadingZeros = true;
@@ -2271,7 +2282,7 @@ ParseRet SkinLR2::SRC_BAR_LEVEL()
     builder.animationTimer = static_cast<IndexTimer>(d.timer);
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    builder.align = static_cast<NumberAlign>(d.align);
+    builder.align = parse_number_align(d.align);
     builder.maxDigits = d.keta;
 
     for (auto& bar : barSprites)
