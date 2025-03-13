@@ -25,7 +25,8 @@ SkinBase::SkinBase(std::shared_ptr<SharedData> data_)
     {
         _base_shared_data->black = std::make_shared<Texture>(0x000000ff);
         _base_shared_data->white = std::make_shared<Texture>(0xffffffff);
-        _base_shared_data->error = std::make_shared<Texture>(0xff00ffff);
+        _base_shared_data->error = std::make_shared<Texture>(nullptr, 0, 0); // LR2 renders either black or transparent
+                                                                             // texture in such case.
         _base_shared_data->stagefile = std::shared_ptr<Texture>(&gChartContext.texStagefile, [](Texture*) {});
         _base_shared_data->backbmp = std::shared_ptr<Texture>(&gChartContext.texBackbmp, [](Texture*) {});
         _base_shared_data->banner = std::shared_ptr<Texture>(&gChartContext.texBanner, [](Texture*) {});
