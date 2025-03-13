@@ -1,11 +1,13 @@
 {
-  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-  "name": "lunaticvibesf",
   "$builtin-baseline-git-tag": "2024.10.21",
-  "builtin-baseline": "10b7a178346f3f0abef60cecd5130e295afd8da4",
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "vcpkg-configuration": {
-    "overlay-ports": ["./vcpkg-overlays"]
+    "overlay-ports": [
+      "./vcpkg-overlays"
+    ]
   },
+  "name": "lunaticvibesf",
+  "builtin-baseline": "10b7a178346f3f0abef60cecd5130e295afd8da4",
   "dependencies": [
     "boost-asio",
     "boost-format",
@@ -14,11 +16,14 @@
     "cereal",
     "curl",
     "ffmpeg",
+    "gtest",
     {
       "name": "imgui",
-      "features": ["sdl2-binding", "sdl2-renderer-binding"]
+      "features": [
+        "sdl2-binding",
+        "sdl2-renderer-binding"
+      ]
     },
-    "gtest",
     {
       "name": "openssl",
       "platform": "!windows"
@@ -29,7 +34,9 @@
     "sdl2-gfx",
     {
       "name": "sdl2-image",
-      "features": ["libjpeg-turbo"]
+      "features": [
+        "libjpeg-turbo"
+      ]
     },
     "sdl2-ttf",
     "sqlite3",
