@@ -670,7 +670,7 @@ Path SkinLR2::getCustomizePath(StringContentView input)
     return path;
 }
 
-void SkinLR2::csvLineTokenize(int line, const std::string& raw, Tokens& res)
+void SkinLR2::csvLineTokenize(unsigned line, const std::string& raw, Tokens& res)
 {
     csvLineTokenizeSimple(std::string_view{raw}.substr(0, raw.find("//")), res);
 
@@ -1897,7 +1897,8 @@ ParseRet SkinLR2::SRC_NOWCOMBO2()
     return ParseRet::OK;
 }
 
-static chart::NoteLaneIndex NoteIdxToLane(SkinType gamemode, int idx, unsigned scratchSide1P, unsigned scratchSide2P)
+static chart::NoteLaneIndex NoteIdxToLane(SkinType gamemode, unsigned idx, unsigned scratchSide1P,
+                                          unsigned scratchSide2P)
 {
     LVF_DEBUG_ASSERT(idx < 20);
 

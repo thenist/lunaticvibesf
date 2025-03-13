@@ -436,7 +436,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
             {
                 LOG_ERROR << "[ArenaHost] cereal exception: " << e.what();
             }
-            size_t length = ss.tellp();
+            const auto length = ss.tellp();
             if (length == 0)
             {
                 lunaticvibes::verify_failed("[Arena] Pack SEEK_LOBBY resp payload failed");
@@ -611,7 +611,7 @@ void ArenaHost::handleJoinLobby(const std::string& clientKey, const std::shared_
     {
         LOG_ERROR << "[ArenaHost] cereal exception: " << e.what();
     }
-    size_t length = ss.tellp();
+    const auto length = ss.tellp();
     if (length == 0)
     {
         lunaticvibes::verify_failed("[Arena] Pack JOIN_LOBBY resp payload failed");

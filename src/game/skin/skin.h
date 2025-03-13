@@ -41,7 +41,7 @@ public:
         std::shared_ptr<Texture> stagefile;
         std::shared_ptr<Texture> thumbnail;
         std::shared_ptr<Texture> white;
-        std::map<int, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
+        std::map<unsigned, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
     };
 
 protected:
@@ -62,9 +62,9 @@ public:
 
 protected:
     // Images
-    std::map<int, std::shared_ptr<lunaticvibes::Font>> _font_name_map;
+    std::map<unsigned, std::shared_ptr<lunaticvibes::Font>> _font_name_map;
     // Textures
-    std::map<int, std::shared_ptr<sVideo>> _video_name_map; // Use this to get video instance from name
+    std::map<unsigned, std::shared_ptr<sVideo>> _video_name_map; // Use this to get video instance from name
     // Sprite elements
     std::vector<std::shared_ptr<SpriteBase>> _sprites;             // Only modified while parsing the skin.
     std::vector<std::shared_ptr<SpriteLaneVertical>> _laneSprites; // Portion of '_sprites'.
