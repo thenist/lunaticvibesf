@@ -737,10 +737,13 @@ int SkinLR2::IMAGE()
 
     if (lunaticvibes::iequals(parseParamBuf[0], "CONTINUE"))
     {
-        if (auto it = prevSkinTextureNameMap.find(imageCount); it != prevSkinTextureNameMap.end())
-            _base_shared_data->textureNameMap[imageCount] = it->second;
-        else
-            _base_shared_data->textureNameMap[imageCount] = std::make_shared<Texture>(nullptr, 0, 0);
+        _base_shared_data->textureNameMap[imageCount] = [this]() {
+            if (auto it = prevSkinTextureNameMap.find(imageCount); it != prevSkinTextureNameMap.end())
+                return it->second;
+            LOG_WARNING << "[SkinLR2] CONTINUE texture not found index=" << imageCount;
+            return _base_shared_data->error;
+        }();
+
         ++imageCount;
         return 1;
     }
@@ -1206,7 +1209,7 @@ bool SkinLR2::SRC()
                     return {_base_shared_data->white, it->second};
                 if (auto it = _base_shared_data->textureNameMap.find(gr); it != _base_shared_data->textureNameMap.end())
                     return {it->second, nullptr};
-                LOG_WARNING << "[SkinLR2] Texture not found for " << gr;
+                LOG_WARNING << "[SkinLR2] Texture not found for gr=" << gr;
                 return {_base_shared_data->error, nullptr};
             }
             }
@@ -1986,11 +1989,12 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     IndexTimer iTimer = lr2skin::timer(d.timer);
 
     // Find texture from map by gr
-    std::shared_ptr<Texture> tex = nullptr;
-    if (auto it = _base_shared_data->textureNameMap.find(d.gr); it != _base_shared_data->textureNameMap.end())
-        tex = it->second;
-    else
-        tex = _base_shared_data->error;
+    std::shared_ptr<Texture> tex = [this, &d]() {
+        if (auto it = _base_shared_data->textureNameMap.find(d.gr); it != _base_shared_data->textureNameMap.end())
+            return it->second;
+        LOG_WARNING << "[SkinLR2] Note texture not found for gr=" << d.gr;
+        return _base_shared_data->error;
+    }();
 
     // SRC
     if (d._null >= 20)
