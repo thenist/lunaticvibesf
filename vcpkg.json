@@ -1,5 +1,7 @@
 {
-  "$builtin-baseline-git-tag": "2024.10.21",
+  "$builtin-baseline-comment1": "imgui SDL2 bindings will be gone after 2025.02.14 https://github.com/microsoft/vcpkg/pull/42850",
+  "$builtin-baseline-comment2": "SDL2 builds without graphics supports on 2025.02.14 for me",
+  "$builtin-baseline-git-tag": "2025.01.13",
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "vcpkg-configuration": {
     "overlay-ports": [
@@ -7,7 +9,7 @@
     ]
   },
   "name": "lunaticvibesf",
-  "builtin-baseline": "10b7a178346f3f0abef60cecd5130e295afd8da4",
+  "builtin-baseline": "6f29f12e82a8293156836ad81cc9bf5af41fe836",
   "dependencies": [
     "boost-asio",
     "boost-format",
