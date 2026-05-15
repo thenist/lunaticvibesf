@@ -24,16 +24,18 @@ void SetWindowForeground(bool foreground);
 namespace lunaticvibes::details
 {
 
-void doPushMainThreadTask(std::move_only_function<void()> f);
+bool doPushMainThreadTask(std::move_only_function<void()> f);
 
 } // namespace lunaticvibes::details
 
-void pushMainThreadTask(std::invocable<> auto f)
+bool pushMainThreadTask(std::invocable<> auto f)
 {
     if (IsMainThread())
+    {
         f();
-    else
-        lunaticvibes::details::doPushMainThreadTask(f);
+        return true;
+    }
+    return lunaticvibes::details::doPushMainThreadTask(std::move(f));
 }
 
 void doMainThreadTask();
@@ -44,11 +46,11 @@ template <typename T> inline T pushAndWaitMainThreadTask(std::move_only_function
 {
     if (IsMainThread())
         return f();
-    if (CanHandleMainThreadTask())
+
+    std::promise<T> taskPromise;
+    std::future<T> taskFuture = taskPromise.get_future();
+    if (pushMainThreadTask([&]() { taskPromise.set_value(f()); }))
     {
-        std::promise<T> taskPromise;
-        pushMainThreadTask([&]() { taskPromise.set_value(f()); });
-        std::future<T> taskFuture = taskPromise.get_future();
         taskFuture.wait();
         return taskFuture.get();
     }
@@ -58,14 +60,14 @@ template <> inline void pushAndWaitMainThreadTask(std::move_only_function<void()
 {
     if (IsMainThread())
         return f();
-    if (CanHandleMainThreadTask())
-    {
-        std::promise<void> taskPromise;
-        pushMainThreadTask([&]() {
+
+    std::promise<void> taskPromise;
+    std::future<void> taskFuture = taskPromise.get_future();
+    if (pushMainThreadTask([&]() {
             f();
             taskPromise.set_value();
-        });
-        std::future<void> taskFuture = taskPromise.get_future();
+        }))
+    {
         taskFuture.wait();
         return taskFuture.get();
     }
@@ -73,9 +75,7 @@ template <> inline void pushAndWaitMainThreadTask(std::move_only_function<void()
 template <typename T, typename... Arg>
 inline T pushAndWaitMainThreadTask(std::move_only_function<T(Arg...)> f, Arg... arg)
 {
-    if (CanHandleMainThreadTask())
-        return pushAndWaitMainThreadTask<T>(std::bind_front(std::move(f), arg...));
-    return T();
+    return pushAndWaitMainThreadTask<T>(std::bind_front(std::move(f), arg...));
 }
 
 // Unix epoch time.

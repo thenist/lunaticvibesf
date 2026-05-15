@@ -9,7 +9,6 @@
 #include <functional>
 #include <mutex>
 #include <queue>
-#include <shared_mutex>
 #include <stdexcept>
 #include <stdlib.h>
 #include <string>
@@ -21,7 +20,7 @@
 
 #include <tinyfiledialogs.h>
 
-static std::shared_mutex s_main_thread_task_mutex;
+static std::mutex s_main_thread_task_mutex;
 static std::queue<std::move_only_function<void()>> s_main_thread_task_queue;
 static bool s_main_thread_task_do_handle = true;
 
@@ -35,33 +34,53 @@ void SetWindowForeground(bool f)
     s_foreground = f;
 }
 
-void lunaticvibes::details::doPushMainThreadTask(std::move_only_function<void()> f)
+bool lunaticvibes::details::doPushMainThreadTask(std::move_only_function<void()> f)
 {
     LVF_DEBUG_ASSERT(!IsMainThread());
-    if (s_main_thread_task_do_handle)
-    {
-        std::unique_lock l(s_main_thread_task_mutex);
-        s_main_thread_task_queue.emplace(std::move(f));
-    }
+
+    std::lock_guard l(s_main_thread_task_mutex);
+    if (!s_main_thread_task_do_handle)
+        return false;
+
+    s_main_thread_task_queue.emplace(std::move(f));
+    return true;
 }
 
 void doMainThreadTask()
 {
-    std::shared_lock l(s_main_thread_task_mutex);
-    while (!s_main_thread_task_queue.empty())
+    std::queue<std::move_only_function<void()>> tasks;
     {
-        s_main_thread_task_queue.front()();
-        s_main_thread_task_queue.pop();
+        std::lock_guard l(s_main_thread_task_mutex);
+        std::swap(tasks, s_main_thread_task_queue);
+    }
+
+    while (!tasks.empty())
+    {
+        tasks.front()();
+        tasks.pop();
     }
 }
 
 void StopHandleMainThreadTask()
 {
-    s_main_thread_task_do_handle = false;
+    std::queue<std::move_only_function<void()>> tasks;
+    {
+        std::lock_guard l(s_main_thread_task_mutex);
+        s_main_thread_task_do_handle = false;
+        if (IsMainThread())
+            std::swap(tasks, s_main_thread_task_queue);
+    }
+
+    while (!tasks.empty())
+    {
+        tasks.front()();
+        tasks.pop();
+    }
 }
 
 bool CanHandleMainThreadTask()
 {
+    std::lock_guard l(s_main_thread_task_mutex);
     return s_main_thread_task_do_handle;
 }
 
