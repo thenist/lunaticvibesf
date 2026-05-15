@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <functional>
 #include <future>
 #include <mutex>
@@ -37,6 +38,7 @@
 #include <shared_mutex>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <utility>
 
 namespace r = std::ranges;
@@ -1084,6 +1086,22 @@ bool ScenePlay::createRuleset()
 
 ScenePlay::~ScenePlay()
 {
+    sceneEnding.store(true);
+
+    auto waitForLoader = [](std::future<void>& f) {
+        if (!f.valid())
+            return;
+
+        while (f.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready)
+        {
+            if (IsMainThread())
+                doMainThreadTask();
+            std::this_thread::yield();
+        }
+    };
+    waitForLoader(_samplesFuture);
+    waitForLoader(_bgaFuture);
+
     gPlayContext.bgaTexture->stopUpdate();
     gPlayContext.bgaTexture->reset();
 
@@ -1185,11 +1203,10 @@ void ScenePlay::asyncLoadChart()
     }
 
     auto shouldDiscard = [this]() {
-        return gAppIsExiting || gNextScene != SceneType::PLAY || this->sceneEnding ||
-               this->state != ePlayState::LOADING;
+        return gAppIsExiting || gNextScene != SceneType::PLAY || this->sceneEnding.load();
     };
 
-    if ((gChartContext.concurrent.sampleLoadedHash != gChartContext.hash) && !sceneEnding)
+    if ((gChartContext.concurrent.sampleLoadedHash != gChartContext.hash) && !sceneEnding.load())
     {
         _samplesFuture = std::async(std::launch::async, [shouldDiscard]() {
             SetThreadName("ChartSampleLoad");
@@ -1197,7 +1214,7 @@ void ScenePlay::asyncLoadChart()
         });
     }
 
-    if (State::get(IndexSwitch::_LOAD_BGA) && !sceneEnding)
+    if (State::get(IndexSwitch::_LOAD_BGA) && !sceneEnding.load())
     {
         if (gChartContext.concurrent.bgaLoadedHash != gChartContext.hash)
         {
@@ -2271,9 +2288,9 @@ void ScenePlay::updateFadeout(const lunaticvibes::Time& t)
     //
     spinTurntable(gChartContext.started);
 
-    if (!sceneEnding && ft >= pSkin->info.timeOutro)
+    if (!sceneEnding.load() && ft >= pSkin->info.timeOutro)
     {
-        sceneEnding = true;
+        sceneEnding.store(true);
 
         _handleJudgeInput = false;
 

@@ -7,6 +7,7 @@
 #include <game/scene/scene.h>
 #include <game/scene/scene_context.h>
 
+#include <atomic>
 #include <future>
 #include <limits>
 #include <memory>
@@ -117,7 +118,7 @@ private:
     int pb_exscore = 0;
     int pb_maxcombo = 0;
 
-    bool sceneEnding = false;
+    std::atomic<bool> sceneEnding = false;
 
 public:
     void clearGlobalData();

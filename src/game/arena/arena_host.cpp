@@ -466,11 +466,11 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
             {
                 if (!gArenaData.playing)
                 {
+                    std::unique_lock l(clientsMutex);
                     if (!clients.contains(key))
                     {
                         if (gArenaData.getPlayerCount() < MAX_ARENA_PLAYERS)
                         {
-                            std::unique_lock l(clientsMutex);
                             clients[key].id = ++clientID;
                             clients[key].serverSocket = socket;
                             clients[key].endpoint = remote_endpoint;
@@ -511,7 +511,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
                                       std::bind_front(emptyHandleSend, payload));
             }
         }
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         auto it = clients.find(key);
         if (it == clients.end())
         {
@@ -542,7 +542,7 @@ void ArenaHost::handleResponse(const std::string& clientKey, const std::shared_p
 
     Client& c = clients[clientKey];
 
-    std::shared_lock l(c.tasksWaitingForResponseMutex);
+    std::unique_lock l(c.tasksWaitingForResponseMutex);
     auto it = c.tasksWaitingForResponse.find(pMsg->messageIndex);
     if (it == c.tasksWaitingForResponse.end())
     {
@@ -847,12 +847,12 @@ void ArenaHost::update()
 
     // wait response timeout
     {
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         for (auto& [k, cc] : clients)
         {
             std::set<int> taskHasResponse;
             {
-                std::shared_lock l(cc.tasksWaitingForResponseMutex);
+                std::unique_lock l(cc.tasksWaitingForResponseMutex);
                 for (auto& [msgID, task] : cc.tasksWaitingForResponse)
                 {
                     if (task.received)
@@ -888,7 +888,7 @@ void ArenaHost::update()
 
     // heartbeat
     {
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         for (auto& [k, cc] : clients)
         {
             if ((now - cc.heartbeatRecvTime).norm() > 5000 && !cc.heartbeatPending)
@@ -951,7 +951,7 @@ void ArenaHost::update()
 
     // pending chart
     {
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         if (!requestChartPending.empty() && requestChartPendingExistCount >= clients.size() + 1)
         {
             requestChartHash = requestChartPending;
@@ -1013,32 +1013,35 @@ void ArenaHost::update()
     }
 
     // start playing
-    if (!gSelectContext.isArenaReady && !clients.empty() && !hostRequestChartHash.empty())
+    if (!gSelectContext.isArenaReady && !hostRequestChartHash.empty())
     {
-        std::shared_lock l(clientsMutex);
-        size_t ready = 0;
-        for (auto& [k, cc] : clients)
+        std::unique_lock l(clientsMutex);
+        if (!clients.empty())
         {
-            if (cc.requestChartHash == hostRequestChartHash)
-                ++ready;
-        }
-        if (ready == clients.size())
-        {
-            // host decide
+            size_t ready = 0;
+            for (auto& [k, cc] : clients)
+            {
+                if (cc.requestChartHash == hostRequestChartHash)
+                    ++ready;
+            }
+            if (ready == clients.size())
+            {
+                // host decide
 
-            LOG_WARNING << "[Arena] Decide";
+                LOG_WARNING << "[Arena] Decide";
 
-            static std::random_device rd;
-            gArenaData.randomSeed = (static_cast<uint64_t>(rd()) << 32) | rd();
+                static std::random_device rd;
+                gArenaData.randomSeed = (static_cast<uint64_t>(rd()) << 32) | rd();
 
-            startPlaying();
+                startPlaying();
+            }
         }
     }
 
     // host init ruleset
     if (!gArenaData.playing && isCreatedRuleset())
     {
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         for (auto& [k, cc] : clients)
         {
             auto n = std::make_shared<ArenaMessageHostPlayInit>();
@@ -1056,7 +1059,7 @@ void ArenaHost::update()
     // load complete check
     if (!gArenaData.playing && isLoadingFinished())
     {
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         size_t ready = 0;
         for (auto& [k, cc] : clients)
         {
@@ -1097,7 +1100,7 @@ void ArenaHost::update()
     {
         gArenaData.updateGlobals();
 
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         for (auto& [k, cc] : clients)
         {
             auto n = std::make_shared<ArenaMessageHostPlayData>();
@@ -1124,7 +1127,7 @@ void ArenaHost::update()
     // finish check
     if (gArenaData.playing && isPlayingFinished())
     {
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         size_t finished = 0;
         for (auto& [k, cc] : clients)
         {
@@ -1150,7 +1153,7 @@ void ArenaHost::update()
     // result check
     if (isResultFinished())
     {
-        std::shared_lock l(clientsMutex);
+        std::unique_lock l(clientsMutex);
         size_t finished = 0;
         for (auto& [k, cc] : clients)
         {
