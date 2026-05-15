@@ -336,7 +336,7 @@ void ArenaClient::handleResponse(const std::shared_ptr<ArenaMessage>& msg)
 {
     auto pMsg = std::static_pointer_cast<ArenaMessageResponse>(msg);
 
-    std::shared_lock l(tasksWaitingForResponseMutex);
+    std::unique_lock l(tasksWaitingForResponseMutex);
     if (!tasksWaitingForResponse.contains(pMsg->messageIndex))
     {
         LOG_WARNING << "[Arena] Invalid req message index, or duplicate resp msg";
@@ -680,7 +680,7 @@ void ArenaClient::update()
     {
         std::set<int> taskHasResponse;
         {
-            std::shared_lock l(tasksWaitingForResponseMutex);
+            std::unique_lock l(tasksWaitingForResponseMutex);
             for (auto& [msgID, task] : tasksWaitingForResponse)
             {
                 if (task.received)
