@@ -67,7 +67,7 @@ bool ArenaClient::joinLobby(const std::string& address)
             server = *v4addr.begin();
             server.port(ARENA_HOST_PORT);
         }
-        else if (auto v6addr = resolver.resolve(udp::v6(), address, ""); v6addr.empty())
+        else if (auto v6addr = resolver.resolve(udp::v6(), address, ""); !v6addr.empty())
         {
             server = *v6addr.begin();
             server.port(ARENA_HOST_PORT);
