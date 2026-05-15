@@ -14,6 +14,7 @@
 InputWrapper::InputWrapper(unsigned rate, bool background)
     : _background(background), _looper{"InputLoop", std::bind_front(&InputWrapper::loopAsync, this), rate}
 {
+    _releaseBuffer.fill(-1);
 }
 
 InputWrapper::~InputWrapper()

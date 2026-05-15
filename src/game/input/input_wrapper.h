@@ -62,7 +62,7 @@ private:
     AsyncLooper _looper;
     lunaticvibes::Time _prevUpdateEnd;
     std::array<std::pair<long long, bool>, Input::KEY_COUNT> _inputBuffer{{{0, false}}};
-    std::array<long long, Input::KEY_COUNT> _releaseBuffer{-1};
+    std::array<long long, Input::KEY_COUNT> _releaseBuffer{};
     InputMask _prev = 0;
     InputMask _curr = 0;
     double scratchAxisPrev[2] = {0.};
