@@ -59,24 +59,30 @@ jobs:
             os: ubuntu-24.04
             preset: linux-vcpkg-gcc
             build-args: "--config Debug"
+            test-args: "-C Debug"
           - name: "Ubuntu (GCC, Release)"
             os: ubuntu-24.04
             preset: linux-vcpkg-gcc
             build-args: "--config RelWithDebInfo"
+            test-args: "-C RelWithDebInfo"
           - name: "Ubuntu (Clang, Debug)"
             os: ubuntu-24.04
             preset: linux-vcpkg-clang
             build-args: "--config Debug"
+            test-args: "-C Debug"
           - name: "Ubuntu (Clang, Release)"
             os: ubuntu-24.04
             preset: linux-vcpkg-clang
             build-args: "--config RelWithDebInfo"
+            test-args: "-C RelWithDebInfo"
           - name: "Windows (MSVC, Debug)"
             os: windows-2022
             preset: windows-vcpkg-debug
+            test-args: ""
           - name: "Windows (MSVC, Release)"
             os: windows-2022
             preset: windows-vcpkg-release
+            test-args: ""
             package-name: "release-build"
     steps:
       # >>>> COPY PASTE
@@ -117,7 +123,7 @@ jobs:
         run: cmake --build build ${{ matrix.build-args }}
 
       - name: Run tests
-        run: ctest --test-dir build -j $(nproc) --output-on-failure --timeout 10
+        run: ctest --test-dir build ${{ matrix.test-args }} -j 4 --output-on-failure --timeout 10 --no-tests=error
         env:
           UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
 
