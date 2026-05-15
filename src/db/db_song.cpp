@@ -226,7 +226,11 @@ SongDB::SongDB(const char* path) : SQLite(path, "SONG")
         lunaticvibes::assert_failed(("[SongDB] Create gamemode index for song: " + std::string{errmsg()}).c_str());
 }
 
-SongDB::~SongDB() = default;
+SongDB::~SongDB()
+{
+    stopLoading();
+    waitLoadingFinish();
+}
 
 bool SongDB::asyncAddChartTask(const HashMD5& folder, const Path& path)
 {
@@ -801,7 +805,7 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
                     }
                     else
                     {
-                        const long long fstime = getFileLastWriteTime(path);
+                        const long long fstime = getFileLastWriteTime(chart->absolutePath);
                         if (auto q = query("SELECT addtime FROM song WHERE md5=? AND parent=?",
                                            {chart->fileHash.hexdigest(), hash.hexdigest()});
                             !q.empty())
@@ -958,7 +962,7 @@ HashMD5 SongDB::getFolderParent(const Path& path) const
 
 HashMD5 SongDB::getFolderParent(const HashMD5& folder) const
 {
-    auto result = query("SELECT type,parent FROM folder WHERE path=?", {folder.hexdigest()});
+    auto result = query("SELECT type,parent FROM folder WHERE pathmd5=?", {folder.hexdigest()});
     if (!result.empty())
     {
         const auto& leaf = result[0];
@@ -968,6 +972,8 @@ HashMD5 SongDB::getFolderParent(const HashMD5& folder) const
                         << " (" << folder.hexdigest() << ")";
             return {};
         }
+        if (!leaf[1].has_value())
+            return {};
         return HashMD5{ANY_STR(leaf[1])};
     }
     LOG_INFO << "[SongDB] Get folder parent fail: target " << folder.hexdigest() << " not found";
