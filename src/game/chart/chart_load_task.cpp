@@ -54,8 +54,8 @@ void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()
         gPlayContext.wavLoaded = 0;
     }
 
-    std::atomic<size_t> jobs;
-    std::atomic<size_t> jobs_done;
+    std::atomic<size_t> jobs{0};
+    std::atomic<size_t> jobs_done{0};
     for (auto [i, wav] : chart.wavFiles | v::enumerate)
     {
         if (!file_cond(wav)) // Make sure to keep correct 'i', it includes skipped elements.
