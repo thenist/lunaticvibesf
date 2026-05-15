@@ -12,6 +12,7 @@
 #include <chrono>
 #include <cstdio>
 #include <filesystem>
+#include <string>
 
 const DWORD MS_VC_EXCEPTION = 0x406D1388;
 
@@ -54,10 +55,19 @@ void SetThreadName(const char* name)
 
 Path GetExecutablePath()
 {
-    char fullpath[256] = {0};
-    if (!GetModuleFileNameA(nullptr, fullpath, sizeof(fullpath)))
-        return {};
-    return fs::path(fullpath).parent_path();
+    std::wstring fullpath(MAX_PATH, L'\0');
+    while (true)
+    {
+        const DWORD len = GetModuleFileNameW(nullptr, fullpath.data(), static_cast<DWORD>(fullpath.size()));
+        if (len == 0)
+            return {};
+        if (len < fullpath.size())
+        {
+            fullpath.resize(len);
+            return fs::path(fullpath).parent_path();
+        }
+        fullpath.resize(fullpath.size() * 2);
+    }
 }
 
 static HWND hwnd = nullptr;

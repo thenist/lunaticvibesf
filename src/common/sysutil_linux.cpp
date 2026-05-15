@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <boost/format.hpp>
 
@@ -55,15 +56,20 @@ void SetThreadName(const char* name)
 
 Path GetExecutablePath()
 {
-    char fullpath[256] = {0};
-
-    char process_path[] = "/proc/self/exe";
-    const auto bytes =
-        std::min(readlink(process_path, fullpath, sizeof(fullpath)), static_cast<ssize_t>(sizeof(fullpath) - 1));
-    if (bytes >= 0)
-        fullpath[bytes] = '\0';
-
-    return PathFromUTF8(fullpath).parent_path();
+    std::vector<char> fullpath(256);
+    const char process_path[] = "/proc/self/exe";
+    while (true)
+    {
+        const ssize_t bytes = readlink(process_path, fullpath.data(), fullpath.size());
+        if (bytes < 0)
+            return {};
+        if (static_cast<size_t>(bytes) < fullpath.size())
+        {
+            fullpath[static_cast<size_t>(bytes)] = '\0';
+            return PathFromUTF8(fullpath.data()).parent_path();
+        }
+        fullpath.resize(fullpath.size() * 2);
+    }
 }
 
 long long getFileLastWriteTime(const Path& p)
