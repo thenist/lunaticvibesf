@@ -46,9 +46,15 @@ int SoundMgr::setDevice(size_t index)
     SoundMgr& _inst = inst();
     if (!_inst._initialized)
         return -255;
+    const bool wasRunning = _inst.driver->isRunning();
+    if (wasRunning)
+        _inst.driver->loopEnd();
+
     int ret = _inst.driver->setDevice(index);
     if (ret != 0)
         _inst._initialized = false;
+    else if (wasRunning)
+        _inst.driver->loopStart();
     return ret;
 }
 
