@@ -225,7 +225,7 @@ static void convert(const std::string& input, eFileEncoding fromEncoding, eFileE
 
     DWORD narrow_buf_size = WideCharToMultiByte(to, 0, wstr.get(), wide_buf_size, 0, 0, 0, FALSE);
     auto lstr = std::make_unique_for_overwrite<char[]>(narrow_buf_size);
-    WideCharToMultiByte(to, 0, wstr.get(), narrow_buf_size, lstr.get(), narrow_buf_size, 0, FALSE);
+    WideCharToMultiByte(to, 0, wstr.get(), wide_buf_size, lstr.get(), narrow_buf_size, 0, FALSE);
 
     // NOTE: narrow_buf_size doesn't include null-terminator as we are passing size to WideCharToMultiByte explicitly.
     out.assign(lstr.get(), narrow_buf_size);
