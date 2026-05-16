@@ -18,6 +18,7 @@ add_executable(
     db/test_db_conn.cpp
     db/test_score_db.cpp
     db/test_song_db.cpp
+    game/test_generic_info.cpp
     game/test_graphics.cpp
     game/test_lr2skin.cpp
     game/test_lr2soundset.cpp

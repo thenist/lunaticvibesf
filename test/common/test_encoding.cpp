@@ -38,3 +38,10 @@ TEST(Encoding, Utf8ToUtf32)
     };
     EXPECT_EQ(utf8_to_utf32("aA\nあ"), U"aA\nあ");
 }
+
+TEST(Encoding, ShiftJisToUtf8)
+{
+    std::string out;
+    lunaticvibes::to_utf8("\x82\xa0", eFileEncoding::SHIFT_JIS, out);
+    EXPECT_EQ(out, "\xe3\x81\x82");
+}
