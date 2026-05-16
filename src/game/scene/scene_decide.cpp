@@ -1,5 +1,6 @@
 #include "scene_decide.h"
 
+#include <common/crash_handler.h>
 #include <common/log.h>
 #include <game/arena/arena_data.h>
 #include <game/runtime/index/timer.h>
@@ -62,6 +63,7 @@ void SceneDecide::updateStart(const lunaticvibes::Time& t)
 
     if (!gInCustomize && rt.norm() >= pSkin->info.timeDecideExpiry)
     {
+        lunaticvibes::CrashBreadcrumb("SceneDecide::updateStart -> PLAY");
         gNextScene = SceneType::PLAY;
     }
 }
@@ -72,6 +74,7 @@ void SceneDecide::updateSkip(const lunaticvibes::Time& t)
 
     if (ft.norm() >= pSkin->info.timeOutro)
     {
+        lunaticvibes::CrashBreadcrumb("SceneDecide::updateSkip -> PLAY");
         gNextScene = SceneType::PLAY;
     }
 }
@@ -82,6 +85,7 @@ void SceneDecide::updateCancel(const lunaticvibes::Time& t)
 
     if (ft.norm() >= pSkin->info.timeOutro)
     {
+        lunaticvibes::CrashBreadcrumb("SceneDecide::updateCancel -> SELECT");
         clearContextPlay();
         gPlayContext.isAuto = false;
         gPlayContext.isReplay = false;

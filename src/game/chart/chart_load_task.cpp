@@ -2,6 +2,7 @@
 
 #include <common/assert.h>
 #include <common/chartformat/chartformat.h>
+#include <common/crash_handler.h>
 #include <common/log.h>
 #include <common/sysutil.h>
 #include <common/thread_pool.h>
@@ -20,6 +21,7 @@ namespace v = std::views;
 // NOTE: no point in trying to make this less global, as it has load samples into the global audio driver.
 void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()>& should_discard)
 {
+    CrashBreadcrumb("ChartLoadTask::load_audio start");
     LVF_ASSERT(!IsMainThread());
 
     {
@@ -43,6 +45,7 @@ void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()
             gPlayContext.wavTotal = 0;
             gPlayContext.wavLoaded = 1;
         }
+        CrashBreadcrumb("ChartLoadTask::load_audio no audio");
         return;
     }
 
@@ -84,6 +87,7 @@ void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()
     if (should_discard())
     {
         LOG_DEBUG << "[ChartLoadTask] Discarding loaded audio";
+        CrashBreadcrumb("ChartLoadTask::load_audio discarded");
         return;
     }
 
@@ -91,13 +95,16 @@ void lunaticvibes::load_audio(ChartFormatBase& chart, const std::function<bool()
         std::unique_lock l{gChartContext.concurrent.mutex};
         gChartContext.concurrent.sampleLoadedHash = chart.fileHash;
     }
+    CrashBreadcrumb("ChartLoadTask::load_audio end");
 }
 
 void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()>& should_discard)
 {
+    CrashBreadcrumb("ChartLoadTask::load_video start");
     LVF_ASSERT(!IsMainThread());
 
     pushAndWaitMainThreadTask<void>([]() { gPlayContext.bgaTexture->clear(); });
+    CrashBreadcrumb("ChartLoadTask::load_video cleared texture");
 
     {
         std::unique_lock l{gChartContext.concurrent.mutex};
@@ -117,6 +124,7 @@ void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()
         std::unique_lock l{gPlayContext._mutex};
         gPlayContext.bmpTotal = 0;
         gPlayContext.bmpLoaded = 1;
+        CrashBreadcrumb("ChartLoadTask::load_video no BGA");
         return;
     }
 
@@ -149,6 +157,7 @@ void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()
     if (should_discard())
     {
         LOG_DEBUG << "[ChartLoadTask] State changed, discarding BGA";
+        CrashBreadcrumb("ChartLoadTask::load_video discarded");
         return;
     }
 
@@ -160,4 +169,5 @@ void lunaticvibes::load_video(ChartFormatBase& chart, const std::function<bool()
         std::unique_lock l{gChartContext.concurrent.mutex};
         gChartContext.concurrent.bgaLoadedHash = gChartContext.hash;
     }
+    CrashBreadcrumb("ChartLoadTask::load_video end");
 }

@@ -2,6 +2,7 @@
 
 #include <common/assert.h>
 #include <common/chartformat/chartformat_bms.h>
+#include <common/crash_handler.h>
 #include <common/log.h>
 #include <common/play_modifiers.h>
 #include <common/sysutil.h>
@@ -212,6 +213,7 @@ static Option::e_gauge_type gaugeToOption(lunaticvibes::BmsGaugeType gauge)
 
 ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, gPlayContext.mode, 1000, true)
 {
+    lunaticvibes::CrashBreadcrumb("ScenePlay::ScenePlay start");
     _type = SceneType::PLAY;
     state = ePlayState::PREPARE;
 
@@ -257,6 +259,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
     {
         if (gChartContext.path.empty())
         {
+            lunaticvibes::CrashBreadcrumb("ScenePlay::ScenePlay missing chart path");
             LOG_ERROR << "[Play] Chart not specified!";
             gNextScene = gQuitOnFinish ? SceneType::EXIT_TRANS : SceneType::SELECT;
             return;
@@ -274,6 +277,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
     }
     if (gChartContext.chart == nullptr || !gChartContext.chart->isLoaded())
     {
+        lunaticvibes::CrashBreadcrumb("ScenePlay::ScenePlay invalid chart");
         LOG_ERROR << "[Play] Invalid chart: " << gChartContext.path;
         gNextScene = gQuitOnFinish ? SceneType::EXIT_TRANS : SceneType::SELECT;
         return;
@@ -335,6 +339,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
 
     // chartobj
     gPlayContext.chartObjLoaded = createChartObj();
+    lunaticvibes::CrashBreadcrumb("ScenePlay::ScenePlay chart object created");
     gPlayContext.remainTime = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength();
 
     LOG_DEBUG << "[Play] Real BPM: " << gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM() << " ("
@@ -373,6 +378,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
 
     // ruleset, should be called after initial health set
     gPlayContext.rulesetLoaded = createRuleset();
+    lunaticvibes::CrashBreadcrumb("ScenePlay::ScenePlay ruleset created");
 
     if (gPlayContext.rulesetLoaded && gArenaData.isOnline())
     {
@@ -643,6 +649,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
     State::set(IndexTimer::MUSIC_BEAT, TIMER_NEVER);
     SoundMgr::setSysVolume(1.0);
     SoundMgr::setNoteVolume(1.0);
+    lunaticvibes::CrashBreadcrumb("ScenePlay::ScenePlay end");
 }
 
 void ScenePlay::clearGlobalData()
@@ -1086,6 +1093,7 @@ bool ScenePlay::createRuleset()
 
 ScenePlay::~ScenePlay()
 {
+    lunaticvibes::CrashBreadcrumb("ScenePlay::~ScenePlay start");
     sceneEnding.store(true);
 
     auto waitForLoader = [](std::future<void>& f) {
@@ -1106,6 +1114,7 @@ ScenePlay::~ScenePlay()
     gPlayContext.bgaTexture->reset();
 
     _input.loopEnd();
+    lunaticvibes::CrashBreadcrumb("ScenePlay::~ScenePlay end");
 }
 
 void ScenePlay::setInitialHealthBMS()
@@ -1192,6 +1201,7 @@ void ScenePlay::setInitialHealthBMS()
 
 void ScenePlay::asyncLoadChart()
 {
+    lunaticvibes::CrashBreadcrumb("ScenePlay::asyncLoadChart start");
     if (!gChartContext.chart)
         return;
 
@@ -1210,7 +1220,9 @@ void ScenePlay::asyncLoadChart()
     {
         _samplesFuture = std::async(std::launch::async, [shouldDiscard]() {
             SetThreadName("ChartSampleLoad");
+            lunaticvibes::CrashBreadcrumb("ScenePlay sample loader start");
             lunaticvibes::load_audio(*gChartContext.chart, shouldDiscard);
+            lunaticvibes::CrashBreadcrumb("ScenePlay sample loader end");
         });
     }
 
@@ -1220,7 +1232,9 @@ void ScenePlay::asyncLoadChart()
         {
             _bgaFuture = std::async(std::launch::async, [shouldDiscard]() {
                 SetThreadName("ChartBgaLoad");
+                lunaticvibes::CrashBreadcrumb("ScenePlay BGA loader start");
                 lunaticvibes::load_video(*gChartContext.chart, shouldDiscard);
+                lunaticvibes::CrashBreadcrumb("ScenePlay BGA loader end");
             });
         }
         else

@@ -1,6 +1,7 @@
 #include <common/assert.h>
 #include <common/beat.h>
 #include <common/chartformat/chartformat_bms.h>
+#include <common/crash_handler.h>
 #include <common/hash.h>
 #include <common/in_test_mode.h>
 #include <common/log.h>
@@ -91,6 +92,8 @@ int main(int argc, char* argv[])
 
     executablePath = GetExecutablePath();
     fs::current_path(executablePath);
+    lunaticvibes::InstallCrashHandler();
+    lunaticvibes::CrashBreadcrumb("main: startup");
 
     lunaticvibes::InitLogger("LunaticVibesF.log");
 
@@ -318,7 +321,9 @@ int main(int argc, char* argv[])
         }
     });
 
+    lunaticvibes::CrashBreadcrumb("main: entering main loop");
     mainLoop();
+    lunaticvibes::CrashBreadcrumb("main: exited main loop");
 
     return 0;
 }
@@ -384,6 +389,8 @@ void mainLoop()
         };
         if (wantSceneChange())
         {
+            lunaticvibes::CrashBreadcrumb(std::format("mainLoop: scene change {} -> {}", static_cast<int>(currentScene),
+                                                      static_cast<int>(gNextScene.load())));
             LOG_DEBUG << "[Main] Changing scene";
 
             if (gInCustomize && sceneCustomize == nullptr)
@@ -409,20 +416,24 @@ void mainLoop()
 
             if (scene)
             {
+                lunaticvibes::CrashBreadcrumb("mainLoop: destroy scene start");
                 scene->inputLoopEnd();
                 scene.reset();
+                lunaticvibes::CrashBreadcrumb("mainLoop: destroy scene end");
             }
 
             clearCustomDstOpt();
             currentScene = gNextScene;
             if (currentScene != SceneType::EXIT && currentScene != SceneType::NOT_INIT)
             {
+                lunaticvibes::CrashBreadcrumb(std::format("mainLoop: build scene {} start", static_cast<int>(currentScene)));
                 State::set(IndexTimer::SCENE_START, TIMER_NEVER);
                 State::set(IndexTimer::START_INPUT, TIMER_NEVER);
                 State::set(IndexTimer::_LOAD_START, TIMER_NEVER);
                 State::set(IndexTimer::PLAY_READY, TIMER_NEVER);
                 State::set(IndexTimer::PLAY_START, TIMER_NEVER);
                 scene = lunaticvibes::buildScene(skinMgr, currentScene);
+                lunaticvibes::CrashBreadcrumb(std::format("mainLoop: build scene {} end", static_cast<int>(currentScene)));
                 LVF_ASSERT(scene != nullptr);
                 auto t = lunaticvibes::Time::now();
                 State::set(IndexTimer::SCENE_START, t.norm());

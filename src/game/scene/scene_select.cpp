@@ -10,6 +10,7 @@
 
 #include <common/assert.h>
 #include <common/chartformat/chartformat_types.h>
+#include <common/crash_handler.h>
 #include <common/entry/entry.h>
 #include <common/entry/entry_random_song.h>
 #include <common/entry/entry_song.h>
@@ -541,6 +542,7 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
 
 SceneSelect::~SceneSelect()
 {
+    lunaticvibes::CrashBreadcrumb("SceneSelect::~SceneSelect start");
     if (_previewChartLoading.joinable())
         _previewChartLoading.join();
     if (_previewLoading.joinable())
@@ -574,6 +576,7 @@ SceneSelect::~SceneSelect()
     ConfigMgr::save();
 
     _input.loopEnd();
+    lunaticvibes::CrashBreadcrumb("SceneSelect::~SceneSelect end");
 }
 
 void SceneSelect::closeReadme(const lunaticvibes::Time& closing_time)
@@ -2055,6 +2058,7 @@ static std::pair<std::shared_ptr<ChartFormatBase>, size_t> selectRandom(
 
 void SceneSelect::decide()
 {
+    lunaticvibes::CrashBreadcrumb("SceneSelect::decide start");
     std::shared_lock<std::shared_mutex> u(gSelectContext._mutex);
 
     if (gArenaData.isOnline())
@@ -2235,6 +2239,8 @@ void SceneSelect::decide()
     case eEntryType::CHART_LINK:
     case eEntryType::REPLAY: lunaticvibes::assert_failed("[Select] decide() with wrong entry type");
     }
+
+    lunaticvibes::CrashBreadcrumb("SceneSelect::decide chart prepared");
 
     if (!gPlayContext.isReplay)
     {
@@ -2532,6 +2538,7 @@ void SceneSelect::decide()
         }
     }
 
+    lunaticvibes::CrashBreadcrumb("SceneSelect::decide -> DECIDE");
     gNextScene = SceneType::DECIDE;
 }
 

@@ -11,6 +11,7 @@ add_library(
     chartformat/chartformat.cpp
     chartformat/chartformat_bms.cpp
     coursefile/lr2crs.cpp
+    crash_handler.cpp
     difficultytable/difficultytable.cpp
     difficultytable/table_bms.cpp
     encoding.cpp
@@ -51,6 +52,10 @@ if(LINUX)
     )
     find_package(OpenSSL REQUIRED)
     target_link_libraries(common PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+endif()
+
+if(WIN32)
+    target_link_libraries(common PRIVATE Dbghelp)
 endif()
 
 target_precompile_headers(common PUBLIC pch.h)
